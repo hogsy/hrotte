@@ -33,8 +33,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "watcom.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef DOS
 #include <mem.h>
 #include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 #include "rt_cfg.h"
 #include "isr.h"
 #include "develop.h"
@@ -69,6 +75,8 @@ int fxnums[ 11 ] = {
    -1, UltraSound, SoundBlaster, SoundMan16, ProAudioSpectrum,
    Awe32, SoundScape, Adlib, SoundSource, TandySoundSource, PC
    };
+
+void MU_SetupGUSInitFile( void );
 
 int MUSIC_GetPosition( void ) {
    songposition pos;

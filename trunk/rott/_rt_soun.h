@@ -38,7 +38,7 @@ typedef struct
 #define SD_PITCHSHIFTOFF 0x08
 #define SD_PLAYONCE      0x10
 
-typedef enum {
+enum {
    sd_prio0=17,
    sd_prio1=16,
    sd_prio2=15,
