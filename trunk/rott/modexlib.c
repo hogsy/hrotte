@@ -407,14 +407,22 @@ static SDL_Surface *sdl_backbuf = NULL;
 
 void GraphicsMode ( void )
 {
+    Uint32 flags = 0;
+
 	if (SDL_InitSubSystem (SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
 	    Error ("Could not initialize SDL\n");
 	}
 
+    #ifdef PLATFORM_WIN32
+        // FIXME: remove this.  --ryan.
+        flags = SDL_FULLSCREEN;
+        SDL_WM_GrabInput(SDL_GRAB_ON);
+    #endif
+
     SDL_WM_SetCaption ("Rise of the Triad", "ROTT");
     SDL_ShowCursor (0);
-	sdl_surface = SDL_SetVideoMode (320, 200, 8, 0);
+	sdl_surface = SDL_SetVideoMode (320, 200, 8, flags);
 	if (sdl_surface == NULL)
 	{
 		Error ("Could not set video mode\n");

@@ -102,7 +102,7 @@ static word sdl_mouse_button_mask = 0;
 static int sdl_total_sticks = 0;
 static word *sdl_stick_button_state = NULL;
 static word sdl_sticks_joybits = 0;
-static int mouse_grabbed = 0;
+static int sdl_mouse_grabbed = 0;
 static unsigned int scancodes[SDLK_LAST];
 #endif
 
@@ -213,7 +213,7 @@ static int sdl_mouse_motion_filter(SDL_Event const *event)
     } /* if */
     else
     {
-        if (mouse_grabbed)
+        if (sdl_mouse_grabbed)
         {
           	mouse_relative_x = event->motion.xrel;
        	    mouse_relative_y = event->motion.yrel;
@@ -449,8 +449,8 @@ static int sdl_key_filter(const SDL_Event *event)
          (event->key.state == SDL_PRESSED) &&
          (event->key.keysym.mod & KMOD_CTRL) )
     {
-        mouse_grabbed = ((mouse_grabbed) ? 0 : 1);
-        if (mouse_grabbed)
+        sdl_mouse_grabbed = ((sdl_mouse_grabbed) ? 0 : 1);
+        if (sdl_mouse_grabbed)
             grab_mode = SDL_GRAB_ON;
         SDL_WM_GrabInput(grab_mode);
         return(0);
@@ -1006,6 +1006,12 @@ void IN_Startup (void)
       return;
 
 #if USE_SDL
+
+#if PLATFORM_WIN32
+// fixme: remove this.
+sdl_mouse_grabbed = 1;
+#endif
+
 /*
   all keys are now mapped to the wolf3d-style names,
   except where no such name is available.
