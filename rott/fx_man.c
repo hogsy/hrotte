@@ -591,8 +591,6 @@ static int doSetPan(int handle, int vol, int left,
 {
     int retval = FX_Warning;
 
-    printf("handle:%d vol:%d left:%d right:%d\n", handle, vol, left, right);
-    
     if ((handle < 0) || (handle >= numChannels))
         setWarningMessage("Invalid handle in doSetPan().");
     else if ((checkIfPlaying) && (!Mix_Playing(handle)))
@@ -705,18 +703,12 @@ static int setupVocPlayback(char *ptr, int size, int priority, unsigned long cal
 
 static int _FX_SetPosition(int chan, int angle, int distance)
 {
-    /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
-//    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 359.0), 
-//        distance);
-
     int left;
     int right;
     int mid;
     int volume;
     int status;
  
-    printf("chan %d, angle %d, distance %d\n", chan, angle, distance);   
-    
     if ( distance < 0 ) {
         distance  = -distance;
         angle    += MV_NumPanPositions / 2;
@@ -1296,6 +1288,4 @@ void MUSIC_RegisterTimbreBank(unsigned char *timbres)
 } // MUSIC_RegisterTimbreBank
 
 
-
 // end of fx_man.c ...
-
