@@ -360,6 +360,7 @@ void DrawCinematicBackground ( backevent * back )
    if (height!=MAXSCREENHEIGHT)
       DrawClearBuffer ();
 
+#ifdef DOS
    for (plane=0;plane<4;plane++)
       {
       buf=(byte *)bufferofs+ylookup[back->yoffset];
@@ -378,6 +379,21 @@ void DrawCinematicBackground ( backevent * back )
          DrawFilmPost(buf,src,height);
          }
       }
+#else
+      buf=(byte *)bufferofs+ylookup[back->yoffset];
+      offset=(back->currentoffset>>FRACTIONBITS);
+
+      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
+         {
+         if (offset>=back->backdropwidth)
+            src=&(pic->data) + ( (offset - back->backdropwidth) * (pic->height) );
+         else if (offset<0)
+            src=&(pic->data) + ( (offset + back->backdropwidth) * (pic->height) );
+         else
+            src=&(pic->data) + ( offset * (pic->height) );
+         DrawFilmPost(buf,src,height);
+         }
+#endif
 }
 
 /*
@@ -404,6 +420,7 @@ void DrawCinematicMultiBackground ( backevent * back )
    if (height!=MAXSCREENHEIGHT)
       DrawClearBuffer ();
 
+#ifdef DOS
    for (plane=0;plane<4;plane++)
       {
       buf=(byte *)bufferofs+ylookup[back->yoffset];
@@ -422,6 +439,21 @@ void DrawCinematicMultiBackground ( backevent * back )
          DrawFilmPost(buf,src,height);
          }
       }
+#else
+      buf=(byte *)bufferofs+ylookup[back->yoffset];
+      offset=(back->currentoffset>>FRACTIONBITS);
+
+      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
+         {
+         if (offset>=back->backdropwidth)
+            src=back->data + ( (offset - back->backdropwidth) * (back->height) );
+         else if (offset<0)
+            src=back->data + ( (offset + back->backdropwidth) * (back->height) );
+         else
+            src=back->data + ( offset * (back->height) );
+         DrawFilmPost(buf,src,height);
+         }
+#endif
 }
 
 /*
@@ -450,6 +482,7 @@ void DrawCinematicBackdrop ( backevent * back )
 
    toppost=-p->topoffset+back->yoffset;
 
+#ifdef dOS
    for (plane=0;plane<4;plane++)
       {
       buf=(byte *)bufferofs;
@@ -476,6 +509,29 @@ void DrawCinematicBackdrop ( backevent * back )
             }
          }
       }
+#else
+      buf=(byte *)bufferofs;
+      offset=(back->currentoffset>>FRACTIONBITS);
+
+      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
+         {
+         if (offset>=back->backdropwidth)
+            src = shape + p->collumnofs[offset - back->backdropwidth];
+         else if (offset<0)
+            src=shape + p->collumnofs[offset + back->backdropwidth];
+         else
+            src = shape + p->collumnofs[offset];
+
+         postoffset=*(src++);
+         for (;postoffset!=255;)
+            {
+            postlength=*(src++);
+            DrawFilmPost(buf + ylookup[toppost+postoffset],src,postlength);
+            src+=postlength;
+            postoffset=*(src++);
+            }
+         }
+#endif
 }
 
 /*
@@ -656,8 +712,12 @@ void DrawBlankScreen ( void )
 */
 void DrawClearBuffer ( void )
 {
+#ifdef DOS
   VGAMAPMASK(15);
   memset((byte *)bufferofs,0,SCREENBWIDE*MAXSCREENHEIGHT);
+#else
+  memset((byte *)bufferofs,0,MAXSCREENWIDTH*MAXSCREENHEIGHT);
+#endif
 }
 
 /*
@@ -875,6 +935,7 @@ void ProfileDisplay ( void )
 
 void DrawPostPic ( int lumpnum )
 {
+#ifdef DOS
    byte * src;
    byte * buf;
    lpic_t * pic;
@@ -899,5 +960,26 @@ void DrawPostPic ( int lumpnum )
          DrawFilmPost(buf,src,height);
          }
       }
+#else
+   byte * src;
+   byte * buf;
+   lpic_t * pic;
+   int i;
+   int height;
+
+   pic=(lpic_t *)W_CacheLumpNum(lumpnum,PU_CACHE);
+
+   height = pic->height;
+
+   buf=(byte *)bufferofs;
+
+   src=&(pic->data);
+
+   for (i=0;i<MAXSCREENWIDTH;i++,src+=height,buf++)
+      {
+      DrawFilmPost(buf,src,height);
+      }
+
+#endif
 }
 

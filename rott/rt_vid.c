@@ -255,6 +255,7 @@ void VWB_DrawPic (int x, int y, pic_t *pic)
 
 void VL_Bar (int x, int y, int width, int height, int color)
 {
+#ifdef DOS
    byte  *dest;
    byte  leftmask,rightmask;
    int   midbytes,linedelta;
@@ -295,6 +296,15 @@ void VL_Bar (int x, int y, int width, int height, int color)
    }
 
    VGAMAPMASK(15);
+#else
+	byte *dest = (byte *)(bufferofs+ylookup[y]+x);
+	
+	while (height--) {
+		memset(dest, color, width);
+		
+		dest += linewidth;
+	}
+#endif
 }
 
 
@@ -320,6 +330,7 @@ void VWB_Bar (int x, int y, int width, int height, int color)
 
 void VL_TBar (int x, int y, int width, int height)
 {
+#ifdef DOS
    byte  *dest;
    byte  pixel;
    byte  readmask;
@@ -362,6 +373,28 @@ void VL_TBar (int x, int y, int width, int height)
 
       y++;
    }
+#else
+	int w = width;
+	
+	while (height--) {
+		byte *dest = (byte *)(bufferofs+ylookup[y]+x);
+		
+		width = w;
+		
+		while (width--) {
+			byte pixel = *dest;
+			
+			pixel = *(colormap+(27<<8)+pixel);
+			
+			*dest = pixel;
+			
+			dest++;
+		}
+		
+		y++;
+	}
+			
+#endif
 }
 
 
@@ -387,6 +420,7 @@ void VWB_TBar (int x, int y, int width, int height)
 
 void VL_Hlin (unsigned x, unsigned y, unsigned width, unsigned color)
 {
+#ifdef DOS
    unsigned xbyte;
    byte     *dest;
    byte     leftmask,
@@ -420,6 +454,11 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, unsigned color)
    *dest = color;
 
    VGAMAPMASK (15);
+#else
+	byte *dest = (byte*)(bufferofs+ylookup[y]+x);
+	
+	memset(dest, color, width);
+#endif
 }
 
 
@@ -431,6 +470,7 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, unsigned color)
 
 void VL_Vlin (int x, int y, int height, int color)
 {
+#ifdef DOS
    byte  *dest,
          mask;
 
@@ -446,6 +486,15 @@ void VL_Vlin (int x, int y, int height, int color)
    }
 
    VGAMAPMASK (15);
+#else
+	byte *dest = (byte*)(bufferofs+ylookup[y]+x);
+	
+	while (height--) {
+		*dest = color;
+		
+		dest += linewidth;
+	}
+#endif
 }
 
 
@@ -486,6 +535,7 @@ void VWB_Vlin (int y1, int y2, int x, int color)
 
 void VL_THlin (unsigned x, unsigned y, unsigned width, boolean up)
 {
+#ifdef DOS
    byte     *dest;
    byte     pixel;
    byte     readmask;
@@ -525,6 +575,23 @@ void VL_THlin (unsigned x, unsigned y, unsigned width, boolean up)
       VGAREADMAP (readmask);
       VGAMAPMASK (writemask);
    }
+#else
+	byte *dest = (byte*)(bufferofs+ylookup[y]+x);
+	
+	while (width--) {
+		byte pixel = *dest;
+
+		if (up) {
+			pixel = *(colormap+(13<<8)+pixel);
+		} else {
+			pixel = *(colormap+(27<<8)+pixel);
+		}
+		
+		*dest = pixel;
+		
+		dest++;
+	}
+#endif
 }
 
 
@@ -537,6 +604,7 @@ void VL_THlin (unsigned x, unsigned y, unsigned width, boolean up)
 
 void VL_TVlin (unsigned x, unsigned y, unsigned height, boolean up)
 {
+#ifdef DOS
    byte     *dest;
    byte     pixel;
    byte     readmask;
@@ -565,6 +633,23 @@ void VL_TVlin (unsigned x, unsigned y, unsigned height, boolean up)
 
       dest += linewidth;
    }
+#else
+	byte *dest = (byte*)(bufferofs+ylookup[y]+x);
+	
+	while (height--) {
+		byte pixel = *dest;
+
+		if (up) {
+			pixel = *(colormap+(13<<8)+pixel);
+		} else {
+			pixel = *(colormap+(27<<8)+pixel);
+		}
+		
+		*dest = pixel;
+		
+		dest += linewidth;
+	}
+#endif
 }
 
 
@@ -705,6 +790,7 @@ void VW_UpdateScreen (void)
 
 void VL_FillPalette (int red, int green, int blue)
 {
+#ifdef DOS
    int   i;
 
    OUTP (PEL_WRITE_ADR,0);
@@ -714,6 +800,9 @@ void VL_FillPalette (int red, int green, int blue)
       OUTP (PEL_DATA,green);
       OUTP (PEL_DATA,blue);
    }
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //===========================================================================
@@ -728,10 +817,14 @@ void VL_FillPalette (int red, int green, int blue)
 
 void VL_SetColor  (int color, int red, int green, int blue)
 {
+#ifdef DOS
    OUTP (PEL_WRITE_ADR,color);
    OUTP (PEL_DATA,red);
    OUTP (PEL_DATA,green);
    OUTP (PEL_DATA,blue);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //===========================================================================

@@ -411,7 +411,7 @@ void GraphicsMode ( void )
 		Error ("Could not initialize SDL");
 	}
 
-	sdl_surface = SDL_SetVideoMode (320, 240, 8, 0);
+	sdl_surface = SDL_SetVideoMode (320, 200, 8, 0);
 	if (sdl_surface == NULL)
 	{
 		Error ("Could not set video mode");

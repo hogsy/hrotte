@@ -1243,7 +1243,13 @@ void R_DrawSolidColumn (int color, byte * buf)
 
 void DrawFilmPost (byte * buf, byte * src, int height)
 {
-	STUB_FUNCTION;
+	while (height--) { 
+		*buf = *src;
+		
+		src++;
+		
+		buf += linewidth;
+	}
 }
 
 #endif
