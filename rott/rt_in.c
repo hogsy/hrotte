@@ -100,6 +100,7 @@ static word sdl_mouse_button_mask = 0;
 static int sdl_total_sticks = 0;
 static word *sdl_stick_button_state = NULL;
 static word sdl_sticks_joybits = 0;
+static int mouse_grabbed = 0;
 static unsigned int scancodes[SDLK_LAST];
 #endif
 
@@ -171,6 +172,360 @@ int (far *function_ptr)();
 static char *ParmStrings[] = {"nojoys","nomouse","spaceball","cyberman","assassin",NULL};
 
 
+#if USE_SDL
+#define sdldebug printf
+
+static int sdl_mouse_button_filter(SDL_Event const *event)
+{
+        /*
+         * What DOS games expect:
+         *  0	left button pressed if 1
+         *  1	right button pressed if 1
+         *  2	middle button pressed if 1
+         *
+         *   (That is, this is what Int 33h (AX=0x05) returns...)
+         */
+
+    Uint8 bmask = SDL_GetMouseState(NULL, NULL);
+    sdl_mouse_button_mask = 0;  /* this is a static var. */
+    if (bmask & SDL_BUTTON_LMASK) sdl_mouse_button_mask |= 1;
+    if (bmask & SDL_BUTTON_RMASK) sdl_mouse_button_mask |= 2;
+    if (bmask & SDL_BUTTON_MMASK) sdl_mouse_button_mask |= 4;
+    return(0);
+} /* sdl_mouse_up_filter */
+
+
+static int sdl_mouse_motion_filter(SDL_Event const *event)
+{
+    static int mouse_x = 0;
+    static int mouse_y = 0;
+    int mouse_relative_x = 0;
+    int mouse_relative_y = 0;
+
+    if (event->type == SDL_JOYBALLMOTION)
+    {
+        mouse_relative_x = event->jball.xrel/100;
+        mouse_relative_y = event->jball.yrel/100;
+       	mouse_x += mouse_relative_x;
+       	mouse_y += mouse_relative_y;
+    } /* if */
+    else
+    {
+        if (mouse_grabbed)
+        {
+          	mouse_relative_x = event->motion.xrel;
+       	    mouse_relative_y = event->motion.yrel;
+           	mouse_x += mouse_relative_x;
+           	mouse_y += mouse_relative_y;
+        } /* if */
+        else
+        {
+          	mouse_relative_x = event->motion.x - mouse_x;
+           	mouse_relative_y = event->motion.y - mouse_y;
+           	mouse_x = event->motion.x;
+           	mouse_y = event->motion.y;
+        } /* else */
+    } /* else */
+
+#if 0
+   	if (mouse_x < 0) mouse_x = 0;
+   	if (mouse_x > surface->w) mouse_x = surface->w;
+   	if (mouse_y < 0) mouse_y = 0;
+   	if (mouse_y > surface->h) mouse_y = surface->h;
+#endif
+
+    /* set static vars... */
+    sdl_mouse_delta_x += mouse_relative_x;
+    sdl_mouse_delta_y += mouse_relative_y;
+
+    return(0);
+} /* sdl_mouse_motion_filter */
+
+
+/**
+ * Attempt to flip the video surface to fullscreen or windowed mode.
+ *  Attempts to maintain the surface's state, but makes no guarantee
+ *  that pointers (i.e., the surface's pixels field) will be the same
+ *  after this call.
+ *
+ * Caveats: Your surface pointers will be changing; if you have any other
+ *           copies laying about, they are invalidated.
+ *
+ *          Do NOT call this from an SDL event filter on Windows. You can
+ *           call it based on the return values from SDL_PollEvent, etc, just
+ *           not during the function you passed to SDL_SetEventFilter().
+ *
+ *          Thread safe? Likely not.
+ *
+ *   @param surface pointer to surface ptr to toggle. May be different
+ *                  pointer on return. MAY BE NULL ON RETURN IF FAILURE!
+ *   @param flags   pointer to flags to set on surface. The value pointed
+ *                  to will be XOR'd with SDL_FULLSCREEN before use. Actual
+ *                  flags set will be filled into pointer. Contents are
+ *                  undefined on failure. Can be NULL, in which case the
+ *                  surface's current flags are used.
+ *  @return non-zero on success, zero on failure.
+ */
+static int attempt_fullscreen_toggle(SDL_Surface **surface, Uint32 *flags)
+{
+    long framesize = 0;
+    void *pixels = NULL;
+    SDL_Rect clip;
+    Uint32 tmpflags = 0;
+    int w = 0;
+    int h = 0;
+    int bpp = 0;
+    int grabmouse = (SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON);
+    int showmouse = SDL_ShowCursor(-1);
+    SDL_Color *palette = NULL;
+    int ncolors = 0;
+
+    sdldebug("attempting to toggle fullscreen flag...");
+
+    if ( (!surface) || (!(*surface)) )  /* don't try if there's no surface. */
+    {
+        sdldebug("Null surface (?!). Not toggling fullscreen flag.");
+        return(0);
+    } /* if */
+
+    if (SDL_WM_ToggleFullScreen(*surface))
+    {
+        sdldebug("SDL_WM_ToggleFullScreen() seems to work on this system.");
+        if (flags)
+            *flags ^= SDL_FULLSCREEN;
+        return(1);
+    } /* if */
+
+    if ( !(SDL_GetVideoInfo()->wm_available) )
+    {
+        sdldebug("No window manager. Not toggling fullscreen flag.");
+        return(0);
+    } /* if */
+
+    sdldebug("toggling fullscreen flag The Hard Way...");
+    tmpflags = (*surface)->flags;
+    w = (*surface)->w;
+    h = (*surface)->h;
+    bpp = (*surface)->format->BitsPerPixel;
+
+    if (flags == NULL)  /* use the surface's flags. */
+        flags = &tmpflags;
+
+    SDL_GetClipRect(*surface, &clip);
+
+        /* save the contents of the screen. */
+    if ( (!(tmpflags & SDL_OPENGL)) && (!(tmpflags & SDL_OPENGLBLIT)) )
+    {
+        framesize = (w * h) * ((*surface)->format->BytesPerPixel);
+        pixels = malloc(framesize);
+        if (pixels == NULL)
+            return(0);
+        memcpy(pixels, (*surface)->pixels, framesize);
+    } /* if */
+
+#if 1
+    STUB_FUNCTION;   /* palette is broken. FIXME !!! --ryan. */
+#else
+    if ((*surface)->format->palette != NULL)
+    {
+        ncolors = (*surface)->format->palette->ncolors;
+        palette = malloc(ncolors * sizeof (SDL_Color));
+        if (palette == NULL)
+        {
+            free(pixels);
+            return(0);
+        } /* if */
+        memcpy(palette, (*surface)->format->palette->colors,
+               ncolors * sizeof (SDL_Color));
+    } /* if */
+#endif
+
+    if (grabmouse)
+        SDL_WM_GrabInput(SDL_GRAB_OFF);
+
+    SDL_ShowCursor(1);
+
+    *surface = SDL_SetVideoMode(w, h, bpp, (*flags) ^ SDL_FULLSCREEN);
+
+    if (*surface != NULL)
+        *flags ^= SDL_FULLSCREEN;
+
+    else  /* yikes! Try to put it back as it was... */
+    {
+        *surface = SDL_SetVideoMode(w, h, bpp, tmpflags);
+        if (*surface == NULL)  /* completely screwed. */
+        {
+            if (pixels != NULL)
+                free(pixels);
+            if (palette != NULL)
+                free(palette);
+            return(0);
+        } /* if */
+    } /* if */
+
+    /* Unfortunately, you lose your OpenGL image until the next frame... */
+
+    if (pixels != NULL)
+    {
+        memcpy((*surface)->pixels, pixels, framesize);
+        free(pixels);
+    } /* if */
+
+#if 1
+    STUB_FUNCTION;   /* palette is broken. FIXME !!! --ryan. */
+#else
+    if (palette != NULL)
+    {
+            /* !!! FIXME : No idea if that flags param is right. */
+        SDL_SetPalette(*surface, SDL_LOGPAL, palette, 0, ncolors);
+        free(palette);
+    } /* if */
+#endif
+
+    SDL_SetClipRect(*surface, &clip);
+
+    if (grabmouse)
+        SDL_WM_GrabInput(SDL_GRAB_ON);
+
+    SDL_ShowCursor(showmouse);
+
+#if 0
+    STUB_FUNCTION;  /* pull this out of buildengine/sdl_driver.c ... */
+    output_surface_info(*surface);
+#endif
+
+    return(1);
+} /* attempt_fullscreen_toggle */
+
+
+    /*
+     * The windib driver can't alert us to the keypad enter key, which
+     *  Ken's code depends on heavily. It sends it as the same key as the
+     *  regular return key. These users will have to hit SHIFT-ENTER,
+     *  which we check for explicitly, and give the engine a keypad enter
+     *  enter event.
+     */
+static int handle_keypad_enter_hack(const SDL_Event *event)
+{
+    static int kp_enter_hack = 0;
+    int retval = 0;
+
+    if (event->key.keysym.sym == SDLK_RETURN)
+    {
+        if (event->key.state == SDL_PRESSED)
+        {
+            if (event->key.keysym.mod & KMOD_SHIFT)
+            {
+                kp_enter_hack = 1;
+                retval = scancodes[SDLK_KP_ENTER];
+            } /* if */
+        } /* if */
+
+        else  /* key released */
+        {
+            if (kp_enter_hack)
+            {
+                kp_enter_hack = 0;
+                retval = scancodes[SDLK_KP_ENTER];
+            } /* if */
+        } /* if */
+    } /* if */
+
+    return(retval);
+} /* handle_keypad_enter_hack */
+
+
+static int sdl_key_filter(const SDL_Event *event)
+{
+    SDL_GrabMode grab_mode = SDL_GRAB_OFF;
+    int extended;
+    int tmp;
+    int lastkey;
+
+    if ( (event->key.keysym.sym == SDLK_g) &&
+         (event->key.state == SDL_PRESSED) &&
+         (event->key.keysym.mod & KMOD_CTRL) )
+    {
+        mouse_grabbed = ((mouse_grabbed) ? 0 : 1);
+        if (mouse_grabbed)
+            grab_mode = SDL_GRAB_ON;
+        SDL_WM_GrabInput(grab_mode);
+        return(0);
+    } /* if */
+
+    else if ( ( (event->key.keysym.sym == SDLK_RETURN) ||
+                (event->key.keysym.sym == SDLK_KP_ENTER) ) &&
+              (event->key.state == SDL_PRESSED) &&
+              (event->key.keysym.mod & KMOD_ALT) )
+    {
+        SDL_Surface *surface = SDL_GetVideoSurface();
+        if (surface != NULL)
+        {
+            Uint32 sdl_flags = surface->flags;
+            attempt_fullscreen_toggle(&surface, &sdl_flags);
+        } /* if */
+        return(0);
+    } /* if */
+
+    lastkey = handle_keypad_enter_hack(event);
+    if (!lastkey)
+    {
+        lastkey = scancodes[event->key.keysym.sym];
+        if (!lastkey)   /* No DOS equivalent defined. */
+            return(0);
+    } /* if */
+
+    extended = ((lastkey & 0xFF00) >> 8);
+    if (extended != 0)
+    {
+        KeyboardQueue[ Keytail ] = extended;
+        Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
+        lastkey = scancodes[event->key.keysym.sym] & 0xFF;
+    } /* if */
+
+    if (event->key.state == SDL_RELEASED)
+        lastkey += 128;  /* +128 signifies that the key is released in DOS. */
+
+    KeyboardQueue[ Keytail ] = lastkey;
+    Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
+
+    return(0);
+} /* sdl_key_filter */
+
+
+static int root_sdl_event_filter(const SDL_Event *event)
+{
+    switch (event->type)
+    {
+        case SDL_KEYUP:
+        case SDL_KEYDOWN:
+            return(sdl_key_filter(event));
+        case SDL_JOYBALLMOTION:
+        case SDL_MOUSEMOTION:
+            return(sdl_mouse_motion_filter(event));
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEBUTTONDOWN:
+            return(sdl_mouse_button_filter(event));
+        case SDL_QUIT:
+            /* !!! rcg TEMP */
+            fprintf(stderr, "\n\n\nSDL_QUIT!\n\n\n");
+            SDL_Quit();
+            exit(42);
+    } /* switch */
+
+    return(1);
+} /* root_sdl_event_filter */
+
+
+static void sdl_handle_events(void)
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+        root_sdl_event_filter(&event);
+} /* sdl_handle_events */
+#endif
+
+
 //******************************************************************************
 //
 // IN_PumpEvents () - Let platform process an event queue.
@@ -179,65 +534,11 @@ static char *ParmStrings[] = {"nojoys","nomouse","spaceball","cyberman","assassi
 void IN_PumpEvents(void)
 {
 #if USE_SDL
-   SDL_Event event;
-
-   while (SDL_PollEvent(&event))
-   {
-       switch (event.type)
-       {
-           case SDL_MOUSEMOTION:
-               sdl_mouse_delta_x += event.motion.xrel;
-               sdl_mouse_delta_y += event.motion.yrel;
-               break;
-
-           /* !!! FIXME: JOYBALL events should effect mouse delta. */
-
-           case SDL_MOUSEBUTTONDOWN:
-               sdl_mouse_button_mask |= 1 << event.button.button;
-	       break;
-
-           case SDL_MOUSEBUTTONUP:
-               sdl_mouse_button_mask &= ~(1 << event.button.button);
-	       break;
-
-           case SDL_KEYDOWN:
-            /* This should really call I_KeyboardISR or something. --ryan. */
-            KeyboardQueue[ Keytail ] = scancodes[event.key.keysym.sym];
-            Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
-           break;
-
-           case SDL_KEYUP:
-            /* This should really call I_KeyboardISR or something. --ryan. */
-            KeyboardQueue[ Keytail ] = scancodes[event.key.keysym.sym] | 0x80;
-            Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
-           break;
-
-           case SDL_JOYAXISMOTION:
-		STUB_FUNCTION;
-		break;
-
-           case SDL_JOYBUTTONDOWN:
-		STUB_FUNCTION;
-		break;
-
-           case SDL_JOYBUTTONUP:
-		STUB_FUNCTION;
-		break;
-
-           case SDL_QUIT:
-            printf("SDL_QUIT!\n");
-            SDL_Quit();
-            exit(42);
-		break;
-       }
-   }
-
-
-   STUB_FUNCTION;  /* so someone knows to come enhance this... --ryan. */
-
+   sdl_handle_events();
 
 #elif PLATFORM_DOS
    /* no-op. */
+
 #else
 #error please define for your platform.
 #endif
