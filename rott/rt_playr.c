@@ -5746,7 +5746,8 @@ void  T_DogUse (objtype *ob)
 			 pstate->buttonheld[bt_use]=false;
           Cmd_Use(ob);
 			 break;
-
+                  default:
+                         break;
 		 }
 	  pstate->attackframe++;
      cur = &(DOGSCRATCH.attackinfo[pstate->attackframe]);
