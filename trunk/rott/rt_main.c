@@ -34,6 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <process.h>
 #include <direct.h>
 #include <bios.h>
+#else
+#include <signal.h>
 #endif
 
 #include "rt_actor.h"
@@ -147,11 +149,19 @@ void PlayTurboGame( void );
 void Init_Tables (void);
 void CheckRemoteRidicule ( int scancode );
 
+#ifndef DOS
+extern void crash_print (int);
+#endif
+
 int main (int argc, char *argv[])
 {
 #ifndef DOS
 	_argc = argc;
 	_argv = argv;
+#endif
+
+#ifndef DOS
+   signal (11, crash_print);
 #endif
 
    // Set which release version we're on
