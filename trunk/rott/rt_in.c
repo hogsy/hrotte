@@ -685,6 +685,9 @@ void IN_GetJoyAbs (word joy, word *xp, word *yp)
 #if USE_SDL
    STUB_FUNCTION;
 
+   *xp = 0;
+   *yp = 0;
+   
 #elif PLATFORM_DOS
    Joy_x  = Joy_y = 0;
    Joy_xs = joy? 2 : 0;       // Find shift value for x axis
