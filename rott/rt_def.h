@@ -246,12 +246,21 @@ typedef long fixed;
 
 //////////////////      GLOBAL ENUMERATED TYPES    ///////////////////////
 
-
+#ifdef __WATCOMC__
 typedef enum
  {false,
   true
  }
  boolean;
+#else
+/* boolean is serialized at the moment, and watcomc made it a byte. */
+
+typedef unsigned char boolean;
+enum {
+  false, true
+};
+#endif
+
 
 
 
