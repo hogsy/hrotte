@@ -143,81 +143,32 @@ char getch(void)
 }
 
 /* from Dan Olson */
-static void put_dos2ansi(byte attrib)
+void put_dos2ansi(byte attrib)
 {
+	int lookup[] = {30,34,32,36,31,35,33,37};
 	byte fore,back,blink=0,intens=0;
 	
-	fore = attrib&15;	// bits 0-3
-	back = attrib&112; // bits 4-6
-       	blink = attrib&128; // bit 7
+	fore = attrib&15;	/* bits 0-3 */
+	back = attrib&112; /* bits 4-6 */
+       	blink = attrib&128; /* bit 7 */
 	
-	// Fix background, blink is either on or off.
+	/* Fix background, blink is either on or off. */
 	back = back>>4;
-
-	// Fix foreground
+ 
+	/* Fix foreground */
 	if (fore > 7) {
 		intens = 1;
 		fore-=8;
 	}
 
-	// Convert fore/back
-	switch (fore) {
-		case 0: // BLACK
-			fore=30;
-			break;
-		case 1: // BLUE
-			fore=34;
-			break;
-		case 2: // GREEN
-			fore=32;
-			break;
-		case 3: // CYAN
-			fore=36;
-			break;
-		case 4: // RED
-			fore=31;
-			break;
-		case 5: // Magenta
-			fore=35;
-			break;
-		case 6: // BROWN(yellow)
-			fore=33;
-			break;
-		case 7: //GRAy
-			fore=37;
-			break;
-	}
-			
-	switch (back) {
-		case 0: // BLACK
-			back=40;
-			break;
-		case 1: // BLUE
-			back=44;
-			break;
-		case 2: // GREEN
-			back=42;
-			break;
-		case 3: // CYAN
-			back=46;
-			break;
-		case 4: // RED
-			back=41;
-			break;
-		case 5: // Magenta
-			back=45;
-			break;
-		case 6: // BROWN(yellow)
-			back=43;
-			break;
-		case 7: //GRAy
-			back=47;
-			break;
-	}
+	/* Convert fore/back */
+	fore = lookup[fore];
+	back = lookup[back]+10;
+
 	if (blink)
-		printf ("%c[%d;5;%dm%c[%dm", 27, intens, fore, 27, back);
+		printf ("\x1b[%d;5;%dm\x1b[%dm", intens, fore, back);
 	else
-		printf ("%c[%d;25;%dm%c[%dm", 27, intens, fore, 27, back);
+		printf ("\x1b[%d;25;%dm\x1b[%dm", intens, fore, back);
 }
 
 void DisplayTextSplash(byte *text, int l)
