@@ -1825,10 +1825,17 @@ void DrawPPic (int xpos, int ypos, int width, int height, byte *src, int num, bo
    int k;
    int amt;
 
+#ifdef DOS
    if (up)
       amt = 2;
    else
       amt = -2;
+#else
+   if (up)
+      amt = 8;
+   else
+      amt = -8;
+#endif
 
    mask = 1;
 
