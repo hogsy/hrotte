@@ -15,6 +15,7 @@ rott: 	\
 	engine.o \
 	fx_man.o \
 	isr.o \
+	modexlib.o \
 	rt_actor.o \
 	rt_battl.o \
 	rt_build.o \
@@ -54,8 +55,8 @@ rott: 	\
 	z_zone.o
 	$(CC) $^ $(LDLIBS) -o $@
 
-# rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
-# rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a, f_scale
+# rt_error.c, sbconfig.c
+# rt_dr_a, rt_fc_a, rt_sc_a, f_scale
 # rt_err.obj - some dos text screen for error messages
 
 clean:
