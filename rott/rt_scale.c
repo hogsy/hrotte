@@ -1198,22 +1198,28 @@ void DrawNormalSprite (int x, int y, int shapenum)
 
 #ifndef DOS
 
-static int pixelcount;
-static int loopcount;
-
 void R_DrawColumn (byte * buf)
 {
-	STUB_FUNCTION;
-#if 0
-	/* DDOI - This is a test replacement of the ASM code */
-	buf += ylookup[dc_yl];
-	pixelcount = dc_yh - dc_yl + 1;
-	if (dc_yl < dc_yh)	// Verify - DDOI
-	{
-		loopcount = dc_yh + 1;
-		
+	// This is *NOT* 100% correct - DDOI
+	int pixelcount, loopcount;
+	int frac, fracstep;
 
-#endif
+	pixelcount = dc_yh - dc_yl + 1;
+	if (pixelcount < 0) return;
+
+	loopcount = pixelcount/2;
+
+	buf += ylookup[dc_yl];
+
+	fracstep = dc_iscale;
+	frac = dc_texturemid + (dc_yl-centery)*fracstep;
+
+	do
+	{
+		*buf = shadingtable[dc_source[(frac>>SFRACBITS)&127]];
+		buf += MAXSCREENWIDTH;
+		frac += fracstep;
+	} while (loopcount--);
 }
 
 void R_TransColumn (byte * buf)
