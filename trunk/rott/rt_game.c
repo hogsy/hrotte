@@ -2566,7 +2566,11 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
    byte *screen1, *screen2, *screen3;
    int  plane;
 
+#ifdef DOS
    dest = (byte *)(ylookup[y]+(x>>2));
+#else
+   dest = (byte *)(ylookup[y]+x);
+#endif
    mask = 1 << (x&3);
 
    dest1 = (byte *)(dest+page1start);
