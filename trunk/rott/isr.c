@@ -816,12 +816,10 @@ void I_Delay ( int delay )
 
 void I_StartupTimer (void)
 {
-	SDL_InitSubSystem (SDL_INIT_TIMER);
 }
 
 void I_ShutdownTimer (void)
 {
-	SDL_QuitSubSystem (SDL_INIT_TIMER);
 }
 
 /*
