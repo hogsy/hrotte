@@ -2652,6 +2652,8 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
          dest2++;
          dest3++;
       }
+#else
+      dest1++; dest2++; dest3++;
 #endif
    }
 }
