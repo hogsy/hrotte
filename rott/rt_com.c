@@ -88,8 +88,20 @@ void InitROTTNET (void)
 	netarg=CheckParm ("net");
 	netarg++;
 
+#ifdef DOS
 	netaddress=atol(_argv[netarg]);
 	rottcom=(rottcom_t *)netaddress;
+#else
+        rottcom = (rottcom_t *) malloc (sizeof(rottcom_t));
+        memset(rottcom, 0, sizeof(rottcom_t));
+        rottcom->ticstep = 1;
+        rottcom->remotenode = -1;
+        rottcom->gametype = 1;
+        rottcom->numplayers = 1;
+        rottcom->client = 0;
+        rottcom->consoleplayer = 1;
+#endif
+
    remoteridicule = false;
    remoteridicule = rottcom->remoteridicule;
    if (rottcom->ticstep != 1)
@@ -130,7 +142,8 @@ boolean ReadPacket (void)
 #ifdef DOS
 	int386(rottcom->intnum,&comregs,&comregs);
 #else
-	STUB_FUNCTION;
+	rottcom->remotenode = -1;
+//	STUB_FUNCTION;
 #endif
 
    // Is it ready?
@@ -226,7 +239,8 @@ void WritePacket (void * buffer, int len, int destination)
 #ifdef DOS
 	int386(rottcom->intnum,&comregs,&comregs);
 #else
-	STUB_FUNCTION;
+// printf("WritePacket: time=%ld size=%ld src=%ld type=%d\n",GetTicCount(),rottcom->datalength,rottcom->remotenode,rottcom->data[0]);
+//	STUB_FUNCTION;
 #endif
 
 #if 0
