@@ -86,10 +86,10 @@ unsigned long * lights;
 int         wstart;
 
 
-int  dirangle8[9] = {0,FINEANGLES/8,2*FINEANGLES/8,3*FINEANGLES/8,4*FINEANGLES/8,
+const int dirangle8[9] = {0,FINEANGLES/8,2*FINEANGLES/8,3*FINEANGLES/8,4*FINEANGLES/8,
                      5*FINEANGLES/8,6*FINEANGLES/8,7*FINEANGLES/8,8*FINEANGLES/8};
 
-int  dirangle16[16] = {0,FINEANGLES/16,2*FINEANGLES/16,3*FINEANGLES/16,
+const int dirangle16[16] = {0,FINEANGLES/16,2*FINEANGLES/16,3*FINEANGLES/16,
 							  4*FINEANGLES/16,5*FINEANGLES/16,6*FINEANGLES/16,
 							  7*FINEANGLES/16,8*FINEANGLES/16,9*FINEANGLES/16,
 							  10*FINEANGLES/16,11*FINEANGLES/16,12*FINEANGLES/16,
@@ -143,7 +143,7 @@ static int nonbobpheight;
 
 static visobj_t * sortedvislist[MAXVISIBLE];
 
-static fixed mindist = 0x1000;
+static const fixed mindist = 0x1000;
 
 static int walltime=0;
 
@@ -154,7 +154,7 @@ static int      preindex;
 static int      netlump;
 static int      gmasklump;
 
-static int weaponshape[NUMWEAPGRAPHICS] =
+static const int weaponshape[NUMWEAPGRAPHICS] =
      {
 #if (SHAREWARE == 0)
 

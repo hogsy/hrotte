@@ -168,7 +168,7 @@ extern int LastLetter;
 extern char LetterQueue[MAXLETTERS];
 extern ModemMessage MSG;
 
-extern char ScanChars[128];
+extern const char ScanChars[128];
 
 //***************************************************************************
 //
