@@ -71,7 +71,9 @@ typedef struct
 	char	data[MAXPACKETSIZE];
 } rottcom_t;
 
+/*
 #warning rottcom_t needs to be packed
+*/
 
 #if __WATCOMC__
 #pragma pack (4)

@@ -54,7 +54,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define O_TEXT 0
 #endif
 
+#ifndef min
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef max
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
+#endif
+
 #ifndef DOS
+#define strcmpi strcasecmp
+#define stricmp strcasecmp
+
 char *strupr(char *);
 char *itoa(int, char *, int);
 char *ltoa(long, char *, int);

@@ -85,7 +85,7 @@ typedef enum
 #define ACTORSIZE              0x5800
 #define PWALLRAD               0xa000
 
-
+#ifdef __WATCOMC__
 int M_ABS(int value);
 #pragma aux M_ABS =  \
 		  "test eax,eax",                     \
@@ -95,6 +95,9 @@ int M_ABS(int value);
 		  parm    [eax] \
 		  value   [eax]           \
 		  modify exact [eax]
+#else
+#define M_ABS abs
+#endif
 
 #define M_CheckPlayerKilled(ob) \
 { if ((ob->obclass == playerobj) && (ob->flags & FL_DYING)) \
