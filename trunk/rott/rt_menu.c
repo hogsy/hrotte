@@ -4768,6 +4768,8 @@ void WaitKeyUp (void)
 
 void ReadAnyControl (ControlInfo *ci)
 {
+   IN_PumpEvents();
+
 #ifdef DOS
    union REGS inregs;
    union REGS outregs;
@@ -4925,7 +4927,9 @@ void ReadAnyControl (ControlInfo *ci)
    }
 #endif
 #else
-	STUB_FUNCTION;
+#warning please unify this code.
+    IN_UpdateKeyboard ();
+    IN_ReadControl (0, ci);
 #endif
 }
 

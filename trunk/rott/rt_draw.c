@@ -5576,6 +5576,7 @@ void DoCreditScreen ( void )
       time = (CREDITSTARTY - FirstCredits[i].endy)*(VBLCOUNTER*1)/CREDITSTARTY;
 //      time = VBLCOUNTER;
       WarpCreditString ( time, bkgnd, i, FirstCredits );
+      IN_PumpEvents();
 //      SD_Play ( SD_EXPLODESND );
       if (LastScan !=0)
          break;
@@ -5584,6 +5585,7 @@ void DoCreditScreen ( void )
    DrawBackground ( bkgnd );
    DrawPreviousCredits ( i, FirstCredits );
    FlipPage();
+   IN_PumpEvents();
 
    I_Delay(40);
 
@@ -5592,6 +5594,7 @@ void DoCreditScreen ( void )
       time = (CREDITSTARTY - SecondCredits[i].endy)*(VBLCOUNTER/2)/CREDITSTARTY;
 //      time = VBLCOUNTER;
       WarpCreditString ( time, bkgnd, i, SecondCredits );
+      IN_PumpEvents();
 //      SD_Play ( SD_EXPLODESND );
       if (LastScan !=0)
          break;
@@ -5600,6 +5603,7 @@ void DoCreditScreen ( void )
    DrawBackground ( bkgnd );
    DrawPreviousCredits ( i, SecondCredits );
    FlipPage();
+   IN_PumpEvents();
 
    I_Delay(40);
    MenuFadeOut();
