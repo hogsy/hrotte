@@ -65,6 +65,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef DOS
 #define strcmpi strcasecmp
 #define stricmp strcasecmp
+#define _fstricmp strcasecmp
 
 char *strupr(char *);
 char *itoa(int, char *, int);

@@ -33,6 +33,7 @@ rott: 	\
 	rt_rand.o \
 	rt_scale.o \
 	rt_sound.o \
+	rt_sqrt.o \
 	rt_stat.o \
 	rt_state.o \
 	rt_str.o \
@@ -42,6 +43,7 @@ rott: 	\
 	rt_vid.o \
 	scriplib.o \
 	w_wad.o \
+	watcom.o \
 	z_zone.o
 
 # rt_in.c, rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
