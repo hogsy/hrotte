@@ -642,7 +642,7 @@ void DrawHLine (int xleft, int xright, int yp)
 #endif
 
          mr_xfrac = startxfrac;
-		   mr_yfrac = startyfrac;
+         mr_yfrac = startyfrac;
 
 #ifdef DOS
          startxfrac+=mr_xstep>>2;
@@ -650,7 +650,11 @@ void DrawHLine (int xleft, int xright, int yp)
 
          mr_count=((xright-plane)>>2)+1;
 #else
-        mr_count = xright-xleft;
+        // back off the pixel increment (orig. is 4x)
+        mr_xstep >>= 2;
+        mr_ystep >>= 2;
+        
+        mr_count = xright-xleft+1;
 #endif
 
          if (mr_count)
@@ -717,15 +721,16 @@ void DrawPlanes( void )
 void DrawRow(int count, byte * dest, byte * src)
 {
 	unsigned frac, fracstep;
-	int ecx;
+	int coord;
 
 	frac = (mr_yfrac<<16) + (mr_xfrac&0xffff);
 	fracstep = (mr_ystep<<16) + (mr_xstep&0xffff);
+
 	while (count--) {
-		ecx = /* (ecx << 23) | */ ((((unsigned)frac) >> (32-23)) & 0x7f);
-		ecx = (ecx << 7) | ((((unsigned)frac) >> (32-7)) & 0x7f);
+		/* extract the x/y coordinates */
+		coord = ((frac >> (32-7)) | ((frac >> (32-23)) << 7)) & 16383;
 		
-		*dest++ = shadingtable[src[ecx&16383]];
+		*dest++ = shadingtable[src[coord]];
 		frac += fracstep;
 	}
 }
