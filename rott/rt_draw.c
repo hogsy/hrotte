@@ -2457,15 +2457,19 @@ void InterpolateDoor (visobj_t * plane)
    for (pl=0;pl<4;pl++)
 #endif
       {
+#ifdef DOS
       top=topinc*pl;
       bot=(d2*dx)+(pl*botinc);
       height=(plane->h1<<DHEIGHTFRACTION)+(dh*pl);
       buf=(byte *)bufferofs+((pl+plane->x1)>>2);
       VGAWRITEMAP((plane->x1+pl)&3);
-#ifdef DOS
       for (i=plane->x1+pl;i<=plane->x2;i+=4,buf++)
 #else
-      for (i=plane->x1+pl;i<=plane->x2;i++,buf++)
+      top=topinc;
+      bot=(d2*dx)+botinc;
+      height=(plane->h1<<DHEIGHTFRACTION)+dh;
+      buf=(byte *)bufferofs+(plane->x1);
+      for (i=plane->x1;i<=plane->x2;i++,buf++)
 #endif
          {
          if ((i>=0 && i<viewwidth) && (bot!=0) && (posts[i].wallheight<=(height>>DHEIGHTFRACTION)) )
@@ -2930,21 +2934,31 @@ void DrawScaledScreen(int x, int y, int step, byte * src)
     ysize=(200<<16)/step;
     if (ysize>200) ysize=200;
 
+#ifdef DOS
     for (plane=x;plane<x+4;plane++)
+#endif
        {
        yfrac=0;
        VGAWRITEMAP(plane&3);
        for (j=y;j<y+ysize;j++)
           {
           p=src+(320*(yfrac>>16));
+#ifdef DOS
           buf=(byte *)bufferofs+ylookup[j]+(plane>>2);
+#else
+          buf=(byte *)bufferofs+ylookup[j];
+#endif
           xfrac=(plane-x)*step;
           yfrac+=step;
           for (i=plane;i<x+xsize;i+=4)
              {
              *buf=*(p+(xfrac>>16));
              buf++;
+#ifdef DOS
              xfrac+=(step<<2);
+#else
+             xfrac+=step;
+#endif
              }
           }
        }
@@ -3029,12 +3043,19 @@ void StartupRotateBuffer ( int masked)
       memset(RotatedImage,0,131072);
    else
       memset(RotatedImage,0xff,131072);
+#ifdef DOS
    for (i=0;i<4;i++)
+#endif
       {
       VGAREADMAP(i);
       for (a=0;a<200;a++)
+#ifdef DOS
          for (b=0;b<80;b++)
             *(RotatedImage+99+i+((a+28)<<9)+(b<<2))=*((byte *)bufferofs+(a*linewidth)+b);
+#else
+         for (b=0;b<320;b++)
+            *(RotatedImage+99+((a+28)<<9)+b)=*((byte *)bufferofs+(a*linewidth)+b);
+#endif
       }
 }
 
@@ -6082,7 +6103,11 @@ int CountParticles (void)
       VGAREADMAP(plane);
       for (a=0;a<200;a++)
          {
+#ifdef DOS
          for (b=0;b<80;b++)
+#else
+         for (b=0;b<320;b++)
+#endif
             {
             if (*((byte *)bufferofs+(a*linewidth)+b)!=255)
                count++;
@@ -6107,12 +6132,20 @@ void AssignParticles (void)
       VGAREADMAP(plane);
       for (a=0;a<200;a++)
          {
+#ifdef DOS
          for (b=0;b<80;b++)
+#else
+         for (b=0;b<320;b++)
+#endif
             {
             pixel = *((byte *)bufferofs+(a*linewidth)+b);
             if (pixel!=255)
                {
+#ifdef DOS
                part->endx=plane+(b<<2);
+#else
+               part->endx=b;
+#endif
                part->endy=a;
                part->color=pixel;
                part++;
