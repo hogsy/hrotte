@@ -741,4 +741,70 @@ void I_ShutdownKeyboard (void)
 	_dos_setvect (KEYBOARDINT, oldkeyboardisr);
 	*(short *)0x41c = *(short *)0x41a;      // clear bios key buffer
 }
+#else
+
+/*
+================
+=
+= ISR_SetTime
+=
+================
+*/
+void ISR_SetTime(int settime)
+{
+	ticcount = settime;
+	
+	STUB_FUNCTION;
+}
+
+/*
+================
+=
+= I_Delay
+=
+================
+*/
+
+void I_Delay ( int delay )
+{
+	STUB_FUNCTION;
+}
+
+/*
+===============
+=
+= I_StartupTimer
+=
+===============
+*/
+
+void I_StartupTimer (void)
+{
+	STUB_FUNCTION;
+}
+
+void I_ShutdownTimer (void)
+{
+	STUB_FUNCTION;
+}
+
+/*
+===============
+=
+= I_StartupKeyboard
+=
+===============
+*/
+
+void I_StartupKeyboard (void)
+{
+	STUB_FUNCTION;
+}
+
+
+void I_ShutdownKeyboard (void)
+{
+	STUB_FUNCTION;
+}
 #endif
+
