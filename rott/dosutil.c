@@ -164,32 +164,25 @@ void put_dos2ansi(byte attrib)
 	fore = lookup[fore];
 	back = lookup[back]+10;
 
+	// 'Render"
 	if (blink)
-		printf ("%c[%d;5;%dm%c[%dm", 27, intens, fore, 27, back);
+		printf ("\033[%d;5;%dm\033[%dm", intens, fore, back);
 	else
-		printf ("%c[%d;25;%dm%c[%dm", 27, intens, fore, 27, back);
+		printf ("\033[%d;25;%dm\033[%dm", intens, fore, back);
 }
 
 void DisplayTextSplash(byte *text, int l)
 {
-	int i, x;
-	
-	//printf("%02X %02X %02X %02X\n", text[0], text[1], text[2], text[3]);
-	//text += 4;
-	//printf("%02X %02X %02X %02X\n", text[0], text[1], text[2], text[3]);
-	//text += 2;
-	
-	for (x = 0; x < l; x++) {
-		for (i = 0; i < 160; i += 2) {
-			put_dos2ansi(text[160*x+i+2]);
-			if (text[160*x+i+1] && text[160*x+i+1] != 160)
-				printf("%c", text[160*x+i+1]);
-			else
-				printf(" ");
-		}
-		printf("%c[m", 27);
-		printf("\n");
+	int i;
+	int bound = 80*l*2;
+
+	for (i=0;i<bound;i+=2)
+	{
+		put_dos2ansi(text[i+1]);
+		putchar (text[i]);
 	}
+
+	printf ("\033[m");
 }
 
 #include <execinfo.h>

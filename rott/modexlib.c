@@ -633,7 +633,7 @@ void VL_ClearVideo (byte color)
   VGAMAPMASK(15);
   memset((byte *)(0xa000<<4),color,0x10000);
 #else
-  memset (sdl_surface->pixels, color, 0x10000);
+  memset (sdl_surface->pixels, color, MAXSCREENWIDTH*MAXSCREENHEIGHT);
 #endif
 }
 
