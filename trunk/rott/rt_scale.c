@@ -1227,7 +1227,26 @@ void R_TransColumn (byte * buf)
 
 void R_DrawWallColumn (byte * buf)
 {
-	STUB_FUNCTION;
+	// This is *NOT* 100% correct - DDOI
+	int count;
+	int frac, fracstep;
+
+	count = dc_yh - dc_yl;
+	if (count < 0) return;
+
+	buf += ylookup[dc_yl];
+
+	fracstep = dc_iscale;
+	frac = dc_texturemid + (dc_yl-centery)*fracstep;
+	frac <<= 10;
+	fracstep <<= 10;
+
+	do
+	{
+		*buf = shadingtable[dc_source[(frac>>26)&127]];
+		buf += MAXSCREENWIDTH;
+		frac += fracstep;
+	} while (count--);
 }
 
 void R_DrawClippedColumn (byte * buf)
