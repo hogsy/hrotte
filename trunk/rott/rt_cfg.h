@@ -60,7 +60,11 @@ extern int     DetailLevel;
 extern int     fandc;
 extern int     blanktime;
 extern char    CodeName[9];
+#ifdef DOS
 extern char   *ApogeePath;
+#else
+extern char   ApogeePath[256];
+#endif
 
 extern int     DefaultDifficulty;
 extern int     DefaultPlayerCharacter;

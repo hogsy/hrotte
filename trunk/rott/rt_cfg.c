@@ -138,7 +138,11 @@ int     viewsize         = 7;
 #endif
 MacroList CommbatMacros[MAXMACROS];
 
+#ifdef DOS
 char *ApogeePath = "APOGEECD";
+#else
+char ApogeePath[256];
+#endif
 
 //******************************************************************************
 //
@@ -938,11 +942,13 @@ void ReadConfig (void)
 
       Z_Free (scriptbuffer);
       }
+#ifdef DOS
    else if ( !SOUNDSETUP )
       {
       Error( "Could not find SOUND.ROT.  Please run SNDSETUP to configure "
          "your sound hardware." );
       }
+#endif
 
 
 #ifdef _ROTT_

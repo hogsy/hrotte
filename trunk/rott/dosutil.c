@@ -4,6 +4,8 @@
 #include <ctype.h>
 
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -111,6 +113,23 @@ char *ultoa(unsigned long value, char *string, int radix)
 char getch(void)
 {
 	getchar();
+	return 0;
+}
+
+extern char ApogeePath[256];
+
+int setup_homedir (void)
+{
+	int err;
+
+	snprintf (ApogeePath, 256, "%s/.rott/", getenv ("HOME"));
+	err = mkdir (ApogeePath, S_IRWXU);
+	if (err == -1 && errno != EEXIST)
+	{
+		fprintf (stderr, "Couldn't create preferences directory: %s\n", 
+				strerror (errno));
+		return -1;
+	}
 	return 0;
 }
 
