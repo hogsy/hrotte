@@ -3867,10 +3867,8 @@ void SpawnParticles(objtype*ob,int which,int numparticles)
       if (MISCVARS->randgibspeed == true)
          new->speed += (randadj << 11);
 
-#if (SHAREWARE == 0)  
-      if (ob->state == &s_snakefireworks)
+//      if (ob->state == &s_snakefireworks)
          new->z = ob->z;
-#endif
 
       Fix(randphi);
       Fix(randtheta);
