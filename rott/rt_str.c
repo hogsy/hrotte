@@ -161,6 +161,7 @@ void US_ClippedPrint (int x, int y, char *s)
 
 void VW_DrawPropString (char *string)
 {
+#ifdef DOS
    byte  pix;
    int   width,step,height,ht;
    byte  *source, *dest, *origdest;
@@ -206,7 +207,41 @@ void VW_DrawPropString (char *string)
    }
    bufferheight = ht;
    bufferwidth = ((dest+1)-origdest)*4;
+#else
+   byte  pix;
+   int   width,step,height,ht;
+   byte  *source, *dest, *origdest;
+   int   ch,mask;
 
+   ht = CurrentFont->height;
+   dest = origdest = (byte *)(bufferofs+ylookup[py]+px);
+
+   while ((ch = *string++)!=0)
+   {
+      ch -= 31;
+      width = step = CurrentFont->width[ch];
+      source = ((byte *)CurrentFont)+CurrentFont->charofs[ch];
+      while (width--)
+      {
+         height = ht;
+         while (height--)
+         {
+            pix = *source;
+            if (pix)
+               *dest = pix;
+
+            source++;
+            dest += linewidth;
+         }
+
+         px++;
+	 origdest++;
+         dest = origdest;
+      }
+   }
+   bufferheight = ht;
+   bufferwidth = ((dest+1)-origdest);
+#endif
 }
 
 

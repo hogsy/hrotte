@@ -427,10 +427,15 @@ void GraphicsMode ( void )
 */
 void TextMode ( void )
 {
-	if (sdl_surface == NULL) return;
-
-	SDL_QuitSubSystem (SDL_INIT_VIDEO);
-	sdl_surface = NULL;
+	if (SDL_WasInit(SDL_INIT_VIDEO) == SDL_INIT_VIDEO) {
+		if (sdl_surface != NULL) {
+			SDL_FreeSurface(sdl_surface);
+	
+			sdl_surface = NULL;
+		}
+		
+		SDL_QuitSubSystem (SDL_INIT_VIDEO);
+	}
 }
 
 /*
