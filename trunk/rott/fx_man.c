@@ -745,7 +745,11 @@ int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
 
     // !!! FIXME: Need to do something with pitchoffset.
 
-    Mix_SetPosition(chan, (Uint8) ((((float) angle) / 31.0) * 255.0), distance);
+    /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
+    /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
+    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
+    	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
+    
     Mix_PlayChannel(chan, chunk, 0);
     return(FX_Ok + chan);
 } // FX_PlayVOC3D
@@ -767,7 +771,11 @@ int FX_PlayVOC3D_ROTT(char *ptr, int size, int pitchoffset, int angle, int dista
 
     // !!! FIXME: Need to do something with pitchoffset.
 
-    Mix_SetPosition(chan, (Uint8) ((((float) angle) / 31.0) * 255.0), distance);
+    /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
+    /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
+    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
+    	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
+
     Mix_PlayChannel(chan, chunk, 0);
     return(FX_Ok + chan);
 } // FX_PlayVOC3D_ROTT
@@ -834,9 +842,10 @@ int FX_Pan3D(int handle, int angle, int distance)
         setWarningMessage("voice is no longer playing in FX_Pan3D().");
     else
     {
-        Mix_SetPosition(handle,
-                        (Uint8) ((((float) angle) / 31.0) * 255.0),
-                        distance);
+        /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
+        /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
+        Mix_SetPosition(handle, (Sint16) ((((float) angle) / 31.0) * 360.0), 
+            (Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
         retval = FX_Ok;
     } // else
 
