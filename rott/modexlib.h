@@ -151,8 +151,14 @@ void  TurnOffTextCursor ( void );
         modify exact [eax edx]
 #endif
 
+#ifdef DOS
 void  VGAMAPMASK (int x);
 void  VGAREADMAP (int x);
 void  VGAWRITEMAP(int x);
+#else
+#define VGAMAPMASK(a)
+#define VGAREADMAP(a)
+#define VGAWRITEMAP(a)
+#endif
 
 #endif
