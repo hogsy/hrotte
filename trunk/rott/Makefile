@@ -23,6 +23,7 @@ rott: 	engine.o \
 	rt_state.o \
 	rt_str.o \
 	rt_ted.o \
+	rt_view.o \
 	rt_vid.o \
 	scriplib.o \
 	w_wad.o \
