@@ -107,7 +107,11 @@ void VW_DrawClippedString (int x, int y, char *string)
                if ((y>=0) && (y<MAXSCREENHEIGHT))
                   {
                   if (*source>0)
+#ifdef DOS
                      *((byte *)(bufferofs+ylookup[y]+(x>>2))) = *source;
+#else
+                     *((byte *)(bufferofs+ylookup[y]+x)) = *source;
+#endif
                   }
                source++;
                y++;
@@ -281,7 +285,11 @@ void VW_DrawIPropString (char *string)
 
 
    ht = CurrentFont->height;
+#ifdef DOS
    dest = origdest = (byte *)(bufferofs+ylookup[py]+(px>>2));
+#else
+   dest = origdest = (byte *)(bufferofs+ylookup[py]+px);
+#endif
 
 
    mask = 1<<(px&3);
@@ -308,17 +316,25 @@ void VW_DrawIPropString (char *string)
          }
 
          px++;
+#ifdef DOS
          mask <<= 1;
          if (mask == 16)
          {
             mask = 1;
             origdest++;
          }
+#else
+	 origdest++;
+#endif
          dest = origdest;
       }
    }
    bufferheight = ht;
+#ifdef DOS
    bufferwidth = ((dest+1)-origdest)*4;
+#else
+   bufferwidth = ((dest+1)-origdest);
+#endif
 
 }
 
@@ -1472,7 +1488,11 @@ void DrawIntensityChar
 
    ht = IFont->height;
 
+#ifdef DOS
    origdest = ( byte * )( bufferofs + ylookup[ py ] + ( px >> 2 ) );
+#else
+   origdest = ( byte * )( bufferofs + ylookup[ py ] + px );
+#endif
    dest = origdest;
 
    ch -= 31;
@@ -1499,12 +1519,16 @@ void DrawIntensityChar
          }
 
       px++;
+#ifdef DOS
       mask <<= 1;
       if ( mask == 16 )
          {
          mask = 1;
          origdest++;
          }
+#else
+      origdest++;
+#endif
       dest = origdest;
       }
    }

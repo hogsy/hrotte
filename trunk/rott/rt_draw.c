@@ -1920,11 +1920,17 @@ void   DrawWalls (void)
    whereami=13;
    if (doublestep>1)
       {
+#ifdef DOS
       for (plane=0;plane<4;plane+=2)
+#endif
          {
          VGAMAPMASK((1<<plane)+(1<<(plane+1)));
          buf=(byte *)(bufferofs);
+#ifdef DOS
          for (post=&posts[plane];post<&posts[viewwidth];post+=4,buf++)
+#else
+         for (post=&posts[plane];post<&posts[viewwidth];post++,buf++)
+#endif
             {
             SetWallLightLevel(post);
             DrawWallPost(post,buf);
@@ -1935,11 +1941,17 @@ void   DrawWalls (void)
 		}
    else
       {
+#ifdef DOS
       for (plane=0;plane<4;plane++)
+#endif
          {
          VGAWRITEMAP(plane);
          buf=(byte *)(bufferofs);
+#ifdef DOS
          for (post=&posts[plane];post<&posts[viewwidth];post+=4,buf++)
+#else
+         for (post=&posts[plane];post<&posts[viewwidth];post++,buf++)
+#endif
             {
             SetWallLightLevel(post);
             DrawWallPost(post,buf);
@@ -2441,14 +2453,20 @@ void InterpolateDoor (visobj_t * plane)
    botinc=d1-d2;
    if (plane->x1>=viewwidth)
       return;
+#ifdef DOS
    for (pl=0;pl<4;pl++)
+#endif
       {
       top=topinc*pl;
       bot=(d2*dx)+(pl*botinc);
       height=(plane->h1<<DHEIGHTFRACTION)+(dh*pl);
       buf=(byte *)bufferofs+((pl+plane->x1)>>2);
       VGAWRITEMAP((plane->x1+pl)&3);
+#ifdef DOS
       for (i=plane->x1+pl;i<=plane->x2;i+=4,buf++)
+#else
+      for (i=plane->x1+pl;i<=plane->x2;i++,buf++)
+#endif
          {
          if ((i>=0 && i<viewwidth) && (bot!=0) && (posts[i].wallheight<=(height>>DHEIGHTFRACTION)) )
             {
@@ -2568,8 +2586,11 @@ void InterpolateMaskedWall (visobj_t * plane)
    botinc=d1-d2;
    if (plane->x1>=viewwidth)
       return;
+#ifdef DOS
    for (pl=0;pl<4;pl++)
+#endif
       {
+#ifdef DOS
       int planenum;
 
       top=topinc*pl;
@@ -2580,6 +2601,13 @@ void InterpolateMaskedWall (visobj_t * plane)
       VGAWRITEMAP(planenum);
       VGAREADMAP(planenum);
       for (i=plane->x1+pl;i<=plane->x2;i+=4,buf++)
+#else
+      top=topinc;
+      bot=(d2*dx)+botinc;
+      height=(plane->h1<<DHEIGHTFRACTION)+dh;
+      buf=(byte *)bufferofs+(plane->x1);
+      for (i=plane->x1;i<=plane->x2;i++,buf++)
+#endif
          {
          if ((i>=0 && i<viewwidth) && (bot!=0) && (posts[i].wallheight<=(height>>DHEIGHTFRACTION)) )
             {
@@ -2638,7 +2666,11 @@ void DrawPlayerLocation ( void )
    whereami=20;
    VGAMAPMASK(15);
    for (i=0;i<18;i++)
+#ifdef DOS
       memset((byte *)bufferofs+(ylookup[i+PLY])+(PLX>>2),0,6);
+#else
+      memset((byte *)bufferofs+(ylookup[i+PLY])+PLX,0,6);
+#endif
    px=PLX;
 	py=PLY;
 	VW_DrawPropString(strupr(itoa(player->x,&buf[0],16)));
@@ -3149,7 +3181,11 @@ void DrawScaledPost ( int height, byte * src, int offset, int x)
    sprtopoffset=centeryfrac - FixedMul(dc_texturemid,dc_invscale);
    shadingtable=colormap+(1<<12);
    VGAWRITEMAP(x&3);
+#ifdef DOS
    ScaleMaskedPost(((p->collumnofs[offset])+src), (byte *)bufferofs+(x>>2));
+#else
+   ScaleMaskedPost(((p->collumnofs[offset])+src), (byte *)bufferofs+x);
+#endif
 }
 
 
@@ -3631,7 +3667,11 @@ void DoIntro (void)
             yhigh=0;
          postheight=yhigh-ylow+1;
          if (postheight>0)
+#ifdef DOS
             DrawSkyPost((byte *)bufferofs + (x>>2) + ylookup[ylow],src,postheight);
+#else
+            DrawSkyPost((byte *)bufferofs + (x>>2) + ylookup[ylow],src,postheight);
+#endif
          }
       FlipPage();
       CalcTics();
@@ -3725,7 +3765,11 @@ void DoZIntro (void)
                src=0;
             dc_source=shape+(src * 200);
 //            if (RandomNumber("hello",0)<128)
+#ifdef DOS
             R_DrawColumn ((byte *)bufferofs+(x>>2));
+#else
+            R_DrawColumn ((byte *)bufferofs+x);
+#endif
             }
 //         srcoffset+=0x10000;
          x++;
@@ -3851,7 +3895,9 @@ void DrawBackground ( byte * bkgnd )
 
    size=linewidth*200;
 
+#ifdef DOS
    for (plane=0;plane<4;plane++)
+#endif
       {
       VGAWRITEMAP(plane);
       memcpy((byte *)bufferofs,bkgnd,size);
@@ -3873,7 +3919,9 @@ void PrepareBackground ( byte * bkgnd )
 
    size=linewidth*200;
 
+#ifdef DOS
    for (plane=0;plane<4;plane++)
+#endif
       {
       VGAREADMAP(plane);
       memcpy(bkgnd,(byte *)bufferofs,size);
@@ -4153,7 +4201,11 @@ fadeworld:
       VGAWRITEMAP(x&3);
       for (y=0;y<200;y++)
          {
+#ifdef DOS
          *((byte *)bufferofs+ylookup[y]+(x>>2))=*tmp++;
+#else
+         *((byte *)bufferofs+ylookup[y]+x)=*tmp++;
+#endif
          }
       }
    tmp=sky;
@@ -4162,7 +4214,11 @@ fadeworld:
       VGAWRITEMAP(x&3);
       for (y=0;y<200;y++)
          {
+#ifdef DOS
          *((byte *)bufferofs+ylookup[y]+(x>>2))=*tmp++;
+#else
+         *((byte *)bufferofs+ylookup[y]+x)=*tmp++;
+#endif
          }
       }
 
@@ -4225,7 +4281,11 @@ fadeworld:
       VGAWRITEMAP(x&3);
       for (y=0;y<200;y++)
          {
+#ifdef DOS
          *((byte *)bufferofs+ylookup[y]+(x>>2))=*tmp++;
+#else
+         *((byte *)bufferofs+ylookup[y]+x)=*tmp++;
+#endif
          }
       }
    tmp=sky;
@@ -4234,7 +4294,11 @@ fadeworld:
       VGAWRITEMAP(x&3);
       for (y=0;y<200;y++)
          {
+#ifdef DOS
          *((byte *)bufferofs+ylookup[y]+(x>>2))=*tmp++;
+#else
+         *((byte *)bufferofs+ylookup[y]+x)=*tmp++;
+#endif
          }
       }
 
@@ -5895,7 +5959,9 @@ void DrawParticles (void)
    ParticleType * part;
 
    VL_ClearBuffer (bufferofs, 0);
+#ifdef DOS
    for (plane=0;plane<4;plane++)
+#endif
       {
       VGAWRITEMAP(plane);
       for (i=0;i<numparticles;i++)
@@ -5909,7 +5975,11 @@ void DrawParticles (void)
          if (dx>=viewwidth) dx=viewwidth-1;
          if (dy<0) dy=0;
          if (dy>=viewheight) dy=viewheight-1;
+#ifdef DOS
          *( (byte *) bufferofs + (dx>>2) + ylookup[dy] ) = part->color;
+#else
+         *( (byte *) bufferofs + dx + ylookup[dy] ) = part->color;
+#endif
          }
       }
 }
@@ -5941,7 +6011,9 @@ int CountParticles (void)
    int count;
 
    count=0;
+#ifdef DOS
    for (plane=0;plane<4;plane++)
+#endif
       {
       VGAREADMAP(plane);
       for (a=0;a<200;a++)
@@ -5964,7 +6036,9 @@ void AssignParticles (void)
 
    part=&Particle[0];
 
+#ifdef DOS
    for (plane=0;plane<4;plane++)
+#endif
       {
       VGAREADMAP(plane);
       for (a=0;a<200;a++)
