@@ -165,9 +165,11 @@ void W_CheckWADIntegrity ( void )
 {
    int crc;
 
+// CRC disabled because it's not very useful these days
+
+#ifdef DOS
    crc = CalculateCRC ((byte *)lumpinfo, numlumps*sizeof(lumpinfo_t) );
-setbuf(stdout, NULL);
-printf("\n\n\ncrc == (%d).\n\n\n", crc);
+
    if (crc != WADCHECKSUM)
       {
       printf("==============================================================================\n");
@@ -179,6 +181,7 @@ printf("\n\n\ncrc == (%d).\n\n\n", crc);
 //      printf("crc=%ld\n",crc);
       getch();
       }
+#endif
 }
 
 
