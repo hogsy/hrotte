@@ -8,9 +8,3 @@ void VH_UpdateScreen (void)
 {
 	// Not needed - DDOI
 }
-
-void JoyStick_Vals (void)
-{
-	STUB_FUNCTION;
-}
-

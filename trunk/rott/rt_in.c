@@ -95,6 +95,7 @@ ModemMessage MSG;
 
 
 #if USE_SDL
+static SDL_Joystick* sdl_joysticks[MaxJoys];
 static int sdl_mouse_delta_x = 0;
 static int sdl_mouse_delta_y = 0;
 static word sdl_mouse_button_mask = 0;
@@ -682,29 +683,33 @@ void IN_IgnoreMouseButtons
 
 void IN_GetJoyAbs (word joy, word *xp, word *yp)
 {
-#if USE_SDL
-   STUB_FUNCTION;
-
-   *xp = 0;
-   *yp = 0;
-   
-#elif PLATFORM_DOS
    Joy_x  = Joy_y = 0;
    Joy_xs = joy? 2 : 0;       // Find shift value for x axis
    Joy_xb = 1 << Joy_xs;      // Use shift value to get x bit mask
    Joy_ys = joy? 3 : 1;       // Do the same for y axis
    Joy_yb = 1 << Joy_ys;
 
+#ifdef DOS
    JoyStick_Vals ();
+#else
+   if (joy < sdl_total_sticks)
+   {
+	   Joy_x = SDL_JoystickGetAxis (sdl_joysticks[joy], 0);
+	   Joy_y = SDL_JoystickGetAxis (sdl_joysticks[joy], 1);
+   } else {
+	   Joy_x = 0;
+	   Joy_y = 0;
+   }
+#endif
 
    *xp = Joy_x;
    *yp = Joy_y;
-
-#else
-#error please define for your platform.
-#endif
 }
 
+void JoyStick_Vals (void)
+{
+
+}
 
 
 //******************************************************************************
@@ -919,15 +924,20 @@ void IN_SetupJoy (word joy, word minx, word maxx, word miny, word maxy)
 //
 //******************************************************************************
 
+
 boolean INL_StartJoy (word joy)
 {
    word x,y;
 
 #if USE_SDL
+   int i;
+
    if (!SDL_WasInit(SDL_INIT_JOYSTICK))
    {
        SDL_Init(SDL_INIT_JOYSTICK);
        sdl_total_sticks = SDL_NumJoysticks();
+       if (sdl_total_sticks > MaxJoys) sdl_total_sticks = MaxJoys;
+
        if ((sdl_stick_button_state == NULL) && (sdl_total_sticks > 0))
        {
            sdl_stick_button_state = (word *) malloc(sizeof (word) * sdl_total_sticks);
@@ -939,7 +949,10 @@ boolean INL_StartJoy (word joy)
        SDL_JoystickEventState(SDL_ENABLE);
    }
 
-   STUB_FUNCTION;  /* !!! FIXME: SDL_JoystickOpen() individual sticks... */
+   for (i = 0; i < sdl_total_sticks; i++)
+   {
+	   sdl_joysticks[i] = SDL_JoystickOpen (i);
+   }
 #endif
 
    IN_GetJoyAbs (joy, &x, &y);
@@ -968,6 +981,9 @@ boolean INL_StartJoy (word joy)
 void INL_ShutJoy (word joy)
 {
    JoysPresent[joy] = false;
+#ifndef DOS
+   if (joy < sdl_total_sticks) SDL_JoystickClose (sdl_joysticks[joy]);
+#endif
 }
 
 
