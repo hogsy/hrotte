@@ -1092,9 +1092,9 @@ void VL_SetPalette (byte *palette)
 
    for (i = 0; i < 256; i++)
    {
-	   cmap[i].r = gammatable[(gammaindex<<6)+(*palette++)];
-	   cmap[i].g = gammatable[(gammaindex<<6)+(*palette++)];
-	   cmap[i].b = gammatable[(gammaindex<<6)+(*palette++)];
+	   cmap[i].r = gammatable[(gammaindex<<6)+(*palette++)] << 2;
+	   cmap[i].g = gammatable[(gammaindex<<6)+(*palette++)] << 2;
+	   cmap[i].b = gammatable[(gammaindex<<6)+(*palette++)] << 2;
    }
 
    SDL_SetColors (SDL_GetVideoSurface (), cmap, 0, 256);
