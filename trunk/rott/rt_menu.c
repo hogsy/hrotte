@@ -370,7 +370,6 @@ char *colorname[] =
 //
 // MENU ITEMS
 //
-#if ( TEXTMENUS == 1 )
 CP_MenuNames MainMenuNames[] =
    {
    "NEW GAME",
@@ -383,9 +382,6 @@ CP_MenuNames MainMenuNames[] =
    "BACK TO DEMO", //"BACK TO GAME"
    "QUIT"
    };
-#else
-   #define MainMenuNames NULL
-#endif
 
 CP_iteminfo MainItems  = { MENU_X, MENU_Y + 1, 9, STARTITEM, 32, MainMenuNames, mn_largefont };
 CP_itemtype MainMenu[] =
@@ -422,8 +418,6 @@ CP_itemtype LSMenu[] =
 	   { CP_Active, "", 'o', NULL }
    };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames CtlMenuNames[] =
    {
    "MOUSE ENABLED",
@@ -436,9 +430,6 @@ CP_MenuNames CtlMenuNames[] =
    "MOUSE SENSITIVITY",
    "CUSTOMIZE CONTROLS"
    };
-#else
-   #define CtlMenuNames NULL
-#endif
 
 CP_iteminfo CtlItems  = { CTL_X, MENU_Y, 9, -1, 36, CtlMenuNames, mn_largefont };
 CP_itemtype CtlMenu[] =
@@ -513,17 +504,12 @@ CP_itemtype TufMenu[ 4 ][ 7 ] =
       }
    };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames CustomMenuNames[] =
    {
    "CUSTOMIZE KEYBOARD",
    "CUSTOMIZE MOUSE",
    "CUSTOMIZE JOYSTICK"
    };
-#else
-   #define CustomMenuNames NULL
-#endif
 
 CP_iteminfo CustomItems = {32, 64, 3, 0, 24, CustomMenuNames, mn_largefont };
 
@@ -705,8 +691,6 @@ CP_itemtype JoyBtnMenu[] =
       { 1, "\0", 'D', (menuptr)DefineJoyBtn }
    };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames PlayerMenuNames[] =
    {
    "TARADINO CASSATT",
@@ -715,9 +699,6 @@ CP_MenuNames PlayerMenuNames[] =
    "LORELEI NI",
    "IAN PAUL FREELEY"
    };
-#else
-   #define PlayerMenuNames NULL
-#endif
 
 CP_iteminfo PlayerItems = {TUF_X, 48, 5, 0, 80, PlayerMenuNames, mn_largefont };
 
@@ -730,7 +711,6 @@ CP_itemtype PlayerMenu[] =
    {1, "name5\0", 'I', NULL},
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames ControlMMenuNames[] =
    {
    "CONTROLS",
@@ -738,9 +718,6 @@ CP_MenuNames ControlMMenuNames[] =
    "MUSIC VOLUME",
    "SOUND FX VOLUME"
    };
-#else
-   #define ControlMMenuNames NULL
-#endif
 
 CP_iteminfo ControlMItems = {32, 48, 4, 0, 32, ControlMMenuNames, mn_largefont };
 
@@ -752,7 +729,6 @@ CP_itemtype ControlMMenu[] =
    {1, "fxvolumn\0", 'S', (menuptr)FXVolume}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames OptionsNames[] =
    {
    "AUTO DETAIL ADJUST",
@@ -765,9 +741,7 @@ CP_MenuNames OptionsNames[] =
    "VIOLENCE LEVEL",
    "SCREEN SIZE"
    };
-#else
-   #define OptionsNames NULL
-#endif
+
 CP_iteminfo OptionsItems = { 20, MENU_Y, 9, 0, 43, OptionsNames, mn_largefont };
 
 CP_itemtype OptionsMenu[] =
@@ -783,16 +757,12 @@ CP_itemtype OptionsMenu[] =
    {1, "\0",        'S', (menuptr)CP_ScreenSize}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames DetailMenuNames[] =
    {
    "LOW DETAIL",
    "MEDIUM DETAIL",
    "HIGH DETAIL"
    };
-#else
-   #define DetailMenuNames NULL
-#endif
 
 CP_iteminfo DetailItems = { 32, 64, 3, 0, 43, DetailMenuNames, mn_largefont };
 
@@ -803,16 +773,12 @@ CP_itemtype DetailMenu[] =
    {1, "hidtl\0",  'H', NULL}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames BattleMenuNames[] =
    {
    "PLAY GAME",
    "PLAY TEAM GAME",
    "COMM-BAT OPTIONS"
    };
-#else
-   #define BattleMenuNames NULL
-#endif
 
 CP_iteminfo BattleItems = { 32, 19, 3, 0, 24, BattleMenuNames, mn_largefont };
 
@@ -823,7 +789,6 @@ CP_itemtype BattleMenu[] =
    {1, "comopt\0",   'C', (menuptr)CP_BattleOptions}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames ViolenceMenuNames[] =
    {
    "NONE",
@@ -831,9 +796,6 @@ CP_MenuNames ViolenceMenuNames[] =
    "A LOT",
    "EXCESSIVE"
    };
-#else
-   #define ViolenceMenuNames NULL
-#endif
 
 CP_iteminfo ViolenceItems = { 32, 64, 4, 0, 45, ViolenceMenuNames, mn_largefont };
 
@@ -845,15 +807,11 @@ CP_itemtype ViolenceMenu[] =
    {1, "vexcess\0", 'E', NULL}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames VMenuNames[] =
    {
    "SET VIOLENCE LEVEL",
    "" // "ENTER PASSWORD" // "CHANGE PASSWORD"
    };
-#else
-   #define VMenuNames NULL
-#endif
 
 CP_iteminfo VItems = { 32, MP_Y, 2, 0, 24, VMenuNames, mn_largefont };
 
@@ -863,7 +821,6 @@ CP_itemtype VMenu[] =
    {1, "mepass\0", 'E', (menuptr)CP_PWMenu}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames ModeMenuNames[] =
    {
    "NORMAL",
@@ -876,9 +833,6 @@ CP_MenuNames ModeMenuNames[] =
    "DELUDER",
    "CAPTURE THE TRIAD"
    };
-#else
-   #define ModeMenuNames NULL
-#endif
 
 CP_iteminfo ModeItems = { MENU_X, MENU_Y + 1, 9, 0, 24, ModeMenuNames, mn_largefont };
 
@@ -895,8 +849,6 @@ CP_itemtype ModeMenu[] =
    {CP_Active,         "captriad\0", 'C', (menuptr)CP_BattleMenu}
 };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames BOptNames[] =
    {
    "GRAVITY",
@@ -909,9 +861,6 @@ CP_MenuNames BOptNames[] =
    "DANGER DAMAGE",
    "TIME LIMIT"
    };
-#else
-   #define BOptNames NULL
-#endif
 
 CP_iteminfo BOptItems = { MENU_X, MENU_Y + 1, 9, 0, 24, BOptNames, mn_largefont };
 
@@ -928,16 +877,12 @@ CP_itemtype BOptMenu[] =
    {1, "timel\0",    'T', (menuptr)CP_TimeLimitOptions}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames GravityMenuNames[] =
    {
    "LOW",
    "NORMAL",
    "HIGH"
    };
-#else
-   #define GravityMenuNames NULL
-#endif
 
 CP_iteminfo GravityItems = { 32, 26, 3, 0, 45, GravityMenuNames, mn_largefont };
 
@@ -948,16 +893,11 @@ CP_itemtype GravityMenu[] =
 	{1, "b_high\0",   'H', NULL}
 };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames SpeedMenuNames[] =
    {
    "NORMAL",
    "FAST"
    };
-#else
-   #define SpeedMenuNames NULL
-#endif
 
 CP_iteminfo SpeedItems = { 32, MP_Y, 2, 0, 45, SpeedMenuNames, mn_largefont };
 
@@ -967,16 +907,12 @@ CP_itemtype SpeedMenu[] =
    {1, "b_fast\0",   'F', NULL}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames AmmoPerWeaponMenuNames[] =
    {
    "ONE",
    "NORMAL",
    "GUNFINITY"
    };
-#else
-   #define AmmoPerWeaponMenuNames NULL
-#endif
 
 CP_iteminfo AmmoPerWeaponItems = { 32, 26, 3, 0, 45, AmmoPerWeaponMenuNames, mn_largefont };
 
@@ -987,8 +923,6 @@ CP_itemtype AmmoPerWeaponMenu[] =
    {1, "b_gunf\0",   'G', NULL}
 };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames HitPointMenuNames[] =
    {
    "ONE",
@@ -999,9 +933,6 @@ CP_MenuNames HitPointMenuNames[] =
    "500",
    "4000"
    };
-#else
-   #define HitPointMenuNames NULL
-#endif
 
 CP_iteminfo HitPointItems = { 32, 32, 7, 0, 45, HitPointMenuNames, mn_largefont };
 
@@ -1016,7 +947,6 @@ CP_itemtype HitPointMenu[] =
    {1, "b_4000\0", 'a', NULL}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames SpawnMenuNames[] =
    {
    "SPAWN DANGERS",
@@ -1028,9 +958,6 @@ CP_MenuNames SpawnMenuNames[] =
    "RANDOM WEAPONS",
    "FRIENDLY FIRE"
    };
-#else
-   #define SpawnMenuNames NULL
-#endif
 
 CP_iteminfo SpawnItems = { 20, 24, 8, 0, 35, SpawnMenuNames, mn_largefont };
 
@@ -1046,8 +973,6 @@ CP_itemtype SpawnMenu[] =
    {1, "b_friend\0", 'F', NULL}
 };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames LightLevelMenuNames[] =
    {
    "DARK",
@@ -1057,9 +982,6 @@ CP_MenuNames LightLevelMenuNames[] =
    "PERIODIC",
    "LIGHTNING"
    };
-#else
-   #define LightLevelMenuNames NULL
-#endif
 
 CP_iteminfo LightLevelItems = { 32, 40, 6, 0, 45, LightLevelMenuNames, mn_largefont };
 
@@ -1073,7 +995,6 @@ CP_itemtype LightLevelMenu[] =
    {1, "b_light\0",  'L', NULL}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames PointGoalMenuNames[] =
    {
    "1",
@@ -1086,12 +1007,8 @@ CP_MenuNames PointGoalMenuNames[] =
    "RANDOM BLIND",
    "INFINITE"
    };
-#else
-   #define PointGoalMenuNames NULL
-#endif
 
 CP_iteminfo PointGoalItems = { 32, 16, 9, 0, 45, PointGoalMenuNames, mn_largefont };
-
 
 CP_itemtype PointGoalMenu[] =
 {
@@ -1106,17 +1023,12 @@ CP_itemtype PointGoalMenu[] =
 	{1, "b_inf\0",    'I', NULL}
 };
 
-
-#if ( TEXTMENUS == 1 )
 CP_MenuNames DangerMenuNames[] =
    {
    "LOW",
    "NORMAL",
    "KILL"
    };
-#else
-   #define DangerMenuNames NULL
-#endif
 
 CP_iteminfo DangerItems = { 32, 56, 3, 0, 45, DangerMenuNames, mn_largefont };
 
@@ -1127,7 +1039,6 @@ CP_itemtype DangerMenu[] =
 	{1, "b_kill\0",   'K', NULL}
 };
 
-#if ( TEXTMENUS == 1 )
 CP_MenuNames TimeLimitMenuNames[] =
    {
    "1",
@@ -1139,9 +1050,6 @@ CP_MenuNames TimeLimitMenuNames[] =
    "99",
    "NONE"
    };
-#else
-   #define TimeLimitMenuNames NULL
-#endif
 
 CP_iteminfo TimeLimitItems = { 32, 24, 8, 0, 45, TimeLimitMenuNames, mn_largefont };
 
