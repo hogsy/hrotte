@@ -1195,3 +1195,37 @@ void DrawNormalSprite (int x, int y, int shapenum)
          DrawNormalPost ((byte *)(p->collumnofs[cnt]+shape), b);
       }
 }
+
+#ifndef DOS
+
+void R_DrawColumn (byte *buf)
+{
+	STUB_FUNCTION;
+}
+
+void R_DrawFilmColumn (byte *buf)
+{
+	STUB_FUNCTION;
+}
+
+void R_TransColumn (byte *buf)
+{
+	STUB_FUNCTION;
+}
+
+void R_DrawWallColumn (byte *buf)
+{
+	STUB_FUNCTION;
+}
+
+void R_DrawClippedColumn (byte *buf)
+{
+	STUB_FUNCTION;
+}
+
+void R_DrawSolidColumn (int color, byte *buf)
+{
+	STUB_FUNCTION;
+}
+
+#endif
