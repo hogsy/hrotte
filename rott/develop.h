@@ -44,12 +44,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SUPERROTT   0
 #define SITELICENSE 0
 
-// cute little dopefish thing, only works when not SHAREWARE
+// cute little dopefish thing, only works with special patch?
 #define DOPEFISH 0
 
 // okay?
 
-#define TEXTMENUS   0
 #define TEDLAUNCH   0
 #define SOFTERROR   0
 #define RANDOMTEST  0
