@@ -101,7 +101,7 @@ typedef struct MoveType {
   short momy;
   word  dangle;
   word  buttons;
-  char  Sounddata[];
+  char  Sounddata[0];
 } MoveType;
 
 typedef struct NullMoveType {
