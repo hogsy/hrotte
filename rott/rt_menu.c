@@ -1532,9 +1532,8 @@ void ScanForSavedGames ()
    if (!_dos_findfirst (filename, 0, &f))
       do
       {
-
          strcpy(str,&f.name[7]);
-			sscanf((const char *)&str[0],"%x",&which);
+         sscanf((const char *)&str[0],"%x",&which);
 
          if (which < NUMSAVEGAMES)
          {
@@ -2826,8 +2825,8 @@ boolean CP_DisplayMsg
    char   *inactive;
    int     activex;
    int     inactivex;
-   int     W_H;
-   int     L_Y;
+   int     W_H = 0;
+   int     L_Y = 0;
    int     tri;
    int     QUITPIC;
    int     t;

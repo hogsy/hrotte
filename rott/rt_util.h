@@ -106,7 +106,18 @@ void AbortCheck (char * abortstring);
 void FixFilePath(char *filename);
 
 
-#ifndef DOS
+#if PLATFORM_WIN32
+#include <io.h>
+struct find_t
+{
+	long handle;
+    struct _finddata_t data;
+	char name[MAX_PATH];
+};
+int _dos_findfirst(char *filename, int x, struct find_t *f);
+int _dos_findnext(struct find_t *f);
+
+#elif PLATFORM_UNIX
 struct find_t
 {
     DIR *dir;
@@ -116,6 +127,14 @@ struct find_t
 int _dos_findfirst(char *filename, int x, struct find_t *f);
 int _dos_findnext(struct find_t *f);
 
+#elif PLATFORM_DOS
+   /* no-op */
+#else
+#error please define for your platform.
+#endif
+
+
+#if !PLATFORM_DOS
 struct dosdate_t
 {
     unsigned char day;

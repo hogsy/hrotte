@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -g $(shell sdl-config --cflags) -DUSE_SDL=1 -DPLATFORM_UNIX=1 -W -Wall -Wno-unused -DUSE_EXECINFO=1
-LDLIBS = $(shell sdl-config --libs) -lSDL_mixer -Wl,-E
+CFLAGS = -g -I/cygdrive/c/SDL/include -DUSE_SDL=1 -DPLATFORM_UNIX=1 -W -Wall -Wno-unused
+LDLIBS = -L/cygdrive/c/SDL/lib  -lSDL -lSDL_mixer -Wl,-E
 
 all: rott
 
