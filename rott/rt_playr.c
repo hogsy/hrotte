@@ -3651,7 +3651,8 @@ keys:
 				check->flags = stats[stat_emptystatue].flags|FL_ABP;
 				break;
 
-
+			default:
+			    ;
 			}
 		}
 	else
@@ -4566,6 +4567,8 @@ void  T_Attack (objtype *ob)
    #endif
             break;
 
+	 default:
+	     ;
          }
 
       pstate->attackframe++;

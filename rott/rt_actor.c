@@ -55,6 +55,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "modexlib.h"
 #include "rt_net.h"
 #include "rt_msg.h"
+#include "fx_man.h"
 //MED
 #include "memcheck.h"
 
@@ -427,6 +428,7 @@ void SpawnFirewall(objtype*ob,int which,int newz);
 void SelectKristChaseDir(objtype*ob);
 void ExplodeStatic(statobj_t*tempstat);
 void AvoidPlayerMissile(objtype*ob);
+int EnvironmentDamage(objtype *ob);
 
 static int     STOPSPEED         =    0x200;
 static int     PLAYERFRICTION    =    0xe000;
@@ -1330,11 +1332,12 @@ void RemoveObj (objtype *gone)
 
 	MakeInactive(gone);
 
-	if (gone->obclass!=inertobj)
-	  if (ValidAreanumber(gone->areanumber))
+	if (gone->obclass!=inertobj) {
+	    if (ValidAreanumber(gone->areanumber))
 		 RemoveFromArea(gone);
 	  else
 		 Error("tried to remove an instance of %s with invalid areanumber %d",debugstr[gone->obclass],gone->areanumber);
+	}
 
 	if (gone == LASTACTOR)
 	  LASTACTOR = gone->prev;
@@ -1494,6 +1497,8 @@ void ConsiderAlternateActor(objtype *ob,classtype which)
                ob->shapeoffset =  W_GetNumForName("MRKKSH1") -
                                   W_GetNumForName("ALLKSH1");
 					break;
+				default:
+				    ;
 				}
 			}
 
@@ -1583,7 +1588,8 @@ void SpawnStand (classtype which, int tilex, int tiley, int dir, int ambush)
        case b_darkmonkobj:
          Error("\n%s actor at %d,%d not allowed in shareware !",debugstr[which],tilex,tiley);
          break;
-
+      default:
+	  ;
       }
 
 
@@ -1675,7 +1681,8 @@ void SpawnPatrol (classtype which, int tilex, int tiley, int dir)
        case b_darkmonkobj:
          Error("\n%s actor at %d,%d not allowed in shareware !",debugstr[which],tilex,tiley);
          break;
-
+      default:
+	  ;
       }
 
  #endif
@@ -2513,6 +2520,8 @@ void MissileHitActor(objtype *owner, objtype *missile, objtype *victim,
             case b_robobossobj:
                AddMessage("NME defeated!",MSG_CHEAT);
                break;
+	    default:
+		;
             }
          MU_StartSong(song_bossdie);
          }
@@ -3230,8 +3239,9 @@ void T_Explosion(objtype* ob)
          }
       else
          {
-         if (check->obclass != b_darkmonkobj)
-            SoftError("non-darkmonk actor %d being helped by explosion",check->obclass);
+	     if (check->obclass != b_darkmonkobj) {
+		 SoftError("non-darkmonk actor %d being helped by explosion",check->obclass);
+	     }
          check->hitpoints += pdamage;
          }
       }
@@ -6069,7 +6079,9 @@ boolean CheckDoor(objtype *ob,doorobj_t * door,int trytilex,int trytiley)
 	  if ((ob->tilex == (door->tilex + 1)) &&	(trytiley == ob->tiley))
 		doorok = true;
 	  break;
-	 }
+	default:
+	    ;
+	}
 
 
   if (doorok)
@@ -10670,6 +10682,8 @@ void DamageStaticObject(statobj_t*tempstat,int damage)
                case stat_floorfire:
                   SpawnSlowParticles(gt_sparks,5,tempstat->x,tempstat->y,tempstat->z);
                   break;
+	       default:
+		   ;
                }
             }
          SpawnSolidStatic(tempstat);
@@ -11036,6 +11050,8 @@ void T_Use(objtype*ob)
 	 //NewState(ob,&s_darianspears);
 	 break;
 #endif
+  default:
+      ;
   }
 
 
@@ -11500,6 +11516,8 @@ int EnvironmentDamage(objtype *ob)
          case crushcolobj:
             damage = 10;
             break;
+	 default:
+	     ;
          }
 
       if (gamestate.difficulty < gd_hard)
@@ -11516,7 +11534,7 @@ int EnvironmentDamage(objtype *ob)
 
 void T_AutoShootAlign(objtype*ob)
 {
-  if (ob->dir != ob->temp1)
+  if (ob->dir != (dirtype)ob->temp1)
 	 ob->dir = dirorder16[ob->dir][NEXT];
   else
 	 NewState(ob,M_S(AIM));
@@ -11526,7 +11544,7 @@ void T_AutoShootAlign(objtype*ob)
 
 void T_AutoRealign(objtype*ob)
 {
-  if (ob->dir != ob->targettilex)
+  if (ob->dir != (dirtype)ob->targettilex)
 	 ob->dir = dirorder16[ob->dir][NEXT];
   else
 	 {objtype *temp;
@@ -11872,8 +11890,9 @@ void  A_MissileWeapon(objtype *ob)
 		 }
 		break;
 #endif
-
-	 }
+    default:
+	;
+    }
 
 	SpawnMissile(ob,nobclass,nspeed,AngleBetween(ob,PLAYER[0]),nstate,noffset);
 	new->z += zoffset;
@@ -12324,8 +12343,8 @@ void SelectPathDir (objtype *ob)
 
 	spot = MAPSPOT(ob->tilex,ob->tiley,1)-ICONARROWS;
 	set = ((ocl == wallopobj) || (ocl == roboguardobj));
-	done = (((!set) && (ob->dir == spot)) ||
-			  (set && (ob->dir == (spot<<1))));
+	done = (((!set) && (ob->dir == (dirtype)spot)) ||
+			  (set && (ob->dir == (dirtype)(spot<<1))));
 
 	if ((spot >= 0) && (spot<= 7) && (!done))
       {
@@ -12447,6 +12466,8 @@ boolean CheckSight (objtype *ob,void *atwhat)
 		if (deltax > 0)
 			return false;
 		break;
+	default:
+	    ;
 	}
 
 //
@@ -12967,11 +12988,12 @@ void ShootActor(objtype * shooter, objtype * target, int damage, int accuracy, i
 				 if (pstate->health <= 0)
 					{
 
-					 if (shooter->obclass == playerobj)
+					    if (shooter->obclass == playerobj) {
 						if (!target->momentumz)
 						  BATTLE_PlayerKilledPlayer(battle_kill_with_bullet,shooter->dirchoosetime,target->dirchoosetime);
 						else
 						  BATTLE_PlayerKilledPlayer(battle_kill_with_bullet_in_air,shooter->dirchoosetime,target->dirchoosetime);
+					    }
 					}
 				}
 //      SoftError("ShootActor: damage=%ld dist=%ld\n",damage,dist);
@@ -13442,6 +13464,8 @@ void T_BossDied (objtype *ob)
 		case b_darksnakeobj:
 			playstate = ex_bossdied;
 		break;
+	default:
+	    ;
 	}
 }
 

@@ -799,6 +799,7 @@ word INL_GetJoyButtons (word joy)
 #error please define for your platform.
 #endif
 
+   return result;
 }
 
 #if 0
@@ -1335,7 +1336,10 @@ void IN_ReadControl (int player, ControlInfo *info)
          buttons = IN_GetMouseButtons ();
          realdelta = true;
       break;
+           
 #endif
+   default:
+       ;
    }
 
    if (realdelta)

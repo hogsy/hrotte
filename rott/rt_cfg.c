@@ -368,7 +368,7 @@ void ConvertStringToPasswordString ( char * string )
    for (i=0;i<13;i++)
       {
       memcpy(&temp[0],&string[i<<1],2);
-      sscanf(&temp[0],"%x",&passwordstring[i]);
+      sscanf(&temp[0],"%x",(unsigned int *)&passwordstring[i]);
       }
 }
 

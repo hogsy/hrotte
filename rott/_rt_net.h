@@ -62,8 +62,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ClientCommandNumberStatus(which, command)    \
         (CommandState[(which+1)]->CommandStates[(command)])
 
-//#define PacketAddress(time)    \
-//        ((time) & (MAXCMDS-1))
+/*
+#define PacketAddress(time)    \
+        ((time) & (MAXCMDS-1))
+*/
+
 #define PacketAddress(time)    \
         (time)
 

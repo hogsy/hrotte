@@ -27,17 +27,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //***************************************************************************
 
 void DrawSkyPost (byte * buf, byte * src, int height);
-#pragma aux DrawSkyPost parm [EDI] [ESI] [ECX] modify exact [eax ecx edx edi esi ebx]
-
 void DrawRow(int count, byte * dest, byte * src);
-#pragma aux DrawRow parm [ECX] [EDI] [ESI] modify exact [eax ebx ecx edx esi edi]
-
 void DrawRotRow(int count, byte * dest, byte * src);
-#pragma aux DrawRotRow parm [ECX] [EDI] [ESI] modify exact [eax ebx ecx edx esi edi]
-
 void DrawMaskedRotRow(int count, byte * dest, byte * src);
-#pragma aux DrawMaskedRotRow parm [ECX] [EDI] [ESI] modify exact [eax ebx ecx edx esi edi]
 
+#if (defined __WATCOMC__)
+#pragma aux DrawSkyPost parm [EDI] [ESI] [ECX] modify exact [eax ecx edx edi esi ebx]
+#pragma aux DrawRow parm [ECX] [EDI] [ESI] modify exact [eax ebx ecx edx esi edi]
+#pragma aux DrawRotRow parm [ECX] [EDI] [ESI] modify exact [eax ebx ecx edx esi edi]
+#pragma aux DrawMaskedRotRow parm [ECX] [EDI] [ESI] modify exact [eax ebx ecx edx esi edi]
+#endif
 
 #endif
 

@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "modexlib.h"
 //MED
 #include "memcheck.h"
-
+#include "rt_util.h"
 
 
 // GLOBAL VARIABLES
@@ -409,7 +409,7 @@ void GraphicsMode ( void )
 {
 	if (SDL_InitSubSystem (SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
-		Error ("Could not initialize SDL");
+	    Error ("Could not initialize SDL\n");
 	}
 
     SDL_WM_SetCaption ("Rise of the Triad", "ROTT");
@@ -417,7 +417,7 @@ void GraphicsMode ( void )
 	sdl_surface = SDL_SetVideoMode (320, 200, 8, 0);
 	if (sdl_surface == NULL)
 	{
-		Error ("Could not set video mode");
+		Error ("Could not set video mode\n");
 	}
 }
 

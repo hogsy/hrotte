@@ -41,6 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_crc.h"
 #include "rt_main.h"
 
+long filelength(int handle);
 
 //=============
 // GLOBALS
@@ -142,7 +143,7 @@ void W_AddFile (char *_filename)
 //           Error("W_AddFile: Could not realloc %ld bytes",numlumps*sizeof(lumpinfo_t));
         lump_p = &lumpinfo[startlump];
 
-        for (i=startlump ; i<numlumps ; i++,lump_p++, fileinfo++)
+        for (i=startlump ; i<(unsigned int)numlumps ; i++,lump_p++, fileinfo++)
         {
                 lump_p->handle = handle;
                 lump_p->position = LONG(fileinfo->filepos);
@@ -227,7 +228,7 @@ void W_InitMultipleFiles (char **filenames)
            Error("W_InitFiles: lumpcache malloc failed size=%ld\n",numlumps<<2);
 
         if (!quiet)
-           printf("W_Wad: Wad Manager Started NUMLUMPS=%ld\n",numlumps);
+           printf("W_Wad: Wad Manager Started NUMLUMPS=%ld\n",(long int)numlumps);
 #if (DATACORRUPTIONTEST == 1)
         lumpcheck=SafeMalloc(numlumps);
         memset(lumpcheck,255,numlumps);
@@ -443,7 +444,7 @@ void W_WriteLump (int lump, void *src)
 */
 void    *W_CacheLumpNum (int lump, int tag)
 {
-        if ((unsigned)lump >= numlumps)
+        if (lump >= (int)numlumps)
                 Error ("W_CacheLumpNum: %i >= numlumps",lump);
 
         else if (lump < 0)
