@@ -813,6 +813,9 @@ int FX_SoundActive(int handle)
 {
     handle -= FX_Ok;
 
+    if (chaninfo == NULL)
+        return(__FX_FALSE);
+
     if ((handle < 0) || (handle >= numChannels))
     {
         setWarningMessage("Invalid handle in FX_SoundActive().");
