@@ -497,7 +497,7 @@ int FX_SetCallBack(void (*func)(unsigned long))
 void FX_SetVolume(int volume)
 {
     snddebug("setting master volume to %f.2 percent.", (volume / 255.0) * 100);
-//    Mix_Volume(-1, volume >> 1);  // it's 0-128 in SDL_mixer, not 0-255.
+    Mix_Volume(-1, volume >> 1);  // it's 0-128 in SDL_mixer, not 0-255.
 } // FX_SetVolume
 
 
