@@ -3383,10 +3383,16 @@ void QuickSaveGame (void)
    s=&game.picture[0];
    for (i=0;i<320;i+=2)
       {
+#ifdef DOS
       VGAREADMAP(i&3);
       b=(byte *)bufferofs+(i>>2);
       for (j=0;j<100;j++,s++,b+=SCREENBWIDE<<1)
          *s=*b;
+#else
+      b=(byte *)bufferofs+i;
+      for (j=0;j<100;j++,s++,b+=(MAXSCREENWIDTH<<1))
+         *s=*b;
+#endif
       }
 
    ScanForSavedGames ();
