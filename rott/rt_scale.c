@@ -1201,7 +1201,7 @@ void DrawNormalSprite (int x, int y, int shapenum)
 static int pixelcount;
 static int loopcount;
 
-void R_DrawColumn (byte *buf)
+void R_DrawColumn (byte * buf)
 {
 	STUB_FUNCTION;
 #if 0
@@ -1216,27 +1216,32 @@ void R_DrawColumn (byte *buf)
 #endif
 }
 
-void R_DrawFilmColumn (byte *buf)
+void R_DrawFilmColumn (byte * buf)
 {
 	STUB_FUNCTION;
 }
 
-void R_TransColumn (byte *buf)
+void R_TransColumn (byte * buf)
 {
 	STUB_FUNCTION;
 }
 
-void R_DrawWallColumn (byte *buf)
+void R_DrawWallColumn (byte * buf)
 {
 	STUB_FUNCTION;
 }
 
-void R_DrawClippedColumn (byte *buf)
+void R_DrawClippedColumn (byte * buf)
 {
 	STUB_FUNCTION;
 }
 
-void R_DrawSolidColumn (int color, byte *buf)
+void R_DrawSolidColumn (int color, byte * buf)
+{
+	STUB_FUNCTION;
+}
+
+void DrawFilmPost (byte * buf, byte * src, int height)
 {
 	STUB_FUNCTION;
 }
