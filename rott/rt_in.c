@@ -109,7 +109,7 @@ static unsigned int scancodes[SDLK_LAST];
 
 //   'q','w','e','r','t','y','u','i','o','p','[',']','\\', 0 ,'a','s',
 
-char ScanChars[128] =    // Scan code names with single chars
+const char ScanChars[128] =    // Scan code names with single chars
 {
     0 , 0 ,'1','2','3','4','5','6','7','8','9','0','-','=', 0 , 0 ,
    'q','w','e','r','t','y','u','i','o','p','[',']', 0 , 0 ,'a','s',
@@ -121,7 +121,7 @@ char ScanChars[128] =    // Scan code names with single chars
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
 };
 
-char ShiftedScanChars[128] =    // Shifted Scan code names with single chars
+const char ShiftedScanChars[128] =    // Shifted Scan code names with single chars
 {
     0 , 0 ,'!','@','#','$','%','^','&','*','(',')','_','+', 0 , 0 ,
    'Q','W','E','R','T','Y','U','I','O','P','{','}', 0 , 0 ,'A','S',
@@ -134,7 +134,7 @@ char ShiftedScanChars[128] =    // Shifted Scan code names with single chars
 };
 
 #if 0
-char ScanChars[128] =    // Scan code names with single chars
+const char ScanChars[128] =    // Scan code names with single chars
 {
    '?','?','1','2','3','4','5','6','7','8','9','0','-','+','?','?',
    'Q','W','E','R','T','Y','U','I','O','P','[',']','|','?','A','S',

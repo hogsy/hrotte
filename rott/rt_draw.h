@@ -92,8 +92,8 @@ extern int drawtime;
 extern int c_startx;
 extern int c_starty;
 
-extern  int dirangle8[9];
-extern  int dirangle16[16];
+extern const int dirangle8[9];
+extern const int dirangle16[16];
 extern  int firstcoloffset;
 
 //=========================== macros =============================
