@@ -20,8 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef DOS
 #include <dos.h>
 #include <conio.h>
+#endif
 
 #include "rt_def.h"
 #include "rt_vid.h"
@@ -724,10 +727,14 @@ void VL_SetColor  (int color, int red, int green, int blue)
 
 void VL_GetColor  (int color, int *red, int *green, int *blue)
 {
+#ifdef DOS
    OUTP (PEL_READ_ADR,color);
    *red   = inp (PEL_DATA);
    *green = inp (PEL_DATA);
    *blue  = inp (PEL_DATA);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //===========================================================================
@@ -1083,9 +1090,13 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
 
 void SetBorderColor (int color)
 {
+#ifdef DOS
    inp  (STATUS_REGISTER_1);
    outp (ATR_INDEX,0x31);
    outp (ATR_INDEX,color);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //****************************************************************************
@@ -1096,11 +1107,15 @@ void SetBorderColor (int color)
 
 void SetBorderColorInterrupt (int color)
 {
+#ifdef DOS
    union REGS regs;
 
    regs.w.ax = 0x1001;
    regs.w.bx = color<<8;
    int386(0x10,&regs,&regs);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 
