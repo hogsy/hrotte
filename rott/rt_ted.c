@@ -5770,9 +5770,11 @@ void SetupGameLevel (void)
 		SetupLights();
       SetupInanimateActors();
       }
-   else
+   else {
+      SetupPlayers(); // force initialization of player obj - SBF
       FixTiles();
-
+   }
+   
 	if (gamestate.SpawnEluder || gamestate.SpawnDeluder)
       {
 //MED
