@@ -295,6 +295,8 @@ word IN_GetMouseButtons
    {
    word buttons = 0;
 
+   IN_PumpEvents();
+
 #if USE_SDL
    buttons = sdl_mouse_button_mask;
 

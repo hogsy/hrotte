@@ -3269,6 +3269,7 @@ void ApogeeTitle (void)
    while (time>=0)
       {
       VL_DrawPostPic (W_GetNumForName("ap_wrld"));
+      IN_PumpEvents();
 
       x=100+FixedMul(APOGEEXMAG,sintable[anglex>>16]);
 
@@ -3291,6 +3292,7 @@ void ApogeeTitle (void)
 
    while (MU_SongPlaying())
       {
+      IN_PumpEvents();
       if ((LastScan) || IN_GetMouseButtons())
          goto apogeeexit;
       }
