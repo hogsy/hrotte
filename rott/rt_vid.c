@@ -147,7 +147,6 @@ void DrawTiledRegion
    )
 
    {
-#ifdef DOS
    byte  *source;
    byte  *sourceoff;
    int    sourcex;
@@ -164,12 +163,18 @@ void DrawTiledRegion
    int    HeightIndex;
    int    WidthIndex;
 
+#ifdef DOS
+   start = ( byte * )( bufferofs +  x + ylookup[ y ] );
+#else
    start = ( byte * )( bufferofs + ( x>>2 ) + ylookup[ y ] );
+#endif
 
    source       = &tile->data;
    sourcewidth  = tile->width;
    sourceheight = tile->height;
+#ifdef DOS
    offx >>= 2;
+#endif
    if ( offx >= sourcewidth )
       {
       offx %= sourcewidth;
@@ -182,11 +187,13 @@ void DrawTiledRegion
    startoffset = offy * sourcewidth;
    planesize = sourcewidth * sourceheight;
 
+#ifdef DOS
    width >>= 2;
 
    mask  = 1 << ( x & 3 );
    plane = 4;
    while( plane > 0 )
+#endif
       {
       VGAMAPMASK( mask );
       origdest = start;
@@ -221,6 +228,7 @@ void DrawTiledRegion
             }
          }
 
+#ifdef DOS
       source += planesize;
 
       mask <<= 1;
@@ -230,81 +238,8 @@ void DrawTiledRegion
          }
 
       plane--;
-      }
-#else
-
-#if 0
-   byte  *source;
-   byte  *sourceoff;
-   int    sourcex;
-   int    sourcey;
-   int    sourcewidth;
-   int    sourceheight;
-   int    mask;
-   int    plane;
-   int    planesize;
-   byte  *start;
-   byte  *origdest;
-   byte  *dest;
-   int    startoffset;
-   int    HeightIndex;
-   int    WidthIndex;
-
-   start = ( byte * )( bufferofs + ( x>>2 ) + ylookup[ y ] );
-
-   source       = &tile->data;
-   sourcewidth  = tile->width;
-   sourceheight = tile->height;
-   offx >>= 2;
-   if ( offx >= sourcewidth )
-      {
-      offx %= sourcewidth;
-      }
-   if ( offy >= sourceheight )
-      {
-      offy %= sourceheight;
-      }
-
-   startoffset = offy * sourcewidth;
-   planesize = sourcewidth * sourceheight;
-
-
-      origdest = start;
-
-      sourcey     = offy;
-      sourceoff   = source + startoffset;
-      HeightIndex = height;
-
-      while( HeightIndex-- )
-         {
-         dest       = origdest;
-         sourcex    = offx;
-         WidthIndex = width;
-         while( WidthIndex-- )
-            {
-            *dest = sourceoff[ sourcex ];
-            dest++;
-            sourcex++;
-            if ( sourcex >= sourcewidth )
-               {
-               sourcex = 0;
-               }
-            }
-
-         origdest  += linewidth;
-         sourceoff += sourcewidth;
-         sourcey++;
-         if ( sourcey >= sourceheight )
-            {
-            sourcey   = 0;
-            sourceoff = source;
-            }
-         }
-#else
-	STUB_FUNCTION;
 #endif
-
-#endif
+      }
    }
 
 
@@ -1184,14 +1119,18 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
    byte *source = (byte *)&lbminfo->data;
    byte *buf;
    int  ht = lbminfo->height;
+#ifdef DOS
    int  planes;
    byte writemask;
+#endif
    int  x = 0;
    int  y;
    byte *origbuf;
    byte pal[768];
 
+#ifdef DOS
    writemask   = 1 << (x&3);
+#endif
    orig = screen;
 
    buf = (byte *) SafeMalloc (64000);
@@ -1236,7 +1175,9 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
    	} while (count < lbminfo->width);
    }
 
+#ifdef DOS
    for (planes = 0; planes < 4; planes++)
+#endif
    {
       int cnt;
 
@@ -1245,9 +1186,18 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
       buf = origbuf;
       VGAMAPMASK (writemask);
 
-      for (y = 0; y < ((lbminfo->height*lbminfo->width)>>2); y++)
+#ifdef DOS
+      for (y = 0; y < (lbminfo->height*lbminfo->width)>>2; y++)
+#else
+      for (y = 0; y < (lbminfo->height*lbminfo->width); y++)
+#endif
       {
+#ifdef DOS
          *screen++ = *(buf+(y*4)+planes);
+#else
+         *screen++ = *(buf+y);
+#endif
+#ifdef DOS
          cnt++;
 
          if (cnt == 80)
@@ -1255,9 +1205,12 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
             screen += 16;
             cnt = 0;
          }
+#endif
       }
 
+#ifdef DOS
       writemask <<= 1;
+#endif
    }
 
    SafeFree(origbuf);
