@@ -33,7 +33,9 @@ extern "C" {
 #endif
 
 #if defined(_MSC_VER) || defined(__BORLANDC__)
-#define REALMODE
+#  if PLATFORM_DOS
+#    define REALMODE
+#  endif
 #endif
 
 #if defined(REALMODE)

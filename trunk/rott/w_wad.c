@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#ifdef DOS
+#if PLATFORM_DOS
 #include <malloc.h>
 #include <conio.h>
 #include <io.h>
@@ -40,8 +40,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "rt_crc.h"
 #include "rt_main.h"
-
-long filelength(int handle);
 
 //=============
 // GLOBALS

@@ -36,6 +36,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <ctype.h>
 #endif
 
+#if (defined _MSC_VER)
+/* __int64 is built in. */
+#include <malloc.h>
+#include <fcntl.h>
+#include <io.h>
+//#define alloca(x) _alloca(x)
+#define access(x, y) _access(x, y)
+#define F_OK  0
+#elif (defined __GNUC__)
+#define __int64 long long;
+#else
+#error please define your platform.
+#endif
 
 #if PLATFORM_DOS || PLATFORM_WIN32
 #define PATH_SEP_CHAR '\\'
@@ -98,16 +111,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define max(a, b)  (((a) > (b)) ? (a) : (b))
 #endif
 
-#ifndef DOS
-#define strcmpi strcasecmp
-#define stricmp strcasecmp
-#define _fstricmp strcasecmp
-
-char *strupr(char *);
-char *itoa(int, char *, int);
-char *ltoa(long, char *, int);
-char *ultoa(unsigned long, char *, int);
-char getch(void);
+#if !PLATFORM_DOS
+  #if PLATFORM_WIN32
+    #define strcmpi(x, y) stricmp(x, y)
+    #define _fstricmp(x, y) stricmp(x, y)
+  #elif PLATFORM_UNIX
+    #define strcmpi(x, y) strcasecmp(x, y)
+    #define stricmp(x, y) strcasecmp(x, y)
+    #define _fstricmp(x, y) strcasecmp(x, y)
+    char *strupr(char *);
+    char *itoa(int, char *, int);
+    char *ltoa(long, char *, int);
+    char *ultoa(unsigned long, char *, int);
+    char getch(void);
+  #else
+    #error please define for your platform.
+  #endif
 
 #if !defined(ANSIESC)
 #define STUB_FUNCTION fprintf(stderr,"STUB: %s at " __FILE__ ", line %d, thread %d\n",__FUNCTION__,__LINE__,getpid())

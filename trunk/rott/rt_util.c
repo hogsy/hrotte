@@ -60,7 +60,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "memcheck.h"
 
 void print_stack (int level);
-long filelength (int handle);
 
 int    egacolor[16];
 byte   *  origpal;
@@ -872,7 +871,43 @@ void FixFilePath(char *filename)
 }
 
 
-#ifndef DOS
+#if PLATFORM_DOS
+ /* no-op. */
+
+#elif PLATFORM_WIN32
+int _dos_findfirst(char *filename, int x, struct find_t *f)
+{
+    long rc = _findfirst(filename, &f->data);
+    f->handle = rc;
+    if (rc != -1)
+    {
+        strncpy(f->name, f->data.name, sizeof (f->name) - 1);
+        f->name[sizeof (f->name) - 1] = '\0';
+        return(0);
+    }
+    return(1);
+}
+
+int _dos_findnext(struct find_t *f)
+{
+    int rc = 0;
+    if (f->handle == -1)
+        return(1);   /* invalid handle. */
+
+    rc = _findnext(f->handle, &f->data);
+    if (rc == -1)
+    {
+        _findclose(f->handle);
+        f->handle = -1;
+        return(1);
+    }
+
+    strncpy(f->name, f->data.name, sizeof (f->name) - 1);
+    f->name[sizeof (f->name) - 1] = '\0';
+    return(0);
+}
+
+#elif PLATFORM_UNIX 
 int _dos_findfirst(char *filename, int x, struct find_t *f)
 {
     char *ptr;
@@ -952,7 +987,12 @@ int _dos_findnext(struct find_t *f)
     f->dir = NULL;
     return(1);  /* no match in whole directory. */
 }
+#else
+#error please define for your platform.
+#endif
 
+
+#if !PLATFORM_DOS
 void _dos_getdate(struct dosdate_t *date)
 {
 	time_t curtime = time(NULL);
@@ -972,7 +1012,6 @@ void _dos_getdate(struct dosdate_t *date)
 	}
 }
 #endif
-
 
 
 void GetPathFromEnvironment( char *fullname, const char *envname, const char *filename )

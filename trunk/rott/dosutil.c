@@ -4,15 +4,18 @@
 #include <ctype.h>
 
 #include <sys/stat.h>
+#if PLATFORM_UNIX
 #include <sys/types.h>
 #include <errno.h>
 #include <unistd.h>
+#endif
+
 #include <fcntl.h>
 
 #include "rt_def.h"
 
 #if defined(USE_SDL)
-#include <SDL/SDL.h>
+#include "SDL.h"
 #endif
               
 /* 
@@ -23,6 +26,7 @@
 int _argc;
 char **_argv;
 
+#if PLATFORM_UNIX
 long filelength(int handle)
 {
 	struct stat buf;
@@ -109,6 +113,7 @@ char *ultoa(unsigned long value, char *string, int radix)
 	
 	return string;
 }
+#endif
 
 char getch(void)
 {

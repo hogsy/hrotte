@@ -38,6 +38,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <signal.h>
 #endif
 
+#if USE_SDL
+/* Need to redefine main to SDL_main on some platforms... */
+#include "SDL.h"
+#endif
+
 #include "rt_actor.h"
 #include "rt_stat.h"
 #include "rt_vid.h"
@@ -154,11 +159,7 @@ extern void crash_print (int);
 extern int setup_homedir (void);
 #endif
 
-#if defined(PLATFORM_MACOSX)
-int SDL_main(int argc, char *argv[])
-#else
 int main (int argc, char *argv[])
-#endif
 {
 #ifndef DOS
 	_argc = argc;
