@@ -70,9 +70,13 @@ void Error (char *error, ...)
 }
 
 
-int SafeOpenWrite (char *filename)
+int SafeOpenWrite (char *_filename)
 {
 	int	handle;
+    char filename[MAX_PATH];
+    strncpy(filename, _filename, sizeof (filename));
+    filename[sizeof (filename) - 1] = '\0';
+    FixFilePath(filename);
 
 	handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_TRUNC
 	, S_IREAD | S_IWRITE);

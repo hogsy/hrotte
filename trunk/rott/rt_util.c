@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <conio.h>
 #include <io.h>
 #include <direct.h>
-#else
+#elif USE_SDL
 #include "SDL.h"
 #endif
 
@@ -627,9 +627,13 @@ int CheckParm (char *check)
 
 
 
-int SafeOpenAppend (char *filename)
+int SafeOpenAppend (char *_filename)
 {
 	int	handle;
+    char filename[MAX_PATH];
+    strncpy(filename, _filename, sizeof (filename));
+    filename[sizeof (filename) - 1] = '\0';
+    FixFilePath(filename);
 
 	handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_APPEND
 	, S_IREAD | S_IWRITE);
@@ -640,9 +644,13 @@ int SafeOpenAppend (char *filename)
 	return handle;
 }
 
-int SafeOpenWrite (char *filename)
+int SafeOpenWrite (char *_filename)
 {
 	int	handle;
+    char filename[MAX_PATH];
+    strncpy(filename, _filename, sizeof (filename));
+    filename[sizeof (filename) - 1] = '\0';
+    FixFilePath(filename);
 
 	handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_TRUNC
 	, S_IREAD | S_IWRITE);
@@ -653,9 +661,13 @@ int SafeOpenWrite (char *filename)
 	return handle;
 }
 
-int SafeOpenRead (char *filename)
+int SafeOpenRead (char *_filename)
 {
 	int	handle;
+    char filename[MAX_PATH];
+    strncpy(filename, _filename, sizeof (filename));
+    filename[sizeof (filename) - 1] = '\0';
+    FixFilePath(filename);
 
 	handle = open(filename,O_RDONLY | O_BINARY);
 
@@ -780,6 +792,77 @@ void	SaveFile (char *filename, void *buffer, long count)
 }
 
 
+void FixFilePath(char *filename)
+{
+#if PLATFORM_UNIX
+    char *ptr;
+    char *lastsep = filename;
+
+    if ((!filename) || (*filename == '\0'))
+        return;
+
+    if (access(filename, F_OK) == 0)  /* File exists; we're good to go. */
+        return;
+
+    for (ptr = filename; 1; ptr++)
+    {
+        if (*ptr == '\\')
+            *ptr = PATH_SEP_CHAR;
+
+        if ((*ptr == PATH_SEP_CHAR) || (*ptr == '\0'))
+        {
+            char pch = *ptr;
+            struct dirent *dent = NULL;
+            DIR *dir;
+
+            if ((pch == PATH_SEP_CHAR) && (*(ptr + 1) == '\0'))
+                return; /* eos is pathsep; we're done. */
+
+            if (lastsep == ptr)
+                continue;  /* absolute path; skip to next one. */
+
+            *ptr = '\0';
+            if (lastsep == filename)
+                dir = opendir((*lastsep == PATH_SEP_CHAR) ? ROOTDIR : CURDIR);
+            else
+            {
+                *lastsep = '\0';
+                dir = opendir(filename);
+                *lastsep = PATH_SEP_CHAR;
+                lastsep++;
+            }
+
+            if (dir == NULL)
+            {
+                *ptr = PATH_SEP_CHAR;
+                return;  /* maybe dir doesn't exist? give up. */
+            }
+
+            while ((dent = readdir(dir)) != NULL)
+            {
+                if (strcasecmp(dent->d_name, lastsep) == 0)
+                {
+                    /* found match; replace it. */
+                    strcpy(lastsep, dent->d_name);
+                    break;
+                }
+            }
+
+            closedir(dir);
+            *ptr = pch;
+            lastsep = ptr;
+
+            if (dent == NULL)
+                return;  /* no match. oh well. */
+
+            if (pch == '\0')  /* eos? */
+                return;
+        }
+    }
+#endif
+}
+
+
 void GetPathFromEnvironment( char *fullname, const char *envname, const char *filename )
    {
    char *path;
@@ -789,9 +872,9 @@ void GetPathFromEnvironment( char *fullname, const char *envname, const char *fi
    if ( path != NULL )
       {
       strcpy( fullname, path );
-      if ( fullname[ strlen( fullname ) ] != '\\' )
+      if ( fullname[ strlen( fullname ) ] != PATH_SEP_CHAR )
          {
-         strcat( fullname, "\\" );
+         strcat( fullname, PATH_SEP_STR );
          }
       strcat( fullname, filename );
       }
@@ -799,6 +882,8 @@ void GetPathFromEnvironment( char *fullname, const char *envname, const char *fi
       {
       strcpy( fullname, filename );
       }
+
+      FixFilePath(fullname);
    }
 
 void DefaultExtension (char *path, char *extension)
@@ -810,7 +895,7 @@ void DefaultExtension (char *path, char *extension)
 //
 	src = path + strlen(path) - 1;
 
-	while (*src != '\\' && src != path)
+	while (*src != PATH_SEP_CHAR && src != path)
 	{
 		if (*src == '.')
 			return;			// it has an extension
@@ -824,7 +909,7 @@ void DefaultPath (char *path, char *basepath)
 {
 	char	temp[128];
 
-	if (path[0] == '\\')
+	if (path[0] == PATH_SEP_CHAR)
 		return;							// absolute path location
 	strcpy (temp,path);
 	strcpy (path,basepath);
@@ -842,7 +927,7 @@ void ExtractFileBase (char *path, char *dest)
 //
 // back up until a \ or the start
 //
-	while (src != path && *(src-1) != '\\')
+	while (src != path && *(src-1) != PATH_SEP_CHAR)
 		src--;
 
 //

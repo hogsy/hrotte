@@ -97,6 +97,8 @@ boolean UL_ChangeDirectory (char *path);
 boolean UL_ChangeDrive (char *drive);
 void AbortCheck (char * abortstring);
 
+void FixFilePath(char *filename);
+
 #if (SOFTERROR==1)
 
 void  SoftwareError (char *error, ...);

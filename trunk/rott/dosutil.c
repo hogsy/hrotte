@@ -204,18 +204,26 @@ uint32_t SwapInt32L(uint32_t i)
 
 /* ** */
 
-int OpenWrite(char *fn)
+int OpenWrite(char *_fn)
 {
 	int fp;
-	
+    char fn[MAX_PATH];
+    strncpy(fn, _fn, sizeof (fn));
+    fn[sizeof (fn) - 1] = '\0';
+    FixFilePath(fn);
+
 	fp = open(fn, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
 	return fp;
 }
 
-int OpenWriteAppend(char *fn)
+int OpenWriteAppend(char *_fn)
 {
 	int fp;
-	
+    char fn[MAX_PATH];
+    strncpy(fn, _fn, sizeof (fn));
+    fn[sizeof (fn) - 1] = '\0';
+    FixFilePath(fn);
+
 	fp = open(fn, O_CREAT|O_WRONLY|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
 	return fp;
 }
@@ -260,9 +268,13 @@ int WriteBytes(int fp, byte *d, int len)
 }
 
 
-int OpenRead(char *fn)
+int OpenRead(char *_fn)
 {
 	int fp;
+    char fn[MAX_PATH];
+    strncpy(fn, _fn, sizeof (fn));
+    fn[sizeof (fn) - 1] = '\0';
+    FixFilePath(fn);
 	
 	fp = open(fn, O_RDONLY | O_BINARY);
 	

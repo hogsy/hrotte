@@ -271,14 +271,19 @@ static int GetWarp(char *string, WarpRecord *pRecord)
 
 /*-------------------------------------------------------------------------*/
 
-int SbConfigParse(char *filename)
+int SbConfigParse(char *_filename)
 {
 	int             i;
 	FILE           *file;
 	char           *pc;
 	char            buffer[128];
+    char filename[MAX_PATH];
 
-   if(!filename) filename=DEFAULT_CONFIG_FILENAME;
+   if(!_filename) _filename=DEFAULT_CONFIG_FILENAME;
+
+    strncpy(filename, _filename, sizeof (filename));
+    filename[sizeof (filename) - 1] = '\0';
+    FixFilePath(filename);
 
 	if(!(file=fopen(filename, "r")))
       {
