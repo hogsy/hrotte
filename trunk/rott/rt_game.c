@@ -186,6 +186,9 @@ void V_ReDrawBkgnd (int x, int y, int width, int height, boolean shade)
 
    origdest = (byte *)(bufferofs+ylookup[y]+(x>>2));
 
+#ifndef DOS
+STUB_FUNCTION;
+#endif
 
    if (VW_MarkUpdateBlock (x, y, x+width-1, y+height-1))
    {
@@ -1522,13 +1525,21 @@ void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *
 
    mask = 1 << (xpos&3);
 
+#ifdef DOS
    olddest = (byte *)(ylookup[ypos] + (xpos>>2));
+#else
+   olddest = (byte *)(ylookup[ypos] + xpos);
+#endif
 
    for (planes = 0; planes < 4; planes++)
    {
       VGAMAPMASK (mask);
 
       dest = olddest;
+
+#ifndef DOS
+      dest += planes;
+#endif
 
       for (y = 0; y < height; y++)
       {
@@ -1548,10 +1559,18 @@ void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *
                }
             }
 
+#ifdef DOS
             dest++;
+#else
+            dest += 4;
+#endif
          }
 
+#ifdef DOS
          dest += (linewidth-width);
+#else
+         dest += (linewidth-width*4);
+#endif
       }
 
       if (heightmod)
@@ -1601,13 +1620,21 @@ void DrawColoredMPPic (int xpos, int ypos, int width, int height, int heightmod,
 
    mask = 1 << (xpos&3);
 
+#ifdef DOS
    olddest = (byte *)(ylookup[ypos] + (xpos>>2));
+#else
+   olddest = (byte *)(ylookup[ypos] + xpos);
+#endif
 
    for (planes = 0; planes < 4; planes++)
    {
       VGAMAPMASK (mask);
 
       dest = olddest;
+
+#ifndef DOS
+      dest += planes;
+#endif
 
       for (y = 0; y < height; y++)
       {
@@ -1629,10 +1656,18 @@ void DrawColoredMPPic (int xpos, int ypos, int width, int height, int heightmod,
                }
             }
 
+#ifdef DOS
             dest++;
+#else
+            dest += 4;
+#endif
          }
 
+#ifdef DOS
          dest += (linewidth-width);
+#else
+         dest += (linewidth-width*4);
+#endif
       }
 
       if (heightmod)
@@ -1772,13 +1807,21 @@ void DrawPPic (int xpos, int ypos, int width, int height, byte *src, int num, bo
 
    mask = 1;
 
+#ifdef DOS
    olddest = (byte *)(ylookup[ypos] + (xpos>>2));
+#else
+   olddest = (byte *)(ylookup[ypos] + xpos);
+#endif
 
    for (planes = 0; planes < 4; planes++)
    {
       VGAMAPMASK (mask);
 
       dest = olddest;
+
+#ifndef DOS
+      dest += planes;
+#endif
 
       for (y = 0; y < height; y++)
       {
@@ -1801,10 +1844,18 @@ void DrawPPic (int xpos, int ypos, int width, int height, byte *src, int num, bo
                }
             }
 
+#ifdef DOS
             dest++;
+#else
+            dest += 4;
+#endif
          }
 
+#ifdef DOS
          dest += (linewidth-width);
+#else
+         dest += (linewidth-width*4);
+#endif
       }
 
       mask <<= 1;
@@ -1976,13 +2027,21 @@ void SingleDrawPPic (int xpos, int ypos, int width, int height, byte *src, int n
 
    mask = 1;
 
+#ifdef DOS
    olddest = (byte *)(bufferofs - screenofs + ylookup[ypos] + (xpos>>2));
+#else
+   olddest = (byte *)(bufferofs - screenofs + ylookup[ypos] + xpos);
+#endif
 
    for (planes = 0; planes < 4; planes++)
    {
       VGAMAPMASK (mask);
 
       dest = olddest;
+
+#ifndef DOS
+      dest += planes;
+#endif
 
       for (y = 0; y < height; y++)
       {
@@ -1998,10 +2057,18 @@ void SingleDrawPPic (int xpos, int ypos, int width, int height, byte *src, int n
                }
             }
 
+#ifdef DOS
             dest++;
+#else
+            dest += 4;
+#endif
          }
 
+#ifdef DOS
          dest += (linewidth-width);
+#else
+         dest += (linewidth-width*4);
+#endif
       }
 
       mask <<= 1;
@@ -2365,13 +2432,20 @@ void Drawpic (int xpos, int ypos, int width, int height, byte *src)
 
    mask = 1 << (xpos&3);
 
+#ifdef DOS
    olddest = (byte *)(bufferofs + ylookup[ypos] + (xpos>>2));
-
+#else
+   olddest = (byte *)(bufferofs + ylookup[ypos] + xpos);
+#endif
    for (planes = 0; planes < 4; planes++)
    {
       VGAMAPMASK (mask);
 
       dest = olddest;
+
+#ifdef DOS
+      dest += planes;
+#endif
 
       for (y = 0; y < height; y++)
       {
@@ -2382,10 +2456,18 @@ void Drawpic (int xpos, int ypos, int width, int height, byte *src)
             if (pixel != 255)
                *(dest) = pixel;
 
+#ifdef DOS
             dest++;
+#else
+            dest += 4;
+#endif
          }
 
+#ifdef DOS
          dest += (linewidth-width);
+#else
+         dest += (linewidth-width*4);
+#endif
       }
 
       mask <<= 1;
