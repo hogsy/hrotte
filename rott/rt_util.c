@@ -394,7 +394,7 @@ void Error (char *error, ...)
       GetToken (true);
    }
 
-#ifdef DOS	// Disable while colors not implemented - DDOI
+#ifdef ANSIESC
    for (i = 0; i < 8; i++)
       printf ("\n");
 #endif
@@ -1194,8 +1194,11 @@ void UL_printf (byte *str)
          s++;
    }
 #else
-   //printf ("%c[%d;%dH%s",27,py,px,str);	// Nothing magical about this - DDOI
-   printf ("%s ",str);	// Temp hack - DDOI
+#ifdef ANSIESC
+   printf ("\x1b[%d;%dH%s",py,px,str);
+#else
+   printf ("%s ",str);	// Hackish but works - DDOI
+#endif
 #endif
 }
 
@@ -1223,8 +1226,18 @@ void UL_ColorBox (int x, int y, int w, int h, int color)
          screen+=2;
          }
       }
-#else
-	STUB_FUNCTION;
+#elif defined (ANSIESC)
+   int i,j;
+
+
+   for (j=0;j<h;j++)
+      {
+      for (i=0;i<w;i++)
+         {
+         printf ("\x1b[%d;%dH",y+j,x+i);
+         put_dos2ansi(color);
+         }
+      }
 #endif
 }
 
