@@ -3835,6 +3835,9 @@ void DefineKey
 
    do
       {
+
+      IN_PumpEvents();
+
       //
       // FLASH CURSOR
       //
