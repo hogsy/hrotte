@@ -338,6 +338,8 @@ void Error (char *error, ...)
 	TextMode ();
 #ifdef DOS
    memcpy ((byte *)0xB8000, &ROTT_ERR, 160*7);
+#elif defined (ANSIESC)
+   DisplayTextSplash (&ROTT_ERR, 7);
 #endif
    memset (msgbuf, 0, 300);
 
@@ -414,6 +416,10 @@ void Error (char *error, ...)
       level = gamestate.mapon+1;
 
    printf ("Area         = %ld\n", level);
+
+#ifndef DOS
+   print_stack (1);
+#endif
 
    ShutDown();	// DDOI - moved this so that it doesn't try to access player
    		// which is freed by this function.
