@@ -131,6 +131,12 @@ static char*elevstring[NUMELEVATORACTIONS] =
 #endif
 #endif
 
+void UtilizeDoor (int door,void (*action)(int));
+void UseDoor (int door);
+void Teleport(elevator_t*eptr,int destination);
+void ConnectPushWall (int pwall);
+void SetupPushWall (int pwall);
+void WallMoving (int pwall);
 
 /*
 ===============
