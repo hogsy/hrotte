@@ -872,9 +872,7 @@ void FixFilePath(char *filename)
 }
 
 
-#if PLATFORM_DOS
-    /* no op. */
-#elif PLATFORM_UNIX
+#ifndef DOS
 int _dos_findfirst(char *filename, int x, struct find_t *f)
 {
     char *ptr;
@@ -890,13 +888,11 @@ int _dos_findfirst(char *filename, int x, struct find_t *f)
     {
         ptr = filename;
         f->dir = opendir(CURDIR);
-        printf("  - scanning [%s].\n", CURDIR);
     }
     else
     {
         *ptr = '\0';
         f->dir = opendir(f->pattern);
-        printf("  - scanning [%s].\n", f->pattern);
         memmove(f->pattern, ptr + 1, strlen(ptr) + 1);
     }
 
@@ -947,14 +943,11 @@ int _dos_findnext(struct find_t *f)
             if (strlen(dent->d_name) < sizeof (f->name))
             {
                 strcpy(f->name, dent->d_name);
-                printf("  - [%s] matches [%s].\n", f->name, f->pattern);
                 return(0);  /* match. */
             }
         }
-        printf("  - [%s] failed to match [%s].\n", dent->d_name, f->pattern);
     }
 
-    printf("  - scanned whole dir.\n");
     closedir(f->dir);
     f->dir = NULL;
     return(1);  /* no match in whole directory. */
@@ -978,9 +971,6 @@ void _dos_getdate(struct dosdate_t *date)
 		date->dayofweek = - tm->tm_wday + 1;
 	}
 }
-
-#else
-#error please define your platform.
 #endif
 
 

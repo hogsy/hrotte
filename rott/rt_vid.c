@@ -1165,8 +1165,6 @@ void SetBorderColor (int color)
    inp  (STATUS_REGISTER_1);
    outp (ATR_INDEX,0x31);
    outp (ATR_INDEX,color);
-#else
-	STUB_FUNCTION;
 #endif
 }
 

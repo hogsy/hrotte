@@ -106,9 +106,7 @@ void AbortCheck (char * abortstring);
 void FixFilePath(char *filename);
 
 
-#if PLATFORM_DOS
-    /* no op. */
-#elif PLATFORM_UNIX
+#ifndef DOS
 struct find_t
 {
     DIR *dir;
@@ -127,9 +125,6 @@ struct dosdate_t
 };
 
 void _dos_getdate(struct dosdate_t *date);
-
-#else
-#error please define your platform.
 #endif
 
 

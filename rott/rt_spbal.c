@@ -494,7 +494,6 @@ void OpenSpaceBall (void)
 
 void CloseSpaceBall (void)
 {
-	STUB_FUNCTION;
 }
 
 unsigned GetSpaceBallButtons (void)
