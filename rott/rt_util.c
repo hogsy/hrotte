@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <ctype.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <time.h>
 #include "watcom.h"
 #include "_rt_util.h"
 #include "rt_util.h"
@@ -957,6 +958,25 @@ int _dos_findnext(struct find_t *f)
     closedir(f->dir);
     f->dir = NULL;
     return(1);  /* no match in whole directory. */
+}
+
+void _dos_getdate(struct dosdate_t *date)
+{
+	time_t curtime = time(NULL);
+	struct tm *tm;
+	
+	if (date == NULL) {
+		return;
+	}
+	
+	memset(date, 0, sizeof(struct dosdate_t));
+	
+	if ((tm = localtime(&curtime)) != NULL) {
+		date->day = tm->tm_mday;
+		date->month = tm->tm_mon + 1;
+		date->year = tm->tm_year + 1900;
+		date->dayofweek = - tm->tm_wday + 1;
+	}
 }
 
 #else
