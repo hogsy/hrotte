@@ -77,7 +77,7 @@ char *strupr(char *s)
 	char *p = s;
 	
 	while (*p) {
-		*p = tolower(*p);
+		*p = toupper(*p);
 		p++;
 	}
 	
