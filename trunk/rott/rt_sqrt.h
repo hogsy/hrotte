@@ -40,7 +40,7 @@ DESCRIPTION:
 long FixedSqrtLP(long n);  // Low  Precision (8.8)
 long FixedSqrtHP(long n);  // High Precision (8.16)
 
-
+#ifdef __WATCOMC__
 #pragma aux FixedSqrtLP =            \
     "         xor eax, eax"          \
     "         mov ebx, 40000000h"    \
@@ -104,4 +104,6 @@ long FixedSqrtHP(long n);  // High Precision (8.16)
     parm caller [ecx]                \
     value [eax]                      \
     modify [eax ebx ecx edx];
+#endif
+
 #endif
