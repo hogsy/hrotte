@@ -242,10 +242,45 @@ void PlayMovie ( char * name, boolean uselumpy )
 
 #ifndef DOS
 int cin_iscale;
-int cin_source;
+byte *cin_source;
 int cin_texturemid;
 int cin_ycenter;
 int cin_yh;
 int cin_yl;
+
+/* f_scale.asm */
+
+void R_DrawFilmColumn (byte * buf)
+{
+	// This is *NOT* 100% correct - DDOI
+	int count;
+	int frac, fracstep;
+
+	count = cin_yh - cin_yl;
+	if (count < 0) return;
+
+	buf += ylookup[cin_yl];
+
+	fracstep = cin_iscale;
+	frac = cin_texturemid + (cin_yl-cin_ycenter)*fracstep;
+
+	do
+	{
+		*buf = cin_source[(frac>>SFRACBITS)&127];
+		buf += MAXSCREENWIDTH;
+		frac += fracstep;
+	} while (count--);
+}
+
+void DrawFilmPost (byte * buf, byte * src, int height)
+{
+	while (height--) { 
+		*buf = *src;
+		
+		src++;
+		
+		buf += linewidth;
+	}
+}
 #endif
 
