@@ -43,6 +43,7 @@ rott: 	\
 	rt_str.o \
 	rt_ted.o \
 	rt_util.o \
+	rt_vh_a.o \
 	rt_view.o \
 	rt_vid.o \
 	scriplib.o \
@@ -51,12 +52,12 @@ rott: 	\
 	z_zone.o
 	$(CC) $^ $(LDLIBS) -o $@
 
-# rt_in.c, rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
+# rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
 # rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a, f_scale
 # rt_err.obj - some dos text screen for error messages
 
 clean:
-	rm -rf *.o
+	rm *.o
 
 distclean: clean
-	rm -rf *~
+	rm *~
