@@ -1460,7 +1460,7 @@ void QuitGame ( void )
          printf ("\n");
 #if DOS
       memcpy ((byte *)0xB8000, txtscn, 4000);
-#else
+#elif defined (ANSIESC)
       DisplayTextSplash (txtscn, 25);
 #endif
 
