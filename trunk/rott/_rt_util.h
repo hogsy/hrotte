@@ -28,10 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ERRORROW        2
 #define ERRORCOL        11
 
-#define ERRORFILE       ("ROTTERR.TXT")
-#define SOFTERRORFILE   ("ERROR.")
-#define DEBUGFILE       ("ROTT.DBG")
-#define MAPDEBUGFILE    ("MAPINFO.TXT")
+#define ERRORFILE       ("rotterr.txt")
+#define SOFTERRORFILE   ("error.txt")
+#define DEBUGFILE       ("rott.dbg")
+#define MAPDEBUGFILE    ("mapinfo.txt")
 
 #define SGN(x)          ((x>0) ? (1) : ((x==0) ? (0) : (-1)))
 

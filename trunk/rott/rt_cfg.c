@@ -146,15 +146,15 @@ char *ApogeePath = "APOGEECD";
 //
 //******************************************************************************
 
-static char SoundName[13]  = "SOUND.ROT";
+static char SoundName[13]  = "sound.rot";
 
 #ifdef _ROTT_
 
-static char *ConfigName = "CONFIG.ROT";
-static char *ScoresName = "SCORES.ROT";
-static char *ROTT       = "ROTT.ROT";
-static char *CONFIG     = "SETUP.ROT";
-static char *BattleName = "BATTLE.ROT";
+static char *ConfigName = "config.rot";
+static char *ScoresName = "scores.rot";
+static char *ROTT       = "rott.rot";
+static char *CONFIG     = "setup.rot";
+static char *BattleName = "battle.rot";
 
 AlternateInformation RemoteSounds;
 //AlternateInformation PlayerGraphics;
