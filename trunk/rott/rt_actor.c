@@ -3361,7 +3361,9 @@ void SpawnSuperFatalityGibs(objtype *ob,objtype *attacker)
       else
          {
          MISCVARS->randgibspeed = true;
-         SpawnParticles(ob,GUTS,75);
+//         SpawnParticles(ob,GUTS,75);
+//MED
+         SpawnParticles(ob,GUTS,150);
          MISCVARS->randgibspeed = false;
          }
       SpawnParticles(ob,GUTS,40);
@@ -3414,7 +3416,9 @@ boolean Vicious_Annihilation(objtype *ob, objtype *attacker)
             )
             {
             MISCVARS->directgibs = true;
-            MISCVARS->gibgravity = GRAVITY*2;
+//MED
+            MISCVARS->gibgravity = GRAVITY/2;
+//            MISCVARS->gibgravity = GRAVITY*2;           
             MISCVARS->fulllightgibs = true;
             SpawnSuperFatalityGibs(ob,attacker);
             MISCVARS->fulllightgibs = false;
@@ -3735,16 +3739,16 @@ gib_t RandomGutsType(void)
    if (rand < 128)
       return gt_organ;
 
-   if (rand < 160)
+   //if (rand < 160)
       return gt_rib;
 
-   return gt_pinkorgan;
+   //return gt_pinkorgan;
 
 
    }
 
 
-
+//MED
 void SpawnParticles(objtype*ob,int which,int numparticles)
    {
    int randphi,randtheta,i,nspeed;
@@ -3806,7 +3810,7 @@ void SpawnParticles(objtype*ob,int which,int numparticles)
 
       if
          (
-         (gibtype >= gt_organ) && (gibtype <= gt_limb) &&
+        // (gibtype >= gt_organ) && (gibtype <= gt_limb) &&
          (MISCVARS->numgibs >= MAXGIBS)
          )
          return;
@@ -3842,7 +3846,8 @@ void SpawnParticles(objtype*ob,int which,int numparticles)
                      (randadj<<4);
          dz = 100 + (randadj<<3);
 
-//       nspeed = 0x2800 + (randadj<<7);
+//MED
+//         nspeed = 0x2800 + (randadj<<7);
          nspeed = 0x2800;
          
          randphi = atan2_appx(FindDistance(dx,dy),dz<<10);
@@ -3866,8 +3871,8 @@ void SpawnParticles(objtype*ob,int which,int numparticles)
       new->temp3 = (MISCVARS->gibgravity == -1)?(GRAVITY):(MISCVARS->gibgravity);
 
       new->speed = nspeed>>1;
-      if (MISCVARS->randgibspeed == true)
-         new->speed += (randadj << 11);
+      //if (MISCVARS->randgibspeed == true)
+      //   new->speed += (randadj << 11);
 
 //      if (ob->state == &s_snakefireworks)
          new->z = ob->z;
