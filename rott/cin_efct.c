@@ -360,6 +360,8 @@ void DrawCinematicBackground ( backevent * back )
    if (height!=MAXSCREENHEIGHT)
       DrawClearBuffer ();
 
+   plane = 0;
+   
 #ifdef DOS
    for (plane=0;plane<4;plane++)
 #endif
@@ -372,7 +374,7 @@ void DrawCinematicBackground ( backevent * back )
 #ifdef DOS
       for (i=plane;i<MAXSCREENWIDTH;i+=4,offset+=4,buf++)
 #else
-      for (i=plane;i<MAXSCREENWIDTH;i++,offset++,buf++)
+      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
 #endif
          {
          if (offset>=back->backdropwidth)
@@ -410,6 +412,8 @@ void DrawCinematicMultiBackground ( backevent * back )
    if (height!=MAXSCREENHEIGHT)
       DrawClearBuffer ();
 
+   plane = 0;
+   
 #ifdef DOS
    for (plane=0;plane<4;plane++)
 #endif
@@ -422,7 +426,7 @@ void DrawCinematicMultiBackground ( backevent * back )
 #ifdef DOS
       for (i=plane;i<MAXSCREENWIDTH;i+=4,offset+=4,buf++)
 #else
-      for (i=plane;i<MAXSCREENWIDTH;i++,offset++,buf++)
+      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
 #endif
          {
          if (offset>=back->backdropwidth)
@@ -462,6 +466,8 @@ void DrawCinematicBackdrop ( backevent * back )
 
    toppost=-p->topoffset+back->yoffset;
 
+   plane = 0;
+   
 #ifdef DOS
    for (plane=0;plane<4;plane++)
 #endif
@@ -474,7 +480,7 @@ void DrawCinematicBackdrop ( backevent * back )
 #ifdef DOS
       for (i=plane;i<MAXSCREENWIDTH;i+=4,offset+=4,buf++)
 #else
-      for (i=plane;i<MAXSCREENWIDTH;i++,offset++,buf++)
+      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
 #endif
          {
          if (offset>=back->backdropwidth)
@@ -879,6 +885,8 @@ void ProfileDisplay ( void )
 
    DrawClearBuffer ();
 
+   plane = 0;
+   
 #ifdef DOS
    for (plane=0;plane<4;plane++)
 #endif
@@ -889,7 +897,7 @@ void ProfileDisplay ( void )
 #ifdef DOS
       for (i=plane;i<MAXSCREENWIDTH;i+=4,buf++)
 #else
-      for (i=plane;i<MAXSCREENWIDTH;i++,buf++)
+      for (i=0;i<MAXSCREENWIDTH;i++,buf++)
 #endif
          {
          DrawFilmPost(buf,&src[0],200);
@@ -918,6 +926,8 @@ void DrawPostPic ( int lumpnum )
 
    height = pic->height;
 
+   plane = 0;
+   
 #ifdef DOS
    for (plane=0;plane<4;plane++)
 #endif
@@ -931,11 +941,10 @@ void DrawPostPic ( int lumpnum )
 #ifdef DOS
       for (i=plane;i<MAXSCREENWIDTH;i+=4,src+=(pic->height<<2),buf++)
 #else
-      for (i=plane;i<MAXSCREENWIDTH;i++,src+=pic->height,buf++)
+      for (i=0;i<MAXSCREENWIDTH;i++,src+=pic->height,buf++)
 #endif
          {
          DrawFilmPost(buf,src,height);
          }
       }
 }
-
