@@ -330,7 +330,7 @@ void SetSoundDefaultValues
    //
    //  no config file, so select default values
    //
-   #if defined(PLATFORM_UNIX)
+   #if !defined(PLATFORM_DOS)
    // icculus' SDL_mixer driver looks like a soundscape to us
    MusicMode   = 6;
    FXMode      = 6;
