@@ -56,10 +56,6 @@ rott: 	\
 	z_zone.o
 	$(CC) $^ $(LDLIBS) -o $@
 
-# rt_error.c, sbconfig.c
-# rt_dr_a, rt_fc_a, rt_sc_a, f_scale
-# rt_err.obj - some dos text screen for error messages
-
 clean:
 	rm -rf *.o
 
