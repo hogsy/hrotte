@@ -361,7 +361,7 @@ int FX_Init(int SoundCard, int numvoices, int numchannels,
     } // if
 
     audio_format = (samplebits == 8) ? AUDIO_U8 : AUDIO_S16;
-    if (Mix_OpenAudio(mixrate, audio_format, numchannels, 1024) < 0)
+    if (Mix_OpenAudio(mixrate, audio_format, numchannels, 512) < 0)
     {
         setErrorMessage(SDL_GetError());
         return(FX_Error);
@@ -431,7 +431,7 @@ int FX_SetCallBack(void (*func)(unsigned long))
 void FX_SetVolume(int volume)
 {
     snddebug("setting master volume to %f.2 percent.", (volume / 255.0) * 100);
-    Mix_Volume(-1, volume >> 1);  // it's 0-128 in SDL_mixer, not 0-255.
+//    Mix_Volume(-1, volume >> 1);  // it's 0-128 in SDL_mixer, not 0-255.
 } // FX_SetVolume
 
 
@@ -545,7 +545,7 @@ static int doSetPan(int handle, int vol, int left,
 
             else
             {
-                Mix_SetPanning(handle, left, right);
+//                Mix_SetPanning(handle, left, right);
             } // else
         } // if
         else
@@ -558,7 +558,7 @@ static int doSetPan(int handle, int vol, int left,
             else
             {
                 // volume must be from 0-128, so the ">> 1" converts.
-                Mix_Volume(handle, vol >> 1);
+//                Mix_Volume(handle, vol >> 1);
             } // else
         } // else
 
@@ -747,8 +747,8 @@ int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
 
     /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
     /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
-    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
-    	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
+//    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
+ //   	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
     
     Mix_PlayChannel(chan, chunk, 0);
     return(FX_Ok + chan);
@@ -773,8 +773,8 @@ int FX_PlayVOC3D_ROTT(char *ptr, int size, int pitchoffset, int angle, int dista
 
     /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
     /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
-    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
-    	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
+//    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
+//    	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
 
     Mix_PlayChannel(chan, chunk, 0);
     return(FX_Ok + chan);
@@ -844,8 +844,8 @@ int FX_Pan3D(int handle, int angle, int distance)
     {
         /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
         /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
-        Mix_SetPosition(handle, (Sint16) ((((float) angle) / 31.0) * 360.0), 
-            (Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
+//        Mix_SetPosition(handle, (Sint16) ((((float) angle) / 31.0) * 360.0), 
+//            (Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
         retval = FX_Ok;
     } // else
 
