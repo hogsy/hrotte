@@ -754,7 +754,7 @@ static int ticbase;      /* game-supplied base */
 
 int GetTicCount (void)
 {
-	return ((SDL_GetTicks() - ticoffset) * 35) / 1000 + ticbase;
+	return ((SDL_GetTicks() - ticoffset) * VBLCOUNTER) / 1000 + ticbase;
 }
 
 /*
@@ -794,7 +794,16 @@ void SetFastTics (int settime)
 
 void I_Delay ( int delay )
 {
-//	SDL_Delay (delay);
+   int time;
+
+   delay=(VBLCOUNTER*delay)/10;
+   IN_ClearKeysDown();
+   time=GetTicCount();
+   while (GetTicCount()<time+delay)
+      {
+      if (LastScan)
+         break;
+      }
 }
 
 /*
@@ -834,4 +843,3 @@ void I_ShutdownKeyboard (void)
 	STUB_FUNCTION;
 }
 #endif
-
