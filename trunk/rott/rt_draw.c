@@ -3135,30 +3135,47 @@ void DrawRotatedScreen(int cx, int cy, byte *destscreen, int angle, int scale, i
    s = FixedMulShift(scale,sintable[angle],11);
    xst = (((-cx)*s)+(128<<16))-(cy*c);
    xct = (((-cx)*c)+(256<<16)+(1<<18)-(1<<16))+(cy*s);
+#ifdef DOS
    mr_xstep=s<<2;
    mr_ystep=c<<2;
+#else
+   mr_xstep=s;
+   mr_ystep=c;
+#endif
    screen=destscreen;
 
    if (masked==0)
       {
+#ifdef DOS
       for (plane=0;plane<4;plane++,xst+=s,xct+=c)
+#endif
          {
          mr_yfrac=xct;
          mr_xfrac=xst;
          VGAWRITEMAP(plane);
          for (y=0; y<200; y++,mr_xfrac+=c,mr_yfrac-=s)
+#ifdef DOS
             DrawRotRow(((320-plane)>>2)+1,screen+ylookup[y]+(plane>>2),RotatedImage);
+#else
+            DrawRotRow(320,screen+ylookup[y],RotatedImage);
+#endif
          }
       }
    else
       {
+#ifdef DOS
       for (plane=0;plane<4;plane++,xst+=s,xct+=c)
+#endif
          {
          mr_yfrac=xct;
          mr_xfrac=xst;
          VGAWRITEMAP(plane);
          for (y=0; y<200; y++,mr_xfrac+=c,mr_yfrac-=s)
+#ifdef DOS
             DrawMaskedRotRow(((320-plane)>>2)+1,screen+ylookup[y]+(plane>>2),RotatedImage);
+#else
+            DrawMaskedRotRow(320,screen+ylookup[y],RotatedImage);
+#endif
          }
       }
 }
