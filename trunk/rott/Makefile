@@ -10,6 +10,7 @@ rott: 	engine.o \
 	rt_floor.o \
 	rt_game.o \
 	rt_main.o \
+	rt_map.o \
 	rt_menu.o \
 	rt_playr.o \
 	rt_rand.o \

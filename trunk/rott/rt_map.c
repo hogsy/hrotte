@@ -18,9 +18,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "rt_def.h"
-#include <conio.h>
 #include <string.h>
+
+#ifdef DOS
+#include <conio.h>
 #include <dos.h>
+#endif
+
 #include "sprites.h"
 #include "rt_map.h"
 #include "rt_dr_a.h"
@@ -81,6 +85,8 @@ static Ptype arrows[8][7]=
          { {2,4}, {0,2}, {1,2}, {1,0}, {3,0}, {3,2}, {4,2} },
          { {4,4}, {1,4}, {2,3}, {0,1}, {1,0}, {3,2}, {4,1} },
      };
+
+void DrawMap_MaskedShape (int x, int y, int lump, int type);
 
 void CheatMap( void )
 {
