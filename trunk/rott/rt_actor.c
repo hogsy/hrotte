@@ -3414,9 +3414,7 @@ boolean Vicious_Annihilation(objtype *ob, objtype *attacker)
             )
             {
             MISCVARS->directgibs = true;
-//MED
-            MISCVARS->gibgravity = GRAVITY/2;
-//            MISCVARS->gibgravity = GRAVITY*2;
+            MISCVARS->gibgravity = GRAVITY*2;
             MISCVARS->fulllightgibs = true;
             SpawnSuperFatalityGibs(ob,attacker);
             MISCVARS->fulllightgibs = false;
@@ -3842,7 +3840,9 @@ void SpawnParticles(objtype*ob,int which,int numparticles)
                      (randadj<<4);
          dz = 100 + (randadj<<3);
 
-         nspeed = 0x2800 + (randadj<<7);
+//       nspeed = 0x2800 + (randadj<<7);
+         nspeed = 0x2800;
+         
          randphi = atan2_appx(FindDistance(dx,dy),dz<<10);
          }
 
