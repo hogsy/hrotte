@@ -3689,7 +3689,7 @@ void DoIntro (void)
 #ifdef DOS
             DrawSkyPost((byte *)bufferofs + (x>>2) + ylookup[ylow],src,postheight);
 #else
-            DrawSkyPost((byte *)bufferofs + (x>>2) + ylookup[ylow],src,postheight);
+            DrawSkyPost((byte *)bufferofs + x + ylookup[ylow],src,postheight);
 #endif
          }
       FlipPage();
@@ -5697,7 +5697,12 @@ void DrawMaskedRotRow(int count, byte * dest, byte * src)
 
 void DrawSkyPost (byte * buf, byte * src, int height)
 {
-	STUB_FUNCTION;
+	while (height--) {
+		*buf = shadingtable[*src];
+		
+		buf += linewidth;
+		src++;
+	}
 }
 
 #define CEILINGCOLOR 24

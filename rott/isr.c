@@ -774,14 +774,14 @@ void ISR_SetTime(int settime)
 
 int GetFastTics (void)
 {
-	STUB_FUNCTION;
+	/* STUB_FUNCTION; */
 	
 	return 0;
 }
 
 void SetFastTics (int settime)
 {
-	STUB_FUNCTION;
+	/* STUB_FUNCTION; */
 }
 
 /*
