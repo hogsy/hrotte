@@ -107,7 +107,7 @@ void GiveWeapon (objtype * ob, int weapon);
 void GiveMissileWeapon(objtype * ob, int which);
 void GiveLives (int newlives);
 
-void UpdateScore (int num);
+void UpdateScore (unsigned int num);
 void UpdateLives (int num);
 
 void DrawTimeXY( int x, int y, int sec, boolean bufferofsonly );

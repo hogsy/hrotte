@@ -17,12 +17,16 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
+#ifdef DOS
 #include <dos.h>
 #include <io.h>
+#include <conio.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <conio.h>
 #include <ctype.h>
 
 #include "rt_def.h"
@@ -157,6 +161,8 @@ static int playeruniformcolor;
 
 #define NUMBONUSES   11
 #define BONUSBONUS   100000
+
+void DrawPPic (int xpos, int ypos, int width, int height, byte *src, int num, boolean up, boolean bufferofsonly);
 
 //******************************************************************************
 //
@@ -4416,6 +4422,7 @@ void SaveTag (int handle, char * tag, int size)
 
 boolean SaveTheGame (int num, gamestorage_t * game)
 {
+#ifdef DOS
 	struct diskfree_t dfree;
    char   loadname[45]="ROTTGAM0.ROT";
    char   filename[ 128 ];
@@ -4687,6 +4694,11 @@ boolean SaveTheGame (int num, gamestorage_t * game)
 
    pickquick = true;
 	return (true);
+#else
+	STUB_FUNCTION;
+	
+	return false;
+#endif
 }
 
 
@@ -4756,7 +4768,7 @@ boolean LoadTheGame (int num, gamestorage_t * game)
 
    // Load the file
 
-	totalsize=LoadFile(filename,&loadbuffer);
+	totalsize=LoadFile(filename,(void **)&loadbuffer);
 	bufptr=loadbuffer;
 
 	// Calculate checksum
@@ -4996,7 +5008,7 @@ boolean LoadTheGame (int num, gamestorage_t * game)
    // ticcount
    DoLoadGameAction ();
    size=sizeof(ticcount);
-	memcpy(&ticcount,bufptr,size);
+	memcpy((void *)&ticcount,bufptr,size);
    bufptr+=size;
    SaveTime = ticcount;
 
@@ -5104,7 +5116,7 @@ void GetSavedMessage (int num, char * message)
 
    // Load the file
 
-   size=LoadFile(filename,&loadbuffer);
+   size=LoadFile(filename,(void **)&loadbuffer);
    bufptr=loadbuffer;
 
    size=4;
@@ -5146,7 +5158,7 @@ void GetSavedHeader (int num, gamestorage_t * game)
 
    // Load the file
 
-   size=LoadFile(filename,&loadbuffer);
+   size=LoadFile(filename, (void **)&loadbuffer);
    bufptr=loadbuffer;
 
    size=4;

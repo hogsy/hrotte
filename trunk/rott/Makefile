@@ -8,6 +8,7 @@ rott: 	engine.o \
 	rt_door.o \
 	rt_draw.o \
 	rt_floor.o \
+	rt_game.o \
 	rt_main.o \
 	rt_menu.o \
 	rt_playr.o \
@@ -21,8 +22,8 @@ rott: 	engine.o \
 	w_wad.o \
 	z_zone.o
 
-# rt_util.c
-# rt_dr_a, rt_fc_a, rt_vh_a
+# rt_util.c, rt_in.c
+# rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a
 
 clean:
 	rm *.o
