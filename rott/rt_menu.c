@@ -847,7 +847,7 @@ CP_itemtype ViolenceMenu[] =
 CP_MenuNames VMenuNames[] =
    {
    "SET VIOLENCE LEVEL",
-   NULL // "ENTER PASSWORD" // "CHANGE PASSWORD"
+   "" // "ENTER PASSWORD" // "CHANGE PASSWORD"
    };
 #else
    #define VMenuNames NULL
@@ -1914,13 +1914,13 @@ void DrawMainMenu(void)
       MainMenu[ backtodemo ].texture[ 6 ] = '1';
       MainMenu[ backtodemo ].texture[ 7 ] = '1';
       MainMenu[ backtodemo ].texture[ 8 ] = '\0';
-      MainMenuNames[ backtodemo ]         = "BACK TO GAME";
+      strcpy (MainMenuNames[ backtodemo ] , "BACK TO GAME");
       }
    else
       {
       MainMenu[ backtodemo ].texture[ 6 ] = '8';
       MainMenu[ backtodemo ].texture[ 7 ] = '\0';
-      MainMenuNames[ backtodemo ]         = "BACK TO DEMO";
+      strcpy (MainMenuNames[ backtodemo ] , "BACK TO DEMO");
       }
 
    MN_GetCursorLocation( &MainItems, &MainMenu[ 0 ] );
@@ -3227,7 +3227,7 @@ void AdjustMenuStruct
    MainMenu[ viewscores ].texture[ 6 ] = '7';
    MainMenu[ viewscores ].texture[ 7 ] = '\0';
    MainMenu[ viewscores ].letter       = 'V';
-   MainMenuNames[ viewscores ]         = "VIEW SCORES";
+   strcpy (MainMenuNames[ viewscores ] , "VIEW SCORES");
    }
 
 //******************************************************************************
@@ -5219,7 +5219,7 @@ void MenuFixup
    MainMenu[ viewscores ].texture[ 8 ] = '\0';
    MainMenu[ viewscores ].routine      = ( void * )CP_EndGame;
    MainMenu[ viewscores ].letter       = 'E';
-   MainMenuNames[ viewscores ]         = "END GAME";
+   strcpy (MainMenuNames[ viewscores ] , "END GAME");
    MainMenu[ savegame ].active         = CP_Active;
    ingame = true;
    }
@@ -5973,13 +5973,13 @@ void DrawViolenceMenu (void)
       {
       memcpy( &VMenu[ 1 ].texture, "mcpass\0", 7 );
       VMenu[ 1 ].letter = 'C';
-      VMenuNames[ 1 ]   = "CHANGE PASSWORD";
+      strcpy (VMenuNames[ 1 ] , "CHANGE PASSWORD");
       }
    else
       {
       memcpy( &VMenu[ 1 ].texture, "mepass\0", 7 );
       VMenu[ 1 ].letter = 'E';
-      VMenuNames[ 1 ]   = "ENTER PASSWORD";
+      strcpy (VMenuNames[ 1 ] , "ENTER PASSWORD");
       }
 
    if (VMenu[0].active != CP_CursorLocation)
@@ -8365,7 +8365,7 @@ int HandleMultiPageCustomMenu
             MultiPageCustomMenu[ i ].active = CP_Active;
 
             // Set the name of the level
-            MultiPageCustomNames[ i ] = names[ page + i - 2 ];
+            strcpy (MultiPageCustomNames[ i ] , names[ page + i - 2 ]);
 
             // Set the quick key
             letter = *names[ page + i - 2 ];

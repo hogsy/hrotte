@@ -132,4 +132,11 @@ int FX_StartDemandFeedPlayback( void ( *function )( char **ptr, unsigned long *l
 int  FX_StartRecording( int MixRate, void ( *function )( char *ptr, int length ) );
 void FX_StopRecord( void );
 
+// ROTT Special - SBF
+int FX_PlayVOC3D_ROTT( char *ptr, int size, int pitchoffset, int angle, int distance,
+       int priority, unsigned long callbackval );
+int FX_PlayWAV3D_ROTT( char *ptr, int size, int pitchoffset, int angle, int distance,
+       int priority, unsigned long callbackval );
+// End ROTT hacks
+
 #endif
