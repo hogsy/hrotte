@@ -18,12 +18,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#ifdef DOS
+#if PLATFORM_DOS
 #include <conio.h>
 #include <dos.h>
 #include <i86.h>
+#endif
+
+#if USE_SDL
+#include "SDL.h"
 #endif
 
 #include "rt_main.h"
@@ -86,6 +91,17 @@ word Joy_x,
 int LastLetter = 0;
 char LetterQueue[MAXLETTERS];
 ModemMessage MSG;
+
+
+#if USE_SDL
+static int sdl_mouse_delta_x = 0;
+static int sdl_mouse_delta_y = 0;
+static word sdl_mouse_button_mask = 0;
+static int sdl_total_sticks = 0;
+static word *sdl_stick_button_state = NULL;
+static word sdl_sticks_joybits = 0;
+#endif
+
 
 //   'q','w','e','r','t','y','u','i','o','p','[',']','\\', 0 ,'a','s',
 
@@ -156,6 +172,74 @@ static char *ParmStrings[] = {"nojoys","nomouse","spaceball","cyberman","assassi
 
 //******************************************************************************
 //
+// IN_PumpEvents () - Let platform process an event queue.
+//
+//******************************************************************************
+void IN_PumpEvents(void)
+{
+#if USE_SDL
+   SDL_Event event;
+
+   while (SDL_PollEvent(&event))
+   {
+       switch (event.type)
+       {
+           case SDL_MOUSEMOTION:
+               sdl_mouse_delta_x += event.motion.xrel;
+               sdl_mouse_delta_y += event.motion.yrel;
+               break;
+
+           /* !!! FIXME: JOYBALL events should effect mouse delta. */
+
+           case SDL_MOUSEBUTTONDOWN:
+               sdl_mouse_button_mask |= 1 << event.button.button;
+	       break;
+
+           case SDL_MOUSEBUTTONUP:
+               sdl_mouse_button_mask &= ~(1 << event.button.button);
+	       break;
+
+           case SDL_KEYDOWN:
+		STUB_FUNCTION;
+		break;
+
+           case SDL_KEYUP:
+		STUB_FUNCTION;
+		break;
+
+           case SDL_JOYAXISMOTION:
+		STUB_FUNCTION;
+		break;
+
+           case SDL_JOYBUTTONDOWN:
+		STUB_FUNCTION;
+		break;
+
+           case SDL_JOYBUTTONUP:
+		STUB_FUNCTION;
+		break;
+
+           case SDL_QUIT:
+		STUB_FUNCTION;
+		break;
+       }
+   }
+
+
+   STUB_FUNCTION;  /* so someone knows to come enhance this... --ryan. */
+
+
+#elif PLATFORM_DOS
+   /* no-op. */
+#else
+#error please define for your platform.
+#endif
+}
+
+
+
+//******************************************************************************
+//
 // INL_GetMouseDelta () - Gets the amount that the mouse has moved from the
 //                        mouse driver
 //
@@ -163,7 +247,7 @@ static char *ParmStrings[] = {"nojoys","nomouse","spaceball","cyberman","assassi
 
 void INL_GetMouseDelta(int *x,int *y)
 {
-#ifdef DOS
+#ifdef PLATFORM_DOS
    union REGS inregs;
    union REGS outregs;
 
@@ -175,8 +259,15 @@ void INL_GetMouseDelta(int *x,int *y)
 
    *x = outregs.w.cx;
    *y = outregs.w.dx;
+
+#elif USE_SDL
+   *x = sdl_mouse_delta_x;
+   *x = sdl_mouse_delta_y;
+
+   sdl_mouse_delta_x = sdl_mouse_delta_y = 0;
+
 #else
-	STUB_FUNCTION;
+   #error please define for your platform.
 #endif
 }
 
@@ -195,8 +286,12 @@ word IN_GetMouseButtons
    )
 
    {
-#ifdef DOS
-   word  buttons;
+   word buttons = 0;
+
+#if USE_SDL
+   buttons = sdl_mouse_button_mask;
+
+#elif PLATFORM_DOS
    union REGS inregs;
    union REGS outregs;
 
@@ -208,6 +303,10 @@ word IN_GetMouseButtons
 
    buttons = outregs.w.bx;
 
+#else
+#  error please define for your platform.
+#endif
+
 // Used by menu routines that need to wait for a button release.
 // Sometimes the mouse driver misses an interrupt, so you can't wait for
 // a button to be released.  Instead, you must ignore any buttons that
@@ -217,11 +316,6 @@ word IN_GetMouseButtons
    buttons &= ~IgnoreMouse;
 
    return (buttons);
-#else
-	STUB_FUNCTION;
-	
-	return 0;
-#endif
 }
 
 
@@ -238,8 +332,6 @@ void IN_IgnoreMouseButtons
    )
 
    {
-   word  buttons;
-
    IgnoreMouse |= IN_GetMouseButtons();
    }
 
@@ -252,6 +344,10 @@ void IN_IgnoreMouseButtons
 
 void IN_GetJoyAbs (word joy, word *xp, word *yp)
 {
+#if USE_SDL
+   STUB_FUNCTION;
+
+#elif PLATFORM_DOS
    Joy_x  = Joy_y = 0;
    Joy_xs = joy? 2 : 0;       // Find shift value for x axis
    Joy_xb = 1 << Joy_xs;      // Use shift value to get x bit mask
@@ -262,6 +358,10 @@ void IN_GetJoyAbs (word joy, word *xp, word *yp)
 
    *xp = Joy_x;
    *yp = Joy_y;
+
+#else
+#error please define for your platform.
+#endif
 }
 
 
@@ -342,19 +442,22 @@ void INL_GetJoyDelta (word joy, int *dx, int *dy)
 
 word INL_GetJoyButtons (word joy)
 {
-#ifdef DOS
-   word  result;
+   word  result = 0;
 
+#if USE_SDL
+   if (joy < sdl_total_sticks)
+       result = sdl_stick_button_state[joy];
+
+#elif PLATFORM_DOS
    result = inp (0x201);   // Get all the joystick buttons
    result >>= joy? 6 : 4;  // Shift into bits 0-1
    result &= 3;            // Mask off the useless bits
    result ^= 3;
-   return (result);
+
 #else
-	STUB_FUNCTION;
-	
-	return 0;
+#error please define for your platform.
 #endif
+
 }
 
 #if 0
@@ -391,22 +494,27 @@ word IN_GetJoyButtonsDB (word joy)
 
 boolean INL_StartMouse (void)
 {
-#ifdef DOS
+
+   boolean retval = false;
+
+#if USE_SDL
+   /* no-op. */
+   retval = true;
+
+#elif PLATFORM_DOS
    union REGS inregs;
    union REGS outregs;
 
    inregs.w.ax = 0;
    int386 (MouseInt, &inregs, &outregs);
 
-   if (outregs.w.ax == 0xffff)
-      return (true);
-   else
-      return (false);
+   retval = ((outregs.w.ax == 0xffff) ? true : false);
+
 #else
-	STUB_FUNCTION;
-	
-	return false;
+#error please define your platform.
 #endif
+
+   return (retval);
 }
 
 
@@ -472,6 +580,25 @@ void IN_SetupJoy (word joy, word minx, word maxx, word miny, word maxy)
 boolean INL_StartJoy (word joy)
 {
    word x,y;
+
+#if USE_SDL
+   if (!SDL_WasInit(SDL_INIT_JOYSTICK))
+   {
+       SDL_Init(SDL_INIT_JOYSTICK);
+       sdl_total_sticks = SDL_NumJoysticks();
+       if ((sdl_stick_button_state == NULL) && (sdl_total_sticks > 0))
+       {
+           sdl_stick_button_state = (word *) malloc(sizeof (word) * sdl_total_sticks);
+           if (sdl_stick_button_state == NULL)
+               SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+           else
+               memset(sdl_stick_button_state, '\0', sizeof (word) * sdl_total_sticks);
+       }
+       SDL_JoystickEventState(SDL_ENABLE);
+   }
+
+   STUB_FUNCTION;  /* !!! FIXME: SDL_JoystickOpen() individual sticks... */
+#endif
 
    IN_GetJoyAbs (joy, &x, &y);
 
@@ -784,7 +911,7 @@ ScanCode IN_WaitForKey (void)
    ScanCode result;
 
    while (!(result = LastScan))
-      ;
+      IN_PumpEvents();
    LastScan = 0;
    return (result);
 }
@@ -811,6 +938,8 @@ void IN_StartAck (void)
 
    IN_ClearKeysDown ();
    memset (btnstate, 0, sizeof(btnstate));
+
+   IN_PumpEvents();
 
    buttons = IN_JoyButtons () << 4;
 
@@ -844,6 +973,8 @@ boolean IN_CheckAck (void)
 //
    if (LastScan)
       return true;
+
+   IN_PumpEvents();
 
    buttons = IN_JoyButtons () << 4;
 
@@ -917,19 +1048,21 @@ boolean IN_UserInput (long delay)
 
 byte IN_JoyButtons (void)
 {
-#ifdef DOS
-   unsigned joybits;
+   unsigned joybits = 0;
 
+#if USE_SDL
+   joybits = sdl_sticks_joybits;
+
+#elif PLATFORM_DOS
    joybits = inp (0x201);  // Get all the joystick buttons
    joybits >>= 4;          // only the high bits are useful
    joybits ^= 15;          // return with 1=pressed
 
-   return joybits;
 #else
-	STUB_FUNCTION;
-	
-	return 0;
+#error define your platform.
 #endif
+
+   return (byte) joybits;
 }
 
 
