@@ -3,7 +3,21 @@ CFLAGS=-g
 
 all: rott
 
-rott: engine.o rt_actor.o rt_door.o rt_draw.o rt_floor.o rt_main.o rt_playr.o rt_rand.o rt_scale.o rt_stat.o rt_state.o rt_ted.o w_wad.o z_zone.o
+rott: 	engine.o \
+	rt_actor.o \
+	rt_door.o \
+	rt_draw.o \
+	rt_floor.o \
+	rt_main.o \
+	rt_menu.o \
+	rt_playr.o \
+	rt_rand.o \
+	rt_scale.o \
+	rt_stat.o \
+	rt_state.o \
+	rt_ted.o \
+	w_wad.o \
+	z_zone.o
 
 # rt_util.c
 # rt_dr_a, rt_fc_a
