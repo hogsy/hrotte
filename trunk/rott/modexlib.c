@@ -414,7 +414,7 @@ void GraphicsMode ( void )
 	    Error ("Could not initialize SDL\n");
 	}
 
-    #ifdef PLATFORM_WIN32
+    #if defined(PLATFORM_WIN32) || defined(PLATFORM_MACOSX)
         // FIXME: remove this.  --ryan.
         flags = SDL_FULLSCREEN;
         SDL_WM_GrabInput(SDL_GRAB_ON);
@@ -422,7 +422,8 @@ void GraphicsMode ( void )
 
     SDL_WM_SetCaption ("Rise of the Triad", "ROTT");
     SDL_ShowCursor (0);
-	sdl_surface = SDL_SetVideoMode (320, 200, 8, flags);
+    sdl_surface = SDL_SetVideoMode (320, 200, 8, flags);
+    
 	if (sdl_surface == NULL)
 	{
 		Error ("Could not set video mode\n");

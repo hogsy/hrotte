@@ -161,14 +161,30 @@ extern int setup_homedir (void);
 
 int main (int argc, char *argv[])
 {
+    char *macwd;
 #ifndef DOS
 	_argc = argc;
 	_argv = argv;
 #endif
 
-#if (PLATFORM_MACOSX == 1)
-#warning "Temporary hack. Will be fixed. -jrh"
-    chdir("/Users/overcode/Code/rott/data/");
+#if defined(PLATFORM_MACOSX)
+    {
+        /* OS X will give us a path in the form '/Applications/Rise of the Triad.app/Contents/MacOS/Rise of the Triad'.
+           Our data is in Contents/Resources. */
+        char *path;
+        const char suffix[] = "/Resources/";
+        int end;
+        path = (char *)malloc(strlen(argv[0]) + strlen(suffix) + 1);
+        if (path == NULL) return 1;
+        strcpy(path, argv[0]);
+        /* Back up two '/'s. */
+        for (end = strlen(path)-1; end >= 0 && path[end] != '/'; end--);
+        if (end >= 0) for (--end; end >= 0 && path[end] != '/'; end--);
+        strcpy(&path[end], suffix);
+        printf("Changing to working directory: %s\n", path);
+        chdir(path);
+        free(path);
+    }
 #endif
 
 #ifndef DOS
@@ -295,12 +311,8 @@ int main (int argc, char *argv[])
             }
 
          printf( "hardware.\n"
-            "Please reconfigure your sound setup or run ROTTHELP for\n"
-            "information on setting up sound on your computer.\n\n"
-            "< Press any key to run SNDSETUP >\n" );
-
+                 "Now entering sound setup.\n" );
          SOUNDSETUP = true;
-         getch();
          }
 
       Init_Tables ();

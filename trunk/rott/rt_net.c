@@ -3187,8 +3187,8 @@ void SetupDemo ( void )
 
    DemoHeader=(DemoHeaderType *)demoptr;
    demoptr+=sizeof(gamestate);
-   if (gamestate.violence!=DemoHeader->demostate.violence)
-      Error ("This demo has a different difficulty level than your current settings\n");
+//   if (gamestate.violence!=DemoHeader->demostate.violence)
+//      Error ("This demo has a different difficulty level than your current settings\n");
    memcpy(&gamestate,&(DemoHeader->demostate),sizeof(gamestate));
    SoftError(">>>>>>>>>>>>Start demo playback\n");
 }
