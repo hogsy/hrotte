@@ -886,7 +886,7 @@ void DrawUnScaledSprite (int x, int y, int shapenum, int shade)
       x1=0;
       }
    else
-      frac=0;
+      
 
    x2 = x2 >= viewwidth ? viewwidth-1 : x2;
 
@@ -1198,9 +1198,22 @@ void DrawNormalSprite (int x, int y, int shapenum)
 
 #ifndef DOS
 
+static int pixelcount;
+static int loopcount;
+
 void R_DrawColumn (byte *buf)
 {
 	STUB_FUNCTION;
+#if 0
+	/* DDOI - This is a test replacement of the ASM code */
+	buf += ylookup[dc_yl];
+	pixelcount = dc_yh - dc_yl + 1;
+	if (dc_yl < dc_yh)	// Verify - DDOI
+	{
+		loopcount = dc_yh + 1;
+		
+
+#endif
 }
 
 void R_DrawFilmColumn (byte *buf)
