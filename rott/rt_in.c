@@ -503,10 +503,10 @@ static int sdl_key_filter(const SDL_Event *event)
         }
 
         if (keyon)        // Up event
-            Keystate[k&0x7f]=0;
+            Keystate[strippedkey]=0;
         else                 // Down event
         {
-            Keystate[k]=1;
+            Keystate[strippedkey]=1;
             LastScan = k;
         }
 
