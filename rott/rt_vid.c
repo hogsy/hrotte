@@ -164,9 +164,9 @@ void DrawTiledRegion
    int    WidthIndex;
 
 #ifdef DOS
-   start = ( byte * )( bufferofs +  x + ylookup[ y ] );
-#else
    start = ( byte * )( bufferofs + ( x>>2 ) + ylookup[ y ] );
+#else
+   start = ( byte * )( bufferofs +  x + ylookup[ y ] );
 #endif
 
    source       = &tile->data;
@@ -196,7 +196,12 @@ void DrawTiledRegion
    while( plane > 0 )
       {
       VGAMAPMASK( mask );
+      
+#ifdef DOS
       origdest = start;
+#else
+      origdest = start+(4-plane);
+#endif
 
       sourcey     = offy;
       sourceoff   = source + startoffset;
@@ -210,7 +215,12 @@ void DrawTiledRegion
          while( WidthIndex-- )
             {
             *dest = sourceoff[ sourcex ];
+#ifdef DOS
             dest++;
+#else
+            dest += 4;
+#endif
+            
             sourcex++;
             if ( sourcex >= sourcewidth )
                {
@@ -218,7 +228,12 @@ void DrawTiledRegion
                }
             }
 
+#ifdef DOS
          origdest  += SCREENBWIDE;
+#else 
+         origdest += MAXSCREENWIDTH;
+#endif
+
          sourceoff += sourcewidth;
          sourcey++;
          if ( sourcey >= sourceheight )
