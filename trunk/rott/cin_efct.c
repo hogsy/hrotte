@@ -865,6 +865,8 @@ void PrecacheCinematicEffect ( enum_eventtype type, void * effect )
       case flic:
          PrecacheFlic ( (flicevent *) effect );
          break;
+      default:
+	  ;
       }
 }
 

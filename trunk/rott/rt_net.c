@@ -113,9 +113,9 @@ static int     LastCommandTime[MAXPLAYERS];
 static CommandStatusType * CommandState[MAXPLAYERS+1];
 
 static boolean InProcessServer=false;
-static lastcontrolupdatetime;
-static largesttime;
-static PlayerStatus[MAXPLAYERS];
+static int lastcontrolupdatetime;
+static int largesttime;
+static int PlayerStatus[MAXPLAYERS];
 //static int syncservertime;
 //static boolean FixingPackets;
 static int controldivisor=1;
@@ -128,6 +128,8 @@ void SendSyncCheckPacket ( void );
 void AddModemSubPacket(void * incoming);
 void SetPlayerDescription( void * pkt );
 void UpdateDemoPlayback (int time);
+int GetTypeSize (int type);
+int MaxSpeedForCharacter(playertype *pstate);
 
 /*
 =============================================================================
@@ -2306,22 +2308,22 @@ int SetupCheckForPacket ( void )
                break;
             case COM_GAMEDESC:
                if (standalone==true)
-                  printf("Received GameDescription from player#%ld\n",rottcom->remotenode);
+                  printf("Received GameDescription from player#%ld\n",(long int)rottcom->remotenode);
                WritePacket(&ROTTpacket[0],GetPacketSize(pkt),0); // Send to player 0
                break;
             case COM_GAMEACK:
                if (standalone==true)
-                  printf("Received GameAcknowledgement from player#%ld\n",rottcom->remotenode);
+                  printf("Received GameAcknowledgement from player#%ld\n",(long int)rottcom->remotenode);
                WritePacket(&ROTTpacket[0],GetPacketSize(pkt),0); // Send to player 0
                break;
             case COM_GAMEMASTER:
                if (standalone==true)
-                  printf("Received GameMasterPacket from player#%ld\n",rottcom->remotenode);
+                  printf("Received GameMasterPacket from player#%ld\n",(long int)rottcom->remotenode);
                BroadcastServerPacket(&ROTTpacket[0],GetPacketSize(pkt)); // Send to all
                break;
             case COM_GAMEPLAY:
                if (standalone==true)
-                  printf("Received StartGamePacket from player#%ld\n",rottcom->remotenode);
+                  printf("Received StartGamePacket from player#%ld\n",(long int)rottcom->remotenode);
                BroadcastServerPacket(&ROTTpacket[0],GetPacketSize(pkt)); // Send to all
                retval=scfp_done;
                break;
@@ -2565,8 +2567,9 @@ void ControlPlayerObj (objtype * ob)
          if (ServerCommandStatus(oldpolltime)==cs_ready)
             {
             ProcessPlayerCommand (num);
-            if (demoplayback||demorecord)
+            if (demoplayback||demorecord) {
                SoftError("x=%4lx y=%4lx a=%4lx time=%5ld\n",player->x,player->y,player->angle,oldpolltime);
+	    }
             break;
             }
    //      else if ((ServerCommandStatus(oldpolltime)==cs_fixing) &&
@@ -2682,8 +2685,9 @@ void UpdatePlayerObj ( int player )
 	pstate->angle <<= 11;
    pstate->topspeed=MaxSpeedForCharacter(pstate);
 
-   if (demoplayback||demorecord)
+   if (demoplayback||demorecord) {
       SoftError("  dmx=%4lx dmy=%4lx da=%4lx time=%5ld\n",pstate->dmomx,pstate->dmomy,pstate->angle>>11,oldpolltime);
+   }
 #if 0
 #if (DEVELOPMENT == 1)
          if ((modemgame==true) || (demoplayback==true) || (demorecord==true))

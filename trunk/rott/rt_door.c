@@ -137,6 +137,7 @@ void Teleport(elevator_t*eptr,int destination);
 void ConnectPushWall (int pwall);
 void SetupPushWall (int pwall);
 void WallMoving (int pwall);
+int SetNextAction(elevator_t*eptr,int action);
 
 /*
 ===============
@@ -2968,7 +2969,7 @@ void Teleport(elevator_t*eptr,int destination)
 	 starty = eptr->sy;
 	 destx = eptr->dx;
 	 desty = eptr->dy;
-    tilemap[eptr->esx][eptr->esy] = (elevatorstart + 5|0x2000);
+    tilemap[eptr->esx][eptr->esy] = (elevatorstart + 5) | 0x2000;
 
 	}
  else
@@ -2976,7 +2977,7 @@ void Teleport(elevator_t*eptr,int destination)
 	 starty = eptr->dy;
 	 destx = eptr->sx;
 	 desty = eptr->sy;
-    tilemap[eptr->edx][eptr->edy] = (elevatorstart + 5|0x2000);
+	 tilemap[eptr->edx][eptr->edy] = (elevatorstart + 5) | 0x2000;
 	}
 
  for(tstat=firstactivestat;tstat;tstat=tstat->nextactive)
@@ -3197,7 +3198,7 @@ void OperateElevatorSwitch(objtype*ob,int elevnum,int checkx,int checky)
 	 eptr->ticcount = 0;
 	}
 
- tilemap[checkx][checky] = (elevatorstart + 6|0x2000);
+ tilemap[checkx][checky] = (elevatorstart + 6) | 0x2000;
  SD_PlaySoundRTP(SD_TOUCHPLATESND,ob->x,ob->y);
 
 }
@@ -3235,6 +3236,8 @@ void MoveDoors (void)
 			DoorClosing(door);
          SD_PanRTP ( doorobjlist[door]->soundhandle, doorobjlist[door]->tilex<<16, doorobjlist[door]->tiley<<16 );
 			break;
+		default:
+		    ;
 		}
 }
 

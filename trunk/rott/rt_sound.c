@@ -58,8 +58,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // Local Variables
 
-static soundstart;
-static soundtype;
+static int soundstart;
+static int soundtype;
 int SD_Started=false;
 static boolean PositionStored=false;
 static int NumBadSounds=0;
@@ -1073,7 +1073,7 @@ int MU_Startup ( boolean bombonerror )
 
    status=MUSIC_Init( card, MidiAddress );
 
-   if (status != MUSIC_Ok)
+   if (status != MUSIC_Ok) {
       if (bombonerror)
          {
          DeleteSoundFile ();
@@ -1081,6 +1081,7 @@ int MU_Startup ( boolean bombonerror )
          }
       else
          return (status);
+   }
 
    currentsong=0;
 

@@ -50,9 +50,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define  MaxJoyValue    5000
 
 void Mouse (int x);
+
+#if defined(__WATCOMC__)
 #pragma aux Mouse =  \
    "int  33h"        \
    parm [EAX]        \
    modify [EAX]
+#endif
 
 #endif

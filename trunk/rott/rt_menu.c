@@ -152,7 +152,7 @@ static int numdone;
 
 static char *endStrings[ 7 ] =
    {
-   "Press Y to signal \nfiring squad.\0\0",
+   "Press Y to reformat \nand install Windows.\0\0",
    "Press Y to activate \nguillotine.\0\0",
    "Press Y to release \nthe cyanide gas.\0\0",
    "Press Y to open \ntrap door.\0\0",
@@ -1218,11 +1218,13 @@ void ShowCursor
    int basey
    );
 void CP_DrawSelectedGame (int w);
+int HandleMenu (CP_iteminfo *item_i, CP_itemtype *items, void (*routine)(int w));
 void DrawStoredGame ( byte * pic, int episode, int area );
 void DrawCustomKeyboard (void);
 void DrawBattleModeName( int which );
 void DrawBattleModeDescription( int w );
 void DrawSoundSetupMainMenu( void );
+int ColorMenu(void);
 
 //******************************************************************************
 //
@@ -2181,6 +2183,8 @@ int HandleMenu (CP_iteminfo *item_i, CP_itemtype *items, void (*routine)(int w))
 
                RefreshMenuBuf (0);
             break;
+	 default:
+	     ;
          }
       }
 
@@ -3407,7 +3411,7 @@ int CP_LoadGame (int quick, int dieload)
    {
       which = HandleMenu (&LSItems, &LSMenu[0], CP_DrawSelectedGame);
 
-      if (exit = DoLoad (which))
+      if ((exit = DoLoad (which)))
          break;
 
    } while (which >= 0);
@@ -3553,7 +3557,7 @@ int CP_SaveGame ( void )
          //
          // OVERWRITE EXISTING SAVEGAME?
          //
-         if (SaveGamesAvail[which])
+	  if (SaveGamesAvail[which]) {
             if (!CP_DisplayMsg (GAMESVD, 12))
             {
                DrawLoadSaveScreenAlt (1);
@@ -3565,6 +3569,7 @@ int CP_SaveGame ( void )
                EraseMenuBufRegion (LSM_X+LSItems.indent, LSM_Y+1+which*9, 80, 8);
                PrintLSEntry (which);
             }
+	  }
          quicksaveslot=which;
 
          DrawStoredGame (savedscreen, gamestate.episode, gamestate.mapon);
@@ -3877,7 +3882,7 @@ void DefineKey
          key = LastScan;
          LastScan = 0;
 
-         buttonscan[ order[ handlewhich ] ] = key;
+         buttonscan[ (unsigned int)order[ handlewhich ] ] = key;
 
          strcpy( &NormalKeyNames[ handlewhich ][ KEYNAMEINDEX ],
             IN_GetScanName( key ) );
@@ -4192,7 +4197,7 @@ void Message (char *string)
    CurrentFont = newfont1;
    h = CurrentFont->height;
 
-   for (i = 0; i < strlen (string); i++)
+   for (i = 0; i < (int)strlen (string); i++)
       if (string[i] == '\n')
       {
          if (w > mw)
@@ -5083,7 +5088,7 @@ void DrawCustomKeyboard (void)
    for( i = 0; i < NormalKeyItems.amount; i++ )
       {
       strcpy( &NormalKeyNames[ i ][ KEYNAMEINDEX ],
-         IN_GetScanName( buttonscan[ order[ i ] ] ) );
+         IN_GetScanName( buttonscan[ (unsigned int)order[ i ] ] ) );
       }
 
    MN_GetCursorLocation( &NormalKeyItems, &NormalKeyMenu[ 0 ] );
@@ -5852,6 +5857,8 @@ boolean SliderMenu
                   moved = true;
                   }
                break;
+	    default:
+		;
             }
 
          lastdir = ci.dir;
@@ -6440,7 +6447,7 @@ void DrawLightLevelOptionDescription( int w )
 //
 //****************************************************************************
 
-void DrawPointGoalOptionDescription( w )
+void DrawPointGoalOptionDescription( int w )
    {
    DrawOptionDescription( PointGoalOptionDescriptions, w );
    }
@@ -8241,12 +8248,12 @@ void ShowBattleOptions
       }
 
    strcpy( text, string );
-   if ( options->Gravity < temp )
+   if ( options->Gravity < (unsigned int)temp )
       {
       strcat( text, "-" );
       }
 
-   if ( options->Gravity > temp )
+   if ( options->Gravity > (unsigned int)temp )
       {
       strcat( text, "+" );
       }
@@ -8988,14 +8995,14 @@ void SS_DrawSBSetupMenu
       }
    else
       {
-      strcat( text, TypeNames[ typetostring[ SBSettings.Type ] ] );
+	  strcat( text, TypeNames[ (unsigned int)typetostring[ SBSettings.Type ] ] );
       }
 
    PrintBattleOption( true, WindowX, PrintY, text );
    PrintY += 6;
 
    strcpy( text, "Port : " );
-   if ( SBSettings.Address != UNDEFINED )
+   if ( SBSettings.Address != (unsigned long)UNDEFINED )
       {
       itoa( SBSettings.Address, num, 16 );
       strcat( text, num );
@@ -9010,7 +9017,7 @@ void SS_DrawSBSetupMenu
    PrintY += 6;
 
    strcpy( text, "IRQ : " );
-   if ( SBSettings.Interrupt != UNDEFINED )
+   if ( SBSettings.Interrupt != (unsigned long)UNDEFINED )
       {
       itoa( SBSettings.Interrupt, num, 10 );
       strcat( text, num );
@@ -9024,7 +9031,7 @@ void SS_DrawSBSetupMenu
    PrintY += 6;
 
    strcpy( text, "DMA : " );
-   if ( SBSettings.Dma8 != UNDEFINED )
+   if ( SBSettings.Dma8 != (unsigned long)UNDEFINED )
       {
       itoa( SBSettings.Dma8, num, 10 );
       strcat( text, num );
@@ -9038,7 +9045,7 @@ void SS_DrawSBSetupMenu
    PrintY += 6;
 
    strcpy( text, "16-Bit DMA : " );
-   if ( SBSettings.Dma16 != UNDEFINED )
+   if ( SBSettings.Dma16 != (unsigned long)UNDEFINED )
       {
       itoa( SBSettings.Dma16, num, 10 );
       strcat( text, num );

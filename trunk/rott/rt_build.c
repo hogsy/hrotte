@@ -74,7 +74,7 @@ static boolean BackgroundDrawn=false;
 
 static plane_t planelist[MAXPLANES],*planeptr;
 
-static StringShade=16;
+static int StringShade=16;
 
 extern void (*USL_MeasureString)(char *, int *, int *, font_t *);
 

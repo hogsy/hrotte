@@ -58,6 +58,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //MED
 #include "memcheck.h"
 
+void print_stack (int level);
+long filelength (int handle);
+
 int    egacolor[16];
 byte   *  origpal;
 FILE   *  errout;
@@ -404,18 +407,18 @@ void Error (char *error, ...)
 
    if (player!=NULL)
       {
-      printf ("Player X     = %lx\n", player->x);
-      printf ("Player Y     = %lx\n", player->y);
-      printf ("Player Angle = %lx\n\n", player->angle);
+      printf ("Player X     = %lx\n", (long int)player->x);
+      printf ("Player Y     = %lx\n", (long int)player->y);
+      printf ("Player Angle = %lx\n\n", (long int)player->angle);
       }
-   printf ("Episode      = %ld\n", gamestate.episode);
+   printf ("Episode      = %ld\n", (long int)gamestate.episode);
 
    if (gamestate.episode > 1)
       level = (gamestate.mapon+1) - ((gamestate.episode-1) << 3);
    else
       level = gamestate.mapon+1;
 
-   printf ("Area         = %ld\n", level);
+   printf ("Area         = %ld\n", (long int)level);
 
 #ifndef DOS
    print_stack (1);
@@ -445,7 +448,9 @@ void Error (char *error, ...)
       getch();
       }
 
-#warning an SDL_Quit might be good here...
+   #if USE_SDL
+   SDL_Quit();
+   #endif
 
    exit (1);
 }
@@ -688,7 +693,7 @@ void SafeRead (int handle, void *buffer, long count)
 	while (count)
 	{
 		iocount = count > 0x8000 ? 0x8000 : count;
-		if (read (handle,buffer,iocount) != iocount)
+		if (read (handle,buffer,iocount) != (int)iocount)
 			Error ("File read failure reading %ld bytes",count);
 		buffer = (void *)( (byte *)buffer + iocount );
 		count -= iocount;
@@ -703,7 +708,7 @@ void SafeWrite (int handle, void *buffer, long count)
 	while (count)
 	{
 		iocount = count > 0x8000 ? 0x8000 : count;
-		if (write (handle,buffer,iocount) != iocount)
+		if (write (handle,buffer,iocount) != (int)iocount)
 			Error ("File write failure writing %ld bytes",count);
 		buffer = (void *)( (byte *)buffer + iocount );
 		count -= iocount;
@@ -715,7 +720,7 @@ void SafeWriteString (int handle, char * buffer)
 	unsigned	iocount;
 
    iocount=strlen(buffer);
-	if (write (handle,buffer,iocount) != iocount)
+	if (write (handle,buffer,iocount) != (int)iocount)
 			Error ("File write string failure writing %s\n",buffer);
 }
 
@@ -1609,7 +1614,7 @@ static int Width;                       /* width of an object in bytes          
 static char *Base;                      /* pointer to element [-1] of array             */
 
 
-static newsift_down(L,U) int L,U;
+static void newsift_down(L,U) int L,U;
 {  int c;
 
    while(1)

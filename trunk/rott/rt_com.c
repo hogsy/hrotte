@@ -102,8 +102,8 @@ void InitROTTNET (void)
 
    if (!quiet)
       {
-      printf("ROTTNET: Communicating on vector %ld\n",rottcom->intnum);
-      printf("ROTTNET: consoleplayer=%ld\n",rottcom->consoleplayer);
+      printf("ROTTNET: Communicating on vector %ld\n",(long int)rottcom->intnum);
+      printf("ROTTNET: consoleplayer=%ld\n",(long int)rottcom->consoleplayer);
       }
 }
 
@@ -195,7 +195,7 @@ void WritePacket (void * buffer, int len, int destination)
    // set destination
    rottcom->remotenode=destination;
 
-   if (len>(MAXCOMBUFFERSIZE-sizeof(word)))
+   if (len>(int)(MAXCOMBUFFERSIZE-sizeof(word)))
       {
       Error("WritePacket: Overflowed buffer\n");
       }
@@ -387,7 +387,7 @@ void SetTime ( void )
             else if (i!=consoleplayer)
                SyncTime(i);
             if (standalone==true)
-               printf("SetTime: player#%ld\n",i);
+               printf("SetTime: player#%ld\n",(long int)i);
             }
          }
       else

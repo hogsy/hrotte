@@ -701,10 +701,10 @@ int FX_PlayLoopedVOC(char *ptr, long loopstart, long loopend,
 
     totalsamples = chunk->alen / samplesize;
 
-    if ((loopstart >= 0) && (loopstart < totalsamples))
+    if ((loopstart >= 0) && ((unsigned int)loopstart < totalsamples))
     {
         if (loopend < 0) loopend = 0;
-        if (loopend > totalsamples) loopend = totalsamples;
+        if ((unsigned int)loopend > totalsamples) loopend = totalsamples;
 
         if (loopend < loopstart)
         {
@@ -1097,7 +1097,7 @@ int MUSIC_StopSong(void)
     if ( (Mix_PlayingMusic()) || (Mix_PausedMusic()) )
         Mix_HaltMusic();
 
-    if (music_musicchunk);
+    if (music_musicchunk)
         Mix_FreeMusic(music_musicchunk);
 
     music_songdata = NULL;

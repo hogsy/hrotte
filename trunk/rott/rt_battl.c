@@ -1069,10 +1069,12 @@ battle_status BATTLE_PlayerKilledPlayer
                   }
                }
             break;
-         #if (BATTLECHECK == 1)
          default :
+         #if (BATTLECHECK == 1)
             Error( "BATTLE_PlayerKilledPlayer called with a "
                "reason of %d in Hunter.", reason );
+         #else
+	    ;
          #endif
          }
       }

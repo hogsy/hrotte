@@ -1067,7 +1067,7 @@ void DrawScaleds (void)
 
 			 visptr->h1=pheight-statptr->z;
 
-			 if ((statptr->itemnumber != -1) &&
+			 if ((statptr->itemnumber != (unsigned int)-1) &&
 				  (statptr->flags&FL_HEIGHTFLIPPABLE)
 				 )
 				 {

@@ -848,7 +848,7 @@ boolean US_LineInput (int x, int y, char *buf, char *def, boolean escok,
 
       case sc_End:
 
-         if ( cursor != strlen (s) )
+         if ( cursor != (int)strlen (s) )
             {
             cursor = strlen (s);
             cursormoved = true;
@@ -1140,7 +1140,7 @@ boolean US_lineinput (int x, int y, char *buf, char *def, boolean escok,
 
       case sc_End:
 
-         if ( cursor != strlen( s ) )
+         if ( cursor != (int)strlen( s ) )
             {
             cursor = strlen (s);
             cursormoved = true;
@@ -1498,8 +1498,8 @@ void DrawIntensityChar
    dest = origdest;
 
    ch -= 31;
-   width = IFont->width[ ch ];
-   source = ( ( byte * )IFont ) + IFont->charofs[ ch ];
+   width = IFont->width[ (unsigned int)ch ];
+   source = ( ( byte * )IFont ) + IFont->charofs[ (unsigned int)ch ];
 
    mask = 1 << ( px & 3 );
 

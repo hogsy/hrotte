@@ -171,6 +171,7 @@ void SetupRandomActors(void);
 void SetupActors(void);
 void SetupStatics(void);
 void LoftSprites( void );
+int GetLumpForTile(int tile);
 
 //========================================
 

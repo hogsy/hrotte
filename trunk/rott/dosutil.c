@@ -8,6 +8,10 @@
 #include <fcntl.h>
 
 #include "rt_def.h"
+
+#if defined(USE_SDL)
+#include <SDL/SDL.h>
+#endif
               
 /* 
   Copied over from Wolf3D Linux: http://www.icculus.org/wolf3d/
@@ -183,7 +187,9 @@ void crash_print (int sig)
 	printf ("OH NO OH NO ROTT CRASHED!\n");
 	printf ("Here is where:\n");
 	print_stack (1);
+#if defined(USE_SDL)
 	SDL_Quit ();
+#endif
 	exit (1);
 }
 

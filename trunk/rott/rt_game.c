@@ -67,6 +67,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "memcheck.h"
 
 
+long filelength(int handle);
+
+
 #if (SHAREWARE == 1)
 #define NUMAMMOGRAPHICS 10
 #else
@@ -1049,7 +1052,7 @@ void DrawNumber (int x, int y, int width, int which, boolean bufferofsonly)
       z--;
    }
 
-   c = length <= width ? 0 : length-width;
+   c = length <= (unsigned)width ? 0 : length-width;
    while (c < length)
    {
       switch (which)
@@ -3946,7 +3949,7 @@ void BattleLevelCompleted ( int localplayer )
             {
             ReadAnyControl (&ci);
             }
-         while( ci.dir == key );
+         while( ci.dir == (dirtype)key );
          }
 
       LastScreen = Screen;
