@@ -2862,13 +2862,17 @@ void GetFileName (boolean saveLBM)
 	int i;
 	
 	for (i = 0; i < 9999; i++) {
+		char filename[128];
+		
 		if (saveLBM) {
 	   		sprintf(savename, "rott%04d.lbm", i);
 	   	} else {
 	   		sprintf(savename, "rott%04d.pcx", i);
 	   	}
 
-		if (access(savename, F_OK) != 0) {
+		GetPathFromEnvironment( filename, ApogeePath, savename );
+		
+		if (access(filename, F_OK) != 0) {
 			return;
 		}
 	}
