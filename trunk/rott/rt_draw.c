@@ -5687,12 +5687,53 @@ void  DrawMapPost (int height, byte * src, byte * buf)
 
 void DrawRotRow(int count, byte * dest, byte * src)
 {
-	STUB_FUNCTION;
+	unsigned eax, ecx, edx, ebp, fracstep;
+
+	ecx = mr_yfrac;
+	edx = mr_xfrac;
+	fracstep = mr_xstep;
+	while (count--) {
+		eax = edx >> 16;
+		ebp = ecx;
+		if (eax <= 255)
+		{
+			ebp >>= 16;
+			if (ebp <= 511)
+			{
+				ebp <<= 23;
+				eax = (eax << 9) | (ebp >> (32-9));
+			}
+		}
+		*dest++ = src[eax];
+		edx += fracstep;
+		ecx += fracstep;
+	}
 }
 
 void DrawMaskedRotRow(int count, byte * dest, byte * src)
 {
-	STUB_FUNCTION;
+	unsigned eax, ecx, edx, ebp, fracstep;
+
+	ecx = mr_yfrac;
+	edx = mr_xfrac;
+	fracstep = mr_xstep;
+	while (count--) {
+		eax = edx >> 16;
+		ebp = ecx;
+		if (eax <= 255)
+		{
+			ebp >>= 16;
+			if (ebp <= 511)
+			{
+				ebp <<= 23;
+				eax = (eax << 9) | (ebp >> (32-9));
+			}
+		}
+		if (src[eax] != 0xff) *dest = src[eax];
+		dest++;
+		edx += fracstep;
+		ecx += fracstep;
+	}
 }
 
 void DrawSkyPost (byte * buf, byte * src, int height)
