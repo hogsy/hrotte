@@ -22,11 +22,12 @@ rott: 	engine.o \
 	rt_str.o \
 	rt_ted.o \
 	rt_vid.o \
+	scriplib.o \
 	w_wad.o \
 	z_zone.o
 
 # rt_util.c, rt_in.c
-# rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a
+# rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a, f_scale
 
 clean:
 	rm *.o
