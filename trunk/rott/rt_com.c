@@ -17,17 +17,20 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include <conio.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <conio.h>
 #include <ctype.h>
+#include <stdarg.h>
+
+#ifdef DOS
+#include <conio.h>
 #include <dos.h>
 #include <process.h>
-#include <stdarg.h>
 #include <bios.h>
-#include <ctype.h>
+#endif
+
 #include "rt_def.h"
 #include "_rt_com.h"
 #include "rt_com.h"
@@ -55,10 +58,15 @@ byte ROTTpacket[MAXCOMBUFFERSIZE];
 int controlsynctime;
 
 // LOCAL VARIABLES
+#ifdef DOS
 static union  REGS   comregs;
+#endif
+
 static int    ComStarted=false;
 static int    transittimes[MAXPLAYERS];
 
+void SyncTime( int client );
+void SetTransitTime( int client, int time );
 
 /*
 ===============
@@ -119,7 +127,11 @@ boolean ReadPacket (void)
 
    // Check to see if a packet is ready
 
+#ifdef DOS
 	int386(rottcom->intnum,&comregs,&comregs);
+#else
+	STUB_FUNCTION;
+#endif
 
    // Is it ready?
 
@@ -211,7 +223,11 @@ void WritePacket (void * buffer, int len, int destination)
 
 //   SoftError( "WritePacket: time=%ld size=%ld src=%ld type=%d\n",ticcount,rottcom->datalength,rottcom->remotenode,rottcom->data[0]);
    // Send It !
+#ifdef DOS
 	int386(rottcom->intnum,&comregs,&comregs);
+#else
+	STUB_FUNCTION;
+#endif
 
 #if 0
    rottcom->command=CMD_OUTQUEBUFFERSIZE;
