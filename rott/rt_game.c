@@ -1522,7 +1522,6 @@ void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *
    byte mask;
    byte pixel;
 
-
    mask = 1 << (xpos&3);
 
 #ifdef DOS
@@ -1576,12 +1575,14 @@ void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *
       if (heightmod)
          src += (heightmod*width);
 
+#ifdef DOS
       mask <<= 1;
       if (mask == 16)
       {
          mask = 1;
          olddest++;
       }
+#endif
    }
 }
 
@@ -1673,12 +1674,14 @@ void DrawColoredMPPic (int xpos, int ypos, int width, int height, int heightmod,
       if (heightmod)
          src += (heightmod*width);
 
+#ifdef DOS
       mask <<= 1;
       if (mask == 16)
       {
          mask = 1;
          olddest++;
       }
+#endif
    }
 }
 
@@ -2469,13 +2472,15 @@ void Drawpic (int xpos, int ypos, int width, int height, byte *src)
          dest += (linewidth-width*4);
 #endif
       }
-
+      
+#ifdef DOS
       mask <<= 1;
       if (mask == 16)
 		{
          mask = 1;
          olddest++;
       }
+#endif
    }
 }
 
@@ -2601,6 +2606,7 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
 #endif
       }
 
+#ifdef DOS
       mask <<= 1;
 
       if (mask == 16)
@@ -2610,6 +2616,7 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
          dest2++;
          dest3++;
       }
+#endif
    }
 }
 
