@@ -4523,10 +4523,8 @@ void SaveTag (int handle, char * tag, int size)
 
 boolean SaveTheGame (int num, gamestorage_t * game)
 {
-#ifdef DOS
-	struct diskfree_t dfree;
-   char   loadname[45]="ROTTGAM0.ROT";
-   char   filename[ 128 ];
+   char   loadname[MAX_PATH]="ROTTGAM0.ROT";
+   char   filename[MAX_PATH];
    byte   * altbuffer;
 	int    size;
 	int    avail;
@@ -4560,8 +4558,10 @@ boolean SaveTheGame (int num, gamestorage_t * game)
 
    GetPathFromEnvironment( filename, ApogeePath, loadname );
 
+#if PLATFORM_DOS
+{
+   struct diskfree_t dfree;
    // Determine available disk space
-
    letter = toupper(filename[0]);
    if (
        (letter >= 'A') &&
@@ -4589,6 +4589,8 @@ boolean SaveTheGame (int num, gamestorage_t * game)
       CP_DisplayMsg ("There is not enough\nspace on your disk\nto Save Game!\nPress any key to continue", 13);
 		return (false);
 		}
+}
+#endif
 
    // Open the savegame file
 
@@ -4797,11 +4799,6 @@ boolean SaveTheGame (int num, gamestorage_t * game)
 
    pickquick = true;
 	return (true);
-#else
-	STUB_FUNCTION;
-	
-	return false;
-#endif
 }
 
 

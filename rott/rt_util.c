@@ -444,6 +444,9 @@ void Error (char *error, ...)
       {
       getch();
       }
+
+#warning an SDL_Quit might be good here...
+
    exit (1);
 }
 
@@ -861,6 +864,100 @@ void FixFilePath(char *filename)
     }
 #endif
 }
+
+
+#if PLATFORM_DOS
+    /* no op. */
+#elif PLATFORM_UNIX
+int _dos_findfirst(char *filename, int x, struct find_t *f)
+{
+    char *ptr;
+
+    if (strlen(filename) >= sizeof (f->pattern))
+        return(1);
+
+    strcpy(f->pattern, filename);
+    FixFilePath(f->pattern);
+    ptr = strrchr(f->pattern, PATH_SEP_CHAR);
+
+    if (ptr == NULL)
+    {
+        ptr = filename;
+        f->dir = opendir(CURDIR);
+        printf("  - scanning [%s].\n", CURDIR);
+    }
+    else
+    {
+        *ptr = '\0';
+        f->dir = opendir(f->pattern);
+        printf("  - scanning [%s].\n", f->pattern);
+        memmove(f->pattern, ptr + 1, strlen(ptr) + 1);
+    }
+
+    return(_dos_findnext(f));
+}
+
+
+static int check_pattern_nocase(const char *x, const char *y)
+{
+    if ((x == NULL) || (y == NULL))
+        return(0);  /* not a match. */
+
+    while ((*x) && (*y))
+    {
+        if (*x == '*')
+            Error("Unexpected wildcard!");  /* FIXME? */
+
+        else if (*x == '?')
+        {
+            if (*y == '\0')
+                return(0);  /* anything but EOS is okay. */
+        }
+
+        else
+        {
+            if (toupper((int) *x) != toupper((int) *y))
+                return(0);  /* not a match. */
+        }
+
+        x++;
+        y++;
+    }
+
+    return(*x == *y);  /* it's a match (both should be EOS). */
+}
+
+int _dos_findnext(struct find_t *f)
+{
+    struct dirent *dent;
+
+    if (f->dir == NULL)
+        return(1);  /* no such dir or we're just done searching. */
+
+    while ((dent = readdir(f->dir)) != NULL)
+    {
+        if (check_pattern_nocase(f->pattern, dent->d_name))
+        {
+            if (strlen(dent->d_name) < sizeof (f->name))
+            {
+                strcpy(f->name, dent->d_name);
+                printf("  - [%s] matches [%s].\n", f->name, f->pattern);
+                return(0);  /* match. */
+            }
+        }
+        printf("  - [%s] failed to match [%s].\n", dent->d_name, f->pattern);
+    }
+
+    printf("  - scanned whole dir.\n");
+    closedir(f->dir);
+    f->dir = NULL;
+    return(1);  /* no match in whole directory. */
+}
+
+#else
+#error please define your platform.
+#endif
+
 
 
 void GetPathFromEnvironment( char *fullname, const char *envname, const char *filename )
