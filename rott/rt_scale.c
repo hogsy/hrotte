@@ -479,7 +479,7 @@ void ScaleShape (visobj_t * sprite)
    int      plane;
 
    whereami=32;
-   shape=W_CacheLumpNum(sprite->shapenum,PU_CACHE);
+   shape=W_CacheLumpNum(sprite->shapenum,PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
    size=p->origsize>>7;
 //   sprite->viewheight<<=1;
@@ -650,7 +650,7 @@ void ScaleTransparentShape (visobj_t * sprite)
    int    plane;
 
    whereami=33;
-   shape=W_CacheLumpNum(sprite->shapenum,PU_CACHE);
+   shape=W_CacheLumpNum(sprite->shapenum,PU_CACHE, Cvt_transpatch_t, 1);
    p=(transpatch_t *)shape;
    size=p->origsize>>7;
    dc_invscale=sprite->viewheight<<((10-HEIGHTFRACTION)-size);
@@ -749,7 +749,7 @@ void ScaleSolidShape (visobj_t * sprite)
    int    startx;
 
    whereami=34;
-   shape=W_CacheLumpNum(sprite->shapenum,PU_CACHE);
+   shape=W_CacheLumpNum(sprite->shapenum,PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
    size=p->origsize>>7;
    dc_invscale=sprite->viewheight<<((10-HEIGHTFRACTION)-size);
@@ -841,7 +841,7 @@ void ScaleWeapon (int xoff, int y, int shapenum)
 
    whereami=35;
    SetPlayerLightLevel();
-   shape=W_CacheLumpNum(shapenum,PU_CACHE);
+   shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
    h=((p->origsize*weaponscale)>>17);
    centeryclipped=(viewheight-h)+FixedMul(y,weaponscale);
@@ -930,7 +930,7 @@ void DrawUnScaledSprite (int x, int y, int shapenum, int shade)
    shadingtable=colormap+(shade<<8);
    centeryclipped=y;
    xcent=x;
-   shape=W_CacheLumpNum(shapenum,PU_CACHE);
+   shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
 	dc_invscale=0x10000;
 
@@ -1033,7 +1033,7 @@ void DrawPositionedScaledSprite (int x, int y, int shapenum, int height, int typ
    shadingtable=colormap+(1<<12);
 	centeryclipped=y;
 	xcent=x;
-	shape=W_CacheLumpNum(shapenum,PU_CACHE);
+	shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_patch_t, 1);
 	p=(patch_t *)shape;
 	tp=(transpatch_t *)shape;
 
@@ -1124,7 +1124,7 @@ void DrawScreenSizedSprite (int lump)
 
    whereami=39;
    shadingtable=colormap+(1<<12);
-   shape=W_CacheLumpNum(lump,PU_CACHE);
+   shape=W_CacheLumpNum(lump,PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
    dc_invscale=(viewwidth<<16)/p->origsize;
    tx=-p->leftoffset;
@@ -1257,6 +1257,7 @@ void DrawNormalPost (byte * src, byte * buf)
 
    whereami=40;
 
+   // Debug("DrawNormalPost: src %p, buf %p\n");
    while (1)
       {
       offset=*(src++);
@@ -1292,7 +1293,7 @@ void DrawNormalSprite (int x, int y, int shapenum)
 
    whereami=41;
 
-   shape = W_CacheLumpNum (shapenum, PU_CACHE);
+   shape = W_CacheLumpNum (shapenum, PU_CACHE, Cvt_patch_t, 1);
    p = (patch_t *)shape;
 
    if (((x-p->leftoffset)<0) || ((x-p->leftoffset+p->width)>320))

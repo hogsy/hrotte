@@ -430,13 +430,13 @@ void SetPlaneViewSize (void)
    floornum = GetFloorCeilingLump ( floornum );
    //ceilingnum = GetFloorCeilingLump ( ceilingnum );
 
-   floor = W_CacheLumpNum(floornum,PU_LEVELSTRUCT);
+   floor = W_CacheLumpNum(floornum,PU_LEVELSTRUCT, Cvt_patch_t, 1);
    floor +=8;
 
    if (sky==0)  // Don't cache in if not used
       {
       ceilingnum = GetFloorCeilingLump ( ceilingnum );
-      ceiling = W_CacheLumpNum(ceilingnum,PU_LEVELSTRUCT);
+      ceiling = W_CacheLumpNum(ceilingnum,PU_LEVELSTRUCT, Cvt_patch_t, 1);
       ceiling +=8;
       } else {
       	ceiling = NULL;
@@ -473,13 +473,13 @@ void SetPlaneViewSize (void)
       }
       if (sky!=0)
          {
-         skydata[0]=W_CacheLumpNum(skytop,PU_STATIC);
-         skydata[1]=W_CacheLumpNum(skybottom,PU_STATIC);
+         skydata[0]=W_CacheLumpNum(skytop,PU_STATIC, CvtNull, 1);
+         skydata[1]=W_CacheLumpNum(skybottom,PU_STATIC, CvtNull, 1);
          centerskypost=MINSKYHEIGHT-(horizonheight*6);
          oldsky=sky;
          MakeSkyData();
-         W_CacheLumpNum(skytop,PU_CACHE);
-         W_CacheLumpNum(skybottom,PU_CACHE);
+         W_CacheLumpNum(skytop,PU_CACHE, CvtNull, 1);
+         W_CacheLumpNum(skybottom,PU_CACHE, CvtNull, 1);
          x=511;
          for (i=0;i<MAXSKYSEGS;i++)
             {

@@ -200,14 +200,14 @@ void BuildTables (void)
 {
   byte * table;
   byte * ptr;
-  int   length;
+  long  length;
   int   i;
 
 //
 // load in tables file
 //
 
-   table=W_CacheLumpName("tables",PU_STATIC);
+   table=W_CacheLumpName("tables",PU_STATIC, CvtNull, 1);
    ptr=table;
 
 //
@@ -215,7 +215,8 @@ void BuildTables (void)
 //
 
    memcpy(&length,ptr,sizeof(int));
-
+   SwapIntelLong(&length);
+   
 //
 // skip first table
 //
@@ -227,12 +228,14 @@ void BuildTables (void)
 //
 
    memcpy(&length,ptr,sizeof(int));
+   SwapIntelLong(&length);
    ptr+=sizeof(int);
+   
 //
 // get sin/cos table
 //
    memcpy(&sintable[0],ptr,length*sizeof(long));
-
+   SwapIntelLongArray(&sintable[0], length);
    ptr+=(length)*sizeof(int);
 
 //
@@ -240,13 +243,14 @@ void BuildTables (void)
 //
 
    memcpy(&length,ptr,sizeof(int));
+   SwapIntelLong(&length);
    ptr+=sizeof(int);
 
 //
 // get tangent table
 //
    memcpy(tantable,ptr,length*sizeof(short));
-
+   SwapIntelShortArray(tantable, length);
    ptr+=(length)*sizeof(short);
 
 //
@@ -254,13 +258,14 @@ void BuildTables (void)
 //
 
    memcpy(&length,ptr,sizeof(int));
+   SwapIntelLong(&length);
    ptr+=sizeof(int);
 
 //
 // get gamma table
 //
    memcpy(&gammatable[0],ptr,length*sizeof(byte));
-   table=W_CacheLumpName("tables",PU_CACHE);
+   table=W_CacheLumpName("tables",PU_CACHE, CvtNull, 1);
 
    costable = (fixed *)&(sintable[FINEANGLES/4]);
 
@@ -1807,7 +1812,7 @@ void DrawWallPost ( wallcast_t * post, byte * buf)
 
    whereami=42;
    if (post->lump)
-      src=W_CacheLumpNum(post->lump,PU_CACHE);
+      src=W_CacheLumpNum(post->lump,PU_CACHE, CvtNull, 1);
 	if (post->alttile!=0)
       {
       if (post->alttile==-1)
@@ -1838,7 +1843,7 @@ void DrawWallPost ( wallcast_t * post, byte * buf)
       else
          {
          ht=nominalheight;
-         src2=W_CacheLumpNum(post->alttile,PU_CACHE);
+         src2=W_CacheLumpNum(post->alttile,PU_CACHE, CvtNull, 1);
          }
       }
    else
@@ -2449,8 +2454,8 @@ void InterpolateDoor (visobj_t * plane)
    dx=(plane->x2-plane->x1+1);
    if (plane->h1<=0 || plane->h2<=0 || dx==0)
       return;
-   shape=W_CacheLumpNum(plane->shapenum,PU_CACHE);
-	shape2=W_CacheLumpNum(plane->altshapenum,PU_CACHE);
+   shape=W_CacheLumpNum(plane->shapenum,PU_CACHE, Cvt_patch_t, 1);
+	shape2=W_CacheLumpNum(plane->altshapenum,PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
    d1=(1<<(16+HEIGHTFRACTION)) / plane->h1;
    d2=(1<<(16+HEIGHTFRACTION)) / plane->h2;
@@ -2562,7 +2567,7 @@ void InterpolateMaskedWall (visobj_t * plane)
    if (plane->altshapenum>=0)
       {
       drawmiddle=true;
-      shape2=W_CacheLumpNum(plane->altshapenum,PU_CACHE);
+      shape2=W_CacheLumpNum(plane->altshapenum,PU_CACHE, Cvt_patch_t, 1);
       p2=(patch_t *)shape2;
       topoffset=p2->topoffset;
       }
@@ -2573,7 +2578,7 @@ void InterpolateMaskedWall (visobj_t * plane)
    if (plane->viewx>=0)
       {
       drawtop=true;
-      shape3=W_CacheLumpNum(plane->viewx,PU_CACHE);
+      shape3=W_CacheLumpNum(plane->viewx,PU_CACHE, Cvt_patch_t, 1);
       p3=(patch_t *)shape3;
       topoffset=p3->topoffset;
       }
@@ -2584,7 +2589,7 @@ void InterpolateMaskedWall (visobj_t * plane)
    if (plane->shapenum>=0)
       {
       drawbottom=true;
-      shape=W_CacheLumpNum(plane->shapenum,PU_CACHE);
+      shape=W_CacheLumpNum(plane->shapenum,PU_CACHE, Cvt_transpatch_t, 1);
       p = (transpatch_t *)shape;
       topoffset=p->topoffset;
       }
@@ -3265,7 +3270,7 @@ void ApogeeTitle (void)
    IN_ClearKeysDown();
    viewwidth=320;
    viewheight=200;
-   memcpy(&pal[0],W_CacheLumpName("ap_pal",PU_CACHE),768);
+   memcpy(&pal[0],W_CacheLumpName("ap_pal",PU_CACHE, CvtNull, 1),768);
    shadingtable=colormap+(1<<12);
    VL_NormalizePalette(&pal[0]);
    SwitchPalette(&pal[0],35);
@@ -4228,7 +4233,7 @@ void DoEndCinematic ( void )
 fadelogo:
    MenuFadeOut();
    ClearGraphicsScreen();
-   memcpy(&pal[0],W_CacheLumpName("ap_pal",PU_CACHE),768);
+   memcpy(&pal[0],W_CacheLumpName("ap_pal",PU_CACHE,CvtNull,1),768);
    VL_NormalizePalette(&pal[0]);
    SwitchPalette(&pal[0],35);
 
@@ -4255,7 +4260,7 @@ fadeworld:
    MenuFadeIn();
 
 
-   sky=W_CacheLumpNum(W_GetNumForName("SKYSTART")+2,PU_CACHE);
+   sky=W_CacheLumpNum(W_GetNumForName("SKYSTART")+2,PU_CACHE,CvtNull,1);
    tmp=sky;
    for (x=0;x<256;x++)
       {
@@ -4335,7 +4340,7 @@ fadeworld:
    if (LastScan!=0)
      goto finalfade;
 
-   sky=W_CacheLumpNum(W_GetNumForName("SKYSTART")+2,PU_CACHE);
+   sky=W_CacheLumpNum(W_GetNumForName("SKYSTART")+2,PU_CACHE,CvtNull,1);
    tmp=sky;
    for (x=0;x<256;x++)
       {
@@ -5688,14 +5693,14 @@ void DoMicroStoryScreen ( void )
 
    VL_FadeOut (0, 255, 0, 0, 0, 20);
 
-   pic=(pic_t *)W_CacheLumpName("mmbk",PU_CACHE);
+   pic=(pic_t *)W_CacheLumpName("mmbk",PU_CACHE,Cvt_pic_t,1);
    VWB_DrawPic (0, 0, pic);
    CheckHolidays();
 
    x=15;
    y=30;
 
-   IFont = ( cfont_t * )W_CacheLumpName( "sifont", PU_CACHE );
+   IFont = ( cfont_t * )W_CacheLumpName( "sifont", PU_CACHE, Cvt_cfont_t, 1);
    for(i=0;i<NUMSTORYLINES;i++)
       {
       DrawIntensityString (x, y, MicroStory[i], 241);

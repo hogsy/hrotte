@@ -166,7 +166,7 @@ void DrawMap_Wall (int x, int y, int tile)
    buf=(byte *)bufferofs+ylookup[y]+x;
 #endif
 
-   source=W_CacheLumpNum(tile,PU_CACHE);
+   source=W_CacheLumpNum(tile,PU_CACHE, CvtNull, 1);
 
 #ifdef DOS
    for (p=0;p<4;p++)
@@ -598,7 +598,7 @@ void SetupFullMap( void )
 
    // Fill in backgrounds
 
-   pic = (pic_t *) W_CacheLumpNum (W_GetNumForName ("mmbk"), PU_CACHE);
+   pic = (pic_t *) W_CacheLumpNum (W_GetNumForName ("mmbk"), PU_CACHE, Cvt_pic_t, 1);
    VWB_DrawPic (0, 0, pic);
    CheckHolidays();
 

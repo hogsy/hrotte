@@ -248,7 +248,7 @@ void CacheLumpGroup
 
    for( i = 0; i < numberoflumps; i++ )
       {
-      lumparray[ i ] = ( pic_t * )W_CacheLumpNum( lumpnum + i, PU_LEVEL );
+      lumparray[ i ] = ( pic_t * )W_CacheLumpNum( lumpnum + i, PU_LEVEL, Cvt_pic_t, 1 );
       }
    }
 
@@ -267,8 +267,8 @@ void SetupPlayScreen
 	int j;
    int num;
 
-   erase  = ( pic_t * )W_CacheLumpName( "erase", PU_LEVEL );
-   eraseb = ( pic_t * )W_CacheLumpName( "eraseb", PU_LEVEL );
+   erase  = ( pic_t * )W_CacheLumpName( "erase", PU_LEVEL, Cvt_pic_t, 1 );
+   eraseb = ( pic_t * )W_CacheLumpName( "eraseb", PU_LEVEL, Cvt_pic_t, 1 );
 
    CacheLumpGroup( "tmnum0", timenums, 10 );
    CacheLumpGroup( "lfnum0", lifeptnums, 10 );
@@ -282,7 +282,7 @@ void SetupPlayScreen
 
       num = locplayerstate->player;
       men[ num ] = ( pic_t * )W_CacheLumpNum( W_GetNumForName( "MAN1" ) +
-         num, PU_LEVEL );
+         num, PU_LEVEL, Cvt_pic_t, 1 );
       }
    else
       {
@@ -299,7 +299,7 @@ void SetupPlayScreen
       negman  = W_GetNumForName( "negman1" );
       man     = W_GetNumForName( "man1" );
 
-      blankfragpic = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL );
+      blankfragpic = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL, Cvt_pic_t, 1 );
       num++;
 
       for( i = 0; i < numplayers; i++ )
@@ -307,19 +307,19 @@ void SetupPlayScreen
          j = PLAYERSTATE[ i ].player;
          if ( !gamestate.teamplay )
             {
-            fragpic[ j ]    = ( pic_t * )W_CacheLumpNum( num + j, PU_LEVEL );
-            frag100pic[ j ] = ( pic_t * )W_CacheLumpNum( num100 + j, PU_LEVEL );
-            negfragpic[ j ] = ( pic_t * )W_CacheLumpNum( negnum + j, PU_LEVEL );
+            fragpic[ j ]    = ( pic_t * )W_CacheLumpNum( num + j, PU_LEVEL, Cvt_pic_t, 1 );
+            frag100pic[ j ] = ( pic_t * )W_CacheLumpNum( num100 + j, PU_LEVEL, Cvt_pic_t, 1 );
+            negfragpic[ j ] = ( pic_t * )W_CacheLumpNum( negnum + j, PU_LEVEL, Cvt_pic_t, 1 );
             }
          else
             {
-            negfragpic[ j ] = ( pic_t * )W_CacheLumpName( "teamnpic", PU_LEVEL );
-            fragpic[ j ]    = ( pic_t * )W_CacheLumpName( "teampic", PU_LEVEL );
+            negfragpic[ j ] = ( pic_t * )W_CacheLumpName( "teamnpic", PU_LEVEL, Cvt_pic_t, 1 );
+            fragpic[ j ]    = ( pic_t * )W_CacheLumpName( "teampic", PU_LEVEL, Cvt_pic_t, 1 );
             frag100pic[ j ] = fragpic[ j ];
             }
 
-         menneg[ j ]     = ( pic_t * )W_CacheLumpNum( negman + j, PU_LEVEL );
-         men[ j ]        = ( pic_t * )W_CacheLumpNum( man + j, PU_LEVEL );
+         menneg[ j ]     = ( pic_t * )W_CacheLumpNum( negman + j, PU_LEVEL, Cvt_pic_t, 1 );
+         men[ j ]        = ( pic_t * )W_CacheLumpNum( man + j, PU_LEVEL, Cvt_pic_t, 1 );
          }
       }
 
@@ -329,24 +329,24 @@ void SetupPlayScreen
    num   = W_GetNumForName( "INF_B" );
 
    // bullet weapons
-   ammo[0] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL );
-   ammo[1] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL );
-   ammo[2] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL );
+   ammo[0] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL, Cvt_pic_t, 1 );
+   ammo[1] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL, Cvt_pic_t, 1 );
+   ammo[2] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL, Cvt_pic_t, 1 );
 
 
    for(i=3;i < 13; i++ )
       {
-      ammo[ i ] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL );
+      ammo[ i ] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL, Cvt_pic_t, 1 );
       }
 
-   ammo[13] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL );
-   ammo[14] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL );
-   ammo[15] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL );
+   ammo[13] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL, Cvt_pic_t, 1 );
+   ammo[14] = ( pic_t * )W_CacheLumpNum( num, PU_LEVEL, Cvt_pic_t, 1 );
+   ammo[15] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL, Cvt_pic_t, 1 );
 
 
    for(i=16;i < 26; i++ )
       {
-      ammo[ i ] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL );
+      ammo[ i ] = ( pic_t * )W_CacheLumpNum( num++, PU_LEVEL, Cvt_pic_t, 1 );
       }
 
 
@@ -400,7 +400,7 @@ void DrawPlayScreen
 
    if ( SHOW_TOP_STATUS_BAR() )
       {
-      shape = W_CacheLumpName( "stat_bar", PU_CACHE );
+      shape = W_CacheLumpName( "stat_bar", PU_CACHE, Cvt_pic_t, 1 );
       GameMemToScreen( shape, 0, 0, bufferofsonly );
       }
 
@@ -411,7 +411,7 @@ void DrawPlayScreen
 
    if ( SHOW_BOTTOM_STATUS_BAR() )
       {
-      shape = ( pic_t * ) W_CacheLumpName( "bottbar", PU_CACHE );
+      shape = ( pic_t * ) W_CacheLumpName( "bottbar", PU_CACHE, Cvt_pic_t, 1 );
 
       if ( SHOW_KILLS() )
          {
@@ -427,7 +427,7 @@ void DrawPlayScreen
 
       if ( demoplayback )
          {
-         shape = ( pic_t * )W_CacheLumpName( "demo", PU_CACHE );
+         shape = ( pic_t * )W_CacheLumpName( "demo", PU_CACHE, Cvt_pic_t, 1 );
          DrawPPic( 148, 185, shape->width, shape->height,
             ( byte * )&shape->data, 1, true, bufferofsonly );
          }
@@ -495,7 +495,7 @@ void DrawPlayScreen
          shapenum = powerpics + 4;
          }
 
-      shape = ( pic_t * )W_CacheLumpNum ( shapenum, PU_CACHE );
+      shape = ( pic_t * )W_CacheLumpNum ( shapenum, PU_CACHE, Cvt_pic_t, 1 );
 
       GameMemToScreen( eraseb, POWERUP1X, POWERUPY, bufferofsonly );
 
@@ -520,7 +520,7 @@ void DrawPlayScreen
          shapenum = powerpics + 7;
          }
 
-      shape = ( pic_t * )W_CacheLumpNum( shapenum, PU_CACHE );
+      shape = ( pic_t * )W_CacheLumpNum( shapenum, PU_CACHE, Cvt_pic_t, 1 );
 
       GameMemToScreen( eraseb, POWERUP2X, POWERUPY, bufferofsonly );
 
@@ -626,7 +626,7 @@ void DrawKills
       // Draw triad if player is 'it' or has caught a triad
       if ( PLAYER[ consoleplayer ]->flags & FL_DESIGNATED )
          {
-         pic = W_CacheLumpName( "smalltri", PU_CACHE );
+         pic = W_CacheLumpName( "smalltri", PU_CACHE, Cvt_pic_t, 1 );
          DrawPPic( TRIAD_X - 1, TRIAD_Y - 2, pic->width, pic->height,
             ( byte * )&pic->data, 1, true, bufferofsonly );
          }
@@ -667,7 +667,7 @@ void DrawKills
          }
       else
          {
-         pic = W_CacheLumpName( "minus", PU_CACHE );
+         pic = W_CacheLumpName( "minus", PU_CACHE, Cvt_pic_t, 1 );
          StatusDrawColoredPic( LIVES_X - 12, LIVES_Y, pic, bufferofsonly, playeruniformcolor );
          StatusDrawColoredPic( LIVES_X - 4, LIVES_Y, pic, bufferofsonly, playeruniformcolor );
          }
@@ -710,7 +710,7 @@ void DrawKills
          }
       else
          {
-         pic = W_CacheLumpName( "minus", PU_CACHE );
+         pic = W_CacheLumpName( "minus", PU_CACHE, Cvt_pic_t, 1 );
          StatusDrawColoredPic( LEADER_NUM_X, LEADER_NUM_Y, pic, bufferofsonly, playeruniformcolor );
          StatusDrawColoredPic( LEADER_NUM_X + 8, LEADER_NUM_Y, pic, bufferofsonly, playeruniformcolor );
          }
@@ -786,7 +786,7 @@ void DrawKills
          }
       else
          {
-         pic = W_CacheLumpName( "minus", PU_CACHE );
+         pic = W_CacheLumpName( "minus", PU_CACHE, Cvt_pic_t, 1 );
          StatusDrawColoredPic( ( xpos + KILLS_OFFSET ), KILLS_Y, pic, bufferofsonly, playeruniformcolor );
          StatusDrawColoredPic( ( xpos + KILLS_OFFSET + 8 ), KILLS_Y, pic, bufferofsonly, playeruniformcolor );
          }
@@ -858,9 +858,9 @@ void DrawPlayers
 
    num = W_GetNumForName( "botpic1" );
 
-   scorenums[ 0 ]= ( pic_t * )W_CacheLumpName( "kilnum0", PU_CACHE );
-   friend = ( pic_t * )W_CacheLumpName( "t_friend", PU_CACHE );
-   enemy  = ( pic_t * )W_CacheLumpName( "t_enemy", PU_CACHE );
+   scorenums[ 0 ]= ( pic_t * )W_CacheLumpName( "kilnum0", PU_CACHE, Cvt_pic_t, 1 );
+   friend = ( pic_t * )W_CacheLumpName( "t_friend", PU_CACHE, Cvt_pic_t, 1 );
+   enemy  = ( pic_t * )W_CacheLumpName( "t_enemy", PU_CACHE, Cvt_pic_t, 1 );
 
    // Draw all the losers
    CurrentFont = tinyfont;
@@ -876,7 +876,7 @@ void DrawPlayers
             character = PLAYERSTATE[ player ].player;
 
             fragpic[ character ] = ( pic_t * )W_CacheLumpNum( num +
-               character, PU_CACHE );
+               character, PU_CACHE, Cvt_pic_t, 1 );
 
             if ( ( numplayers <= MAXKILLBOXES ) ||
                ( player != consoleplayer ) )
@@ -2194,13 +2194,13 @@ void DrawPauseXY (int x, int y)
 
    if (GamePaused == true)
    {
-      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("paused"), PU_CACHE);
+      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("paused"), PU_CACHE, Cvt_pic_t, 1);
       VWB_DrawPic (x, y, p);
       DrawEpisodeLevel (x,y);
    }
    else
    {
-      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("wait"), PU_CACHE);
+      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("wait"), PU_CACHE, Cvt_pic_t, 1);
       VWB_DrawPic (x, y, p);
    }
 }
@@ -2220,12 +2220,12 @@ void DrawPause (void)
 
    if (GamePaused == true)
    {
-      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("paused"), PU_CACHE);
+      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("paused"), PU_CACHE, Cvt_pic_t, 1);
       DrawPauseXY( (320-(p->width<<2) ) >>1, (200-p->height)>>1);
    }
    else
    {
-      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("wait"), PU_CACHE);
+      p = (pic_t *) W_CacheLumpNum (W_GetNumForName ("wait"), PU_CACHE, Cvt_pic_t, 1);
       DrawPauseXY( (320-(p->width<<2) ) >>1, (200-p->height)>>1);
    }
 
@@ -2364,7 +2364,7 @@ void GM_UpdateBonus
 
          poweruptime = time;
 
-         shape = ( pic_t * )W_CacheLumpNum( shapenum, PU_CACHE );
+         shape = ( pic_t * )W_CacheLumpNum( shapenum, PU_CACHE, Cvt_pic_t, 1 );
 
          GM_MemToScreen( ( byte * )&eraseb->data, eraseb->width,
             eraseb->height, POWERUP1X, POWERUPY );
@@ -2393,7 +2393,7 @@ void GM_UpdateBonus
 
          protectiontime = time;
 
-         shape = ( pic_t * )W_CacheLumpNum( shapenum, PU_CACHE );
+         shape = ( pic_t * )W_CacheLumpNum( shapenum, PU_CACHE, Cvt_pic_t, 1 );
 
          GM_MemToScreen( ( byte * )&eraseb->data, eraseb->width,
             eraseb->height, POWERUP2X, POWERUPY );
@@ -2512,7 +2512,7 @@ void  DrawEpisodeLevel (int x, int y)
           (gamestate.mapon == 22) || (gamestate.mapon == 32) ||
           (gamestate.mapon == 33))
       {
-         p = (pic_t *) W_CacheLumpName ("tnumb", PU_CACHE);
+         p = (pic_t *) W_CacheLumpName ("tnumb", PU_CACHE, Cvt_pic_t, 1);
          Drawpic (x+40, y+16, 8>>2, 16, (byte *)&p->data);
 
          if (gamestate.mapon == 6)
@@ -2545,7 +2545,7 @@ void  DrawEpisodeLevel (int x, int y)
    }
    else
    {
-      p = (pic_t *) W_CacheLumpName ("battp", PU_CACHE);
+      p = (pic_t *) W_CacheLumpName ("battp", PU_CACHE, Cvt_pic_t, 1);
       Drawpic (x+16, y+15, 32>>2, 16, (byte *)&p->data);
 
       level = abs(gamestate.mapon + 1);
@@ -3188,7 +3188,7 @@ void LevelCompleted
          }
       }
 
-   BkPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE );
+   BkPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE, Cvt_pic_t, 1 );
    VWB_DrawPic( 0, 0, BkPic );
 
    CheckHolidays();
@@ -3439,7 +3439,7 @@ void LevelCompleted
             ;
             }
 
-         BkPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE );
+         BkPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE, Cvt_pic_t, 1 );
          VWB_DrawPic( 0, 0, BkPic );
 
          gamestate.score += BONUSBONUS;
@@ -3457,7 +3457,7 @@ void LevelCompleted
             ;
             }
 
-         BkPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE );
+         BkPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE, Cvt_pic_t, 1 );
          VWB_DrawPic( 0, 0, BkPic );
 
          DrawEOLHeader( playstate );
@@ -3500,16 +3500,16 @@ void DrawTallyHeader
    pic_t *Blank;
    pic_t *TopBar;
 
-   Name                 = ( pic_t * )W_CacheLumpName( "t_name",    PU_CACHE );
-   Blank                = ( pic_t * )W_CacheLumpName( "t_blnk",    PU_CACHE );
-   KillCount            = ( pic_t * )W_CacheLumpName( "t_kcount",  PU_CACHE );
-   TimesYouKilledPerson = ( pic_t * )W_CacheLumpName( "t_kilper",  PU_CACHE );
-   TimesPersonKilledYou = ( pic_t * )W_CacheLumpName( "t_perkil" , PU_CACHE );
-   Suicides             = ( pic_t * )W_CacheLumpName( "t_suicid",  PU_CACHE );
-   Score                = ( pic_t * )W_CacheLumpName( "t_score",   PU_CACHE );
-   TopBar               = ( pic_t * )W_CacheLumpName( "t_bar",     PU_CACHE );
+   Name                 = ( pic_t * )W_CacheLumpName( "t_name",    PU_CACHE, Cvt_pic_t, 1 );
+   Blank                = ( pic_t * )W_CacheLumpName( "t_blnk",    PU_CACHE, Cvt_pic_t, 1 );
+   KillCount            = ( pic_t * )W_CacheLumpName( "t_kcount",  PU_CACHE, Cvt_pic_t, 1 );
+   TimesYouKilledPerson = ( pic_t * )W_CacheLumpName( "t_kilper",  PU_CACHE, Cvt_pic_t, 1 );
+   TimesPersonKilledYou = ( pic_t * )W_CacheLumpName( "t_perkil" , PU_CACHE, Cvt_pic_t, 1 );
+   Suicides             = ( pic_t * )W_CacheLumpName( "t_suicid",  PU_CACHE, Cvt_pic_t, 1 );
+   Score                = ( pic_t * )W_CacheLumpName( "t_score",   PU_CACHE, Cvt_pic_t, 1 );
+   TopBar               = ( pic_t * )W_CacheLumpName( "t_bar",     PU_CACHE, Cvt_pic_t, 1 );
 
-   IFont = ( cfont_t * )W_CacheLumpName( "sifont", PU_CACHE );
+   IFont = ( cfont_t * )W_CacheLumpName( "sifont", PU_CACHE, Cvt_cfont_t, 1 );
 
    switch( which )
       {
@@ -3608,7 +3608,7 @@ void ShowKills( int localplayer )
 
    DrawTallyHeader( 2 );
 
-   IFont = (cfont_t * )W_CacheLumpNum (W_GetNumForName ("sifont"), PU_CACHE);
+   IFont = (cfont_t * )W_CacheLumpNum (W_GetNumForName ("sifont"), PU_CACHE, Cvt_cfont_t, 1);
    CurrentFont = smallfont;
    py = 43;
 
@@ -3717,7 +3717,7 @@ void ShowDeaths( int localplayer )
 
    DrawTallyHeader( 3 );
 
-   IFont = (cfont_t * )W_CacheLumpNum (W_GetNumForName ("sifont"), PU_CACHE);
+   IFont = (cfont_t * )W_CacheLumpNum (W_GetNumForName ("sifont"), PU_CACHE, Cvt_cfont_t, 1);
    CurrentFont = smallfont;
    py = 43;
 
@@ -3811,7 +3811,7 @@ void ShowEndScore( int localplayer )
          break;
       }
 
-   IFont = (cfont_t * )W_CacheLumpNum (W_GetNumForName ("sifont"), PU_CACHE);
+   IFont = (cfont_t * )W_CacheLumpNum (W_GetNumForName ("sifont"), PU_CACHE, Cvt_cfont_t, 1);
    CurrentFont = smallfont;
    py = 43;
 
@@ -4373,11 +4373,11 @@ void Died (void)
 
 #if (SHAREWARE==0)
       if (gamestate.violence==vl_excessive)
-         LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("bootblod"), PU_CACHE);
+         LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("bootblod"), PU_CACHE, Cvt_lbm_t, 1);
       else
-         LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("bootnorm"), PU_CACHE);
+         LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("bootnorm"), PU_CACHE, Cvt_lbm_t, 1);
 #else
-      LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("bootblod"), PU_CACHE);
+      LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("bootblod"), PU_CACHE, Cvt_lbm_t, 1);
 #endif
       VL_DecompressLBM (LBM,true);
 

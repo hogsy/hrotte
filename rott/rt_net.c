@@ -2379,7 +2379,7 @@ void ServerLoop( void )
          if (SetupCheckForPacket()==scfp_done)
             done=true;
          }
-      SetTime();
+      ComSetTime();
       StartupClientControls();
       while(1)
          {

@@ -153,11 +153,20 @@ void CheckRemoteRidicule ( int scancode );
 extern void crash_print (int);
 #endif
 
+#if (PLATFORM_MACOSX == 1)
+int SDL_main(int argc, char *argv[])
+#else
 int main (int argc, char *argv[])
+#endif
 {
 #ifndef DOS
 	_argc = argc;
 	_argv = argv;
+#endif
+
+#if (PLATFORM_MACOSX == 1)
+#warning "Temporary hack. Will be fixed. -jrh"
+    chdir("/Users/overcode/Code/rott/data/");
 #endif
 
 #ifndef DOS
@@ -325,9 +334,9 @@ int main (int argc, char *argv[])
    VL_SetVGAPlaneMode();
    VL_SetPalette(origpal);
 
-//   TextMode();
+//   SetTextMode();
 //   GraphicsMode();
-//   TextMode();
+//   SetTextMode();
 //   VL_SetVGAPlaneMode();
 //   VL_SetPalette(origpal);
 //   SetBorderColor(155);
@@ -377,7 +386,7 @@ int main (int argc, char *argv[])
             {
             lbm_t * LBM;
 
-            LBM = (lbm_t *) W_CacheLumpName( "svendor", PU_CACHE);
+            LBM = (lbm_t *) W_CacheLumpName( "svendor", PU_CACHE, Cvt_lbm_t, 1);
             VL_DecompressLBM (LBM,true);
             I_Delay(40);
             MenuFadeOut();
@@ -401,12 +410,12 @@ void DrawRottTitle ( void )
    char title[80];
    char buf[5];
 
-   TextMode();
+   SetTextMode();
    TurnOffTextCursor ();
 
    if (CheckParm("QUIET") == 0)
       {
-      TextMode();
+      SetTextMode();
       TurnOffTextCursor ();
       if (CheckParm ("SOUNDSETUP") == 0)
          {
@@ -516,7 +525,7 @@ void CheckCommandLineParameters( void )
         )
       )
       {
-      TextMode ();
+      SetTextMode ();
       printf ("Rise of the Triad  (c) 1995 Apogee Software\n\n");
       printf ("COMMAND LINE PARAMETERS\n");
       printf ("   SPACEBALL  - Enable check for Spaceball.\n");
@@ -599,7 +608,7 @@ void CheckCommandLineParameters( void )
          TILESTATS = true;
          break;
        case 10:
-         TextMode ();
+         SetTextMode ();
          printf ("Rise of the Triad  (c) 1995 Apogee Software\n");
 //MED
          if (gamestate.Product == ROTT_SHAREWARE)
@@ -788,7 +797,7 @@ void Init_Tables (void)
    getcwd (CWD, 40);                      // get the current directory
 
    origpal=SafeMalloc(768);
-   memcpy (origpal, W_CacheLumpName("pal",PU_CACHE), 768);
+   memcpy (origpal, W_CacheLumpName("pal",PU_CACHE, CvtNull, 1), 768);
 
    FindEGAColors();
 
@@ -806,15 +815,15 @@ void Init_Tables (void)
 		*(origpal+(unsigned int)i) = (*(origpal+(unsigned int)i))>>2;
 
 	// Cache in fonts
-	shape = W_CacheLumpNum (W_GetNumForName ("smallfont"), PU_STATIC);
+	shape = W_CacheLumpNum (W_GetNumForName ("smallfont"), PU_STATIC, Cvt_font_t, 1);
 	smallfont = (font_t *)shape;
 	CurrentFont = smallfont;
 
 	// Cache in tiny font
-	shape = W_CacheLumpNum (W_GetNumForName ("tinyfont"), PU_STATIC);
+	shape = W_CacheLumpNum (W_GetNumForName ("tinyfont"), PU_STATIC, Cvt_font_t, 1);
 	tinyfont = (font_t *)shape;
 
-   intensitytable=W_CacheLumpNum(W_GetNumForName("menucmap"),PU_STATIC);
+   intensitytable=W_CacheLumpNum(W_GetNumForName("menucmap"),PU_STATIC, CvtNull, 1);
    fontcolor = egacolor[4];
 
    if (!quiet)
@@ -1095,7 +1104,7 @@ void GameLoop (void)
             SHAKETICS = 0xFFFF;
             if (modemgame==true)
                {
-               SetTime();
+               ComSetTime();
                turbo = false;
                }
             else if (turbo==true)
@@ -1425,7 +1434,7 @@ void QuitGame ( void )
 
    PrintMapStats();
    PrintTileStats();
-   TextMode();
+   SetTextMode();
 
 #if (DEVELOPMENT == 1)
    printf("Clean Exit\n");
@@ -1464,9 +1473,9 @@ void QuitGame ( void )
    if ( !SOUNDSETUP )
       {
 #if (SHAREWARE==0)
-      txtscn = (byte *) W_CacheLumpNum (W_GetNumForName ("regend"), PU_CACHE);
+      txtscn = (byte *) W_CacheLumpNum (W_GetNumForName ("regend"), PU_CACHE, CvtNull, 1);
 #else
-      txtscn = (byte *) W_CacheLumpNum (W_GetNumForName ("shareend"), PU_CACHE);
+      txtscn = (byte *) W_CacheLumpNum (W_GetNumForName ("shareend"), PU_CACHE, CvtNull, 1);
 #endif
       for (k = 0; k < 23; k++)
          printf ("\n");
@@ -2019,7 +2028,7 @@ void DoBossKey ( void )
    union REGS regs;
    ShutdownClientControls();
 
-   TextMode();
+   SetTextMode();
 
    // move cursor to the row 0 column 4
    regs.w.ax = 0x0200;

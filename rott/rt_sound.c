@@ -127,7 +127,7 @@ void SD_MakeCacheable( unsigned long sndnum )
    if (sounds[sndnum].count>0)
       return;
    else
-      W_CacheLumpNum(SoundNumber(sndnum),PU_CACHE);
+      W_CacheLumpNum(SoundNumber(sndnum),PU_CACHE, CvtFixme, 1);
 }
 
 #if 0
@@ -373,7 +373,7 @@ int SD_PlayIt ( int sndnum, int angle, int distance, int pitch )
 
    sounds[sndnum].count++;
 
-   snd=W_CacheLumpNum(SoundNumber(sndnum),PU_STATIC);
+   snd=W_CacheLumpNum(SoundNumber(sndnum),PU_STATIC, CvtNull, 1);
 
 #ifdef DOS
    if ( *snd == 'C' )
@@ -1122,7 +1122,7 @@ void MU_SetupGUSInitFile( void )
 
       lump=W_GetNumForName("gusmidi");
 
-      SaveFile (filename, W_CacheLumpNum(lump,PU_CACHE), W_LumpLength(lump));
+      SaveFile (filename, W_CacheLumpNum(lump,PU_CACHE, CvtNull, 1), W_LumpLength(lump));
       }
 }
 
@@ -1166,7 +1166,7 @@ void MU_PlaySong ( int num )
 
    lastsongnumber=num;
 
-   currentsong=W_CacheLumpName(rottsongs[num].lumpname,PU_STATIC);
+   currentsong=W_CacheLumpName(rottsongs[num].lumpname,PU_STATIC, CvtFixme, 1);
    if (rottsongs[num].loopflag == loop_yes)
       MUSIC_PlaySong(currentsong,MUSIC_LoopSong);
    else
@@ -1188,7 +1188,7 @@ void MU_StopSong ( void )
    MUSIC_StopSong ();
    if (currentsong)
       {
-      W_CacheLumpName(rottsongs[lastsongnumber].lumpname,PU_CACHE);
+      W_CacheLumpName(rottsongs[lastsongnumber].lumpname,PU_CACHE, CvtFixme, 1);
       currentsong=0;
       }
 }

@@ -50,6 +50,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_msg.h"
 #include "rt_playr.h"
 #include "rt_sound.h"
+#include "myprint.h"
 //MED
 #include "memcheck.h"
 
@@ -70,6 +71,7 @@ int fontcolor;
 
 static int BKw;
 static int BKh;
+   
 
 //******************************************************************************
 //
@@ -1368,23 +1370,23 @@ void US_DrawWindow (int x, int y, int w, int h)
    pic_t *Win9;
 
 	// Cache in windowing shapes
-	shape = W_CacheLumpNum (W_GetNumForName ("window1"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window1"), PU_CACHE, Cvt_pic_t, 1);
 	Win1 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window2"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window2"), PU_CACHE, Cvt_pic_t, 1);
 	Win2 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window3"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window3"), PU_CACHE, Cvt_pic_t, 1);
 	Win3 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window4"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window4"), PU_CACHE, Cvt_pic_t, 1);
 	Win4 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window5"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window5"), PU_CACHE, Cvt_pic_t, 1);
 	Win5 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window6"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window6"), PU_CACHE, Cvt_pic_t, 1);
 	Win6 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window7"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window7"), PU_CACHE, Cvt_pic_t, 1);
 	Win7 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window8"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window8"), PU_CACHE, Cvt_pic_t, 1);
 	Win8 = (pic_t *) shape;
-	shape = W_CacheLumpNum (W_GetNumForName ("window9"), PU_CACHE);
+	shape = W_CacheLumpNum (W_GetNumForName ("window9"), PU_CACHE, Cvt_pic_t, 1);
 	Win9 = (pic_t *) shape;
 
    WindowX = x * 8;
@@ -1701,7 +1703,7 @@ void DrawIntensityString (unsigned short int x, unsigned short int y, char *stri
 
 static unsigned short disp_offset = 160 * 24;
 
-void DrawText
+void DrawRottText
    (
    int x,
    int y,
@@ -1744,7 +1746,7 @@ void TextBox
       {
       for( y = y1; y <= y2; y++ )
          {
-         DrawText( x, y, ch, foreground, background );
+         DrawRottText( x, y, ch, foreground, background );
          }
       }
    }
@@ -1768,47 +1770,47 @@ void TextFrame
       {
       for( x = x1 + 1; x < x2; x++ )
          {
-         DrawText( x, y1, type, foreground, background );
-         DrawText( x, y2, type, foreground, background );
+         DrawRottText( x, y1, type, foreground, background );
+         DrawRottText( x, y2, type, foreground, background );
          }
       for( y = y1 + 1; y < y2; y++ )
          {
-         DrawText( x1, y, type, foreground, background );
-         DrawText( x2, y, type, foreground, background );
+         DrawRottText( x1, y, type, foreground, background );
+         DrawRottText( x2, y, type, foreground, background );
          }
       }
    if ( type == SINGLE_FRAME )
       {
-      DrawText( x1, y1, 'Ú', foreground, background );
-      DrawText( x2, y1, '¿', foreground, background );
-      DrawText( x1, y2, 'À', foreground, background );
-      DrawText( x2, y2, 'Ù', foreground, background );
+      DrawRottText( x1, y1, 'Ú', foreground, background );
+      DrawRottText( x2, y1, '¿', foreground, background );
+      DrawRottText( x1, y2, 'À', foreground, background );
+      DrawRottText( x2, y2, 'Ù', foreground, background );
       for( x = x1 + 1; x < x2; x++ )
          {
-         DrawText( x, y1, 'Ä', foreground, background );
-         DrawText( x, y2, 'Ä', foreground, background );
+         DrawRottText( x, y1, 'Ä', foreground, background );
+         DrawRottText( x, y2, 'Ä', foreground, background );
          }
       for( y = y1 + 1; y < y2; y++ )
          {
-         DrawText( x1, y, '³', foreground, background );
-         DrawText( x2, y, '³', foreground, background );
+         DrawRottText( x1, y, '³', foreground, background );
+         DrawRottText( x2, y, '³', foreground, background );
          }
       }
    if ( type == DOUBLE_FRAME )
       {
-      DrawText( x1, y1, 'É', foreground, background );
-      DrawText( x2, y1, '»', foreground, background );
-      DrawText( x1, y2, 'È', foreground, background );
-      DrawText( x2, y2, '¼', foreground, background );
+      DrawRottText( x1, y1, 'É', foreground, background );
+      DrawRottText( x2, y1, '»', foreground, background );
+      DrawRottText( x1, y2, 'È', foreground, background );
+      DrawRottText( x2, y2, '¼', foreground, background );
       for( x = x1 + 1; x < x2; x++ )
          {
-         DrawText( x, y1, 'Í', foreground, background );
-         DrawText( x, y2, 'Í', foreground, background );
+         DrawRottText( x, y1, 'Í', foreground, background );
+         DrawRottText( x, y2, 'Í', foreground, background );
          }
       for( y = y1 + 1; y < y2; y++ )
          {
-         DrawText( x1, y, 'º', foreground, background );
-         DrawText( x2, y, 'º', foreground, background );
+         DrawRottText( x1, y, 'º', foreground, background );
+         DrawRottText( x2, y, 'º', foreground, background );
          }
       }
    }

@@ -39,7 +39,6 @@ extern  byte   *  origpal;
 extern  int      _argc;
 extern  char **  _argv;
 
-
 void  markgetch( void );
 boolean StringsNotEqual (char * s1, char * s2, int length);
 void  GetPalette(char * pal);
@@ -70,6 +69,10 @@ short MotoShort (short l);
 short IntelShort (short l);
 long  MotoLong (long l);
 long  IntelLong (long l);
+void  SwapIntelLong (long *l);
+void  SwapIntelShort(short *s);
+void  SwapIntelLongArray (long *l, int num);
+void  SwapIntelShortArray (short *s, int num);
 int   US_CheckParm (char *parm, char **strings);
 byte  BestColor (int r, int g, int b, byte *palette);
 int   atan2_appx(int,int);

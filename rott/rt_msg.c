@@ -572,7 +572,7 @@ void RestoreMessageBackground
             EraseMessage[ i ]--;
             if ( viewsize < 15 )
                {
-               shape = W_CacheLumpName( "backtile", PU_CACHE );
+               shape = W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
                DrawTiledRegion( 0, y, 320, 9, 0, y, shape );
                }
             if ( viewsize == 0 )
@@ -608,7 +608,7 @@ void DrawMessages
 
    if ( TotalMessages > 0 )
       {
-      IFont = ( cfont_t * )W_CacheLumpName( "ifnt", PU_CACHE );
+      IFont = ( cfont_t * )W_CacheLumpName( "ifnt", PU_CACHE, Cvt_cfont_t, 1 );
 
       for( i = 0; i < TotalMessages; i++ )
          {

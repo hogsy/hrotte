@@ -1010,7 +1010,7 @@ void CheckVendor (void)
       filecrc = CalculateCRC (vendor, size);
       SafeFree(vendor);
       lump=W_GetNumForName(VENDORLUMP);
-      vendor = W_CacheLumpNum(lump,PU_CACHE);
+      vendor = W_CacheLumpNum(lump,PU_CACHE, CvtNull, 1);
       size=W_LumpLength(lump);
       wadcrc = CalculateCRC (vendor, size);
       if (wadcrc != filecrc)
@@ -1022,7 +1022,7 @@ void CheckVendor (void)
    if (saveout==true)
       {
       lump=W_GetNumForName(VENDORLUMP);
-      vendor = W_CacheLumpNum(lump,PU_CACHE);
+      vendor = W_CacheLumpNum(lump,PU_CACHE, CvtNull, 1);
       size = W_LumpLength(lump);
       SaveFile (filename,vendor,size);
       }

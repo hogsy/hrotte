@@ -21,11 +21,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 
 #ifdef DOS
+#include <malloc.h>
 #include <conio.h>
 #include <io.h>
 #endif
@@ -123,14 +123,15 @@ void W_AddFile (char *_filename)
                 read (handle, &header, sizeof(header));
                 if (strncmp(header.identification,"IWAD",4))
                         Error ("Wad file %s doesn't have IWAD id\n",filename);
-                header.numlumps = LONG(header.numlumps);
-                header.infotableofs = LONG(header.infotableofs);
+                header.numlumps = IntelLong(LONG(header.numlumps));
+                header.infotableofs = IntelLong(LONG(header.infotableofs));
                 length = header.numlumps*sizeof(filelump_t);
                 fileinfo = alloca (length);
                 if (!fileinfo)
                    Error ("Wad file could not allocate header info on stack");
                 lseek (handle, header.infotableofs, SEEK_SET);
                 read (handle, fileinfo, length);
+                
                 numlumps += header.numlumps;
         }
 
@@ -145,6 +146,8 @@ void W_AddFile (char *_filename)
 
         for (i=startlump ; i<(unsigned int)numlumps ; i++,lump_p++, fileinfo++)
         {
+                fileinfo->filepos = IntelLong(LONG(fileinfo->filepos));
+                fileinfo->size = IntelLong(LONG(fileinfo->size));
                 lump_p->handle = handle;
                 lump_p->position = LONG(fileinfo->filepos);
                 lump_p->size = LONG(fileinfo->size);
@@ -177,10 +180,10 @@ void W_CheckWADIntegrity ( void )
       printf("ATTENTION: This version of ROTT has been modified.  If you would like to get\n");
       printf("a copy of the original game, call 1-800-APOGEE1 or run ROTTHELP.EXE.\n");
       printf("      You will not receive technical support for this modified version.\n");
-      printf("                        Press any key to continue\n");
+//      printf("                        Press any key to continue\n");
       printf("==============================================================================\n");
 //      printf("crc=%ld\n",crc);
-      getch();
+//      getch();
       }
 #endif
 }
@@ -394,6 +397,7 @@ void W_ReadLump (int lump, void *dest)
 
         readinglump=lump;
         lumpdest=dest;
+        printf("DANGER WILL ROBINSON: W_ReadLump(%i,%p), expect endianness headaches\n", lump, dest);
         if (lump >= numlumps)
                 Error ("W_ReadLump: %i >= numlumps",lump);
         if (lump < 0)
@@ -422,6 +426,8 @@ void W_WriteLump (int lump, void *src)
    int        c;
    lumpinfo_t *l;
 
+   printf("DANGER WILL ROBINSON: W_WriteLump(%i,%p), expect endianness headaches\n", lump, src);
+
    if (lump >= numlumps)
       Error ("W_WriteLump: %i >= numlumps",lump);
    if (lump < 0)
@@ -442,7 +448,7 @@ void W_WriteLump (int lump, void *src)
 =
 ====================
 */
-void    *W_CacheLumpNum (int lump, int tag)
+void    *W_CacheLumpNum (int lump, int tag, converter_t converter, int numrec)
 {
         if (lump >= (int)numlumps)
                 Error ("W_CacheLumpNum: %i >= numlumps",lump);
@@ -470,12 +476,16 @@ void    *W_CacheLumpNum (int lump, int tag)
                 length=W_LumpLength(lump);
                 Z_Malloc (length+sizeof(word), tag, &lumpcache[lump]);
                 W_ReadLump (lump, lumpcache[lump]);
+                Debug("Invoking endian converter on %p, %i records.\n", lumpcache[lump], numrec);
+                converter(lumpcache[lump], numrec);
 
                 *( (word *) ((byte *)lumpcache[lump]+length) ) = CalculateCRC (lumpcache[lump], length);
                 }
 #else
                 Z_Malloc (W_LumpLength (lump), tag, &lumpcache[lump]);
                 W_ReadLump (lump, lumpcache[lump]);
+                Debug("Invoking endian converter on %p, %i records\n", lump, numrec);
+                converter(lumpcache[lump], numrec);
 #endif
         }
         else
@@ -515,8 +525,7 @@ void    *W_CacheLumpNum (int lump, int tag)
 ====================
 */
 
-void    *W_CacheLumpName (char *name, int tag)
+void    *W_CacheLumpName (char *name, int tag, converter_t converter, int numrec)
 {
-        return W_CacheLumpNum (W_GetNumForName(name), tag);
+        return W_CacheLumpNum (W_GetNumForName(name), tag, converter, numrec);
 }
-

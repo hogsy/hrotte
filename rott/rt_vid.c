@@ -1276,7 +1276,7 @@ void DrawXYPic (int x, int y, int shapenum)
    byte *src;
    pic_t *p;
 
-   p = (pic_t *) W_CacheLumpNum (shapenum, PU_CACHE);
+   p = (pic_t *) W_CacheLumpNum (shapenum, PU_CACHE, Cvt_pic_t, 1);
 
    if ((x<0) || ((x+(p->width<<2))>=320))
       Error ("DrawXYPic: x is out of range\n");

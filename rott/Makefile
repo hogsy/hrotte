@@ -1,10 +1,11 @@
 CC = gcc
-CFLAGS = -g $(shell sdl-config --cflags) -DUSE_SDL=1 -DPLATFORM_UNIX=1 -DUSE_C_SQRT=1 -W -Wall -Wno-unused
+CFLAGS = -g $(shell sdl-config --cflags) -DUSE_SDL=1 -DPLATFORM_UNIX=1 -DUSE_C_SQRT=1 -W -Wall -Wno-unused -DUSE_EXECINFO=1
 LDLIBS = $(shell sdl-config --libs) -lSDL_mixer -Wl,-E
 
 all: rott
 
 rott: 	\
+        byteordr.o \
 	cin_actr.o \
 	cin_efct.o \
 	cin_evnt.o \

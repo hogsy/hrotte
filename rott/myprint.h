@@ -30,7 +30,7 @@ enum COLORS
 #define SINGLE_FRAME -1
 #define DOUBLE_FRAME -2
 
-void DrawText( int x, int y, int ch, int foreground, int background );
+void DrawRottText( int x, int y, int ch, int foreground, int background );
 void TextBox( int x1, int y1, int x2, int y2, int ch, int foreground, int background );
 void TextFrame( int x1, int y1, int x2, int y2, int type, int foreground, int background );
 void mysetxy( int x, int y );

@@ -114,7 +114,7 @@ extern  boolean  graphicsmode;
 
 
 void  GraphicsMode ( void );
-void  TextMode ( void );
+void  SetTextMode ( void );
 void  VL_SetVGAPlaneMode ( void );
 void  VL_ClearBuffer (unsigned buf, byte color);
 void  VL_ClearVideo (byte color);

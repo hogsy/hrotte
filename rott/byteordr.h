@@ -1,5 +1,5 @@
 /*
-Copyright (C) 1994-1995 Apogee Software, Ltd.
+Copyright (C) 2002 John R. Hall
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,32 +17,22 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#ifndef _rt_com_public
-#define _rt_com_public
-
 //***************************************************************************
 //
-// RT_COM.C
+//    byteordr.c - Byte order conversion routines.
 //
 //***************************************************************************
 
-#define MAXPACKET	512
+typedef void (*converter_t)(void *, int);
 
-#include "rottnet.h"
+#define DECLARE_CONVERTER(type) void Cvt_##type(void *lmp, int num);
 
-extern int badpacket;
-extern int consoleplayer;
-extern byte ROTTpacket[MAXCOMBUFFERSIZE];
-
-extern int controlsynctime;
-
-
-//#define consoleplayer (rottcom->consoleplayer)
-
-void InitROTTNET (void);
-boolean ReadPacket (void);
-void WritePacket (void * buffer, int len, int destination);
-void ComSetTime (void);
-int GetTransitTime( int client );
-
-#endif
+DECLARE_CONVERTER(pic_t);
+DECLARE_CONVERTER(lpic_t);
+DECLARE_CONVERTER(font_t);
+DECLARE_CONVERTER(lbm_t);
+DECLARE_CONVERTER(patch_t);
+DECLARE_CONVERTER(transpatch_t);
+DECLARE_CONVERTER(cfont_t);
+void CvtNull(void *lmp, int num);
+void CvtFixme(void *lmp, int num);

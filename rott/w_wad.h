@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _w_wad_public
 #define _w_wad_public
 
+#include "byteordr.h"
+
 void    W_InitMultipleFiles (char **filenames); // Initialize multiple wads
 void    W_InitFile (char *filename);            // Init a single wad file
 
@@ -38,8 +40,10 @@ int     W_LumpLength (int lump);                // Get the length of the numbere
 void    W_ReadLump (int lump, void *dest);      // Read the numbered lump into a buffer
 void W_WriteLump (int lump, void *src);
 
-void    *W_CacheLumpNum (int lump, int tag);    // Cache in the numbered lump with the appropriate memory tag
-void    *W_CacheLumpName (char *name, int tag); // Cache in the named lump with the appropriate memory tag
+void    *W_CacheLumpNum (int lump, int tag, converter_t converter, int numrecs);
+                                                // Cache in the numbered lump with the appropriate memory tag
+void    *W_CacheLumpName (char *name, int tag, converter_t converter, int numrecs);
+                                                // Cache in the named lump with the appropriate memory tag
 
 extern int             numlumps;
 extern void            **lumpcache;
