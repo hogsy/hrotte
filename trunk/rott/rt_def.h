@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define access(x, y) _access(x, y)
 #define F_OK  0
 #elif (defined __GNUC__)
-#define __int64 long long;
+#define __int64 long long
 #else
 #error please define your platform.
 #endif
@@ -124,6 +124,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     char *ltoa(long, char *, int);
     char *ultoa(unsigned long, char *, int);
     char getch(void);
+    long filelength(int handle);
   #else
     #error please define for your platform.
   #endif
