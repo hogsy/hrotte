@@ -136,6 +136,20 @@
 				29B97317FDCFA39411CA2CEA,
 				29B97323FDCFA39411CA2CEA,
 				19C28FACFE9D520D11CA2CBB,
+				F56649AD03B9500001000002,
+				F56649AF03B9500001000002,
+				F56649B003B9500001000002,
+				F56649B103B9500001000002,
+				F56649B203B9500001000002,
+				F56649B303B9500001000002,
+				F56649B403B9500001000002,
+				F56649B503B9500001000002,
+				F56649B603B9500001000002,
+				F56649B703B9500001000002,
+				F56649B803B9500001000002,
+				F56649B903B9500001000002,
+				F56649BA03B9500001000002,
+				F56649BB03B9500001000002,
 			);
 			isa = PBXGroup;
 			name = "SDL App";
@@ -295,6 +309,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				089C165EFE840E0CC02AAC07,
+				F56649F303B9531201000002,
+				F56649F503B9531401000002,
+				F56649F603B9531501000002,
+				F56649F703B9531501000002,
+				F56649FA03B9531901000002,
+				F56649FB03B9531901000002,
+				F56649FC03B9531A01000002,
+				F56649FD03B9531B01000002,
+				F56649FE03B9531C01000002,
+				F56649FF03B9531D01000002,
+				F5664A0003B955DE01000002,
+				F5664A0103B955DF01000002,
+				F5664A0203B955E001000002,
+				F5664A0303B955E101000002,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -404,6 +432,174 @@
 //F52
 //F53
 //F54
+		F56649AD03B9500001000002 = {
+			isa = PBXFileReference;
+			name = BATTLE.ROT;
+			path = ../data/BATTLE.ROT;
+			refType = 2;
+		};
+		F56649AF03B9500001000002 = {
+			isa = PBXFileReference;
+			name = DEMO1_3.DMO;
+			path = ../data/DEMO1_3.DMO;
+			refType = 2;
+		};
+		F56649B003B9500001000002 = {
+			isa = PBXFileReference;
+			name = DEMO2_3.DMO;
+			path = ../data/DEMO2_3.DMO;
+			refType = 2;
+		};
+		F56649B103B9500001000002 = {
+			isa = PBXFileReference;
+			name = DEMO3_3.DMO;
+			path = ../data/DEMO3_3.DMO;
+			refType = 2;
+		};
+		F56649B203B9500001000002 = {
+			isa = PBXFileReference;
+			name = DEMO4_3.DMO;
+			path = ../data/DEMO4_3.DMO;
+			refType = 2;
+		};
+		F56649B303B9500001000002 = {
+			isa = PBXFileReference;
+			name = HUNTBGIN.RTC;
+			path = ../data/HUNTBGIN.RTC;
+			refType = 2;
+		};
+		F56649B403B9500001000002 = {
+			isa = PBXFileReference;
+			name = HUNTBGIN.RTL;
+			path = ../data/HUNTBGIN.RTL;
+			refType = 2;
+		};
+		F56649B503B9500001000002 = {
+			isa = PBXFileReference;
+			name = HUNTBGIN.WAD;
+			path = ../data/HUNTBGIN.WAD;
+			refType = 2;
+		};
+		F56649B603B9500001000002 = {
+			isa = PBXFileReference;
+			name = MODEM.PCK;
+			path = ../data/MODEM.PCK;
+			refType = 2;
+		};
+		F56649B703B9500001000002 = {
+			isa = PBXFileReference;
+			name = ORDER.FRM;
+			path = ../data/ORDER.FRM;
+			refType = 2;
+		};
+		F56649B803B9500001000002 = {
+			isa = PBXFileReference;
+			name = REMOTE1.RTS;
+			path = ../data/REMOTE1.RTS;
+			refType = 2;
+		};
+		F56649B903B9500001000002 = {
+			isa = PBXFileReference;
+			name = SCORES.ROT;
+			path = ../data/SCORES.ROT;
+			refType = 2;
+		};
+		F56649BA03B9500001000002 = {
+			isa = PBXFileReference;
+			name = SOUND.ROT;
+			path = ../data/SOUND.ROT;
+			refType = 2;
+		};
+		F56649BB03B9500001000002 = {
+			isa = PBXFileReference;
+			name = VENDOR.DOC;
+			path = ../data/VENDOR.DOC;
+			refType = 2;
+		};
+		F56649F303B9531201000002 = {
+			fileRef = F56649AD03B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649F503B9531401000002 = {
+			fileRef = F56649AF03B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649F603B9531501000002 = {
+			fileRef = F56649B003B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649F703B9531501000002 = {
+			fileRef = F56649B103B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649FA03B9531901000002 = {
+			fileRef = F56649B503B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649FB03B9531901000002 = {
+			fileRef = F56649B403B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649FC03B9531A01000002 = {
+			fileRef = F56649B303B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649FD03B9531B01000002 = {
+			fileRef = F56649B203B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649FE03B9531C01000002 = {
+			fileRef = F56649BA03B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F56649FF03B9531D01000002 = {
+			fileRef = F56649BB03B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5664A0003B955DE01000002 = {
+			fileRef = F56649B603B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5664A0103B955DF01000002 = {
+			fileRef = F56649B703B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5664A0203B955E001000002 = {
+			fileRef = F56649B803B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5664A0303B955E101000002 = {
+			fileRef = F56649B903B9500001000002;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5A47A9D01A0482F01D3D55B = {
 			isa = PBXFileReference;
 			path = SDLMain.h;

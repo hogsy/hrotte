@@ -94,6 +94,7 @@ boolean WriteSoundFile   = true;
 
 int     FXMode           = 0;
 int     MusicMode        = 0;
+
 int     MUvolume         = 196;
 int     FXvolume         = 196;
 
@@ -329,6 +330,16 @@ void SetSoundDefaultValues
    //
    //  no config file, so select default values
    //
+   #if defined(PLATFORM_UNIX)
+   // icculus' SDL_mixer driver looks like a soundscape to us
+   MusicMode   = 6;
+   FXMode      = 6;
+   NumVoices   = 8;
+   NumChannels = 2;
+   NumBits     = 16;
+   MidiAddress = 0x330;
+   stereoreversed = false;
+   #else
    MusicMode   = 0;
    FXMode      = 0;
    NumVoices   = 4;
@@ -336,6 +347,7 @@ void SetSoundDefaultValues
    NumBits     = 8;
    MidiAddress = 0x330;
    stereoreversed = false;
+   #endif
 
    status = FX_GetBlasterSettings( &blaster );
    if ( status == FX_Ok )
