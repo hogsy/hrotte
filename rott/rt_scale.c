@@ -1203,19 +1203,20 @@ void R_DrawColumn (byte * buf)
 	// This is *NOT* 100% correct - DDOI
 	int count;
 	int frac, fracstep;
+	byte *dest;
 
 	count = dc_yh - dc_yl;
 	if (count < 0) return;
 
-	buf += ylookup[dc_yl];
+	dest = buf + ylookup[dc_yl];
 
 	fracstep = dc_iscale;
 	frac = dc_texturemid + (dc_yl-centery)*fracstep;
 
 	do
 	{
-		*buf = shadingtable[dc_source[(frac>>SFRACBITS)&127]];
-		buf += MAXSCREENWIDTH;
+		*dest = shadingtable[dc_source[(frac>>SFRACBITS)&127]];
+		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	} while (count--);
 }
@@ -1230,11 +1231,12 @@ void R_DrawWallColumn (byte * buf)
 	// This is *NOT* 100% correct - DDOI
 	int count;
 	int frac, fracstep;
+	byte *dest;
 
 	count = dc_yh - dc_yl;
 	if (count < 0) return;
 
-	buf += ylookup[dc_yl];
+	dest = buf + ylookup[dc_yl];
 
 	fracstep = dc_iscale;
 	frac = dc_texturemid + (dc_yl-centery)*fracstep;
@@ -1243,15 +1245,33 @@ void R_DrawWallColumn (byte * buf)
 
 	do
 	{
-		*buf = shadingtable[dc_source[(frac>>26)&127]];
-		buf += MAXSCREENWIDTH;
+		*dest = shadingtable[dc_source[(frac>>26)&127]];
+		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	} while (count--);
 }
 
 void R_DrawClippedColumn (byte * buf)
 {
-	STUB_FUNCTION;
+	// This is *NOT* 100% correct - DDOI
+	int count;
+	int frac, fracstep;
+	byte *dest;
+
+	count = dc_yh - dc_yl;
+	if (count < 0) return;
+
+	dest = buf + ylookup[dc_yl];
+
+	fracstep = dc_iscale;
+	frac = dc_texturemid + (dc_yl-centeryclipped)*fracstep;
+
+	do
+	{
+		*dest = shadingtable[dc_source[(frac>>SFRACBITS)&127]];
+		dest += MAXSCREENWIDTH;
+		frac += fracstep;
+	} while (count--);
 }
 
 void R_DrawSolidColumn (int color, byte * buf)
