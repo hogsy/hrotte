@@ -117,6 +117,17 @@ struct find_t
 };
 int _dos_findfirst(char *filename, int x, struct find_t *f);
 int _dos_findnext(struct find_t *f);
+
+struct dosdate_t
+{
+    unsigned char day;
+    unsigned char month;
+    unsigned int year;
+    unsigned char dayofweek;
+};
+
+void _dos_getdate(struct dosdate_t *date);
+
 #else
 #error please define your platform.
 #endif

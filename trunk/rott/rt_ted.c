@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef DOS
 #include <io.h>
@@ -964,7 +965,6 @@ void MiscPreCache( void )
 
 boolean IsChristmas(void)
    {
-#ifdef DOS
    struct dosdate_t date;
 
    _dos_getdate(&date);
@@ -973,9 +973,6 @@ boolean IsChristmas(void)
        (date.month == 12)
       )
       return true;
-#else
-	STUB_FUNCTION;
-#endif
 
    return false;
 
@@ -992,7 +989,6 @@ boolean IsChristmas(void)
 
 void CheckHolidays(void)
    {
-#ifdef DOS
    struct dosdate_t date;
 
    _dos_getdate(&date);
@@ -1020,9 +1016,6 @@ void CheckHolidays(void)
             DrawNormalSprite(0,0,W_GetNumForName("esterhat"));
          }
       }
-#else
-	STUB_FUNCTION;
-#endif
    }
 
 
