@@ -2948,10 +2948,10 @@ boolean CP_DisplayMsg
       LastScan=0;
       while (LastScan == 0)
          {
+         IN_UpdateKeyboard();
          RefreshMenuBuf( 0 );
          }
       LastScan = 0;
-      IN_UpdateKeyboard();
    }
    IN_ClearKeysDown();
    return( retval );
