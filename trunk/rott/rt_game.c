@@ -187,35 +187,51 @@ void V_ReDrawBkgnd (int x, int y, int width, int height, boolean shade)
    m = (x&3);
    mask = (1 << m);
 
+#ifdef DOS
    origdest = (byte *)(bufferofs+ylookup[y]+(x>>2));
-
-#ifndef DOS
-STUB_FUNCTION;
+#else
+   origdest = (byte *)(bufferofs+ylookup[y]+x);
 #endif
 
    if (VW_MarkUpdateBlock (x, y, x+width-1, y+height-1))
    {
+#ifdef DOS
       for (planes = 0; planes < 4; planes++)
+#endif
       {
+#ifdef DOS
          src = (&(BkPic->data)+((80*200)*m)+(80*y)+(x>>2));
+#else
+         src = (&(BkPic->data)+((80*200)*m)+(80*y)+x);
+#endif
          dest = origdest;
 
          VGAMAPMASK (mask);
 
          for (j = 0; j < height; j++)
          {
+#ifdef DOS
             for (k = 0; k < (width/4); k++)
+#else
+            for (k = 0; k < width; k++)
+#endif
                if (shade)
                   *dest++ = *(colormap + ((MENUSHADELEVEL>>2)<<8) + *src++);
                else
                   *dest++ = *src++;
 
+#ifdef DOS
             src += (80-(width/4));
             dest += (linewidth-(width/4));
+#else
+            src += (80-width);
+            dest += (linewidth-width);
+#endif
          }
 
          m++;
          mask <<= 1;
+#ifdef DOS
          if (mask == 16)
          {
             x+=4;
@@ -223,6 +239,9 @@ STUB_FUNCTION;
             m = 0;
             origdest++;
          }
+#else
+	 origdest++;
+#endif
       }
    }
 }
