@@ -3,12 +3,22 @@ CFLAGS=-g
 
 all: rott
 
-rott: 	engine.o \
+rott: 	\
+	cin_actr.o \
+	cin_efct.o \
+	cin_evnt.o \
+	cin_glob.o \
+	cin_main.o \
+	cin_util.o \
+	engine.o \
 	rt_actor.o \
+	rt_battl.o \
 	rt_build.o \
 	rt_cfg.o \
+	rt_crc.o \
 	rt_com.o \
 	rt_debug.o \
+	rt_dmand.o \
 	rt_door.o \
 	rt_draw.o \
 	rt_floor.o \
@@ -16,6 +26,8 @@ rott: 	engine.o \
 	rt_main.o \
 	rt_map.o \
 	rt_menu.o \
+	rt_msg.o \
+	rt_net.o \
 	rt_playr.o \
 	rt_rand.o \
 	rt_scale.o \
@@ -30,8 +42,9 @@ rott: 	engine.o \
 	w_wad.o \
 	z_zone.o
 
-# rt_util.c, rt_in.c, rt_swift.c
+# rt_util.c, rt_in.c, rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
 # rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a, f_scale
+# rt_err.obj - some dos text screen for error messages
 
 clean:
 	rm *.o

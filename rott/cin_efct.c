@@ -28,7 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "w_wad.h"
 #include "z_zone.h"
 #include <string.h>
+
+#ifdef DOS
 #include <conio.h>
+#endif
 
 #include "modexlib.h"
 #include "fli_glob.h"
@@ -37,6 +40,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static int cin_sprtopoffset;
 static int cin_invscale;
+
+void DrawFadeout ( void );
+void DrawBlankScreen ( void );
+void DrawClearBuffer ( void );
 
 /*
 ===============
