@@ -1334,7 +1334,19 @@ void R_DrawColumn (byte * buf)
 
 void R_TransColumn (byte * buf)
 {
-	STUB_FUNCTION;
+	int count;
+	byte *dest;
+
+	count = dc_yh - dc_yl;
+	if (count < 0) return;
+
+	dest = buf + ylookup[dc_yl];
+
+	while (count--)
+	{
+		*dest = shadingtable[*dest];
+		dest += MAXSCREENWIDTH;
+	}
 }
 
 void R_DrawWallColumn (byte * buf)
@@ -1387,7 +1399,20 @@ void R_DrawClippedColumn (byte * buf)
 
 void R_DrawSolidColumn (int color, byte * buf)
 {
-	STUB_FUNCTION;
+	int count;
+	int frac, fracstep;
+	byte *dest;
+
+	count = dc_yh - dc_yl;
+	if (count < 0) return;
+
+	dest = buf + ylookup[dc_yl];
+
+	while (count--)
+	{
+		*dest = (byte)color;
+		dest += MAXSCREENWIDTH;
+	}
 }
 
 #endif
