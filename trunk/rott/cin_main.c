@@ -265,12 +265,11 @@ void R_DrawFilmColumn (byte * buf)
 	fracstep = cin_iscale;
 	frac = cin_texturemid + (cin_yl-cin_ycenter)*fracstep;
 
-	do
-	{
+	while (count--) {
 		*dest = cin_source[(frac>>SFRACBITS)];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
-	} while (count--);
+	}
 }
 
 void DrawFilmPost (byte * buf, byte * src, int height)

@@ -1336,12 +1336,11 @@ void R_DrawColumn (byte * buf)
 	fracstep = dc_iscale;
 	frac = dc_texturemid + (dc_yl-centery)*fracstep;
 
-	do
-	{
+	while (count--) {
 		*dest = shadingtable[dc_source[(frac>>SFRACBITS)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
-	} while (count--);
+	}
 }
 
 void R_TransColumn (byte * buf)
@@ -1378,12 +1377,11 @@ void R_DrawWallColumn (byte * buf)
 	frac <<= 10;
 	fracstep <<= 10;
 
-	do
-	{
+	while (count--) {
 		*dest = shadingtable[dc_source[(frac>>26)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
-	} while (count--);
+	}
 }
 
 void R_DrawClippedColumn (byte * buf)
@@ -1401,12 +1399,11 @@ void R_DrawClippedColumn (byte * buf)
 	fracstep = dc_iscale;
 	frac = dc_texturemid + (dc_yl-centeryclipped)*fracstep;
 
-	do
-	{
+	while (count--) {
 		*dest = shadingtable[dc_source[(frac>>SFRACBITS)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
-	} while (count--);
+	}
 }
 
 void R_DrawSolidColumn (int color, byte * buf)
