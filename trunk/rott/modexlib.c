@@ -386,6 +386,8 @@ void XFlipPage ( void )
 
 #else
 
+#include "SDL.h"
+
 /* rt_def.h isn't included, so I just put this here... */
 #define STUB_FUNCTION fprintf(stderr,"STUB: %s at " __FILE__ ", line %d, thread %d\n",__FUNCTION__,__LINE__,getpid())
 
@@ -396,9 +398,20 @@ void XFlipPage ( void )
 =
 ====================
 */
+static SDL_Surface *sdl_surface = NULL;
+
 void GraphicsMode ( void )
 {
-	STUB_FUNCTION;
+	if (SDL_InitSubSystem (SDL_INIT_VIDEO)<0)
+	{
+		Error ("Could not initialize SDL");
+	}
+
+	sdl_surface = SDL_SetVideoMode (320, 240, 8, 0);
+	if (sdl_surface == NULL)
+	{
+		Error ("Could not set video mode");
+	}
 }
 
 /*
@@ -410,7 +423,10 @@ void GraphicsMode ( void )
 */
 void TextMode ( void )
 {
-	STUB_FUNCTION;
+	if (sdl_surface == NULL) return;
+
+	SDL_QuitSubSystem (SDL_INIT_VIDEO);
+	sdl_surface = NULL;
 }
 
 /*
@@ -490,14 +506,12 @@ void VL_SetVGAPlaneMode ( void )
     VL_DePlaneVGA ();
     VL_SetLineWidth (48);
     screensize=208*SCREENBWIDE;
-    page1start=0xa0200;
-    page2start=0xa0200+screensize;
-    page3start=0xa0200+(2u*screensize);
+    page1start=sdl_surface->pixels;
+    page2start=sdl_surface->pixels;
+    page3start=sdl_surface->pixels;
     displayofs = page1start;
     bufferofs = page2start;
     XFlipPage ();
-    
-    STUB_FUNCTION;
 }
 
 /*
@@ -519,7 +533,7 @@ void VL_CopyPlanarPage ( byte * src, byte * dest )
       memcpy(dest,src,screensize);
       }
 #else
-	STUB_FUNCTION;
+      memcpy(dest,src,screensize);
 #endif
 }
 
@@ -545,7 +559,7 @@ void VL_CopyPlanarPageToMemory ( byte * src, byte * dest )
             *(ptr)=*(src+(a*linewidth)+b);
       }
 #else
-	STUB_FUNCTION;
+      memcpy(dest,src,screensize);
 #endif
 }
 
@@ -605,7 +619,7 @@ void VL_ClearBuffer (unsigned buf, byte color)
   VGAMAPMASK(15);
   memset((byte *)buf,color,screensize);
 #else
-	STUB_FUNCTION;
+  memset((byte *)buf,color,screensize);
 #endif
 }
 
@@ -625,7 +639,7 @@ void VL_ClearVideo (byte color)
   VGAMAPMASK(15);
   memset((byte *)(0xa000<<4),color,0x10000);
 #else
-	STUB_FUNCTION;
+  memset (sdl_surface->pixels, color, 0x10000);
 #endif
 }
 
@@ -707,7 +721,7 @@ void XFlipPage ( void )
    if (bufferofs > page3start)
       bufferofs = page1start;
 #else
-	STUB_FUNCTION;
+   SDL_UpdateRect (sdl_surface, 0, 0, 0, 0);
 #endif
 }
 

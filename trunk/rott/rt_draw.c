@@ -1535,7 +1535,7 @@ void CalcTics (void)
 //
 
    tc=ticcount;
-	while (tc==oldtime) { tc=ticcount; } /* endwhile */
+	while (tc==oldtime) { tc=I_GetTime (); } /* endwhile */
    tics=tc-oldtime;
 
 //   SoftError("CT ticcount=%ld\n",ticcount);

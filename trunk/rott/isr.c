@@ -743,6 +743,14 @@ void I_ShutdownKeyboard (void)
 }
 #else
 
+#include "SDL.h"
+
+int I_GetTime (void)
+{
+	ticcount = SDL_GetTicks ();
+	return ticcount;
+}
+
 /*
 ================
 =
@@ -767,7 +775,7 @@ void ISR_SetTime(int settime)
 
 void I_Delay ( int delay )
 {
-	STUB_FUNCTION;
+	SDL_Delay (delay);
 }
 
 /*
@@ -780,12 +788,12 @@ void I_Delay ( int delay )
 
 void I_StartupTimer (void)
 {
-	STUB_FUNCTION;
+	SDL_InitSubSystem (SDL_INIT_TIMER);
 }
 
 void I_ShutdownTimer (void)
 {
-	STUB_FUNCTION;
+	SDL_QuitSubSystem (SDL_INIT_TIMER);
 }
 
 /*

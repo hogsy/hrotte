@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <conio.h>
 #include <io.h>
 #include <direct.h>
+#else
+#include "SDL.h"
 #endif
 
 #include <stdarg.h>
@@ -332,7 +334,6 @@ void Error (char *error, ...)
    if (inerror > 1)
       return;
 
-   ShutDown();
 
 	TextMode ();
 #ifdef DOS
@@ -413,6 +414,9 @@ void Error (char *error, ...)
       level = gamestate.mapon+1;
 
    printf ("Area         = %ld\n", level);
+
+   ShutDown();	// DDOI - moved this so that it doesn't try to access player
+   		// which is freed by this function.
 
 #ifdef DOS
    GetPathFromEnvironment( filename, ApogeePath, ERRORFILE );
@@ -1083,7 +1087,17 @@ void VL_SetPalette (byte *palette)
       OUTP (PEL_DATA, gammatable[(gammaindex<<6)+(*palette++)]);
       }
 #else
-	STUB_FUNCTION;
+   SDL_Color cmap[256];
+   int i;
+
+   for (i = 0; i < 256; i++)
+   {
+	   cmap[i].r = gammatable[(gammaindex<<6)+(*palette++)];
+	   cmap[i].g = gammatable[(gammaindex<<6)+(*palette++)];
+	   cmap[i].b = gammatable[(gammaindex<<6)+(*palette++)];
+   }
+
+   SDL_SetColors (SDL_GetVideoSurface (), cmap, 0, 256);
 #endif
 }
 
