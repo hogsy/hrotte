@@ -5780,7 +5780,6 @@ void SetupGameLevel (void)
       SetupInanimateActors();
       }
    else {
-      SetupPlayers(); // force initialization of player obj - SBF
       FixTiles();
    }
    
@@ -5823,15 +5822,18 @@ void SetupGameLevel (void)
 #endif
 		SetupPlayScreen();
 		SetupScreen(false);
-		}
+	}
 
-   if (BATTLEMODE)
-      {
-      SetModemLightLevel ( gamestate.BattleOptions.LightLevel );
-      }
+        if (BATTLEMODE) {
+           SetModemLightLevel ( gamestate.BattleOptions.LightLevel );
+        }
 
-   for (i=0;i<100;i++)
+        if (player != NULL) {
+            for (i=0;i<100;i++) {
 		UpdateLightLevel(player->areanumber);
+            }
+        }
+        
 	insetupgame=false;
 
 	tedlevel = false;   // turn it off once we have done any ted stuff
