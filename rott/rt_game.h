@@ -93,7 +93,7 @@ void DrawPlayScreen (boolean bufferofsonly);
 
 void DrawKills (boolean bufferofsonly);
 void DrawPlayers ( void );
-void DrawGameString (int x, int y, char * str, boolean bufferofsonly);
+void DrawGameString (int x, int y, const char * str, boolean bufferofsonly);
 void DrawNumber (int x, int y, int width, int which, boolean bufferofsonly);
 void TakeDamage (int points, objtype *attacker);
 void HealPlayer (int points, objtype * ob);
