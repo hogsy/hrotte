@@ -932,7 +932,7 @@ int FX_Pan3D(int handle, int angle, int distance)
         setWarningMessage("voice is no longer playing in FX_Pan3D().");
     else
     {
-//        _FX_SetPosition(chan, angle, distance);
+        _FX_SetPosition(handle, angle, distance);
         
         retval = FX_Ok;
     } // else
