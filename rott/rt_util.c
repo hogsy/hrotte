@@ -59,8 +59,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //MED
 #include "memcheck.h"
 
-void print_stack (int level);
-
 int    egacolor[16];
 byte   *  origpal;
 FILE   *  errout;
@@ -419,10 +417,6 @@ void Error (char *error, ...)
       level = gamestate.mapon+1;
 
    printf ("Area         = %ld\n", (long int)level);
-
-#ifndef DOS
-   print_stack (1);
-#endif
 
    ShutDown();	// DDOI - moved this so that it doesn't try to access player
    		// which is freed by this function.
