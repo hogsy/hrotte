@@ -40,6 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //***************************************************************************
 
+#ifdef DOS
 #define SC_INDEX                0x3C4
 #define SC_DATA                 0x3C5
 #define SC_RESET                0
@@ -100,7 +101,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define PEL_WRITE_ADR           0x3c8
 #define PEL_READ_ADR            0x3c7
 #define PEL_DATA                0x3c9
-
+#endif
 
 extern  int      ylookup[MAXSCREENHEIGHT];      // Table of row offsets
 extern  int      linewidth;

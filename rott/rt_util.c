@@ -927,7 +927,7 @@ int _dos_findfirst(char *filename, int x, struct find_t *f)
     {
         *ptr = '\0';
         f->dir = opendir(f->pattern);
-        memmove(f->pattern, ptr + 1, strlen(ptr) + 1);
+        memmove(f->pattern, ptr + 1, strlen(ptr + 1) + 1);
     }
 
     return(_dos_findnext(f));

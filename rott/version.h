@@ -17,6 +17,12 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
+#ifndef VERSION_H
+#define VERSION_H
+
 #define ROTTMAJORVERSION 1
 #define ROTTMINORVERSION 4
 #define ROTTVERSION ((ROTTMAJORVERSION*10)+(ROTTMINORVERSION))
+
+#endif

@@ -23,6 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //***************************************************************************
 
+#ifndef BYTEORDER_H
+#define BYTEORDER_H
+
 typedef void (*converter_t)(void *, int);
 
 #define DECLARE_CONVERTER(type) void Cvt_##type(void *lmp, int num);
@@ -36,3 +39,5 @@ DECLARE_CONVERTER(transpatch_t);
 DECLARE_CONVERTER(cfont_t);
 void CvtNull(void *lmp, int num);
 void CvtFixme(void *lmp, int num);
+
+#endif
