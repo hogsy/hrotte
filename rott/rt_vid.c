@@ -84,6 +84,7 @@ static byte  rightmasks[4] = {1,3,7,15};
 
 void VL_MemToScreen (byte *source, int width, int height, int x, int y)
 {
+#ifdef DOS
    byte *screen, *dest, mask;
    int  plane;
 
@@ -109,6 +110,24 @@ void VL_MemToScreen (byte *source, int width, int height, int x, int y)
          dest++;
       }
    }
+#else
+	/* TODO please optimize me */
+	
+	byte *ptr, *destline;
+	int plane, i, j;
+	
+	ptr = source;
+	
+	for (plane = 0; plane < 4; plane++) {
+		for (j = 0; j < height; j++) {
+			destline = (byte *)(bufferofs+ylookup[y+j]+x);
+
+			for (i = 0; i < width; i++) {
+				*(destline + i*4 + plane) = *ptr++;
+			}			
+		}
+	}
+#endif
 }
 
 //*************************************************************************

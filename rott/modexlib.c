@@ -468,17 +468,10 @@ void VL_SetLineWidth (unsigned width)
 {
    int i,offset;
 
-#ifdef DOS
-//
-// set wide virtual screen
-//
-   outpw (CRTC_INDEX,CRTC_OFFSET+width*256);
-#endif
-
 //
 // set up lookup tables
 //
-   linewidth = width*2;
+   linewidth = 320;
 
    offset = 0;
 
@@ -487,9 +480,6 @@ void VL_SetLineWidth (unsigned width)
       ylookup[i]=offset;
       offset += linewidth;
       }
-  
-  
-   STUB_FUNCTION;
 }
 
 /*
