@@ -32,11 +32,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <ctype.h>
 
-#ifdef DOS
+#if PLATFORM_DOS
 #include <conio.h>
 #include <dos.h>
 #include <io.h>
-#else
+#elif PLATFORM_UNIX
 #include <unistd.h>
 #endif
 
@@ -1521,7 +1521,7 @@ void ScanForSavedGames ()
    // SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
    //
    memset (&SaveGamesAvail[0], 0, sizeof (SaveGamesAvail));
-#ifdef DOS
+#if PLATFORM_DOS || PLATFORM_WIN32
    GetPathFromEnvironment( filename, ApogeePath, SaveName );
 #else
    strncpy (filename, SaveName, 256);
@@ -1551,7 +1551,7 @@ void ScanForSavedGames ()
       }
       else
          MainMenu[loadgame].active = CP_Inactive;
-#ifndef DOS
+#if ((!PLATFORM_DOS) && (!PLATFORM_WIN32))
       chdir (pathsave);
       free (pathsave);
 #endif

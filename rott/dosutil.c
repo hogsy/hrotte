@@ -125,9 +125,10 @@ extern char ApogeePath[256];
 
 int setup_homedir (void)
 {
+#if PLATFORM_UNIX
 	int err;
 
-	snprintf (ApogeePath, 256, "%s/.rott/", getenv ("HOME"));
+	snprintf (ApogeePath, sizeof (ApogeePath), "%s/.rott/", getenv ("HOME"));
 	err = mkdir (ApogeePath, S_IRWXU);
 	if (err == -1 && errno != EEXIST)
 	{
@@ -135,6 +136,10 @@ int setup_homedir (void)
 				strerror (errno));
 		return -1;
 	}
+#else
+    sprintf(ApogeePath, ".%s", PATH_SEP_STR);
+#endif
+
 	return 0;
 }
 
