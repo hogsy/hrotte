@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g $(shell sdl-config --cflags)
+CFLAGS = -g $(shell sdl-config --cflags) -DUSE_SDL=1
 LDLIBS = $(shell sdl-config --libs) -lSDL_mixer
 
 all: rott

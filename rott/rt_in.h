@@ -206,7 +206,7 @@ byte IN_JoyButtons (void);
 void IN_UpdateKeyboard (void);
 void IN_ClearKeyboardQueue (void);
 int IN_InputUpdateKeyboard (void);
-
+void IN_PumpEvents (void);
 void QueueLetterInput (void);
 
 #endif
