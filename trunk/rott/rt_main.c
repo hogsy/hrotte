@@ -1461,7 +1461,7 @@ void QuitGame ( void )
 #if DOS
       memcpy ((byte *)0xB8000, txtscn, 4000);
 #else
-    STUB_FUNCTION;
+      DisplayTextSplash (txtscn, 25);
 #endif
 
 #if (DEBUG == 1)
