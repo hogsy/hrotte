@@ -889,7 +889,7 @@ boolean US_LineInput (int x, int y, char *buf, char *def, boolean escok,
 
             ls = Keyboard[sc_LShift];
             rs = Keyboard[sc_RShift];
-            memset (Keyboard, 0, 127*sizeof(int));       // Clear printable keys
+            memset ((void*)Keyboard, 0, 127*sizeof(int));       // Clear printable keys
             Keyboard[sc_LShift] = ls;
             Keyboard[sc_RShift] = rs;
 
@@ -1183,7 +1183,7 @@ boolean US_lineinput (int x, int y, char *buf, char *def, boolean escok,
 
             ls = Keyboard[sc_LShift];
             rs = Keyboard[sc_RShift];
-            memset (Keyboard, 0, 127*sizeof(int));       // Clear printable keys
+            memset ((void*)Keyboard, 0, 127*sizeof(int));       // Clear printable keys
             Keyboard[sc_LShift] = ls;
             Keyboard[sc_RShift] = rs;
             MN_PlayMenuSnd (SD_MOVECURSORSND);
