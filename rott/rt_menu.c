@@ -1457,7 +1457,9 @@ int getASCII ( void )
    int returnvalue = 0;
    int scancode = 0;
 
+#ifdef DOS
    _disable ();      // must disable for SHIFT purposes
+#endif
 
    IN_UpdateKeyboard ();
 
@@ -1486,7 +1488,9 @@ int getASCII ( void )
    Keyboard[sc_LShift] = LS;
    Keyboard[sc_RShift] = RS;
 
+#ifdef DOS
    _enable ();
+#endif
 
    return (returnvalue);
 }

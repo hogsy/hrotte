@@ -56,7 +56,7 @@ rott: 	\
 # rt_err.obj - some dos text screen for error messages
 
 clean:
-	rm *.o
+	rm -rf *.o
 
 distclean: clean
-	rm *~
+	rm -rf *~

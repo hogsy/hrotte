@@ -129,7 +129,6 @@ char ScanChars[128] =    // Scan code names with single chars
 
 
 
-#ifdef DOS
 //****************************************************************************
 //
 // LOCALS
@@ -164,6 +163,7 @@ static char *ParmStrings[] = {"nojoys","nomouse","spaceball","cyberman","assassi
 
 void INL_GetMouseDelta(int *x,int *y)
 {
+#ifdef DOS
    union REGS inregs;
    union REGS outregs;
 
@@ -175,6 +175,9 @@ void INL_GetMouseDelta(int *x,int *y)
 
    *x = outregs.w.cx;
    *y = outregs.w.dx;
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 
@@ -192,6 +195,7 @@ word IN_GetMouseButtons
    )
 
    {
+#ifdef DOS
    word  buttons;
    union REGS inregs;
    union REGS outregs;
@@ -213,6 +217,11 @@ word IN_GetMouseButtons
    buttons &= ~IgnoreMouse;
 
    return (buttons);
+#else
+	STUB_FUNCTION;
+	
+	return 0;
+#endif
 }
 
 
@@ -376,7 +385,7 @@ word IN_GetJoyButtonsDB (word joy)
 
 boolean INL_StartMouse (void)
 {
-
+#ifdef DOS
    union REGS inregs;
    union REGS outregs;
 
@@ -387,6 +396,11 @@ boolean INL_StartMouse (void)
       return (true);
    else
       return (false);
+#else
+	STUB_FUNCTION;
+	
+	return false;
+#endif
 }
 
 
@@ -655,7 +669,7 @@ void IN_Shutdown (void)
 void IN_ClearKeysDown (void)
 {
    LastScan = sc_None;
-   memset (Keyboard, 0, sizeof (Keyboard));
+   memset ((void *)Keyboard, 0, sizeof (Keyboard));
 }
 
 
@@ -1266,4 +1280,3 @@ void QueueLetterInput (void)
       head = (head+1)&(KEYQMAX-1);
       }        // while
    }
-#endif
