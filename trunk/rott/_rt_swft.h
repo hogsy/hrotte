@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _rt_swift_private
 #define _rt_swift_private
 
+#ifdef DOS
 //****************************************************************************
 //
 // Private header for RT_SWIFT.C.
@@ -101,6 +102,8 @@ static struct rminfo
 void MouseInt (struct rminfo *prmi);
 static void far *allocDOS (unsigned nbytes, short *pseg, short *psel);
 static void freeDOS (short sel);
+
+#endif
 
 #endif
 
