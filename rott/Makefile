@@ -49,6 +49,7 @@ rott: 	\
 	rt_vh_a.o \
 	rt_view.o \
 	rt_vid.o \
+	rt_err.o \
 	scriplib.o \
 	w_wad.o \
 	watcom.o \

@@ -450,7 +450,7 @@ void TurnOffTextCursor ( void )
 */
 void WaitVBL( void )
 {
-	STUB_FUNCTION;
+	SDL_Delay (16667/1000);
 }
 
 
