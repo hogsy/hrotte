@@ -834,12 +834,10 @@ void I_ShutdownTimer (void)
 
 void I_StartupKeyboard (void)
 {
-	STUB_FUNCTION;
 }
 
 
 void I_ShutdownKeyboard (void)
 {
-	STUB_FUNCTION;
 }
 #endif

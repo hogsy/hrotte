@@ -419,7 +419,9 @@ void DrawRottTitle ( void )
       TurnOffTextCursor ();
       if (CheckParm ("SOUNDSETUP") == 0)
          {
+#ifdef ANSIESC
          printf("\n\n\n");
+#endif
          strcpy (title,"Rise of the Triad Startup  Version ");
          strcat (title,itoa(ROTTMAJORVERSION,&buf[0],10));
          strcat (title,".");
@@ -1477,9 +1479,9 @@ void QuitGame ( void )
 #else
       txtscn = (byte *) W_CacheLumpNum (W_GetNumForName ("shareend"), PU_CACHE, CvtNull, 1);
 #endif
+#if DOS
       for (k = 0; k < 23; k++)
          printf ("\n");
-#if DOS
       memcpy ((byte *)0xB8000, txtscn, 4000);
 #elif defined (ANSIESC)
       DisplayTextSplash (txtscn, 25);

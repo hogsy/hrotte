@@ -450,7 +450,6 @@ void SetTextMode ( void )
 */
 void TurnOffTextCursor ( void )
 {
-	STUB_FUNCTION;
 }
 
 /*
