@@ -342,6 +342,7 @@ void INL_GetJoyDelta (word joy, int *dx, int *dy)
 
 word INL_GetJoyButtons (word joy)
 {
+#ifdef DOS
    word  result;
 
    result = inp (0x201);   // Get all the joystick buttons
@@ -349,6 +350,11 @@ word INL_GetJoyButtons (word joy)
    result &= 3;            // Mask off the useless bits
    result ^= 3;
    return (result);
+#else
+	STUB_FUNCTION;
+	
+	return 0;
+#endif
 }
 
 #if 0
@@ -911,6 +917,7 @@ boolean IN_UserInput (long delay)
 
 byte IN_JoyButtons (void)
 {
+#ifdef DOS
    unsigned joybits;
 
    joybits = inp (0x201);  // Get all the joystick buttons
@@ -918,6 +925,11 @@ byte IN_JoyButtons (void)
    joybits ^= 15;          // return with 1=pressed
 
    return joybits;
+#else
+	STUB_FUNCTION;
+	
+	return 0;
+#endif
 }
 
 
