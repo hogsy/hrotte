@@ -4,7 +4,6 @@
 #include <ctype.h>
 
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -17,36 +16,6 @@
  
 int _argc;
 char **_argv;
-
-/* TimeCount from David Haslam -- dch@sirius.demon.co.uk */
-
-static struct timeval t0;
-static long tc0;
-
-void set_TimeCount(unsigned long t)
-{
-	tc0 = t;
-	gettimeofday(&t0, NULL);
-}
-
-unsigned long get_TimeCount()
-{
-	struct timeval t1;
-	long secs, usecs;
-	long tc;
-	
-	gettimeofday(&t1, NULL);
-	secs = t1.tv_sec - t0.tv_sec;
-	usecs = t1.tv_usec - t0.tv_usec;
-	if (usecs < 0) {
-		usecs += 1000000;
-		secs--;
-	}
-
-	tc = tc0 + secs * 70 + usecs * 70 / 1000000;
-		
-	return tc;
-}
 
 long filelength(int handle)
 {

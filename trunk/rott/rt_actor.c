@@ -13473,7 +13473,7 @@ void T_Wind
 	int dx;
 	int dy;
 
-	if ( ( ticcount - WindLastTic ) > 0 )
+	if ( ( GetTicCount() - WindLastTic ) > 0 )
 		{
 		WindDistance = 1000;
 
@@ -13488,7 +13488,7 @@ void T_Wind
 				}
 			}
 		}
-	WindLastTic = ticcount;
+	WindLastTic = GetTicCount();
 
 	dx = ( ob->x - PLAYER[0]->x );
 	dy = ( PLAYER[0]->y - ob->y );

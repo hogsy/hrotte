@@ -147,7 +147,7 @@ boolean ReadPacket (void)
       if (crc!=sentcrc)
          {
          badpacket=1;
-         SoftError("BADPKT at %ld\n",ticcount);
+         SoftError("BADPKT at %ld\n",GetTicCount());
          }
       if (networkgame==false)
          {
@@ -160,7 +160,7 @@ boolean ReadPacket (void)
          }
       memcpy(&ROTTpacket[0], &rottcom->data[0], rottcom->datalength);
 
-//      SoftError( "ReadPacket: time=%ld size=%ld src=%ld type=%d\n",ticcount, rottcom->datalength,rottcom->remotenode,rottcom->data[0]);
+//      SoftError( "ReadPacket: time=%ld size=%ld src=%ld type=%d\n",GetTicCount(), rottcom->datalength,rottcom->remotenode,rottcom->data[0]);
 
 #if 0
       rottcom->command=CMD_OUTQUEBUFFERSIZE;
@@ -221,7 +221,7 @@ void WritePacket (void * buffer, int len, int destination)
          rottcom->remotenode++; // server fix-up
       }
 
-//   SoftError( "WritePacket: time=%ld size=%ld src=%ld type=%d\n",ticcount,rottcom->datalength,rottcom->remotenode,rottcom->data[0]);
+//   SoftError( "WritePacket: time=%ld size=%ld src=%ld type=%d\n",GetTicCount(),rottcom->datalength,rottcom->remotenode,rottcom->data[0]);
    // Send It !
 #ifdef DOS
 	int386(rottcom->intnum,&comregs,&comregs);
@@ -272,7 +272,7 @@ boolean ValidSyncPacket ( synctype * sync )
 void SendSyncPacket ( synctype * sync, int dest)
 {
    sync->pkt.type=COM_SYNC;
-   sync->sendtime=ticcount;
+   sync->sendtime=GetTicCount();
    WritePacket( &(sync->pkt.type) , sizeof(syncpackettype) , dest );
 }
 
@@ -299,14 +299,14 @@ boolean SlavePhaseHandler( synctype * sync )
          ISR_SetTime(sync->pkt.clocktime);
          break;
       case SYNC_PHASE3:
-         sync->pkt.clocktime=ticcount;
+         sync->pkt.clocktime=GetTicCount();
          break;
       case SYNC_PHASE4:
-         ISR_SetTime(ticcount-sync->pkt.delta);
-         sync->pkt.clocktime=ticcount;
+         ISR_SetTime(GetTicCount()-sync->pkt.delta);
+         sync->pkt.clocktime=GetTicCount();
          break;
       case SYNC_PHASE5:
-         ISR_SetTime(ticcount-sync->pkt.delta);
+         ISR_SetTime(GetTicCount()-sync->pkt.delta);
          sync->sendtime=sync->pkt.clocktime;
          done=true;
          break;
@@ -334,19 +334,19 @@ boolean MasterPhaseHandler( synctype * sync )
       {
       case SYNC_PHASE1:
          sync->pkt.phase=SYNC_PHASE2;
-         sync->pkt.clocktime=ticcount+(sync->deltatime>>1);
+         sync->pkt.clocktime=GetTicCount()+(sync->deltatime>>1);
          break;
       case SYNC_PHASE2:
          sync->pkt.phase=SYNC_PHASE3;
          break;
       case SYNC_PHASE3:
-         sync->pkt.delta=sync->pkt.clocktime-ticcount+(sync->deltatime>>1);
+         sync->pkt.delta=sync->pkt.clocktime-GetTicCount()+(sync->deltatime>>1);
          sync->pkt.phase=SYNC_PHASE4;
          break;
       case SYNC_PHASE4:
          sync->pkt.phase=SYNC_PHASE5;
-         sync->pkt.delta=sync->pkt.clocktime-ticcount+(sync->deltatime>>1);
-         sync->sendtime=ticcount+SYNCTIME;
+         sync->pkt.delta=sync->pkt.clocktime-GetTicCount()+(sync->deltatime>>1);
+         sync->sendtime=GetTicCount()+SYNCTIME;
          sync->pkt.clocktime=sync->sendtime;
          done=true;
          break;
@@ -411,21 +411,21 @@ void SetTime ( void )
       int time;
 
       syncpacket->type=COM_START;
-      syncpacket->clocktime=ticcount;
+      syncpacket->clocktime=GetTicCount();
       controlsynctime=syncpacket->clocktime;
       if (networkgame==true)
          nump=numplayers;
       else
          nump=1;
 
-      time = ticcount;
+      time = GetTicCount();
 
       for (i=0;i<nump;i++)
          {
          WritePacket( &(syncpacket->type) , sizeof(syncpackettype) , i );
          }
 
-      while (ticcount<time+(VBLCOUNTER/4)) ;
+      while (GetTicCount()<time+(VBLCOUNTER/4)) ;
 
       for (i=0;i<nump;i++)
          {
@@ -462,7 +462,7 @@ void SetTime ( void )
 //
 // flush out any extras
 //
-   while (ticcount<controlsynctime+VBLCOUNTER)
+   while (GetTicCount()<controlsynctime+VBLCOUNTER)
       {
       ReadPacket ();
       }
@@ -495,27 +495,27 @@ void InitialMasterSync ( synctype * sync, int client )
 
    // Initialize send time so as soon as we enter the loop, we send
 
-   sync->sendtime=ticcount-SYNCTIME;
+   sync->sendtime=GetTicCount()-SYNCTIME;
 
    while (done==false)
       {
       sync->pkt.phase=SYNC_PHASE0;
 
       AbortCheck("Initial sync aborted as master");
-	   if ((sync->sendtime+SYNCTIME) <= ticcount)
+	   if ((sync->sendtime+SYNCTIME) <= GetTicCount())
          SendSyncPacket(sync,client);
       if (ValidSyncPacket(sync)==true)
          {
          if (sync->pkt.phase==SYNC_PHASE0)
             {
-            int time=ticcount;
+            int time=GetTicCount();
 
-            while (time+SYNCTIME>ticcount)
+            while (time+SYNCTIME>GetTicCount())
                {
                ReadPacket();
                }
-            time=ticcount;
-            while (time+SYNCTIME>ticcount) {}
+            time=GetTicCount();
+            while (time+SYNCTIME>GetTicCount()) {}
             done=true;
             }
          }
@@ -549,10 +549,10 @@ void InitialSlaveSync ( synctype * sync )
             }
          if (sync->pkt.phase==SYNC_PHASE0)
             {
-            int time=ticcount;
+            int time=GetTicCount();
 
             SendSyncPacket(sync,server);
-            while (time+SYNCTIME>ticcount)
+            while (time+SYNCTIME>GetTicCount())
                {
                ReadPacket();
                }
@@ -595,7 +595,7 @@ void SyncTime( int client )
       // Initialize send time so as soon as we enter the loop, we send
 
       sync->pkt.phase=SYNC_PHASE1;
-      sync->sendtime=ticcount-SYNCTIME;
+      sync->sendtime=GetTicCount()-SYNCTIME;
 
       while (done==false)
          {
@@ -603,7 +603,7 @@ void SyncTime( int client )
 
          AbortCheck("SyncTime aborted as master");
 
-		   if ((sync->sendtime+SYNCTIME) <= ticcount)
+		   if ((sync->sendtime+SYNCTIME) <= GetTicCount())
             SendSyncPacket(sync,client);
 
          while (ValidSyncPacket(sync)==true)
@@ -615,7 +615,7 @@ void SyncTime( int client )
 
             // calculate last delta
 
-            dtime[sync->pkt.phase]=ticcount-sync->sendtime;
+            dtime[sync->pkt.phase]=GetTicCount()-sync->sendtime;
 
             for (i=0;i<=sync->pkt.phase;i++)
                sync->deltatime+=dtime[i];
@@ -656,11 +656,11 @@ void SyncTime( int client )
          }
       }
 
-   while (sync->sendtime > ticcount)
+   while (sync->sendtime > GetTicCount())
       {
       while (ReadPacket()) {}
       }
-   while ((sync->sendtime+SYNCTIME) > ticcount)
+   while ((sync->sendtime+SYNCTIME) > GetTicCount())
       {
       }
 

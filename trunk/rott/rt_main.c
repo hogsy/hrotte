@@ -1407,8 +1407,8 @@ void QuitGame ( void )
    MU_FadeOut(200);
    while (MU_FadeActive())
       {
-      int time=ticcount;
-      while (ticcount==time) {}
+      int time=GetTicCount();
+      while (GetTicCount()==time) {}
       }
 
    PrintMapStats();
@@ -1545,7 +1545,7 @@ void UpdateGameObjects ( void )
       waminot();
       }
 
-	atime=fasttics;
+	atime=GetFastTics();
 
    UpdateClientControls ();
 
@@ -1625,7 +1625,7 @@ void UpdateGameObjects ( void )
       if (GamePaused==true)
          break;
 		}
-   actortime=fasttics-atime;
+   actortime=GetFastTics()-atime;
 
    UpdateClientControls ();
 
@@ -1671,7 +1671,7 @@ void PauseLoop ( void )
 
    if ((RefreshPause == true) &&
        (GamePaused == true) &&
-       ((ticcount - pausedstartedticcount) >= blanktime))
+       ((GetTicCount() - pausedstartedticcount) >= blanktime))
       {
       RefreshPause = false;
       StartupScreenSaver();
@@ -1718,7 +1718,7 @@ fromloadedgame:
    drawtime  = 0;
    actortime = 0;
 	tics      = 0;
-	fasttics  = 0;
+	SetFastTics(0);
 
    if ( fizzlein == false )
       {
@@ -1752,7 +1752,7 @@ fromloadedgame:
          {
          PauseLoop();
 
-         atime = fasttics;
+         atime = GetFastTics();
 
          if ( RefreshPause )
             {
@@ -1768,14 +1768,14 @@ fromloadedgame:
          if (controlupdatestarted == 1)
             UpdateGameObjects();
 
-         atime = fasttics;
+         atime = GetFastTics();
 
          ThreeDRefresh();
          }
 
       SyncToServer();
 
-		drawtime = fasttics - atime;
+		drawtime = GetFastTics() - atime;
 
       // Don't allow player to quit if entering message
       canquit = !MSG.messageon;
@@ -1887,7 +1887,7 @@ fromloadedgame:
             if ( ( LastScan == sc_Escape ) && ( canquit ) )
                {
                quitactive = true;
-               quittime   = ticcount + QUITTIMEINTERVAL;
+               quittime   = GetTicCount() + QUITTIMEINTERVAL;
 
                if ( (consoleplayer == 0) || (networkgame == false) )
                   {
@@ -1903,7 +1903,7 @@ fromloadedgame:
             }
          else
             {
-            if ( ticcount > quittime )
+            if ( GetTicCount() > quittime )
                {
                quitactive = false;
                }

@@ -30,7 +30,7 @@ void CinematicDelay ( void )
 
 int GetCinematicTime ( void )
 {
-   return I_GetTime ();
+   return GetTicCount ();
 }
 
 boolean CinematicAbort( void )

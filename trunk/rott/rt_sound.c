@@ -393,7 +393,7 @@ int SD_PlayIt ( int sndnum, int angle, int distance, int pitch )
 */
       NumBadSounds++;
       SoftError("SD_PlayIt: Error/Warning %s\n",FX_ErrorString( FX_Error ));
-      SoftError("BadSoundNumber %ld time %ld\n",NumBadSounds,ticcount);
+      SoftError("BadSoundNumber %ld time %ld\n",NumBadSounds,GetTicCount());
 #endif
       SD_MakeCacheable( sndnum );
 
@@ -804,8 +804,8 @@ void SD_WaitSound ( int handle )
 
    while (FX_SoundActive(handle)!=0)
       {
-      time=ticcount+1;
-      while (time>ticcount) {}
+      time=GetTicCount()+1;
+      while (time>GetTicCount()) {}
       if ((LastScan) || IN_GetMouseButtons())
          break;
       }
@@ -1198,8 +1198,8 @@ void MU_FadeToSong ( int num, int time )
 
    while (MU_FadeActive())
       {
-      t=ticcount;
-      while (ticcount==t) {}
+      t=GetTicCount();
+      while (GetTicCount()==t) {}
       }
 
    MU_FadeIn (num,time>>1);
