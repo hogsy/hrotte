@@ -4583,7 +4583,7 @@ void CacheTransmitterExplosions ( void )
       num=W_GetNumForName(ExplosionInfo[i].name);
       for (j=0;j<ExplosionInfo[i].numframes;j++)
          {
-         W_CacheLumpNum(num+j,PU_CACHE);
+         W_CacheLumpNum(num+j, PU_CACHE, Cvt_patch_t, 1);
          }
       }
 }
@@ -4684,7 +4684,7 @@ void ShowFinalDoor ( void )
    VL_ClearBuffer (bufferofs, 0);
    DrawNormalSprite (0, (200-120)>>1, W_GetNumForName("finldoor"));
    FlipPage();
-   memcpy(&pal[0],W_CacheLumpName("findrpal",PU_CACHE),768);
+   memcpy(&pal[0],W_CacheLumpName("findrpal",PU_CACHE,CvtNull, 1),768);
    VL_NormalizePalette(&pal[0]);
    SD_Play(SD_OPENDOORSND);
    VL_FadeIn (0, 255, pal, 30);
@@ -4701,7 +4701,7 @@ void ShowFinalFire ( void )
    VL_ClearBuffer (bufferofs, 0);
    DrawNormalSprite (0, (200-120)>>1, W_GetNumForName("finlfire"));
    FlipPage();
-   memcpy(&pal[0],W_CacheLumpName("finfrpal",PU_CACHE),768);
+   memcpy(&pal[0],W_CacheLumpName("finfrpal",PU_CACHE,CvtNull, 1),768);
    VL_NormalizePalette(&pal[0]);
    SD_Play(SD_BAZOOKAFIRESND);
    VL_FadeIn (0, 255, pal, 30);
@@ -4792,9 +4792,9 @@ void DoBurningCastle ( void )
    CurrentFont = smallfont;
    FlipPage();
    VL_FadeIn (0, 255, origpal, 30);
-   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC);
+   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC, Cvt_font_t, 1 );
    ScrollString ( 150, &burnCastle1Msg[0], back, 4*VBLCOUNTER, 80);
-   W_CacheLumpName ("newfnt1", PU_CACHE);
+   W_CacheLumpName ("newfnt1", PU_CACHE, Cvt_font_t, 1);
    VL_FadeOut (0, 255, 0, 0, 0, 80);
    SafeFree(back);
 }
@@ -4920,7 +4920,7 @@ void DoSanNicolas ( void )
    DrawNormalSprite(0,16,W_GetNumForName("nicolas"));
    DrawNormalSprite(10,200-58,W_GetNumForName("budgcut"));
    FlipPage();
-   memcpy(&pal[0],W_CacheLumpName("nicpal",PU_CACHE),768);
+   memcpy(&pal[0],W_CacheLumpName("nicpal",PU_CACHE, CvtNull, 1),768);
    VL_NormalizePalette(&pal[0]);
    VL_FadeIn (0, 255, pal, 30);
    I_Delay(60);
@@ -4938,7 +4938,7 @@ void PlayerQuestionScreen ( void )
    CurrentFont = smallfont;
    FlipPage();
    VL_FadeIn (0, 255, origpal, 30);
-   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC);
+   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC, Cvt_font_t, 1);
    ScrollString ( 100, &doneMsg[0], back, 4*VBLCOUNTER, 40);
    ScrollString ( 100, &youWin1Msg[0], back, 4*VBLCOUNTER, 50);
    VL_DrawPostPic (W_GetNumForName("trilogo"));
@@ -4967,7 +4967,7 @@ void PlayerQuestionScreen ( void )
    PrepareBackground ( back );
    SD_Play(SD_PLAYERIPFSND);
    ScrollString ( 100, &youWin6Msg[0], back, 4*VBLCOUNTER, 100);
-   W_CacheLumpName ("newfnt1", PU_CACHE);
+   W_CacheLumpName ("newfnt1", PU_CACHE, Cvt_font_t, 1);
    VL_FadeOut (0, 255, 0, 0, 0, 80);
    SafeFree(back);
 }
@@ -4980,14 +4980,14 @@ void DoYouWin ( void )
    back=SafeMalloc(800*linewidth);
    LastScan=0;
    VL_ClearVideo(0);
-   pic = (pic_t *) W_CacheLumpNum (W_GetNumForName ("mmbk"), PU_CACHE);
+   pic = (pic_t *) W_CacheLumpNum (W_GetNumForName ("mmbk"), PU_CACHE, Cvt_pic_t, 1);
    VWB_DrawPic (0, 0, pic);
    PrepareBackground ( back );
    FlipPage();
    VL_FadeIn (0, 255, origpal, 30);
-   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC);
+   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC, Cvt_font_t, 1);
    ScrollString ( 100, &youWin7Msg[0], back, 4*VBLCOUNTER, 300);
-   W_CacheLumpName ("newfnt1", PU_CACHE);
+   W_CacheLumpName ("newfnt1", PU_CACHE, Cvt_font_t, 1);
    VL_FadeOut (0, 255, 0, 0, 0, 80);
    SafeFree(back);
 }
@@ -5000,7 +5000,7 @@ void DoFinalEnd ( void )
    back=SafeMalloc(800*linewidth);
    LastScan=0;
    VL_ClearVideo(0);
-   pic = (pic_t *) W_CacheLumpNum (W_GetNumForName ("mmbk"), PU_CACHE);
+   pic = (pic_t *) W_CacheLumpNum (W_GetNumForName ("mmbk"), PU_CACHE, Cvt_pic_t, 1);
    VWB_DrawPic (0, 0, pic);
    DrawNormalSprite(0,0,W_GetNumForName("sombrero"));
    DrawNormalSprite(0,0,W_GetNumForName("amflag"));
@@ -5010,9 +5010,9 @@ void DoFinalEnd ( void )
    PrepareBackground ( back );
    FlipPage();
    VL_FadeIn (0, 255, origpal, 30);
-   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC);
+   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC, Cvt_font_t, 1);
    ScrollString ( 100, &youWin8Msg[0], back, 4*VBLCOUNTER, 100);
-   W_CacheLumpName ("newfnt1", PU_CACHE);
+   W_CacheLumpName ("newfnt1", PU_CACHE, Cvt_font_t, 1);
    VL_FadeOut (0, 255, 0, 0, 0, 80);
    SafeFree(back);
    VL_ClearVideo(0);
@@ -5239,7 +5239,7 @@ void DIPCredits ( void )
    PrepareBackground ( back );
    FlipPage();
    VL_FadeIn (0, 255, origpal, 30);
-   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC);
+   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC, Cvt_font_t, 1);
    ScrollString ( 100, &creditsMsg[0], back, 4*VBLCOUNTER, 30);
    CurrentFont = smallfont;
    ScrollString ( 100, &credits1Msg[0], back, 4*VBLCOUNTER, 50);
@@ -5255,7 +5255,7 @@ void DIPCredits ( void )
    ScrollString ( 100, &credits11Msg[0], back, 4*VBLCOUNTER, 80);
    ScrollString ( 100, &credits12Msg[0], back, 4*VBLCOUNTER, 80);
 
-   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC);
+   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC, Cvt_font_t, 1);
    ScrollString ( 100, &actorsMsg[0], back, 4*VBLCOUNTER, 50);
 
    CurrentFont = smallfont;
@@ -5328,7 +5328,7 @@ void DIPCredits ( void )
 
    VL_DrawPostPic (W_GetNumForName("trilogo"));
    PrepareBackground ( back );
-   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC);
+   CurrentFont = (font_t *)W_CacheLumpName ("newfnt1", PU_STATIC, Cvt_font_t, 1);
    ScrollString ( 100, &playersCutMsg[0], back, 4*VBLCOUNTER, 40);
 
    CurrentFont = smallfont;
@@ -5371,7 +5371,7 @@ void DIPCredits ( void )
    ScrollString ( 175, &dipMsg[0], back, 4*VBLCOUNTER, 140);
    VL_FadeOut (0, 255, 0, 0, 0, 80);
 
-   W_CacheLumpName ("newfnt1", PU_CACHE);
+   W_CacheLumpName ("newfnt1", PU_CACHE, Cvt_font_t, 1);
    SafeFree(back);
 }
 
