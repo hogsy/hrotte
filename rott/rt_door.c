@@ -4200,13 +4200,13 @@ void LoadMaskedWalls(byte * bufptr, int sz)
 
   for (i=0;i<maskednum;i++)
      {
-     byte flags;
+     word flags;	// Endianness fix thanks to DrLex - DDOI
 
      mw=maskobjlist[i];
      size=sizeof(mw->flags);
      memcpy(&flags,bufptr,size);
      bufptr+=size;
-     if (flags!=mw->flags)
+     if ((flags&0xff)!=mw->flags)	// Preserves original behavior
         UpdateMaskedWall(i);
      if (mw->flags&MW_SWITCHON)
         mw->toptexture--;
