@@ -126,6 +126,8 @@ void  DebugError (char *error, ...);
 #endif
 
 void Square (void);
+
+#ifdef __WATCOMC__
 #pragma aux Square=\
    "mov edx,03c4h",  \
    "mov eax,0100h",  \
@@ -137,12 +139,17 @@ void Square (void);
    "mov edx,03c4h",  \
    "out dx,ax"      \
    modify exact [eax edx]
+#endif
+
 
 void my_outp(int port, int data);
+
+#ifdef __WATCOMC__
 #pragma aux my_outp =  \
         "out dx,al",                     \
         parm    [edx] [eax] \
         modify exact []
+#endif
 
 #define OUTP                              my_outp
 
