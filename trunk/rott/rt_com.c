@@ -68,6 +68,21 @@ static int    transittimes[MAXPLAYERS];
 void SyncTime( int client );
 void SetTransitTime( int client, int time );
 
+#ifdef PLATFORM_UNIX
+
+static int sock = -1;
+
+static void ReadUDPPacket()
+{
+	rottcom->remotenode = -1;
+}
+
+static void WriteUDPPacket()
+{
+}
+
+#endif
+
 /*
 ===============
 =
@@ -85,21 +100,92 @@ void InitROTTNET (void)
 		return;
 	ComStarted=true;
 
-	netarg=CheckParm ("net");
+#ifdef DOS
+        netarg=CheckParm ("net");
 	netarg++;
 
-#ifdef DOS
 	netaddress=atol(_argv[netarg]);
 	rottcom=(rottcom_t *)netaddress;
-#else
+#elif defined(PLATFORM_UNIX)
+	/*
+	server-specific options:
+	-net: enables netplay
+	-server: run as rott server (default port 34858)
+	-port: select a non-default port for server
+	-host: select a non-default ip address to bind to
+	-standalone: run as standalone server
+	-remoteridicule: enable remote ridicule
+	-players: number of players to expect
+
+	client-specific options:
+	-master: request to have control
+	-net: specifies the host to connect to
+	-port: select a non-default port to connect to
+	*/
+	
         rottcom = (rottcom_t *) malloc (sizeof(rottcom_t));
         memset(rottcom, 0, sizeof(rottcom_t));
+        
         rottcom->ticstep = 1;
-        rottcom->remotenode = -1;
         rottcom->gametype = 1;
-        rottcom->numplayers = 1;
-        rottcom->client = 0;
-        rottcom->consoleplayer = 1;
+        rottcom->remotenode = -1;
+        
+        if (CheckParm("server")) {
+        	if (CheckParm("standalone")) {
+        		rottcom->consoleplayer = 0;
+        	} else {
+        		rottcom->consoleplayer = 1;
+        	}
+        	
+        	if (CheckParm("remoteridicule")) {
+        		rottcom->remoteridicule = 1;
+        	} else {
+        		rottcom->remoteridicule = 0;
+        	}
+        	
+        	netarg = CheckParm("players");
+        	if (netarg && netarg < _argc-1) {
+        		rottcom->numplayers = atoi(_argv[netarg+1]);
+        	} else {
+        		rottcom->numplayers = 2;
+        	}
+        	
+        	rottcom->client = 0;
+        } else {
+        	rottcom->client = 1;
+        	
+        	/* consoleplayer will be initialized after connecting */
+        	/* numplayers will be initialized after connecting */
+        	/* remoteridicule will be initialized after connecting */
+        }
+        
+        /* client-server negotiation protocol, as inspired by ipxsetup.c */
+        /*
+          Best case:
+          client sends a HereIAm packet.
+          server replies with a YouAre packet, and broadcasts an Info packet
+            to the rest, indicating that the new player has joined.
+          client replies with an IAm packet
+          until all players have joined, the server broadcasts an Info packet
+            to the rest, indicating that another player is needed.
+          once server has enough players, it broadcasts an AllDone packet.
+          
+          In detail:
+          Client state: HereIAm (initial connection)
+          Client sends HereIAm packet, waits for YouAre from server.
+          At timeout, Client resends HereIam
+          When client receives YouAre, client switches to IAm state
+          
+          Client state: IAm
+          Client sends IAm packet, waits for IAmAck from server.
+          At timeout, Client resends IAm
+          When client receives IAmAck, client switches to WaitForDone state.
+          
+          Client state: WaitForDone
+          Client waits for AllDone packet.
+          When client receives AllDone, it sends an AllDoneAck.
+         */
+        
 #endif
 
    remoteridicule = false;
@@ -114,7 +200,9 @@ void InitROTTNET (void)
 
    if (!quiet)
       {
+#ifdef DOS
       printf("ROTTNET: Communicating on vector %ld\n",(long int)rottcom->intnum);
+#endif
       printf("ROTTNET: consoleplayer=%ld\n",(long int)rottcom->consoleplayer);
       }
 }
@@ -141,9 +229,8 @@ boolean ReadPacket (void)
 
 #ifdef DOS
 	int386(rottcom->intnum,&comregs,&comregs);
-#else
-	rottcom->remotenode = -1;
-//	STUB_FUNCTION;
+#elif PLATFORM_UNIX
+	ReadUDPPacket();
 #endif
 
    // Is it ready?
@@ -238,9 +325,8 @@ void WritePacket (void * buffer, int len, int destination)
    // Send It !
 #ifdef DOS
 	int386(rottcom->intnum,&comregs,&comregs);
-#else
-// printf("WritePacket: time=%ld size=%ld src=%ld type=%d\n",GetTicCount(),rottcom->datalength,rottcom->remotenode,rottcom->data[0]);
-//	STUB_FUNCTION;
+#elif PLATFORM_UNIX
+	WriteUDPPacket();
 #endif
 
 #if 0
