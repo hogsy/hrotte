@@ -254,19 +254,19 @@ static int        starthitpoints[4][NUMENEMIES+2] =
 static statobj_t  *touchsprite;
 
 
-static byte dirdiff[8][8] = {{0,1,2,3,4,3,2,1},{1,0,1,2,3,4,3,2},
+static const byte dirdiff[8][8] = {{0,1,2,3,4,3,2,1},{1,0,1,2,3,4,3,2},
 				{2,1,0,1,2,3,4,3},{3,2,1,0,1,2,3,4},
 				{4,3,2,1,0,1,2,3},{3,4,3,2,1,0,1,2},
 				{2,3,4,3,2,1,0,1},{1,2,3,4,3,2,1,0}};
 
-static byte dirorder[8][2] = {{southeast,northeast},{east,north},
+static const byte dirorder[8][2] = {{southeast,northeast},{east,north},
 				 {northeast,northwest},{north,west},
 				 {northwest,southwest},{west,south},
 				 {southwest,southeast},{south,east}};
 
 #if (SHAREWARE == 0)
 
-static byte dirdiff16[16][16] = {
+static const byte dirdiff16[16][16] = {
 				{0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1},
 				{1,0,1,2,3,4,5,6,7,8,7,6,5,4,3,2},
 				{2,1,0,1,2,3,4,5,6,7,8,7,6,5,4,3},
@@ -285,7 +285,7 @@ static byte dirdiff16[16][16] = {
 				{1,2,3,4,5,6,7,8,7,6,5,4,3,2,1,0}};
 #endif
 
-static byte dirorder16[16][2] = {
+static const byte dirorder16[16][2] = {
 						 {15,1}  ,   {0,2},   {1,3},   {2,4},
 						  {3,5}  ,   {4,6},   {5,7},   {6,8},
 						  {7,9}  ,  {8,10},  {9,11}, {10,12},
