@@ -575,29 +575,46 @@ void DrawHLine (int xleft, int xright, int yp)
 
    if (doublestep>0)
       {
-#ifdef DOS
       if (xleft&1)
          xleft--;
+
+#ifdef DOS
       for (plane=xleft;plane<xleft+4;plane+=2)
+#endif
          {
+
+#ifdef DOS
          mr_dest=dest+(plane>>2);
+#else
+         mr_dest=dest+xleft;
+#endif
 
          mr_xfrac = startxfrac;
 		   mr_yfrac = startyfrac;
 
+#ifdef DOS
          startxfrac+=mr_xstep>>1;
          startyfrac+=mr_ystep>>1;
 
          mr_count=((xright-plane)>>2)+1;
+#else
+         mr_count = xright - xleft;
+#endif
+
          if (mr_count)
             {
+#ifdef DOS
             int p;
             ofs=((plane&3)<<3)+(plane&3)+1;
 //          VGAMAPMASK(*((byte *)mapmasks1+ofs));
             p=plane&3;
             VGAMAPMASK((1<<p) + (1<<(p+1)));
-
+#endif
             DrawRow(mr_count,mr_dest,buf);
+#ifndef DOS
+            DrawRow(mr_count,mr_dest,buf+1);
+#endif
+
 #if 0
             ofs=(byte)*((byte *)mapmasks2+ofs);
             if (ofs!=0)
@@ -608,9 +625,6 @@ void DrawHLine (int xleft, int xright, int yp)
 #endif
             }
          }
-#else
-	STUB_FUNCTION;
-#endif
       }
    else
       {

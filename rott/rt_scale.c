@@ -417,7 +417,10 @@ void ScaleMaskedWidePost (byte * src, byte * buf, int x, int width)
    VGAMAPMASK(msk);
    ScaleMaskedPost(src,buf);
 #else
-	STUB_FUNCTION;
+	while (width--) {
+		ScaleMaskedPost(src,buf);
+		buf++;
+	}
 #endif
 }
 
@@ -445,7 +448,10 @@ void ScaleClippedWidePost (byte * src, byte * buf, int x, int width)
    VGAMAPMASK(msk);
    ScaleClippedPost(src,buf);
 #else
-	STUB_FUNCTION;
+	while (width--) {
+		ScaleClippedPost(src,buf);
+		buf++;
+	}
 #endif
 }
 
@@ -563,11 +569,17 @@ void ScaleShape (visobj_t * sprite)
       startfrac=frac;
       if (doublestep>1)
          {
+#ifdef DOS
          for (plane=startx;plane<startx+4;plane+=2,startfrac+=(dc_iscale<<1))
+#endif
             {
             frac=startfrac;
 //   VGAWRITEMAP(plane&3);
+#ifdef DOS
             for (x1=plane;x1<=x2;x1+=4, frac += (dc_iscale<<2))
+#else
+            for (x1=startx;x1<=x2;x1+=2, frac += (dc_iscale<<1))
+#endif
                {
                if (
                    (posts[x1].wallheight>sprite->viewheight) &&
