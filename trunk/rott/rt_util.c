@@ -86,7 +86,7 @@ static unsigned char egargb[48]={ 0x00,0x00,0x00,
                             0xff,0xff,0x57,
 									 0xff,0xff,0xff};
 
-extern byte * ROTT_ERR;
+extern const byte * ROTT_ERR;
 
 #if (DEVELOPMENT == 1)
 int TotalStaticMemory=0;
