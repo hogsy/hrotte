@@ -1291,8 +1291,7 @@ void GameLoop (void)
 
                WaitKeyUp();
                LastScan = 0;
-               while (!LastScan)
-                  ;
+               while (!LastScan) IN_UpdateKeyboard();	// Thanks again DrLex
                LastScan=0;
                }
 #endif

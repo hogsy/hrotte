@@ -426,7 +426,7 @@ int FX_Init(int SoundCard, int numvoices, int numchannels,
         return(FX_Error);
     } // if
 
-    audio_format = (samplebits == 8) ? AUDIO_U8 : AUDIO_S16;
+    audio_format = (samplebits == 8) ? AUDIO_U8 : AUDIO_S16SYS;
     if (Mix_OpenAudio(mixrate, audio_format, numchannels, 256) < 0)
     {
         setErrorMessage(SDL_GetError());
