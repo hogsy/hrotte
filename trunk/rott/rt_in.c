@@ -1552,13 +1552,19 @@ byte IN_JoyButtons (void)
 //
 //******************************************************************************
 
+/* HACK HACK HACK */
+static int queuegotit=0;
+
 void IN_UpdateKeyboard (void)
 {
    int tail;
    int key;
 
-   IN_PumpEvents();
-
+   if (!queuegotit)
+       IN_PumpEvents();
+   
+   queuegotit=0;
+   
    if (Keytail != Keyhead)
    {
       tail = Keytail;
@@ -1721,6 +1727,21 @@ void QueueLetterInput (void)
    char c;
    int scancode;
    boolean send = false;
+
+#ifndef PLATFORM_DOS
+   /* HACK HACK HACK */
+   /* 
+     OK, we want the new keys NOW, and not when the update gets them.
+     Since this called before IN_UpdateKeyboard in PollKeyboardButtons,
+     we shall update here.  The hack is there to prevent IN_UpdateKeyboard 
+     from stealing any keys... - SBF
+    */
+   IN_PumpEvents();
+   head = Keyhead;
+   tail = Keytail;
+   queuegotit=1;
+   /* HACK HACK HACK */
+#endif
 
    while (head != tail)
       {
