@@ -1830,8 +1830,12 @@ void PollKeyboardButtons (void)
    IN_UpdateKeyboard();
 
    for (i = 0; i < NUMBUTTONS; i++)
+   {
       if (Keystate[buttonscan[i]])
+      {
          buttonpoll[i] = true;
+      }
+   }
 }
 
 //******************************************************************************
