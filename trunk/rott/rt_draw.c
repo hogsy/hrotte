@@ -5687,23 +5687,17 @@ void  DrawMapPost (int height, byte * src, byte * buf)
 
 void DrawRotRow(int count, byte * dest, byte * src)
 {
-	unsigned eax, ecx, edx, ebp, fracstep;
+	unsigned eax, ecx, edx, fracstep;
 
 	ecx = mr_yfrac;
 	edx = mr_xfrac;
 	fracstep = mr_xstep;
 	while (count--) {
 		eax = edx >> 16;
-		ebp = ecx;
-		if (eax <= 255)
-		{
-			ebp >>= 16;
-			if (ebp <= 511)
-			{
-				ebp <<= 23;
-				eax = (eax << 9) | (ebp >> (32-9));
-			}
-		}
+		if (eax < 256 && (ecx >> 16) < 512)
+			eax = (eax << 9) | ((ecx << 7) >> (32-9));
+		else
+			eax = 0;
 		*dest++ = src[eax];
 		edx += fracstep;
 		ecx += fracstep;
@@ -5712,23 +5706,17 @@ void DrawRotRow(int count, byte * dest, byte * src)
 
 void DrawMaskedRotRow(int count, byte * dest, byte * src)
 {
-	unsigned eax, ecx, edx, ebp, fracstep;
+	unsigned eax, ecx, edx, fracstep;
 
 	ecx = mr_yfrac;
 	edx = mr_xfrac;
 	fracstep = mr_xstep;
 	while (count--) {
 		eax = edx >> 16;
-		ebp = ecx;
-		if (eax <= 255)
-		{
-			ebp >>= 16;
-			if (ebp <= 511)
-			{
-				ebp <<= 23;
-				eax = (eax << 9) | (ebp >> (32-9));
-			}
-		}
+		if (eax < 256 && (ecx >> 16) < 512)
+			eax = (eax << 9) | ((ecx << 7) >> (32-9));
+		else
+			eax = 0;
 		if (src[eax] != 0xff) *dest = src[eax];
 		dest++;
 		edx += fracstep;
