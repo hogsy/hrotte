@@ -1252,25 +1252,27 @@ void DrawScaleds (void)
       // draw farthest
       //
 
-      if (sortedvislist[i]->shapesize==4)
-
-         ScaleSolidShape(sortedvislist[i]);
-
-      else if (sortedvislist[i]->shapesize==3)
+      if (sortedvislist[i]->shapesize==4) {
+      
+        ScaleSolidShape(sortedvislist[i]);
+        
+      } else if (sortedvislist[i]->shapesize==3) {
 
          InterpolateDoor (sortedvislist[i]);
 
-		else if (sortedvislist[i]->shapesize==2)
+      } else if (sortedvislist[i]->shapesize==2) {
 
          InterpolateMaskedWall (sortedvislist[i]);
 
-      else if (sortedvislist[i]->shapesize==1)
+      } else if (sortedvislist[i]->shapesize==1) {
 
          ScaleTransparentShape(sortedvislist[i]);
 
-      else
+      } else {
 
          ScaleShape(sortedvislist[i]);
+
+      }
 
       }
 }
@@ -2766,7 +2768,7 @@ void      ThreeDRefresh (void)
 //
 // draw all the scaled images
 //
-	DrawScaleds();                                         // draw scaled stuff
+    DrawScaleds();                                         // draw scaled stuff
 
    UpdateClientControls ();
 

@@ -99,7 +99,7 @@ typedef struct
         SwapIntelShort(&pp->height);         \
         SwapIntelShort(&pp->leftoffset);     \
         SwapIntelShort(&pp->topoffset);      \
-        for (i = 0; i < 320; i++) {          \
+        for (i = 0; i < pp->width; i++) {          \
             SwapIntelShort((short*)&pp->collumnofs[i]); \
         }                                    \
     }
@@ -124,7 +124,7 @@ typedef struct
         SwapIntelShort(&pp->leftoffset);     \
         SwapIntelShort(&pp->topoffset);      \
         SwapIntelShort(&pp->translevel);     \
-        for (i = 0; i < 320; i++) {          \
+        for (i = 0; i < pp->width; i++) {          \
             SwapIntelShort((short*)&pp->collumnofs[i]); \
         }                                    \
     }

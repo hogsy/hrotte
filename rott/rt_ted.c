@@ -1141,6 +1141,13 @@ void PreCache( void )
    int ticdelay;
    unsigned tempbuf;
 
+#if defined(PLATFORM_MACOSX)
+#warning "Precaching is disabled. Fix."
+// Precaching confuses the byteswapping code, since we have
+// no simple way of knowing the type of each resource.
+    return;
+#endif
+
    if (CachingStarted==false)
       {
       if (loadedgame==false)
@@ -1341,6 +1348,7 @@ void CheckRTLVersion
    // Check the version number
    //
    SafeRead( filehandle, &RTLVersion, sizeof( RTLVersion ) );
+   SwapIntelLong(&RTLVersion);
    if ( RTLVersion > RTL_VERSION )
       {
       Error(
@@ -1386,6 +1394,13 @@ void ReadROTTMap
    lseek( filehandle, RTL_HEADER_OFFSET + mapnum * sizeof( RTLMap ),
       SEEK_SET );
    SafeRead( filehandle, &RTLMap, sizeof( RTLMap ) );
+
+    SwapIntelLong((long *)&RTLMap.used);
+    SwapIntelLong((long *)&RTLMap.CRC);
+    SwapIntelLong((long *)&RTLMap.RLEWtag);
+    SwapIntelLong((long *)&RTLMap.MapSpecials);
+    SwapIntelLongArray((long *)&RTLMap.planestart, NUMPLANES);
+    SwapIntelLongArray((long *)&RTLMap.planelength, NUMPLANES);
 
    if ( !RTLMap.used )
       {
