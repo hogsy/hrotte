@@ -1364,8 +1364,12 @@ void VL_DrawLine (int x1, int y1, int x2, int y2, byte color)
    y1<<=16;
    while (count>0)
       {
+#ifdef DOS
       VGAWRITEMAP((x1>>16)&3);
       *((byte *)bufferofs+(x1>>18)+(ylookup[y1>>16]))=color;
+#else
+      *((byte *)bufferofs+(x1>>16)+(ylookup[y1>>16]))=color;
+#endif
       x1+=xinc;
       y1+=yinc;
       count--;
