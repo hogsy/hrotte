@@ -137,8 +137,7 @@ char *ultoa(unsigned long value, char *string, int radix)
 
 char getch(void)
 {
-	STUB_FUNCTION;
-	
+	getchar();
 	return 0;
 }
 
