@@ -1219,7 +1219,7 @@ void GameLoop (void)
                char str[50];
                int width, height;
 
-               LBM = (lbm_t *) W_CacheLumpName( "deadboss", PU_CACHE);
+               LBM = (lbm_t *) W_CacheLumpName( "deadboss", PU_CACHE, Cvt_lbm_t, 1);
                VL_DecompressLBM (LBM,false);
                MenuFadeOut();
                switch (gamestate.mapon)
@@ -1240,7 +1240,7 @@ void GameLoop (void)
 //                     Error("Boss died on an illegal level\n");
 //                     break;
                   }
-               s = W_CacheLumpNum (shape, PU_CACHE);
+               s = W_CacheLumpNum (shape, PU_CACHE, Cvt_patch_t, 1);
                p = (patch_t *)s;
                DrawNormalSprite ((320-p->origsize)>>1, (230-(p->height-p->topoffset))>>1, shape);
                switch (gamestate.mapon)
@@ -3113,7 +3113,7 @@ void PlayCinematic (void)
          DrawNormalSprite(0,30,W_GetNumForName("nicolas"));
          DrawNormalSprite(0,168,W_GetNumForName("oneyear"));
          FlipPage();
-         memcpy(&pal[0],W_CacheLumpName("nicpal",PU_CACHE),768);
+         memcpy(&pal[0],W_CacheLumpName("nicpal",PU_CACHE, CvtNull, 1),768);
          VL_NormalizePalette(&pal[0]);
          VL_FadeIn(0,255,pal,20);
          I_Delay (60);
