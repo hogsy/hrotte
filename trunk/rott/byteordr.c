@@ -32,7 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 void Cvt_##type(void *lmp, int num)       \
 {                                         \
     int i;                                \
-    Debug("Endian converter Cvt_%s on %i objects at %p.\n", #type, num, lmp); \
     type *recs = (type *)lmp;             \
     for (i = 0; i < num; i++, recs++) {   \
         CONVERT_ENDIAN_##type(recs);      \
