@@ -239,3 +239,13 @@ void PlayMovie ( char * name, boolean uselumpy )
 
    ShutdownCinematic ();
 }
+
+#ifndef DOS
+int cin_iscale;
+int cin_source;
+int cin_texturemid;
+int cin_ycenter;
+int cin_yh;
+int cin_yl;
+#endif
+
