@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -g -I/cygdrive/c/SDL/include -DUSE_SDL=1 -DPLATFORM_UNIX=1 -W -Wall -Wno-unused
-LDLIBS = -L/cygdrive/c/SDL/lib  -lSDL -lSDL_mixer -Wl,-E
+CFLAGS = -g $(shell sdl-config --cflags) -DUSE_SDL=1 -DPLATFORM_UNIX=1 -W -Wall -Wno-unused -DUSE_EXECINFO=1
+LDLIBS = $(shell sdl-config --libs) -lSDL -lSDL_mixer -Wl,-E
 
 all: rott
 
@@ -53,7 +53,7 @@ rott: 	\
 	w_wad.o \
 	watcom.o \
 	z_zone.o \
-        byteordr.o
+	byteordr.o
 	$(CC) $^ $(LDLIBS) -o $@
 
 clean:
