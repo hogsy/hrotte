@@ -282,17 +282,23 @@ static int attempt_fullscreen_toggle(SDL_Surface **surface, Uint32 *flags)
     SDL_Color *palette = NULL;
     int ncolors = 0;
 
+    /*
     sdldebug("attempting to toggle fullscreen flag...");
+    */
 
     if ( (!surface) || (!(*surface)) )  /* don't try if there's no surface. */
     {
+	    /*
         sdldebug("Null surface (?!). Not toggling fullscreen flag.");
+	*/
         return(0);
     } /* if */
 
     if (SDL_WM_ToggleFullScreen(*surface))
     {
+	    /*
         sdldebug("SDL_WM_ToggleFullScreen() seems to work on this system.");
+	*/
         if (flags)
             *flags ^= SDL_FULLSCREEN;
         return(1);
@@ -300,11 +306,15 @@ static int attempt_fullscreen_toggle(SDL_Surface **surface, Uint32 *flags)
 
     if ( !(SDL_GetVideoInfo()->wm_available) )
     {
+	    /*
         sdldebug("No window manager. Not toggling fullscreen flag.");
+	*/
         return(0);
     } /* if */
 
+    /*
     sdldebug("toggling fullscreen flag The Hard Way...");
+    */
     tmpflags = (*surface)->flags;
     w = (*surface)->w;
     h = (*surface)->h;
