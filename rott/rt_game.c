@@ -4559,7 +4559,7 @@ void SaveTag (int handle, char * tag, int size)
 
 boolean SaveTheGame (int num, gamestorage_t * game)
 {
-   char   loadname[MAX_PATH]="ROTTGAM0.ROT";
+   char   loadname[MAX_PATH]="rottgam0.rot";
    char   filename[MAX_PATH];
    byte   * altbuffer;
 	int    size;
@@ -4879,7 +4879,7 @@ int LoadBuffer (byte ** dest, byte ** src)
 
 boolean LoadTheGame (int num, gamestorage_t * game)
 {
-   char   loadname[45]="ROTTGAM0.ROT";
+   char   loadname[45]="rottgam0.rot";
    char   filename[128];
    byte   * loadbuffer;
 	byte   * bufptr;
@@ -5235,7 +5235,7 @@ boolean LoadTheGame (int num, gamestorage_t * game)
 void GetSavedMessage (int num, char * message)
 {
    gamestorage_t game;
-   char   loadname[45]="ROTTGAM0.ROT";
+   char   loadname[45]="rottgam0.rot";
    char   filename[128];
    byte   * loadbuffer;
    byte   * bufptr;
@@ -5277,7 +5277,7 @@ void GetSavedMessage (int num, char * message)
 
 void GetSavedHeader (int num, gamestorage_t * game)
 {
-   char   loadname[45]="ROTTGAM0.ROT";
+   char   loadname[45]="rottgam0.rot";
    char   filename[128];
    byte   * loadbuffer;
    byte   * bufptr;

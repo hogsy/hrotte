@@ -1195,7 +1195,7 @@ static boolean StartGame = false;
 
 static int  SaveGamesAvail[ NUMSAVEGAMES ];
 static char SaveGameNames[ NUMSAVEGAMES ][ 32 ];
-static char SaveName[ 13 ] = "ROTTGAM?.ROT\0";
+static char SaveName[ 13 ] = "rottgam?.rot\0";
 
 static byte *savedscreen;
 static mapfileinfo_t * mapinfo;
@@ -2301,7 +2301,7 @@ int HandleMenu (CP_iteminfo *item_i, CP_itemtype *items, void (*routine)(int w))
          {
             if (CP_DisplayMsg ("Delete saved game?\nAre you sure?", 12) == true)
             {
-               char loadname[45] = "ROTTGAM0.ROT";
+               char loadname[45] = "rottgam0.rot";
                char filename[128];
 
                // Create the proper file name
@@ -3326,7 +3326,7 @@ int DoLoad (int which)
       {
          if (CP_DisplayMsg ("Saved Game is\n old or incompatible\nDelete it?", 12)==true)
          {
-            char loadname[45] = "ROTTGAM0.ROT";
+            char loadname[45] = "rottgam0.rot";
             char filename[128];
 
             // Create the proper file name
@@ -3444,7 +3444,7 @@ void QuickSaveGame (void)
    byte * buf;
    int length;
 
-   char   loadname[45]="ROTTGAM0.ROT";
+   char   loadname[45]="rottgam0.rot";
    char   filename[128];
 
    // Create the proper file name
@@ -3506,7 +3506,7 @@ void QuickSaveGame (void)
 void UndoQuickSaveGame (void)
 {
    byte * buf;
-   char   loadname[45]="ROTTGAM0.ROT";
+   char   loadname[45]="rottgam0.rot";
    char   filename[128];
    int length;
 
