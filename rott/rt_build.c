@@ -1374,8 +1374,20 @@ void MenuBufCPrintLine (char *s)
 
 void MenuBufCPrint (char *s)
 {
+   static char buf[256];
    char  c,
          *se;
+
+    /* !!! FIXME: this is lame. */
+    if (strlen(s) >= sizeof (buf))
+    {
+        fprintf(stderr, "buffer overflow!\n");
+        return;
+    }
+
+    /* prevent writing to literal strings... ( MenubufCPrint("feh"); ) */
+    strcpy(buf, s);
+    s = buf;
 
    while (*s)
    {
