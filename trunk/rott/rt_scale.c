@@ -1216,11 +1216,6 @@ void R_DrawColumn (byte * buf)
 #endif
 }
 
-void R_DrawFilmColumn (byte * buf)
-{
-	STUB_FUNCTION;
-}
-
 void R_TransColumn (byte * buf)
 {
 	STUB_FUNCTION;
@@ -1237,6 +1232,13 @@ void R_DrawClippedColumn (byte * buf)
 }
 
 void R_DrawSolidColumn (int color, byte * buf)
+{
+	STUB_FUNCTION;
+}
+
+/* f_scale.asm */
+
+void R_DrawFilmColumn (byte * buf)
 {
 	STUB_FUNCTION;
 }
