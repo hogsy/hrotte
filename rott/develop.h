@@ -44,6 +44,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SUPERROTT   0
 #define SITELICENSE 0
 
+// cute little dopefish thing, only works when not SHAREWARE
+#define DOPEFISH 0
+
 // okay?
 
 #define TEXTMENUS   1

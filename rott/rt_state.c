@@ -910,7 +910,7 @@ statetype s_guts2 = {false,GUTS2,3,T_Collide,SF_GUTS,&s_guts3};
 statetype s_guts1 = {false,GUTS1,3,T_Collide,SF_GUTS,&s_guts2};
 
 //MED
-#if (SHAREWARE == 1)
+#if (SHAREWARE == 1) || (DOPEFISH == 0)
 statetype s_collectorwander8 = {false,COLLECTOR15,0,T_CollectorWander,0,&s_collectorwander1};
 statetype s_collectorwander7 = {false,COLLECTOR13,1,T_CollectorWander,0,&s_collectorwander8};
 statetype s_collectorwander6 = {false,COLLECTOR11,0,T_CollectorWander,0,&s_collectorwander7};
@@ -933,7 +933,7 @@ statetype s_collectorwander1 = {false,DOPE1,2,T_CollectorWander,0,&s_collectorwa
 
 
 //MED
-#if (SHAREWARE == 1)
+#if (SHAREWARE == 1) || (DOPEFISH == 0)
 statetype s_collectorfdoor8 = {false,COLLECTOR15,0,T_CollectorFindDoor,0,&s_collectorfdoor1};
 statetype s_collectorfdoor7 = {false,COLLECTOR13,1,T_CollectorFindDoor,0,&s_collectorfdoor8};
 statetype s_collectorfdoor6 = {false,COLLECTOR11,0,T_CollectorFindDoor,0,&s_collectorfdoor7};
