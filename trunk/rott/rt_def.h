@@ -35,8 +35,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //***************************************************************************
 
-#define PI      3.141592657
+#undef PI
+#undef M_PI
+
+#ifndef NULL
 #define NULL       0
+#endif
+
+#define PI      3.141592657
 #define LONG(a) ((int)a)
 #define M_PI            3.14159
 
@@ -235,7 +241,7 @@ typedef enum
  thingtype;
 
 #define NUMTXBUTTONS    16
-typedef enum    {
+enum    {
 		  bt_nobutton=-1,
 		  bt_attack=0,
 		  bt_strafe=1,
@@ -296,7 +302,7 @@ typedef enum    { wp_pistol,
 
 
 
-typedef enum    {
+enum    {
 						gd_baby,
 						gd_easy,
 						gd_medium,

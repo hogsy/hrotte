@@ -54,7 +54,8 @@ Local Variables                                                                 
 static int xtilestep,ytilestep;
 static int c_vx,c_vy;
 
-
+void InitialCast ( void );
+void Cast ( int curx );
 
 void Interpolate (int x1, int x2)
 {
