@@ -638,6 +638,14 @@ static int setupVocPlayback(char *ptr, int size, int priority, unsigned long cal
     return(FX_Ok);
 } // setupVocPlayback
 
+static void _FX_SetPosition(int chan, int angle, int distance)
+{
+printf("chan %d, angle %d, distance %d\n", chan, angle, distance);
+
+    /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
+    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 359.0), 
+        distance);
+}
 
 int FX_PlayVOC(char *ptr, int pitchoffset,
                int vol, int left, int right,
@@ -744,12 +752,9 @@ int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
         return(rc);
 
     // !!! FIXME: Need to do something with pitchoffset.
-
-    /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
-    /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
-//    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
- //   	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
     
+    _FX_SetPosition(chan, angle, distance);
+
     Mix_PlayChannel(chan, chunk, 0);
     return(FX_Ok + chan);
 } // FX_PlayVOC3D
@@ -771,10 +776,7 @@ int FX_PlayVOC3D_ROTT(char *ptr, int size, int pitchoffset, int angle, int dista
 
     // !!! FIXME: Need to do something with pitchoffset.
 
-    /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
-    /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
-//    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 360.0), 
-//    	(Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
+    _FX_SetPosition(chan, angle, distance);
 
     Mix_PlayChannel(chan, chunk, 0);
     return(FX_Ok + chan);
@@ -842,10 +844,8 @@ int FX_Pan3D(int handle, int angle, int distance)
         setWarningMessage("voice is no longer playing in FX_Pan3D().");
     else
     {
-        /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
-        /* rescale distance from 0..255 to 1..255 so that SDL_mixer doesn't unreg. */
-//        Mix_SetPosition(handle, (Sint16) ((((float) angle) / 31.0) * 360.0), 
-//            (Uint8) (((((float) distance) / 255.0) * 254.0) + 1.0));
+//        _FX_SetPosition(chan, angle, distance);
+        
         retval = FX_Ok;
     } // else
 
