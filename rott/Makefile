@@ -1,5 +1,6 @@
-CC=gcc
-CFLAGS=-g
+CC = gcc
+CFLAGS = -g $(shell sdl-config --cflags)
+LDLIBS = $(shell sdl-config --libs) -lSDL_mixer
 
 all: rott
 
@@ -12,6 +13,7 @@ rott: 	\
 	cin_util.o \
 	dosutil.o \
 	engine.o \
+	fx_man.o \
 	rt_actor.o \
 	rt_battl.o \
 	rt_build.o \
@@ -45,6 +47,7 @@ rott: 	\
 	w_wad.o \
 	watcom.o \
 	z_zone.o
+	$(CC) $^ $(LDLIBS) -o $@
 
 # rt_in.c, rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
 # rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a, f_scale
