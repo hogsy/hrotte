@@ -113,10 +113,16 @@ void DrawSky( void )
 
    if (doublestep>0)
       {
+#ifdef DOS
       for (plane=0;plane<4;plane+=2)
+#endif
          {
+#ifdef DOS
          VGAMAPMASK((1<<plane)+(1<<(plane+1)));
          for (dest=plane;dest<viewwidth;dest+=4)
+#else
+         for (dest=0;dest<viewwidth;dest+=2)
+#endif
             {
             height=posts[dest].ceilingclip;
             height2=posts[dest+1].ceilingclip;
@@ -126,22 +132,38 @@ void DrawSky( void )
                continue;
             ang=(angle+pixelangle[dest])&(FINEANGLES-1);
             src=skysegs[ang]-ofs;
+#ifdef DOS
             DrawSkyPost((byte *)bufferofs + (dest>>2),src,height);
+#else
+	/* TODO: this isn't right since it's not really optimized */
+            DrawSkyPost((byte *)bufferofs + dest,src,height);
+            DrawSkyPost((byte *)bufferofs + dest + 1,src,height);
+#endif
             }
          }
       }
    else
       {
+#ifdef DOS
       for (plane=0;plane<4;plane++)
+#endif
          {
+#ifdef DOS
          VGAWRITEMAP(plane);
          for (dest=plane;dest<viewwidth;dest+=4)
+#else
+         for (dest=0;dest<viewwidth;dest++)
+#endif
             {
             if ((height=posts[dest].ceilingclip)<=0)
                continue;
             ang=(angle+pixelangle[dest])&(FINEANGLES-1);
             src=skysegs[ang]-ofs;
+#ifdef DOS
             DrawSkyPost((byte *)bufferofs + (dest>>2),src,height);
+#else
+            DrawSkyPost((byte *)bufferofs + dest,src,height);
+#endif
             }
          }
       }
@@ -183,14 +205,24 @@ void DrawFullSky( void )
 
    bufferofs+=screenofs;
 
+#ifdef DOS
    for (plane=0;plane<4;plane++)
+#endif
       {
+#ifdef DOS
       VGAWRITEMAP(plane);
       for (dest=plane;dest<viewwidth;dest+=4)
+#else
+      for (dest=0;dest<viewwidth;dest++)
+#endif
          {
          ang=(angle+pixelangle[dest])&(FINEANGLES-1);
          src=skysegs[ang]-ofs;
+#ifdef DOS
          DrawSkyPost((byte *)bufferofs + (dest>>2),src,viewheight);
+#else
+         DrawSkyPost((byte *)bufferofs + dest,src,viewheight);
+#endif
          }
       }
 
@@ -404,6 +436,8 @@ void SetPlaneViewSize (void)
       ceilingnum = GetFloorCeilingLump ( ceilingnum );
       ceiling = W_CacheLumpNum(ceilingnum,PU_LEVELSTRUCT);
       ceiling +=8;
+      } else {
+      	ceiling = NULL;
       }
 
 	s = W_GetNumForName("SKYSTART");
@@ -519,7 +553,11 @@ void DrawHLine (int xleft, int xright, int yp)
       {
       int hd;
 
+      /* ROTT bug? It'd draw when there was no ceiling. - SBF */
+      if (ceiling == NULL) return;
+      
       buf=ceiling;
+      
       hd=centery-yp;
       height=(hd<<13)/pheight;
       }
@@ -537,6 +575,7 @@ void DrawHLine (int xleft, int xright, int yp)
 
    if (doublestep>0)
       {
+#ifdef DOS
       if (xleft&1)
          xleft--;
       for (plane=xleft;plane<xleft+4;plane+=2)
@@ -569,21 +608,35 @@ void DrawHLine (int xleft, int xright, int yp)
 #endif
             }
          }
+#else
+	STUB_FUNCTION;
+#endif
       }
    else
       {
+#ifdef DOS
       for (plane=xleft;plane<xleft+4;plane++)
+#endif
          {
+#ifdef DOS
          mr_dest=dest+(plane>>2);
          VGAWRITEMAP(plane&3);
+#else
+         mr_dest=dest+xleft;
+#endif
 
          mr_xfrac = startxfrac;
 		   mr_yfrac = startyfrac;
 
+#ifdef DOS
          startxfrac+=mr_xstep>>2;
          startyfrac+=mr_ystep>>2;
 
          mr_count=((xright-plane)>>2)+1;
+#else
+        mr_count = xright-xleft;
+#endif
+
          if (mr_count)
             DrawRow(mr_count,mr_dest,buf);
          }
@@ -647,9 +700,6 @@ void DrawPlanes( void )
 #ifndef DOS
 void DrawRow(int count, byte * dest, byte * src)
 {
-#if 1
-	STUB_FUNCTION;
-#else
 	unsigned frac, fracstep;
 	int ecx;
 
@@ -661,6 +711,5 @@ void DrawRow(int count, byte * dest, byte * src)
 		*dest++ = shadingtable[src[ecx&16383]];
 		frac += fracstep;
 	}
-#endif
 }
 #endif
