@@ -50,6 +50,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define O_BINARY 0
 #endif
 
+#ifndef O_TEXT
+#define O_TEXT 0
+#endif
+
 #ifndef DOS
 char *strupr(char *);
 char *itoa(int, char *, int);

@@ -25,14 +25,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define _ROTT_
 
+#ifdef DOS
 #include <io.h>
+#include <bios.h>
+#include <conio.h>
+#include <process.h>
+#else
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#endif
+
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-#include <bios.h>
-#include <conio.h>
 #include <ctype.h>
-#include <process.h>
 
 #ifdef _ROTT_
 #include "rt_def.h"
@@ -224,7 +231,7 @@ void ReadBoolean (const char * s1, boolean * val)
 //
 //******************************************************************************
 
-void ReadUnsigned (const char * s1, unsigned * val)
+void ReadUnsigned (const char * s1, unsigned long * val)
 {
    int temp;
 
@@ -232,7 +239,6 @@ void ReadUnsigned (const char * s1, unsigned * val)
    ReadInt (s1,&temp);
    *val = (unsigned) temp;
 }
-
 
 //******************************************************************************
 //
@@ -999,7 +1005,7 @@ void CheckVendor (void)
    GetPathFromEnvironment( filename, ApogeePath, VENDORDOC );
    if (access (filename, F_OK) == 0)
       {
-      size = LoadFile(filename,&vendor);
+      size = LoadFile(filename,(void **)&vendor);
       filecrc = CalculateCRC (vendor, size);
       SafeFree(vendor);
       lump=W_GetNumForName(VENDORLUMP);
