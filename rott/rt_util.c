@@ -1042,16 +1042,25 @@ long	IntelLong (long l)
 ==============
 */
 
-void GetaPalette (byte *pal)
+void GetaPalette (byte *palette)
 {
 #ifdef DOS
 	int	i;
 
 	OUTP (PEL_READ_ADR,0);
 	for (i=0 ; i<768 ; i++)
-		pal[i] = inp (PEL_DATA)<<2;
+		palette[i] = inp (PEL_DATA)<<2;
 #else
-	STUB_FUNCTION;
+	int i;
+	SDL_Palette *pal = SDL_GetVideoSurface()->format->palette;
+	
+	for (i = 0; i < 256; i++) {
+		palette[0] = pal->colors[i].r;
+		palette[1] = pal->colors[i].g;
+		palette[2] = pal->colors[i].b;
+		
+		palette += 3;
+	}
 #endif
 }
 
@@ -1074,20 +1083,39 @@ void SetaPalette (byte *pal)
 	for (i=0 ; i<768 ; i++)
 		OUTP (PEL_DATA, pal[i]>>2);
 #else
-	STUB_FUNCTION;
+   SDL_Color cmap[256];
+   int i;
+
+   for (i = 0; i < 256; i++)
+   {
+	   cmap[i].r = pal[i*3+0];
+	   cmap[i].g = pal[i*3+1];
+	   cmap[i].b = pal[i*3+2];
+   }
+
+   SDL_SetColors (SDL_GetVideoSurface (), cmap, 0, 256);
 #endif
 }
 
-void GetPalette(char * pal)
+void GetPalette(char * palette)
 {
 #ifdef DOS
   int i;
 
   OUTP(0x03c7,0);
   for (i=0;i<256*3;i++)
-     *(pal+(unsigned char)i)=inp(0x3c9)<<2;
+     *(palette+(unsigned char)i)=inp(0x3c9)<<2;
 #else
-	STUB_FUNCTION;
+	int i;
+	SDL_Palette *pal = SDL_GetVideoSurface()->format->palette;
+	
+	for (i = 0; i < 256; i++) {
+		palette[0] = pal->colors[i].r;
+		palette[1] = pal->colors[i].g;
+		palette[2] = pal->colors[i].b;
+		
+		palette += 3;
+	}
 #endif
 }
 
@@ -1137,6 +1165,98 @@ int US_CheckParm (char *parm, char **strings)
    }
    return(-1);
 }
+
+/*
+=============================================================================
+
+                  PALETTE OPS
+
+      To avoid snow, do a WaitVBL BEFORE calling these
+
+=============================================================================
+*/
+
+
+/*
+=================
+=
+= VL_FillPalette
+=
+=================
+*/
+
+void VL_FillPalette (int red, int green, int blue)
+{
+#ifdef DOS
+   int   i;
+
+   OUTP (PEL_WRITE_ADR,0);
+   for (i=0;i<256;i++)
+   {
+      OUTP (PEL_DATA,red);
+      OUTP (PEL_DATA,green);
+      OUTP (PEL_DATA,blue);
+   }
+#else
+   SDL_Color cmap[256];
+   int i;
+
+   for (i = 0; i < 256; i++)
+   {
+           cmap[i].r = red << 2;
+           cmap[i].g = green << 2;
+           cmap[i].b = blue << 2;
+   }
+
+   SDL_SetColors (SDL_GetVideoSurface (), cmap, 0, 256);
+#endif
+}
+
+//===========================================================================
+
+/*
+=================
+=
+= VL_SetColor
+=
+=================
+*/
+
+void VL_SetColor  (int color, int red, int green, int blue)
+{
+#ifdef DOS
+   OUTP (PEL_WRITE_ADR,color);
+   OUTP (PEL_DATA,red);
+   OUTP (PEL_DATA,green);
+   OUTP (PEL_DATA,blue);
+#else
+	STUB_FUNCTION;
+#endif
+}
+
+//===========================================================================
+
+/*
+=================
+=
+= VL_GetColor
+=
+=================
+*/
+
+void VL_GetColor  (int color, int *red, int *green, int *blue)
+{
+#ifdef DOS
+   OUTP (PEL_READ_ADR,color);
+   *red   = inp (PEL_DATA);
+   *green = inp (PEL_DATA);
+   *blue  = inp (PEL_DATA);
+#else
+	STUB_FUNCTION;
+#endif
+}
+
+//===========================================================================
 
 /*
 =================
@@ -1216,7 +1336,16 @@ void VL_GetPalette (byte *palette)
    for (i = 0; i < 768; i++)
       *palette++ = inp (PEL_DATA);
 #else
-	STUB_FUNCTION;
+	int i;
+	SDL_Palette *pal = SDL_GetVideoSurface()->format->palette;
+	
+	for (i = 0; i < 256; i++) {
+		palette[0] = pal->colors[i].r >> 2;
+		palette[1] = pal->colors[i].g >> 2;
+		palette[2] = pal->colors[i].b >> 2;
+		
+		palette += 3;
+	}
 #endif
 }
 
