@@ -1328,7 +1328,7 @@ void R_DrawColumn (byte * buf)
 	int frac, fracstep;
 	byte *dest;
 
-	count = dc_yh - dc_yl;
+	count = dc_yh - dc_yl + 1;
 	if (count < 0) return;
 
 	dest = buf + ylookup[dc_yl];
@@ -1348,7 +1348,7 @@ void R_TransColumn (byte * buf)
 	int count;
 	byte *dest;
 
-	count = dc_yh - dc_yl;
+	count = dc_yh - dc_yl + 1;
 	if (count < 0) return;
 
 	dest = buf + ylookup[dc_yl];
@@ -1391,7 +1391,7 @@ void R_DrawClippedColumn (byte * buf)
 	int frac, fracstep;
 	byte *dest;
 
-	count = dc_yh - dc_yl;
+	count = dc_yh - dc_yl + 1;
 	if (count < 0) return;
 
 	dest = buf + ylookup[dc_yl];
@@ -1412,7 +1412,7 @@ void R_DrawSolidColumn (int color, byte * buf)
 	int frac, fracstep;
 	byte *dest;
 
-	count = dc_yh - dc_yl;
+	count = dc_yh - dc_yl + 1;
 	if (count < 0) return;
 
 	dest = buf + ylookup[dc_yl];
