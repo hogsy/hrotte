@@ -4303,12 +4303,12 @@ static byte whichstr = 0;
 
 void DoLoadGameAction (void)
 {
-   if ((SaveTime+1) < ticcount)
+   if ((SaveTime+1) < GetTicCount())
    {
       int temp = bufferofs;
 
       bufferofs = displayofs;
-      SaveTime = ticcount;
+      SaveTime = GetTicCount();
 
       CurrentFont=tinyfont;
 
@@ -4433,7 +4433,8 @@ boolean SaveTheGame (int num, gamestorage_t * game)
    int    crc;
 	int    i;
    char   letter;
-
+   int myticcount;
+   
 	if (num > 15 || num < 0)
 		Error("Illegal Saved game value=%ld\n",num);
 
@@ -4646,8 +4647,9 @@ boolean SaveTheGame (int num, gamestorage_t * game)
 	// Misc
 
 	// ticcount
-	size=sizeof(ticcount);
-   SafeWrite(savehandle,&ticcount,size);
+	myticcount = GetTicCount();
+	size=sizeof(myticcount);
+   SafeWrite(savehandle,&myticcount,size);
 
 	// shaketics
 	size=sizeof(SHAKETICS);
@@ -4754,7 +4756,7 @@ boolean LoadTheGame (int num, gamestorage_t * game)
 	int    savedchecksum;
 	int    i;
    word   mapcrc;
-
+        int myticcount;
 
 	if (num>15 || num<0)
 		Error("Illegal Load game value=%ld\n",num);
@@ -5007,11 +5009,12 @@ boolean LoadTheGame (int num, gamestorage_t * game)
 
    // ticcount
    DoLoadGameAction ();
-   size=sizeof(ticcount);
-	memcpy((void *)&ticcount,bufptr,size);
+   size=sizeof(myticcount);
+	memcpy((void *)&myticcount,bufptr,size);
    bufptr+=size;
-   SaveTime = ticcount;
-
+   SaveTime = myticcount;
+   ISR_SetTime(myticcount);
+   
    // shaketics
    DoLoadGameAction ();
    size=sizeof(SHAKETICS);

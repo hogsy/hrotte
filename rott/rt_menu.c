@@ -2010,7 +2010,7 @@ int HandleMenu (CP_iteminfo *item_i, CP_itemtype *items, void (*routine)(int w))
 
    count    = 2;
    exit     = 0;
-   timer    = ticcount;
+   timer    = GetTicCount();
    IN_ClearKeysDown ();
 
    numactive = GetNumActive (item_i, items);
@@ -2020,9 +2020,9 @@ int HandleMenu (CP_iteminfo *item_i, CP_itemtype *items, void (*routine)(int w))
       ReadAnyControl (&ci);
       RefreshMenuBuf (0);
      // Change Cursor Shape
-      if ((ticcount > (timer+count)) && (MenuNum != 5))
+      if ((GetTicCount() > (timer+count)) && (MenuNum != 5))
       {
-         timer = ticcount;
+         timer = GetTicCount();
 
          CursorNum++;
          if (CursorNum > (MAXCURSORNUM-1))
@@ -2402,7 +2402,7 @@ void HideCursor
    )
 
    {
-   int time = ticcount;
+   int time = GetTicCount();
    int color;
    int delay;
    int posx;
@@ -2467,7 +2467,7 @@ void HideCursor
       }
 
    delay = DELAYAMT - tics;
-   while( ( time + delay ) > ticcount )
+   while( ( time + delay ) > GetTicCount() )
       {
       RefreshMenuBuf (0);
       }
@@ -2529,7 +2529,7 @@ void ShowCursor
    )
 
    {
-   int time = ticcount;
+   int time = GetTicCount();
    int delay;
    int posx;
    int posy;
@@ -2579,7 +2579,7 @@ void ShowCursor
       }
 
    delay = DELAYAMT - tics;
-   while( ( time + delay ) > ticcount )
+   while( ( time + delay ) > GetTicCount() )
       {
       RefreshMenuBuf( 0 );
       }
@@ -3360,7 +3360,7 @@ int CP_LoadGame (int quick, int dieload)
 
 	MenuNum = 6;
 
-   SaveTime = ticcount;
+   SaveTime = GetTicCount();
 
    //
    // QUICKLOAD?
@@ -3819,7 +3819,7 @@ void DefineKey
 
    tick   = false;
    picked = false;
-   timer  = ticcount;
+   timer  = GetTicCount();
 
    x = NORMALKEY_X + 97;
    y = NORMALKEY_Y + ( handlewhich * FontSize[ NormalKeyItems.fontsize ] );
@@ -3842,7 +3842,7 @@ void DefineKey
       //
       // FLASH CURSOR
       //
-      if ( ( ticcount - timer ) > 10 )
+      if ( ( GetTicCount() - timer ) > 10 )
          {
          int color;
 
@@ -3859,7 +3859,7 @@ void DefineKey
          DrawMenuBufIString( x + 2, y - 1, "?", color );
 
          tick  = !tick;
-         timer = ticcount;
+         timer = GetTicCount();
          }
 
       RefreshMenuBuf( 0 );
@@ -5777,7 +5777,7 @@ boolean SliderMenu
 
    exit  = 0;
    moved = false;
-   timer = ticcount;
+   timer = GetTicCount();
    lastdir = dir_None;
 
    do
@@ -5785,9 +5785,9 @@ boolean SliderMenu
       RefreshMenuBuf( 0 );
 
       ReadAnyControl( &ci );
-      if ( ( ( ticcount - timer ) > 5 ) || ( ci.dir != lastdir ) )
+      if ( ( ( GetTicCount() - timer ) > 5 ) || ( ci.dir != lastdir ) )
          {
-         timer = ticcount;
+         timer = GetTicCount();
 
          switch( ci.dir )
             {
@@ -6810,7 +6810,7 @@ int ColorMenu
    boolean done;
 
    colorindex = DefaultPlayerColor;
-   timer      = ticcount;
+   timer      = GetTicCount();
    baseshape  = W_GetNumForName( playerwadname[ locplayerstate->player ] );
 
    update = false;
@@ -6818,10 +6818,10 @@ int ColorMenu
    while( !done )
       {
       ReadAnyControl( &ci );
-      if ( ( ci.dir == dir_East ) && ( ( ticcount - timer ) > 5 ) )
+      if ( ( ci.dir == dir_East ) && ( ( GetTicCount() - timer ) > 5 ) )
          {
          update = true;
-         timer = ticcount;
+         timer = GetTicCount();
 
          colorindex++;
          if ( colorindex >= MAXPLAYERCOLORS )
@@ -6832,10 +6832,10 @@ int ColorMenu
          MN_PlayMenuSnd( SD_MOVECURSORSND );
          }
 
-      if ( ( ci.dir == dir_West ) && ( ( ticcount - timer ) > 5 ) )
+      if ( ( ci.dir == dir_West ) && ( ( GetTicCount() - timer ) > 5 ) )
          {
          update = true;
-         timer = ticcount;
+         timer = GetTicCount();
 
          colorindex--;
          if ( colorindex < 0 )

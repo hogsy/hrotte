@@ -1877,10 +1877,10 @@ void PollMouseButtons (void)
 
                // Is this the first click, or a really late click?
                if ( ( DoubleClickCount[ i ] == 0 ) ||
-                  ( ticcount >= DoubleClickTimer[ i ] ) )
+                  ( GetTicCount() >= DoubleClickTimer[ i ] ) )
                   {
                   // Yes, now wait for a second click
-                  DoubleClickTimer[ i ] = ticcount + DoubleClickSpeed;
+                  DoubleClickTimer[ i ] = GetTicCount() + DoubleClickSpeed;
 
                      //( tics << 5 );
                   DoubleClickCount[ i ] = 1;
@@ -1980,10 +1980,10 @@ void PollJoystickButtons
 
                // Is this the first click, or a really late click?
                if ( ( JoyDblClickCount[ i ] == 0 ) ||
-                  ( ticcount >= JoyDblClickTimer[ i ] ) )
+                  ( GetTicCount() >= JoyDblClickTimer[ i ] ) )
                   {
                   // Yes, now wait for a second click
-                  JoyDblClickTimer[ i ] = ticcount + DoubleClickSpeed;
+                  JoyDblClickTimer[ i ] = GetTicCount() + DoubleClickSpeed;
 
                      //( tics << 5 );
                   JoyDblClickCount[ i ] = 1;
@@ -2403,7 +2403,7 @@ void PollMove (void)
    {
       if (first)
       {
-         nettics = ticcount + (VBLCOUNTER * 4);
+         nettics = GetTicCount() + (VBLCOUNTER * 4);
          first = 0;
       }
 
@@ -2432,7 +2432,7 @@ void PollMove (void)
                leftmom = 0;
          }
 
-      if ((ticcount > nettics) && (rightmom > (NETMOM * 2)) &&
+      if ((GetTicCount() > nettics) && (rightmom > (NETMOM * 2)) &&
                                   (leftmom > (NETMOM * 2)))
       {
          rightmom = 0;
@@ -2542,10 +2542,10 @@ void PollCyberman (void)
 
                // Is this the first click, or a really late click?
                if ( ( DoubleClickCount[ i ] == 0 ) ||
-                  ( ticcount >= DoubleClickTimer[ i ] ) )
+                  ( GetTicCount() >= DoubleClickTimer[ i ] ) )
                   {
                   // Yes, now wait for a second click
-                  DoubleClickTimer[ i ] = ticcount + DoubleClickSpeed;
+                  DoubleClickTimer[ i ] = GetTicCount() + DoubleClickSpeed;
 
                      //( tics << 5 );
                   DoubleClickCount[ i ] = 1;
@@ -2670,10 +2670,10 @@ void PollAssassin (void)
 
                // Is this the first click, or a really late click?
                if ( ( DoubleClickCount[ i ] == 0 ) ||
-                  ( ticcount >= DoubleClickTimer[ i ] ) )
+                  ( GetTicCount() >= DoubleClickTimer[ i ] ) )
                   {
                   // Yes, now wait for a second click
-                  DoubleClickTimer[ i ] = ticcount + DoubleClickSpeed;
+                  DoubleClickTimer[ i ] = GetTicCount() + DoubleClickSpeed;
 
                      //( tics << 5 );
                   DoubleClickCount[ i ] = 1;

@@ -199,8 +199,8 @@ void	TimedPicCommand (void)
 //
 // wait for time
 //
-   delay = ticcount;
-	while (ticcount < (delay+picdelay))
+   delay = GetTicCount();
+	while (GetTicCount() < (delay+picdelay))
 	;
 
 //

@@ -1148,14 +1148,14 @@ void DrawScaleds (void)
 		  if (player->flags&FL_SHROOMS)
 			  {
 			  visptr->shapesize=4;
-			  visptr->h2=(ticcount&0xff);
+			  visptr->h2=(GetTicCount()&0xff);
 			  }
 		  if (obj->obclass==playerobj)
 			  {
 			  if (obj->flags&FL_GODMODE)
 				  {
 				  visptr->shapesize=4;
-				  visptr->h2=240+(ticcount&0x7);
+				  visptr->h2=240+(GetTicCount()&0x7);
 				  }
 			  else if (obj->flags & FL_COLORED)
 				  {
@@ -1516,8 +1516,8 @@ void CalcTics (void)
 
 #if PROFILE
    tics=PROFILETICS;
-   ticcount+=PROFILETICS;
-   oldtime=ticcount;
+   GetTicCount()+=PROFILETICS;
+   oldtime=GetTicCount();
    return;
 #else
 #if (DEVELOPMENT == 1)
@@ -1527,22 +1527,22 @@ void CalcTics (void)
 
    whereami=9;
 //   SoftError("InCalcTics\n");
-//   SoftError("CT ticcount=%ld\n",ticcount);
+//   SoftError("CT GetTicCount()=%ld\n",GetTicCount());
 //   SoftError("CT oldtime=%ld\n",oldtime);
 
 //
 // calculate tics since last refresh for adaptive timing
 //
 
-   tc=ticcount;
-	while (tc==oldtime) { tc=I_GetTime (); } /* endwhile */
+   tc=GetTicCount();
+	while (tc==oldtime) { tc=GetTicCount(); } /* endwhile */
    tics=tc-oldtime;
 
-//   SoftError("CT ticcount=%ld\n",ticcount);
+//   SoftError("CT GetTicCount()=%ld\n",GetTicCount());
 //   if (tics>MAXTICS)
 //      {
 //      tc-=(tics-MAXTICS);
-//      ticcount = tc;
+//      GetTicCount() = tc;
 //     tics = MAXTICS;
 //      }
 
@@ -2198,7 +2198,7 @@ void WallRefresh (void)
    whereami=16;
    firstcoloffset=(firstcoloffset+(tics<<8))&65535;
 
-   dtime=fasttics;
+   dtime=GetFastTics();
    if (missobj)
       {
       viewangle=missobj->angle;
@@ -2213,8 +2213,8 @@ void WallRefresh (void)
       {
       if (player->flags&FL_SHROOMS)
          {
-         viewangle = (player->angle + FixedMulShift(FINEANGLES,sintable[(ticcount<<5)&(FINEANGLES-1)],(16+4)))&(FINEANGLES-1);
-         ChangeFocalWidth(FixedMulShift(40,sintable[(ticcount<<5)&(FINEANGLES-1)],16));
+         viewangle = (player->angle + FixedMulShift(FINEANGLES,sintable[(GetTicCount()<<5)&(FINEANGLES-1)],(16+4)))&(FINEANGLES-1);
+         ChangeFocalWidth(FixedMulShift(40,sintable[(GetTicCount()<<5)&(FINEANGLES-1)],16));
          }
       else
          viewangle = player->angle;
@@ -2239,10 +2239,10 @@ void WallRefresh (void)
 
          mag=(player->speed>MAXBOB ? MAXBOB : player->speed);
 
-         pheight+=FixedMulShift(mag,sintable[(ticcount<<7)&2047],28);
+         pheight+=FixedMulShift(mag,sintable[(GetTicCount()<<7)&2047],28);
 
-         weaponbobx=FixedMulShift(mag,costable[((ticcount<<5))&(FINEANGLES-1)],27);
-         weaponboby=FixedMulShift(mag,sintable[((ticcount<<5))&((FINEANGLES/2)-1)],26);
+         weaponbobx=FixedMulShift(mag,costable[((GetTicCount()<<5))&(FINEANGLES-1)],27);
+         weaponboby=FixedMulShift(mag,sintable[((GetTicCount()<<5))&((FINEANGLES/2)-1)],26);
 			}
       else
          {
@@ -2286,7 +2286,7 @@ void WallRefresh (void)
 
    mag=7+((3-gamestate.difficulty)<<2);
 
-   transparentlevel=FixedMul(mag,sintable[(ticcount<<5)&(FINEANGLES-1)])+mag;
+   transparentlevel=FixedMul(mag,sintable[(GetTicCount()<<5)&(FINEANGLES-1)])+mag;
 
    viewsin = sintable[viewangle];
    viewcos = costable[viewangle];
@@ -2299,7 +2299,7 @@ void WallRefresh (void)
    UpdateClientControls();
    DrawWalls();
    UpdateClientControls();
-   walltime=fasttics-dtime;
+   walltime=GetFastTics()-dtime;
 
 }
 
@@ -3104,7 +3104,7 @@ void RotateBuffer (int startangle, int endangle, int startscale, int endscale, i
 
    //save off fastcounter
 
-   savetics=fasttics;
+   savetics=GetFastTics();
 
    StartupRotateBuffer (0);
 
@@ -3113,7 +3113,7 @@ void RotateBuffer (int startangle, int endangle, int startscale, int endscale, i
    ShutdownRotateBuffer ();
 
    // restore fast counter
-   fasttics=savetics;
+   SetFastTics(savetics);
 }
 
 
@@ -3314,7 +3314,7 @@ void DopefishTitle (void)
    viewwidth=320;
    viewheight=200;
    SwitchPalette(origpal,35);
-   oldtime=ticcount;
+   oldtime=GetTicCount();
    FlipPage();
    for (height=1;height<200;height+=(tics<<2))
       {
@@ -3325,7 +3325,7 @@ void DopefishTitle (void)
          break;
       }
    SD_Play ( SD_DOPEFISHSND );
-   oldtime=ticcount;
+   oldtime=GetTicCount();
    for (height=0;height<FINEANGLES<<1;height+=(tics<<5))
       {
       DrawPositionedScaledSprite (160+FixedMul(60,costable[height&(FINEANGLES-1)]), 100+FixedMul(60,sintable[height&(FINEANGLES-1)]), shapenum, 200, 0);

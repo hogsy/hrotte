@@ -428,7 +428,7 @@ void INL_GetJoyDelta (word joy, int *dx, int *dy)
    else
       *dy = 0;
 
-   lasttime = ticcount;
+   lasttime = GetTicCount();
 }
 
 
@@ -476,8 +476,8 @@ word IN_GetJoyButtonsDB (word joy)
    do
    {
       result1 = INL_GetJoyButtons (joy);
-      lasttime = ticcount;
-      while (ticcount == lasttime)
+      lasttime = GetTicCount();
+      while (GetTicCount() == lasttime)
          ;
       result2 = INL_GetJoyButtons (joy);
    } while (result1 != result2);
@@ -1023,14 +1023,14 @@ boolean IN_UserInput (long delay)
 {
    long lasttime;
 
-   lasttime = ticcount;
+   lasttime = GetTicCount();
 
    IN_StartAck ();
    do
    {
       if (IN_CheckAck())
          return true;
-   } while ((ticcount - lasttime) < delay);
+   } while ((GetTicCount() - lasttime) < delay);
 
    return (false);
 }

@@ -63,8 +63,12 @@ volatile int KeyboardQueue[KEYQMAX];
 volatile int Keystate[MAXKEYBOARDSCAN];
 volatile int Keyhead;
 volatile int Keytail;
+
+#ifdef DOS
 volatile int ticcount;
 volatile int fasttics;
+#endif
+
 volatile boolean PausePressed = false;
 volatile boolean PanicPressed = false;
 int KeyboardStarted=false;
@@ -745,10 +749,12 @@ void I_ShutdownKeyboard (void)
 
 #include "SDL.h"
 
-int I_GetTime (void)
+static int ticoffset;    /* offset for SDL_GetTicks() */
+static int ticbase;      /* game-supplied base */
+
+int GetTicCount (void)
 {
-	ticcount = SDL_GetTicks ();
-	return ticcount;
+	return ((SDL_GetTicks() - ticoffset) * 35) / 1000 + ticbase;
 }
 
 /*
@@ -760,8 +766,21 @@ int I_GetTime (void)
 */
 void ISR_SetTime(int settime)
 {
-	ticcount = settime;
+	ticoffset = SDL_GetTicks();
+	ticbase = settime;
+}
+
+/* developer-only */
+
+int GetFastTics (void)
+{
+	STUB_FUNCTION;
 	
+	return 0;
+}
+
+void SetFastTics (int settime)
+{
 	STUB_FUNCTION;
 }
 
@@ -775,7 +794,7 @@ void ISR_SetTime(int settime)
 
 void I_Delay ( int delay )
 {
-	SDL_Delay (delay);
+//	SDL_Delay (delay);
 }
 
 /*
