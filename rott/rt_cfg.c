@@ -377,6 +377,7 @@ extern char    pword[ 13 ];
 void ConvertStringToPasswordString ( char * string )
 {
    int i;
+   unsigned int j;
    char temp[3];
 
    memset(temp,0,sizeof(temp));
@@ -384,7 +385,11 @@ void ConvertStringToPasswordString ( char * string )
    for (i=0;i<13;i++)
       {
       memcpy(&temp[0],&string[i<<1],2);
-      sscanf(&temp[0],"%x",(unsigned int *)&passwordstring[i]);
+      sscanf(&temp[0],"%x",&j);
+      passwordstring[i+0] = j & 0xff; j >>= 8;
+      passwordstring[i+1] = j & 0xff; j >>= 8;
+      passwordstring[i+2] = j & 0xff; j >>= 8;
+      passwordstring[i+3] = j & 0xff;
       }
 }
 
