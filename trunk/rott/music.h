@@ -86,7 +86,13 @@ void  MUSIC_GetSongLength( songposition *pos );
 int   MUSIC_FadeVolume( int tovolume, int milliseconds );
 int   MUSIC_FadeActive( void );
 void  MUSIC_StopFade( void );
+
+#ifdef __WATCOMC__
 void  MUSIC_RerouteMidiChannel( int channel, int cdecl ( *function )( int event, int c1, int c2 ) );
+#else
+void  MUSIC_RerouteMidiChannel( int channel, int ( *function )( int event, int c1, int c2 ) );
+#endif
+
 void  MUSIC_RegisterTimbreBank( unsigned char *timbres );
 
 #endif
