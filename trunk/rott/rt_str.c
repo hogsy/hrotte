@@ -92,7 +92,7 @@ void VW_DrawClippedString (int x, int y, char *string)
 
    oy=y;
 
-   while ((ch = *string++)!=0)
+   while ((ch = (unsigned char)*string++)!=0)
       {
       ch -= 31;
       width = CurrentFont->width[ch];
@@ -222,7 +222,7 @@ void VW_DrawPropString (char *string)
    ht = CurrentFont->height;
    dest = origdest = (byte *)(bufferofs+ylookup[py]+px);
 
-   while ((ch = *string++)!=0)
+   while ((ch = (unsigned char)*string++)!=0)
    {
       ch -= 31;
       width = step = CurrentFont->width[ch];
@@ -297,7 +297,7 @@ void VW_DrawIPropString (char *string)
    mask = 1<<(px&3);
 
 
-   while ((ch = *string++)!=0)
+   while ((ch = (unsigned char)*string++)!=0)
    {
       ch -= 31;
       width = step = CurrentFont->width[ch];

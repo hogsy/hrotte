@@ -1193,7 +1193,7 @@ void DrawMenuBufPropString (int px, int py, char *string)
    ht = CurrentFont->height;
    dest = origdest = (byte*)menubuf+(px*TEXTUREHEIGHT)+py;
 
-   while ((ch = *string++)!=0)
+   while ((ch = (unsigned char)*string++)!=0)
    {
       ch -= 31;
       width = CurrentFont->width[ch];
@@ -1247,7 +1247,7 @@ void DrawMenuBufIString (int px, int py, char *string, int color)
    PrintX = px;
    PrintY = py;
 
-   while ((ch = *string++)!=0)
+   while ((ch = (unsigned char)*string++)!=0)
    {
       // Tab
       if ( ch == '\x9' )
@@ -1315,7 +1315,7 @@ void DrawTMenuBufPropString (int px, int py, char *string)
    dest = origdest = (byte*)menubuf+(px*TEXTUREHEIGHT)+py;
 
    shadingtable=colormap+(StringShade<<8);
-   while ((ch = *string++)!=0)
+   while ((ch = (unsigned char)*string++)!=0)
    {
       ch -= 31;
       width = CurrentFont->width[ch];
