@@ -315,7 +315,6 @@ void ClearBuffer( char * buf, int size )
 
 void Error (char *error, ...)
 {
-#ifdef DOS
    char msgbuf[300];
 	va_list	argptr;
    char i;
@@ -336,9 +335,12 @@ void Error (char *error, ...)
    ShutDown();
 
 	TextMode ();
+#ifdef DOS
    memcpy ((byte *)0xB8000, &ROTT_ERR, 160*7);
+#endif
    memset (msgbuf, 0, 300);
 
+#ifdef DOS
    px = ERRORVERSIONCOL-1;
    py = ERRORVERSIONROW;
 #if (SHAREWARE == 1)
@@ -359,6 +361,7 @@ void Error (char *error, ...)
    px++;
 
    UL_printf (itoa(ROTTMINORVERSION,&buf[0],10));
+#endif
 
 	va_start (argptr, error);
    vsprintf (&msgbuf[0], error, argptr);
@@ -391,8 +394,10 @@ void Error (char *error, ...)
       GetToken (true);
    }
 
+#ifdef DOS	// Disable while colors not implemented - DDOI
    for (i = 0; i < 8; i++)
       printf ("\n");
+#endif
 
    if (player!=NULL)
       {
@@ -409,6 +414,7 @@ void Error (char *error, ...)
 
    printf ("Area         = %ld\n", level);
 
+#ifdef DOS
    GetPathFromEnvironment( filename, ApogeePath, ERRORFILE );
    handle=SafeOpenAppend ( filename );
    for (y=0;y<16;y++)
@@ -422,14 +428,12 @@ void Error (char *error, ...)
       }
 
    close(handle);
+#endif
 
    if ( SOUNDSETUP )
       {
       getch();
       }
-#else
-	STUB_FUNCTION;
-#endif
    exit (1);
 }
 
@@ -1190,7 +1194,8 @@ void UL_printf (byte *str)
          s++;
    }
 #else
-	STUB_FUNCTION;
+   //printf ("%c[%d;%dH%s",27,py,px,str);	// Nothing magical about this - DDOI
+   printf ("%s ",str);	// Temp hack - DDOI
 #endif
 }
 
