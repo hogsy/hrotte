@@ -1173,11 +1173,18 @@ void MU_PlaySong ( int num )
    size = W_LumpLength(lump);
    
    currentsong=W_CacheLumpNum(lump,PU_STATIC, CvtFixme, 1);
- 
+
+#ifdef PLATFORM_DOS
+   if (rottsongs[num].loopflag == loop_yes)
+      MUSIC_PlaySong(currentsong,size,MUSIC_LoopSong);
+   else
+      MUSIC_PlaySong(currentsong,size,MUSIC_PlayOnce);
+#else 
    if (rottsongs[num].loopflag == loop_yes)
       MUSIC_PlaySongROTT(currentsong,size,MUSIC_LoopSong);
    else
       MUSIC_PlaySongROTT(currentsong,size,MUSIC_PlayOnce);
+#endif
 
    MU_SetVolume (MUvolume);
 }
