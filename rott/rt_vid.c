@@ -147,6 +147,7 @@ void DrawTiledRegion
    )
 
    {
+#ifdef DOS
    byte  *source;
    byte  *sourceoff;
    int    sourcex;
@@ -230,6 +231,80 @@ void DrawTiledRegion
 
       plane--;
       }
+#else
+
+#if 0
+   byte  *source;
+   byte  *sourceoff;
+   int    sourcex;
+   int    sourcey;
+   int    sourcewidth;
+   int    sourceheight;
+   int    mask;
+   int    plane;
+   int    planesize;
+   byte  *start;
+   byte  *origdest;
+   byte  *dest;
+   int    startoffset;
+   int    HeightIndex;
+   int    WidthIndex;
+
+   start = ( byte * )( bufferofs + ( x>>2 ) + ylookup[ y ] );
+
+   source       = &tile->data;
+   sourcewidth  = tile->width;
+   sourceheight = tile->height;
+   offx >>= 2;
+   if ( offx >= sourcewidth )
+      {
+      offx %= sourcewidth;
+      }
+   if ( offy >= sourceheight )
+      {
+      offy %= sourceheight;
+      }
+
+   startoffset = offy * sourcewidth;
+   planesize = sourcewidth * sourceheight;
+
+
+      origdest = start;
+
+      sourcey     = offy;
+      sourceoff   = source + startoffset;
+      HeightIndex = height;
+
+      while( HeightIndex-- )
+         {
+         dest       = origdest;
+         sourcex    = offx;
+         WidthIndex = width;
+         while( WidthIndex-- )
+            {
+            *dest = sourceoff[ sourcex ];
+            dest++;
+            sourcex++;
+            if ( sourcex >= sourcewidth )
+               {
+               sourcex = 0;
+               }
+            }
+
+         origdest  += linewidth;
+         sourceoff += sourcewidth;
+         sourcey++;
+         if ( sourcey >= sourceheight )
+            {
+            sourcey   = 0;
+            sourceoff = source;
+            }
+         }
+#else
+	STUB_FUNCTION;
+#endif
+
+#endif
    }
 
 
@@ -1320,10 +1395,14 @@ void DrawXYPic (int x, int y, int shapenum)
    if ((y<0) || ((y+p->height)>=200))
       Error ("DrawXYPic: y is out of range\n");
 
-
+#ifdef DOS
    buffer = (byte*)bufferofs+(x>>2)+ylookup[y];
+#else
+   buffer = (byte*)bufferofs+ylookup[y];
+#endif
 
    src=(byte *)&p->data;
+
    for (plane=x;plane<x+4;plane++)
       {
       VGAWRITEMAP((plane&3));
@@ -1331,9 +1410,11 @@ void DrawXYPic (int x, int y, int shapenum)
          {
          buf=buffer+ylookup[yy];
          for (xx = 0; xx < p->width; xx++,buf++)
+#ifdef DOS
             *(buf)=*(src++);
+#else
+            *(buf+plane+xx*4)=*(src++);
+#endif
          }
       }
 }
-
-

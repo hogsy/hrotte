@@ -2482,12 +2482,7 @@ void InterpolateDoor (visobj_t * plane)
          {
          if ((i>=0 && i<viewwidth) && (bot!=0) && (posts[i].wallheight<=(height>>DHEIGHTFRACTION)) )
             {
-#warning verify dc_invscale change
-#if 0            
-            dc_invscale=height<<(10-HEIGHTFRACTION-DHEIGHTFRACTION);
-#else
             dc_invscale=height>>(HEIGHTFRACTION+DHEIGHTFRACTION-10);
-#endif
             dc_iscale = 0xffffffffu/(unsigned)dc_invscale;
             dc_texturemid=((pheight-nominalheight+p->topoffset)<<SFRACBITS)+(SFRACUNIT>>1);
             sprtopoffset=centeryfrac - FixedMul(dc_texturemid,dc_invscale);
@@ -2630,12 +2625,7 @@ void InterpolateMaskedWall (visobj_t * plane)
          {
          if ((i>=0 && i<viewwidth) && (bot!=0) && (posts[i].wallheight<=(height>>DHEIGHTFRACTION)) )
             {
-#warning please verify dc_invscale change
-#if 0
-            dc_invscale=height<<(10-HEIGHTFRACTION-DHEIGHTFRACTION);
-#else
             dc_invscale=height>>(HEIGHTFRACTION+DHEIGHTFRACTION-10);
-#endif
             dc_iscale = 0xffffffffu/(unsigned)dc_invscale;
             dc_texturemid=((pheight-nominalheight+topoffset)<<SFRACBITS)+(SFRACUNIT>>1);
             sprtopoffset=centeryfrac - FixedMul(dc_texturemid,dc_invscale);

@@ -2491,7 +2491,9 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
    dest2 = (byte *)(dest+page2start);
    dest3 = (byte *)(dest+page3start);
 
+#ifdef DOS
    for (plane = 0; plane<4; plane++)
+#endif
    {
       VGAMAPMASK (mask);
 
@@ -2502,9 +2504,15 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
                                    screen2 += linewidth,
                                    screen3 += linewidth, source+=width)
       {
+#ifdef DOS
          memcpy (screen1, source, width);
          memcpy (screen2, source, width);
          memcpy (screen3, source, width);
+#else
+         memcpy (screen1, source, width*4);
+         memcpy (screen2, source, width*4);
+         memcpy (screen3, source, width*4);
+#endif
       }
 
       mask <<= 1;

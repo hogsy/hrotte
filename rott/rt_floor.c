@@ -111,6 +111,7 @@ void DrawSky( void )
       ofs=-(399-(centerskypost+viewheight));
       }
 
+#ifdef DOS
    if (doublestep>0)
       {
 #ifdef DOS
@@ -143,6 +144,7 @@ void DrawSky( void )
          }
       }
    else
+#endif
       {
 #ifdef DOS
       for (plane=0;plane<4;plane++)
@@ -573,6 +575,8 @@ void DrawHLine (int xleft, int xright, int yp)
 
    dest=(byte *)bufferofs+ylookup[yp];
 
+/* TODO: horizontal isn't as easy as vertical in packed */
+#ifdef DOS
    if (doublestep>0)
       {
       if (xleft&1)
@@ -611,9 +615,6 @@ void DrawHLine (int xleft, int xright, int yp)
             VGAMAPMASK((1<<p) + (1<<(p+1)));
 #endif
             DrawRow(mr_count,mr_dest,buf);
-#ifndef DOS
-            DrawRow(mr_count,mr_dest,buf+1);
-#endif
 
 #if 0
             ofs=(byte)*((byte *)mapmasks2+ofs);
@@ -627,6 +628,7 @@ void DrawHLine (int xleft, int xright, int yp)
          }
       }
    else
+#endif
       {
 #ifdef DOS
       for (plane=xleft;plane<xleft+4;plane++)
@@ -720,8 +722,9 @@ void DrawRow(int count, byte * dest, byte * src)
 	frac = (mr_yfrac<<16) + (mr_xfrac&0xffff);
 	fracstep = (mr_ystep<<16) + (mr_xstep&0xffff);
 	while (count--) {
-		ecx = (ecx << 23) | (frac >> (32-23));
-		ecx = (ecx << 7) | (frac >> (32-7));
+		ecx = /* (ecx << 23) | */ ((((unsigned)frac) >> (32-23)) & 0x7f);
+		ecx = (ecx << 7) | ((((unsigned)frac) >> (32-7)) & 0x7f);
+		
 		*dest++ = shadingtable[src[ecx&16383]];
 		frac += fracstep;
 	}
