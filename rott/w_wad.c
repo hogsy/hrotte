@@ -60,41 +60,6 @@ static lumpinfo_t      *lumpinfo;              // location of each lump on disk
 static byte *lumpcheck;
 #endif
 
-
-//===================
-
-#ifndef DOS
-
-char *strupr (char *str)
-{
-    char *s = str;
-    while (*s)
-        *s++ = toupper(*s);
-    
-    return str;
-}
-
-/*
-================
-=
-= filelength
-=
-================
-*/
-
-int filelength (int handle)
-{
-    struct stat fileinfo;
-
-    if (fstat (handle,&fileinfo) == -1)
-        Error ("Error fstating");
-
-    return fileinfo.st_size;
-}
-
-#endif
-
-
 /*
 ============================================================================
 
