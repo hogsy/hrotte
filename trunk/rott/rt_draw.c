@@ -5563,8 +5563,39 @@ void DoMicroStoryScreen ( void )
    VL_FadeOut (0, 255, 0, 0, 0, 20);
 }
 
+#ifndef DOS
 
+void  DrawMenuPost (int height, byte * src, byte * buf)
+{
+	STUB_FUNCTION;
+}
 
+void  DrawMapPost (int height, byte * src, byte * buf)
+{
+	STUB_FUNCTION;
+}
+
+void DrawRotRow(int count, byte * dest, byte * src)
+{
+	STUB_FUNCTION;
+}
+
+void DrawMaskedRotRow(int count, byte * dest, byte * src)
+{
+	STUB_FUNCTION;
+}
+
+void DrawSkyPost (byte * buf, byte * src, int height)
+{
+	STUB_FUNCTION;
+}
+
+void DrawRow(int count, byte * dest, byte * src)
+{
+	STUB_FUNCTION;
+}
+
+#endif
 
 #if 0
 
