@@ -62,6 +62,8 @@ static int maxReverbDelay = 256;
 static int mixerIsStereo = 1;
 static duke_channel_info *chaninfo = NULL;
 
+#define HandleOffset       1
+
 /* these come from the real ASS */
 #define MV_MaxPanPosition  31
 #define MV_NumPanPositions ( MV_MaxPanPosition + 1 )
@@ -634,7 +636,7 @@ static int doSetPan(int handle, int vol, int left,
 
 int FX_SetPan(int handle, int vol, int left, int right)
 {
-    return(doSetPan(handle - FX_Ok, vol, left, right, 1));
+    return(doSetPan(handle - HandleOffset, vol, left, right, 1));
 } // FX_SetPan
 
 
@@ -759,7 +761,7 @@ int FX_PlayVOC(char *ptr, int pitchoffset,
     } // if
 
     Mix_PlayChannel(chan, chunk, 0);
-    return(FX_Ok + chan);
+    return(HandleOffset + chan);
 } // FX_PlayVOC
 
 
@@ -821,7 +823,7 @@ int FX_PlayLoopedVOC(char *ptr, long loopstart, long loopend,
     } // if
 
     Mix_PlayChannel(chan, chunk, -1);  /* -1 == looping. */
-    return(FX_Ok + chan);
+    return(HandleOffset + chan);
 } // FX_PlayLoopedVOC
 
 int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
@@ -843,7 +845,7 @@ int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
     _FX_SetPosition(chan, angle, distance);
 
     Mix_PlayChannel(chan, chunk, 0);
-    return(FX_Ok + chan);
+    return(HandleOffset + chan);
 } // FX_PlayVOC3D
 
 // ROTT Special - SBF
@@ -867,7 +869,7 @@ int FX_PlayVOC3D_ROTT(char *ptr, int size, int pitchoffset, int angle, int dista
 
     Mix_PlayChannel(chan, chunk, 0);
 
-    return(FX_Ok + chan);
+    return(HandleOffset + chan);
 } // FX_PlayVOC3D_ROTT
 
 
@@ -924,7 +926,7 @@ int FX_Pan3D(int handle, int angle, int distance)
 {
     int retval = FX_Warning;
 
-    handle -= FX_Ok;
+    handle -= HandleOffset;
 
     if ((handle < 0) || (handle >= numChannels))
         setWarningMessage("Invalid handle in FX_Pan3D().");
@@ -943,7 +945,7 @@ int FX_Pan3D(int handle, int angle, int distance)
 
 int FX_SoundActive(int handle)
 {
-    handle -= FX_Ok;
+    handle -= HandleOffset;
 
     if (chaninfo == NULL)
         return(__FX_FALSE);
@@ -971,7 +973,7 @@ int FX_StopSound(int handle)
     snddebug("explicitly halting channel (%d).", handle);
         // !!! FIXME: Should the user callback fire for this?
 
-    handle -= FX_Ok;
+    handle -= HandleOffset;
 
     if ((handle < 0) || (handle >= numChannels))
     {
