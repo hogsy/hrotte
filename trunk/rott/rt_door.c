@@ -3901,7 +3901,7 @@ void WallMoving (int pwall)
             {
             lbm_t *LBM;
 
-            LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("imfree"), PU_CACHE);
+            LBM = (lbm_t *) W_CacheLumpNum (W_GetNumForName ("imfree"), PU_CACHE, Cvt_lbm_t, 1);
             VL_DecompressLBM (LBM,true);
             VW_UpdateScreen ();
             I_Delay (2000);

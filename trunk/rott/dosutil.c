@@ -158,6 +158,7 @@ void DisplayTextSplash(byte *text, int l)
 	printf ("\033[m");
 }
 
+#if (USE_EXECINFO == 1)
 #include <execinfo.h>
 
 void print_stack (int level)
@@ -181,6 +182,14 @@ void print_stack (int level)
 	*/
 	printf ("}\n");
 }
+#else
+
+void print_stack (int level)
+{
+        printf("Stack dump not implemented.\n");
+}
+
+#endif
 
 void crash_print (int sig)
 {

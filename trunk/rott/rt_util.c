@@ -338,7 +338,7 @@ void Error (char *error, ...)
       return;
 
 
-	TextMode ();
+	SetTextMode ();
 #ifdef DOS
    memcpy ((byte *)0xB8000, &ROTT_ERR, 160*7);
 #elif defined (ANSIESC)
@@ -1090,9 +1090,19 @@ long ParseNum (char *str)
 }
 
 
+#if (BYTE_ORDER == LITTLE_ENDIAN)
+#define KeepShort IntelShort
+#define SwapShort MotoShort
+#define KeepLong IntelLong
+#define SwapLong MotoLong
+#else
+#define KeepShort MotoShort
+#define SwapShort IntelShort
+#define KeepLong MotoLong
+#define SwapLong IntelLong
+#endif
 
-
-short	MotoShort (short l)
+short	SwapShort (short l)
 {
 	byte	b1,b2;
 
@@ -1102,13 +1112,13 @@ short	MotoShort (short l)
 	return (b1<<8) + b2;
 }
 
-short	IntelShort (short l)
+short	KeepShort (short l)
 {
 	return l;
 }
 
 
-long	MotoLong (long l)
+long	SwapLong (long l)
 {
 	byte	b1,b2,b3,b4;
 
@@ -1120,11 +1130,42 @@ long	MotoLong (long l)
 	return ((long)b1<<24) + ((long)b2<<16) + ((long)b3<<8) + b4;
 }
 
-long	IntelLong (long l)
+long	KeepLong (long l)
 {
 	return l;
 }
 
+
+#undef KeepShort
+#undef KeepLong
+#undef SwapShort
+#undef SwapLong
+
+void SwapIntelLong(long *l)
+{
+    *l = IntelLong(*l);
+}
+
+void SwapIntelShort(short *s)
+{
+    *s = IntelShort(*s);
+}
+
+void SwapIntelLongArray(long *l, int num)
+{
+    while (num--) {
+        SwapIntelLong(l);
+        l++;
+    }
+}
+
+void SwapIntelShortArray(short *s, int num)
+{
+    while (num--) {
+        SwapIntelShort(s);
+        s++;
+    }
+}
 
 /*
 ============================================================================

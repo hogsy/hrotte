@@ -1053,7 +1053,7 @@ void DrawPreCache( void )
       else
          {
          pic_t * pic;
-         pic=(pic_t *)W_CacheLumpName("mmbk",PU_CACHE);
+         pic=(pic_t *)W_CacheLumpName("mmbk",PU_CACHE, Cvt_pic_t, 1);
          VWB_DrawPic (0, 0, pic);
 
          CheckHolidays();
@@ -1172,7 +1172,7 @@ void PreCache( void )
       ticdelay=CACHETICDELAY;
       for (i=1;i<cacheindex;i++)
 			{
-         dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel);
+         dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel, CvtFixme, 1);
          total+=W_LumpLength(cachelist[i].lump);
          newheap=Z_UsedHeap();
 			currentmem=(newheap*MAXLEDS)/maxheapsize;
@@ -1255,7 +1255,7 @@ void PreCache( void )
       {
       for (i=1;i<cacheindex;i++)
          {
-			dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel);
+			dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel, CvtNull, 1);
          DoLoadGameAction ();
          }
       ShutdownPreCache ();

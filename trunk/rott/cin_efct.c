@@ -107,7 +107,7 @@ spriteevent * SpawnCinematicSprite ( char * name,
    sprite->frame=0;
    sprite->frametime=framedelay;
 
-   p=(patch_t *)W_CacheLumpNum( W_GetNumForName(sprite->name), PU_CACHE);
+   p=(patch_t *)W_CacheLumpNum( W_GetNumForName(sprite->name), PU_CACHE, Cvt_patch_t, 1);
 
    sprite->x=x << FRACTIONBITS;
    sprite->y=y << FRACTIONBITS;
@@ -177,8 +177,8 @@ backevent * SpawnCinematicMultiBack ( char * name,
    lpic_t * pic1;
    lpic_t * pic2;
 
-   pic1=(lpic_t *)W_CacheLumpName(name,PU_CACHE);
-   pic2=(lpic_t *)W_CacheLumpName(name2,PU_CACHE);
+   pic1=(lpic_t *)W_CacheLumpName(name,PU_CACHE, Cvt_lpic_t, 1);
+   pic2=(lpic_t *)W_CacheLumpName(name2,PU_CACHE, Cvt_lpic_t, 1);
 
    back = SafeMalloc ( sizeof (backevent) );
 
@@ -289,7 +289,7 @@ void DrawFlic ( flicevent * flic )
 
    if (flic->usefile==false)
       {
-      buf=W_CacheLumpName(flic->name,PU_CACHE);
+      buf=W_CacheLumpName(flic->name,PU_CACHE, CvtNull, 1);
       strcpy(flicname,flic->name);
       }
    else
@@ -329,7 +329,7 @@ void PrecacheFlic (flicevent * flic)
 {
    if (flic->usefile==false)
       {
-      W_CacheLumpName(flic->name,PU_CACHE);
+      W_CacheLumpName(flic->name,PU_CACHE, CvtFixme, 1);
       }
 }
 
@@ -351,7 +351,7 @@ void DrawCinematicBackground ( backevent * back )
    int offset;
    int height;
 
-   pic=(lpic_t *)W_CacheLumpName(back->name,PU_CACHE);
+   pic=(lpic_t *)W_CacheLumpName(back->name,PU_CACHE, Cvt_lpic_t, 1);
 
    height = pic->height;
    if (height+back->yoffset>MAXSCREENHEIGHT)
@@ -461,7 +461,7 @@ void DrawCinematicBackdrop ( backevent * back )
    int postlength;
    int toppost;
 
-   shape=W_CacheLumpName(back->name,PU_CACHE);
+   shape=W_CacheLumpName(back->name,PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
 
    toppost=-p->topoffset+back->yoffset;
@@ -511,7 +511,7 @@ void DrawCinematicBackdrop ( backevent * back )
 */
 void PrecacheBack ( backevent * back )
 {
-   W_CacheLumpName( back->name, PU_CACHE);
+   W_CacheLumpName( back->name, PU_CACHE, CvtFixme, 1);
 }
 
 
@@ -538,8 +538,9 @@ void DrawCinematicSprite ( spriteevent * sprite )
    if (height<2)
       return;
 
-   shape=W_CacheLumpNum( W_GetNumForName(sprite->name)+sprite->frame, PU_CACHE);
+   shape=W_CacheLumpNum( W_GetNumForName(sprite->name)+sprite->frame, PU_CACHE, Cvt_patch_t, 1);
    p=(patch_t *)shape;
+   
 
    cin_ycenter=sprite->y >> FRACTIONBITS;
    cin_invscale = (height<<FRACTIONBITS)/p->origsize;
@@ -596,7 +597,7 @@ void PrecacheCinematicSprite ( spriteevent * sprite )
 
    for (i=0;i<sprite->numframes;i++)
       {
-      W_CacheLumpNum( W_GetNumForName(sprite->name)+i, PU_CACHE);
+      W_CacheLumpNum( W_GetNumForName(sprite->name)+i, PU_CACHE, Cvt_patch_t, 1);
       }
 }
 
@@ -613,7 +614,7 @@ void DrawPalette (paletteevent * event)
 {
    byte * pal;
 
-   pal=W_CacheLumpName(event->name,PU_CACHE);
+   pal=W_CacheLumpName(event->name,PU_CACHE, CvtFixme, 1);
    XFlipPage ();
    CinematicSetPalette (pal);
 }
@@ -628,7 +629,7 @@ void DrawPalette (paletteevent * event)
 
 void PrecachePalette (paletteevent * event)
 {
-   W_CacheLumpName(event->name,PU_CACHE);
+   W_CacheLumpName(event->name,PU_CACHE, CvtFixme, 1);
 }
 
 
@@ -924,7 +925,7 @@ void DrawPostPic ( int lumpnum )
    int plane;
    int height;
 
-   pic=(lpic_t *)W_CacheLumpNum(lumpnum,PU_CACHE);
+   pic=(lpic_t *)W_CacheLumpNum(lumpnum,PU_CACHE, Cvt_lpic_t, 1);
 
    height = pic->height;
 

@@ -358,12 +358,12 @@ boolean MasterPhaseHandler( synctype * sync )
 /*
 =============
 =
-= SetTime
+= ComSetTime
 =
 =============
 */
 
-void SetTime ( void )
+void ComSetTime ( void )
 {
    int i;
    syncpackettype * syncpacket;
@@ -387,7 +387,7 @@ void SetTime ( void )
             else if (i!=consoleplayer)
                SyncTime(i);
             if (standalone==true)
-               printf("SetTime: player#%ld\n",(long int)i);
+               printf("ComSetTime: player#%ld\n",(long int)i);
             }
          }
       else
@@ -433,13 +433,13 @@ void SetTime ( void )
          }
 
       if (standalone==true)
-         printf("SetTime: Start packets sent\n");
+         printf("ComSetTime: Start packets sent\n");
       }
    else // Slave/Client
       {
       while (done==false)
          {
-         AbortCheck("SetTime aborted as client");
+         AbortCheck("ComSetTime aborted as client");
 
          if (ReadPacket() && (badpacket==0))
             {

@@ -153,7 +153,7 @@ void CacheScriptFile (char *filename)
 
    lump=W_GetNumForName(filename);
 
-   scriptbuffer=W_CacheLumpNum(lump,PU_CACHE);
+   scriptbuffer=W_CacheLumpNum(lump,PU_CACHE, CvtNull, 1);
 	size = W_LumpLength(lump);
 
 	script_p = scriptbuffer;

@@ -74,11 +74,11 @@ graphicsmode=true;
 /*
 ====================
 =
-= TextMode
+= SetTextMode
 =
 ====================
 */
-void TextMode ( void )
+void SetTextMode ( void )
 {
 
 union REGS regs;
@@ -424,11 +424,11 @@ void GraphicsMode ( void )
 /*
 ====================
 =
-= TextMode
+= SetTextMode
 =
 ====================
 */
-void TextMode ( void )
+void SetTextMode ( void )
 {
 	if (SDL_WasInit(SDL_INIT_VIDEO) == SDL_INIT_VIDEO) {
 		if (sdl_surface != NULL) {

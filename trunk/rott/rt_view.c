@@ -237,7 +237,7 @@ void CalcProjection ( void )
 
 //Hey, isn't this stuff already loaded in?
 //Why don't we make this a lump?
-   table=W_CacheLumpName("tables",PU_STATIC);
+   table=W_CacheLumpName("tables",PU_STATIC, CvtFixme, 1);
    ptr=table;
 
 //
@@ -245,6 +245,7 @@ void CalcProjection ( void )
 //
 
    memcpy(&length,ptr,sizeof(int));
+   SwapIntelLong((long *)&length);
    ptr+=sizeof(int);
    pangle=SafeMalloc(length*sizeof(int));
    memcpy(pangle,ptr,length*sizeof(int));
@@ -254,11 +255,12 @@ void CalcProjection ( void )
       {
       // start 1/2 pixel over, so viewangle bisects two middle pixels
       intang=pangle[frac>>16];
+      SwapIntelLong(&intang);
       pixelangle[centerx-1-i] =(short) intang;
       pixelangle[centerx+i] =(short) -intang;
       frac+=(length*65536/centerx);
       }
-   table=W_CacheLumpName("tables",PU_CACHE);
+   table=W_CacheLumpName("tables",PU_CACHE, CvtFixme, 1);
    SafeFree(pangle);
 }
 
@@ -409,7 +411,7 @@ void SetupScreen ( boolean flip )
    SetViewSize(viewsize);
    if ( viewsize < 7 )
       {
-      shape = W_CacheLumpName( "backtile", PU_CACHE );
+      shape = W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
       DrawTiledRegion( 0, 16, 320, 200 - 32, 0, 16, shape );
       }
 
