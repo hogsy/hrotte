@@ -55,6 +55,8 @@ char *strupr(char *);
 char *itoa(int, char *, int);
 
 #define STUB_FUNCTION fprintf(stderr,"STUB: %s at " __FILE__ ", line %d, thread %d\n",__FUNCTION__,__LINE__,getpid())
+
+#define far
 #endif
 
 //***************************************************************************
