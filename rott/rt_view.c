@@ -351,7 +351,11 @@ void SetViewSize
       }
 
    // Calculate offset of view window
+#ifdef DOS
    screenofs = ( screenx >> 2 ) + ylookup[ screeny ];
+#else
+   screenofs = screenx + ylookup[ screeny ];
+#endif
 
 //
 // calculate trace angles and projection constants

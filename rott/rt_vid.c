@@ -191,9 +191,9 @@ void DrawTiledRegion
    width >>= 2;
 
    mask  = 1 << ( x & 3 );
+#endif
    plane = 4;
    while( plane > 0 )
-#endif
       {
       VGAMAPMASK( mask );
       origdest = start;
@@ -228,17 +228,17 @@ void DrawTiledRegion
             }
          }
 
-#ifdef DOS
       source += planesize;
 
+#ifdef DOS
       mask <<= 1;
       if ( mask > 8 )
          {
          mask = 1;
          }
+#endif
 
       plane--;
-#endif
       }
    }
 

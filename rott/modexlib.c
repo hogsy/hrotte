@@ -574,8 +574,6 @@ void VL_CopyBufferToAll ( unsigned buffer )
       if (page3start!=buffer)
          memcpy((byte *)page3start,(byte *)buffer,screensize);
       }
-#else
-	STUB_FUNCTION;
 #endif
 }
 
