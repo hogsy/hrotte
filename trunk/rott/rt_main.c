@@ -19,17 +19,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "rt_def.h"
 #include "lumpy.h"
-#include <malloc.h>
-#include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <fcntl.h>
+#include <string.h>
+
+#ifdef DOS
+#include <malloc.h>
+#include <dos.h>
 #include <io.h>
 #include <conio.h>
 #include <graph.h>
-#include <string.h>
 #include <process.h>
+#include <direct.h>
+#include <bios.h>
+#endif
+
 #include "rt_actor.h"
 #include "rt_stat.h"
 #include "rt_vid.h"
@@ -69,10 +75,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cin_main.h"
 #include "rottnet.h"
 #include "rt_scale.h"
-
-#include <direct.h>
-#include <bios.h>
-
 
 #include "music.h"
 #include "fx_man.h"
@@ -140,7 +142,12 @@ boolean timelimitenabled;
 boolean demoexit;
 boolean noecho;
 
-void main ()
+void CheckCommandLineParameters( void );
+void PlayTurboGame( void );
+void Init_Tables (void);
+void CheckRemoteRidicule ( int scancode );
+
+int main ()
 {
    // Set which release version we're on
    gamestate.Version = ROTTVERSION;
@@ -370,6 +377,8 @@ void main ()
 
 
    QuitGame();
+   
+   return 0;
 }
 
 void DrawRottTitle ( void )
@@ -1980,6 +1989,7 @@ void CheckRemoteRidicule ( int scancode )
 
 void DoBossKey ( void )
 {
+#ifdef DOS
    union REGS regs;
    ShutdownClientControls();
 
@@ -2004,6 +2014,9 @@ void DoBossKey ( void )
    ThreeDRefresh();
 
    StartupClientControls();
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 
@@ -2748,6 +2761,7 @@ void WriteLBMfile (char *filename, byte *data, int width, int height)
 
 void GetFileName (boolean saveLBM)
 {
+#ifdef DOS
    char num[4];
    int cnt = 0;
    struct find_t fblock;
@@ -2782,8 +2796,9 @@ void GetFileName (boolean saveLBM)
          savename[7] = num[0];
    }
    while (_dos_findfirst (savename, 0, &fblock) == 0);
-
-
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //****************************************************************************
