@@ -1007,7 +1007,7 @@ void _dos_getdate(struct dosdate_t *date)
 		date->day = tm->tm_mday;
 		date->month = tm->tm_mon + 1;
 		date->year = tm->tm_year + 1900;
-		date->dayofweek = - tm->tm_wday + 1;
+		date->dayofweek = tm->tm_wday + 1;
 	}
 }
 #endif
