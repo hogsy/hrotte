@@ -2950,18 +2950,28 @@ void DrawScaledScreen(int x, int y, int step, byte * src)
 #endif
        {
        yfrac=0;
+#ifdef DOS
        VGAWRITEMAP(plane&3);
+#endif
        for (j=y;j<y+ysize;j++)
           {
           p=src+(320*(yfrac>>16));
 #ifdef DOS
           buf=(byte *)bufferofs+ylookup[j]+(plane>>2);
 #else
-          buf=(byte *)bufferofs+ylookup[j];
+          buf=(byte *)bufferofs+ylookup[j]+x;
 #endif
+#ifdef DOS
           xfrac=(plane-x)*step;
+#else
+          xfrac=0;
+#endif
           yfrac+=step;
+#ifdef DOS
           for (i=plane;i<x+xsize;i+=4)
+#else
+          for (i=x;i<x+xsize;i++)
+#endif
              {
              *buf=*(p+(xfrac>>16));
              buf++;
@@ -5725,40 +5735,47 @@ void  DrawMapPost (int height, byte * src, byte * buf)
 
 void DrawRotRow(int count, byte * dest, byte * src)
 {
-	unsigned eax, ecx, edx, fracstep;
+	unsigned eax, ecx, edx;
 
 	ecx = mr_yfrac;
 	edx = mr_xfrac;
-	fracstep = mr_xstep;
+
 	while (count--) {
 		eax = edx >> 16;
-		if (eax < 256 && (ecx >> 16) < 512)
+		if (eax < 256 && (ecx >> 16) < 512) {
 			eax = (eax << 9) | ((ecx << 7) >> (32-9));
-		else
+		} else {
 			eax = 0;
+		}
+		
 		*dest++ = src[eax];
-		edx += fracstep;
-		ecx += fracstep;
+		
+		edx += mr_xstep;
+		ecx += mr_ystep;
 	}
 }
 
 void DrawMaskedRotRow(int count, byte * dest, byte * src)
 {
-	unsigned eax, ecx, edx, fracstep;
-
-	ecx = mr_yfrac;
-	edx = mr_xfrac;
-	fracstep = mr_xstep;
+	unsigned eax;
+	unsigned xfrac, yfrac;
+	
+	xfrac = mr_xfrac;
+	yfrac = mr_yfrac;
+	
 	while (count--) {
-		eax = edx >> 16;
-		if (eax < 256 && (ecx >> 16) < 512)
-			eax = (eax << 9) | ((ecx << 7) >> (32-9));
-		else
+		eax = xfrac >> 16;
+		if (eax < 256 && (yfrac >> 16) < 512) {
+			eax = (eax << 9) | ((yfrac << 7) >> (32-9));
+		} else {
 			eax = 0;
+		}
+		
 		if (src[eax] != 0xff) *dest = src[eax];
 		dest++;
-		edx += fracstep;
-		ecx += fracstep;
+		
+		xfrac += mr_xstep;
+		yfrac += mr_ystep;
 	}
 }
 

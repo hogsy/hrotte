@@ -22,14 +22,14 @@ fixed FixedMulShift(fixed a, fixed b, fixed shift)
 	long long y = b;
 	long long z = x * y;
 	
-	return (z >> shift) & 0xffffffff;
+	return (((unsigned long long)z) >> shift) & 0xffffffff;
 }
 
 fixed FixedDiv2(fixed a, fixed b)
 {
-	long long x = a << 16;
-	long long y = b;
-	long long z = x / y;
+	long long x = (signed long)a;
+	long long y = (signed long)b;
+	long long z = x * 65536LL / y;
 	
 	return (z) & 0xffffffff;
 }
