@@ -37,13 +37,14 @@ rott: 	\
 	rt_state.o \
 	rt_str.o \
 	rt_ted.o \
+	rt_util.o \
 	rt_view.o \
 	rt_vid.o \
 	scriplib.o \
 	w_wad.o \
 	z_zone.o
 
-# rt_util.c, rt_in.c, rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
+# rt_in.c, rt_swift.c, rt_spbal.c, rt_error.c, modexlib.c, sbconfig.c
 # rt_dr_a, rt_fc_a, rt_vh_a, rt_sc_a, f_scale
 # rt_err.obj - some dos text screen for error messages
 

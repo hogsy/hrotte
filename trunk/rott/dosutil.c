@@ -12,8 +12,12 @@
               
 /* 
   Copied over from Wolf3D Linux: http://www.icculus.org/wolf3d/
+  Modified for ROTT.
  */
  
+int _argc;
+char **_argv;
+
 /* TimeCount from David Haslam -- dch@sirius.demon.co.uk */
 
 static struct timeval t0;

@@ -76,7 +76,7 @@ int   atan2_appx(int,int);
 int   FindDistance(int ix, int iy);
 int   Find_3D_Distance(int ix, int iy, int iz);
 void  SetPalette ( char * pal );
-void  SetaPalette ( char * pal );
+void  SetaPalette ( byte * pal );
 void  FindEGAColors ( void );
 void  VL_SetPalette (byte *palette);
 void  VL_GetPalette (byte *palette);
