@@ -3765,9 +3765,11 @@ void SpawnParticles(objtype*ob,int which,int numparticles)
 
    for(i=0;i<numparticles;i++)
       {
+      int ordertemp;	/* DDOI - Watcom evaluates the mult order diff */
       randphi = (GameRandomNumber("particle generate phi",0) << 3);
-      randadj = RandomSign() *
-               (GameRandomNumber("rand gib adjust",0) >> 4);
+      // randadj = RandomSign() * (GameRandomNumber("rand gib adjust",0) >> 4);
+      ordertemp = (GameRandomNumber("rand gib adjust",0) >> 4);
+      randadj = RandomSign() * ordertemp;
 
 
 
