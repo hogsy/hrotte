@@ -610,7 +610,7 @@ void SetupFullMap( void )
       memset((byte *)bufferofs+ylookup[ty]+24,0,32);
 #else
    for (ty=37;ty<37+127;ty++)
-      memset((byte *)bufferofs+ylookup[ty]+24,0,32*4);
+      memset((byte *)bufferofs+ylookup[ty]+96,0,128);
 #endif
 }
 
@@ -643,7 +643,11 @@ void DrawFullMap( void )
       buf=(byte *)bufferofs+ylookup[37]+((96+mapx));
 #endif
 
+#ifdef DOS
       for (mapy=0;mapy<mapheight;mapy++,buf+=SCREENBWIDE)
+#else
+      for (mapy=0;mapy<mapheight;mapy++,buf+=MAXSCREENWIDTH)
+#endif
          {
          if ((mapx==player->tilex ) && (mapy==player->tiley))
             {
