@@ -1326,7 +1326,7 @@ void R_DrawColumn (byte * buf)
 
 	do
 	{
-		*dest = shadingtable[dc_source[(frac>>SFRACBITS)&127]];
+		*dest = shadingtable[dc_source[(frac>>SFRACBITS)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	} while (count--);
@@ -1356,7 +1356,7 @@ void R_DrawWallColumn (byte * buf)
 
 	do
 	{
-		*dest = shadingtable[dc_source[(frac>>26)&127]];
+		*dest = shadingtable[dc_source[(frac>>26)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	} while (count--);
@@ -1379,7 +1379,7 @@ void R_DrawClippedColumn (byte * buf)
 
 	do
 	{
-		*dest = shadingtable[dc_source[(frac>>SFRACBITS)&127]];
+		*dest = shadingtable[dc_source[(frac>>SFRACBITS)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	} while (count--);

@@ -643,3 +643,24 @@ void DrawPlanes( void )
       DrawHLine(xstarts[y],viewwidth-1,y);
       }
 }
+
+#ifndef DOS
+void DrawRow(int count, byte * dest, byte * src)
+{
+#if 1
+	STUB_FUNCTION;
+#else
+	unsigned frac, fracstep;
+	int ecx;
+
+	frac = (mr_yfrac<<16) + (mr_xfrac&0xffff);
+	fracstep = (mr_ystep<<16) + (mr_xstep&0xffff);
+	while (count--) {
+		ecx = (ecx << 23) | (frac >> (32-23));
+		ecx = (ecx << 7) | (frac >> (32-7));
+		*dest++ = shadingtable[src[ecx&16383]];
+		frac += fracstep;
+	}
+#endif
+}
+#endif

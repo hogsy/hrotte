@@ -5694,11 +5694,6 @@ void DrawSkyPost (byte * buf, byte * src, int height)
 	STUB_FUNCTION;
 }
 
-void DrawRow(int count, byte * dest, byte * src)
-{
-	STUB_FUNCTION;
-}
-
 #define CEILINGCOLOR 24
 #define FLOORCOLOR 32
 
