@@ -15,13 +15,14 @@ rott: 	engine.o \
 	rt_scale.o \
 	rt_stat.o \
 	rt_state.o \
+	rt_str.o \
 	rt_ted.o \
 	rt_vid.o \
 	w_wad.o \
 	z_zone.o
 
 # rt_util.c
-# rt_dr_a, rt_fc_a
+# rt_dr_a, rt_fc_a, rt_vh_a
 
 clean:
 	rm *.o
