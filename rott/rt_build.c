@@ -245,11 +245,20 @@ void   DrawPlanePosts (void)
    int i;
 
    shadingtable=colormap+(16<<8);
+
+#ifdef DOS
    for (plane=0;plane<4;plane++)
+#endif
+
       {
       VGAWRITEMAP(plane);
       buf=(byte *)(bufferofs);
+
+#ifdef DOS
       for (i=plane;i<viewwidth;i+=4,buf++)
+#else
+      for (i=0;i<viewwidth;i++,buf++)
+#endif
          {
          height=(posts[i].wallheight);
          if (height<=4)

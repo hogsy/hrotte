@@ -5665,7 +5665,13 @@ void DoMicroStoryScreen ( void )
 
 void  DrawMenuPost (int height, byte * src, byte * buf)
 {
-	STUB_FUNCTION;
+	int frac = hp_startfrac;
+	while (height--) {
+		*buf = src[frac >> 16];
+		
+		buf += linewidth;
+		frac += hp_srcstep;
+	}
 }
 
 void  DrawMapPost (int height, byte * src, byte * buf)
