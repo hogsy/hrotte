@@ -1777,7 +1777,7 @@ void UpdateTriads (objtype * ob, int num)
       GiveLives(1);
       if (ob==player)
          {
-         AddMessage("100 Life Item Points!  Extra Life!\n",MSG_BONUS);
+         AddMessage("100 Life Item Points!  Extra Life!",MSG_BONUS);
          SD_PlaySoundRTP (SD_GET1UPSND, player->x, player->y);
          }
       pstate->triads -= 100;
@@ -4183,7 +4183,7 @@ void Died (void)
       killangle=startangle+(TOTALDEATHROT>>1);
       if (dopefish==true)
          {
-         AddMessage("Dopefish Death Cam\n",MSG_SYSTEM);
+         AddMessage("Dopefish Death Cam",MSG_SYSTEM);
          }
       for (iangle=startangle;;)
          {
