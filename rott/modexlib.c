@@ -465,20 +465,19 @@ void WaitVBL( void )
 	SDL_Delay (16667/1000);
 }
 
-
 /*
-====================
+=======================
 =
-= VL_SetLineWidth
+= VL_SetVGAPlaneMode
 =
-= Line witdh is in WORDS, 40 words is normal width for vgaplanegr
-=
-====================
+=======================
 */
 
-void VL_SetLineWidth (unsigned width)
+void VL_SetVGAPlaneMode ( void )
 {
    int i,offset;
+
+    GraphicsMode();
 
 //
 // set up lookup tables
@@ -492,22 +491,9 @@ void VL_SetLineWidth (unsigned width)
       ylookup[i]=offset;
       offset += linewidth;
       }
-}
 
-/*
-=======================
-=
-= VL_SetVGAPlaneMode
-=
-=======================
-*/
+    screensize=MAXSCREENHEIGHT*MAXSCREENWIDTH;
 
-void VL_SetVGAPlaneMode ( void )
-{
-    GraphicsMode();
-    VL_DePlaneVGA ();
-    VL_SetLineWidth (48);
-    screensize=208*SCREENBWIDE;
     page1start=sdl_surface->pixels;
     page2start=sdl_surface->pixels;
     page3start=sdl_surface->pixels;
@@ -655,47 +641,6 @@ void VL_ClearVideo (byte color)
 
 void VL_DePlaneVGA (void)
 {
-#ifdef DOS
-//
-// change CPU addressing to non linear mode
-//
-
-//
-// turn off chain 4 and odd/even
-//
-        outp (SC_INDEX,SC_MEMMODE);
-        outp (SC_DATA,(inp(SC_DATA)&~8)|4);
-
-        outp (SC_INDEX,SC_MAPMASK);         // leave this set throughout
-
-//
-// turn off odd/even and set write mode 0
-//
-        outp (GC_INDEX,GC_MODE);
-        outp (GC_DATA,inp(GC_DATA)&~0x13);
-
-//
-// turn off chain
-//
-        outp (GC_INDEX,GC_MISCELLANEOUS);
-        outp (GC_DATA,inp(GC_DATA)&~2);
-
-//
-// clear the entire buffer space, because int 10h only did 16 k / plane
-//
-        VL_ClearVideo (0);
-
-//
-// change CRTC scanning from doubleword to byte mode, allowing >64k scans
-//
-        outp (CRTC_INDEX,CRTC_UNDERLINE);
-        outp (CRTC_DATA,inp(CRTC_DATA)&~0x40);
-
-        outp (CRTC_INDEX,CRTC_MODE);
-        outp (CRTC_DATA,inp(CRTC_DATA)|0x40);
-#else
-	STUB_FUNCTION;
-#endif
 }
 
 
