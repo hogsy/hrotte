@@ -447,6 +447,9 @@ void DrawRottTitle ( void )
 #else
          strcat (title,"DFISH");
 #endif
+#ifndef ANSIESC
+         strcat (title,"\n");
+#endif
 
          px=(80-strlen(title))>>1;
          py=0;
@@ -476,6 +479,9 @@ void DrawRottTitle ( void )
          py=1;
 
          UL_printf(title);
+#ifndef ANSIESC
+	 printf ("\n");
+#endif
 
          UL_ColorBox (0, 0, 80, 2, 0x1e);
          }
