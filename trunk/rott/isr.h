@@ -68,8 +68,8 @@ void SetFastTics(int);
 
 extern int KeyboardStarted;
 
-extern int ASCIINames[];   // Ascii -> scan code conversion
-extern int ShiftNames[];   // Shifted Ascii->scancode conversion
+extern const int ASCIINames[];   // Ascii -> scan code conversion
+extern const int ShiftNames[];   // Shifted Ascii->scancode conversion
 extern volatile boolean PausePressed;  //Game paused variable
 extern volatile boolean PanicPressed;  //Panic key variable
 
