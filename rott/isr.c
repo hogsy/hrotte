@@ -72,8 +72,9 @@ volatile int fasttics;
 volatile boolean PausePressed = false;
 volatile boolean PanicPressed = false;
 int KeyboardStarted=false;
-int  ASCIINames[] =          // Unshifted ASCII for scan codes
-													 {
+
+const int ASCIINames[] =          // Unshifted ASCII for scan codes
+{
 //       0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		  0  ,27 ,'1','2','3','4','5','6','7','8','9','0','-','=',8  ,9  ,        // 0
 		  'q','w','e','r','t','y','u','i','o','p','[',']',13 ,0  ,'a','s',        // 1
@@ -83,9 +84,10 @@ int  ASCIINames[] =          // Unshifted ASCII for scan codes
 		  '2','3','0',127,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 5
 		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 6
 		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0           // 7
-													 },
-		  ShiftNames[] =              // Shifted ASCII for scan codes
-													 {
+};
+
+const int ShiftNames[] =              // Shifted ASCII for scan codes
+{
 //       0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		  0  ,27 ,'!','@','#','$','%','^','&','*','(',')','_','+',8  ,9  ,        // 0
 		  'Q','W','E','R','T','Y','U','I','O','P','{','}',13 ,0  ,'A','S',        // 1
@@ -95,7 +97,7 @@ int  ASCIINames[] =          // Unshifted ASCII for scan codes
 		  '2','3','0',127,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 5
 		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 6
 		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0           // 7
-													 };
+};
 
 #ifdef DOS
 
