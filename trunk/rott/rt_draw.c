@@ -5595,6 +5595,11 @@ void DrawRow(int count, byte * dest, byte * src)
 	STUB_FUNCTION;
 }
 
+void RefreshClear (void)
+{
+	STUB_FUNCTION;
+}
+
 #endif
 
 #if 0
