@@ -4768,17 +4768,18 @@ void WaitKeyUp (void)
 
 void ReadAnyControl (ControlInfo *ci)
 {
-   IN_PumpEvents();
 
-#ifdef DOS
+#if PLATFORM_DOS
    union REGS inregs;
    union REGS outregs;
+#endif
+
    int mouseactive = 0;
-   word buttons;
+   word buttons = 0;
 //   struct Spw_IntPacket packet;
 
 
-   IN_UpdateKeyboard ();
+   IN_UpdateKeyboard ();  /* implies IN_PumpEvents() ... */
    IN_ReadControl (0, ci);
 
    if (MousePresent && mouseenabled)
@@ -4786,7 +4787,31 @@ void ReadAnyControl (ControlInfo *ci)
       int mousey,
           mousex;
 
+#if USE_SDL
+      INL_GetMouseDelta(&mousex, &mousey);
+      if (mousex >= SENSITIVE)
+      {
+         ci->dir = dir_East;
+         mouseactive = 1;
+      }
+      else if (mousex <= -SENSITIVE)
+      {
+         ci->dir = dir_West;
+         mouseactive = 1;
+      }
 
+      if (mousey >= SENSITIVE)
+      {
+         ci->dir = dir_South;
+         mouseactive = 1;
+      }
+      else if (mousey <= -SENSITIVE)
+      {
+         ci->dir = dir_North;
+         mouseactive = 1;
+      }
+
+#elif PLATFORM_DOS
 		// READ MOUSE MOTION COUNTERS
       // RETURN DIRECTION
       // HOME MOUSE
@@ -4852,6 +4877,7 @@ void ReadAnyControl (ControlInfo *ci)
 
          mouseactive = 1;
       }
+#endif
 
       buttons = IN_GetMouseButtons();
       if ( buttons )
@@ -4925,11 +4951,6 @@ void ReadAnyControl (ControlInfo *ci)
          if (packet.tx > (MENU_AMT * 6))
             ci->dir = dir_East;
    }
-#endif
-#else
-#warning please unify this code.
-    IN_UpdateKeyboard ();
-    IN_ReadControl (0, ci);
 #endif
 }
 
