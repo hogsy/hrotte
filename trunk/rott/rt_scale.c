@@ -417,6 +417,8 @@ void ScaleMaskedWidePost (byte * src, byte * buf, int x, int width)
    VGAMAPMASK(msk);
    ScaleMaskedPost(src,buf);
 #else
+	buf += x;
+	
 	while (width--) {
 		ScaleMaskedPost(src,buf);
 		buf++;
@@ -448,6 +450,8 @@ void ScaleClippedWidePost (byte * src, byte * buf, int x, int width)
    VGAMAPMASK(msk);
    ScaleClippedPost(src,buf);
 #else
+	buf += x;
+	
 	while (width--) {
 		ScaleClippedPost(src,buf);
 		buf++;
@@ -1378,7 +1382,7 @@ void R_DrawWallColumn (byte * buf)
 	fracstep <<= 10;
 
 	while (count--) {
-		*dest = shadingtable[dc_source[(frac>>26)]];
+		*dest = shadingtable[dc_source[(((unsigned)frac)>>26)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	}
@@ -1400,7 +1404,7 @@ void R_DrawClippedColumn (byte * buf)
 	frac = dc_texturemid + (dc_yl-centeryclipped)*fracstep;
 
 	while (count--) {
-		*dest = shadingtable[dc_source[(frac>>SFRACBITS)]];
+		*dest = shadingtable[dc_source[(((unsigned)frac)>>SFRACBITS)]];
 		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	}
