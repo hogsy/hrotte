@@ -22,6 +22,9 @@
 
 #include "SDL.h"
 #include "SDL_mixer.h"
+#include "rt_def.h"      // ROTT music hack
+#include "rt_cfg.h"      // ROTT music hack
+#include "rt_util.h"     // ROTT music hack
 #include "fx_man.h"
 #include "music.h"
 
@@ -1213,6 +1216,33 @@ int MUSIC_PlaySong(unsigned char *song, int loopflag)
     return(MUSIC_Ok);
 } // MUSIC_PlaySong
 
+// ROTT Special - SBF
+int MUSIC_PlaySongROTT(unsigned char *song, int size, int loopflag)
+{
+    char filename[MAX_PATH];
+    int handle;
+    
+    MUSIC_StopSong();
+
+    // save the file somewhere, so SDL_mixer can load it
+    GetPathFromEnvironment(filename, ApogeePath, "tmpsong.mid");
+    handle = SafeOpenWrite(filename);
+    
+    SafeWrite(handle, song, size);
+    close(handle);
+    
+    music_songdata = song;
+
+    // finally, we can load it with SDL_mixer
+    music_musicchunk = Mix_LoadMUS(filename);
+    if (music_musicchunk == NULL) {
+        return MUSIC_Error;
+    }
+    
+    Mix_PlayMusic(music_musicchunk, (loopflag == MUSIC_PlayOnce) ? 0 : -1);
+
+    return(MUSIC_Ok);
+} // MUSIC_PlaySongROTT
 
 void MUSIC_SetContext(int context)
 {
