@@ -151,6 +151,7 @@ void CheckRemoteRidicule ( int scancode );
 
 #ifndef DOS
 extern void crash_print (int);
+extern int setup_homedir (void);
 #endif
 
 #if defined(PLATFORM_MACOSX)
@@ -171,6 +172,8 @@ int main (int argc, char *argv[])
 
 #ifndef DOS
    signal (11, crash_print);
+
+   if (setup_homedir() == -1) return 1;
 #endif
 
    // Set which release version we're on

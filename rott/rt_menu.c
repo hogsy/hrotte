@@ -36,6 +36,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <conio.h>
 #include <dos.h>
 #include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 #include <sys/types.h>
@@ -1507,16 +1509,25 @@ int getASCII ( void )
 void ScanForSavedGames ()
 {
    struct find_t f;
-   char filename[128];
+   char filename[256];
    char str[45];
    int which;
    boolean found = false;
+#ifndef DOS
+   char *pathsave;
+#endif
 
    //
    // SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
    //
    memset (&SaveGamesAvail[0], 0, sizeof (SaveGamesAvail));
+#ifdef DOS
    GetPathFromEnvironment( filename, ApogeePath, SaveName );
+#else
+   strncpy (filename, SaveName, 256);
+   pathsave = getcwd (NULL, 0);
+   chdir (ApogeePath);
+#endif
 
    if (!_dos_findfirst (filename, 0, &f))
       do
@@ -1541,6 +1552,10 @@ void ScanForSavedGames ()
       }
       else
          MainMenu[loadgame].active = CP_Inactive;
+#ifndef DOS
+      chdir (pathsave);
+      free (pathsave);
+#endif
 }
 
 

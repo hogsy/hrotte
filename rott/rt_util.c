@@ -977,9 +977,14 @@ void _dos_getdate(struct dosdate_t *date)
 
 void GetPathFromEnvironment( char *fullname, const char *envname, const char *filename )
    {
-   char *path;
 
+#ifdef DOS
+   char *path;
    path = getenv( envname );
+#else
+   const char *path;
+   path = envname;
+#endif
 
    if ( path != NULL )
       {
