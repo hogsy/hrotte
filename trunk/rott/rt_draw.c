@@ -1918,6 +1918,9 @@ void   DrawWalls (void)
    wallcast_t * post;
 
    whereami=13;
+   
+   plane = 0;
+   
    if (doublestep>1)
       {
 #ifdef DOS
@@ -1929,11 +1932,14 @@ void   DrawWalls (void)
 #ifdef DOS
          for (post=&posts[plane];post<&posts[viewwidth];post+=4,buf++)
 #else
-         for (post=&posts[plane];post<&posts[viewwidth];post++,buf++)
+         for (post=&posts[plane];post<&posts[viewwidth];post+=2,buf+=2)
 #endif
             {
             SetWallLightLevel(post);
             DrawWallPost(post,buf);
+#ifndef DOS            
+            DrawWallPost(post,buf+1); 
+#endif
             (post+1)->ceilingclip=post->ceilingclip;
             (post+1)->floorclip=post->floorclip;
             }
@@ -2463,12 +2469,14 @@ void InterpolateDoor (visobj_t * plane)
       height=(plane->h1<<DHEIGHTFRACTION)+(dh*pl);
       buf=(byte *)bufferofs+((pl+plane->x1)>>2);
       VGAWRITEMAP((plane->x1+pl)&3);
+
       for (i=plane->x1+pl;i<=plane->x2;i+=4,buf++)
 #else
-      top=topinc;
-      bot=(d2*dx)+botinc;
-      height=(plane->h1<<DHEIGHTFRACTION)+dh;
+      top=0;
+      bot=(d2*dx);
+      height=(plane->h1<<DHEIGHTFRACTION);
       buf=(byte *)bufferofs+(plane->x1);
+
       for (i=plane->x1;i<=plane->x2;i++,buf++)
 #endif
          {
@@ -2505,9 +2513,16 @@ void InterpolateDoor (visobj_t * plane)
                R_DrawWallColumn (buf);
                }
             }
+            
+#ifdef DOS
          top+=topinc<<2;
          bot+=botinc<<2;
          height+=dh<<2;
+#else
+         top+=topinc;
+         bot+=botinc;
+         height+=dh;
+#endif
          }
       }
 }
@@ -2606,9 +2621,9 @@ void InterpolateMaskedWall (visobj_t * plane)
       VGAREADMAP(planenum);
       for (i=plane->x1+pl;i<=plane->x2;i+=4,buf++)
 #else
-      top=topinc;
-      bot=(d2*dx)+botinc;
-      height=(plane->h1<<DHEIGHTFRACTION)+dh;
+      top=0;
+      bot=(d2*dx);
+      height=(plane->h1<<DHEIGHTFRACTION);
       buf=(byte *)bufferofs+(plane->x1);
       for (i=plane->x1;i<=plane->x2;i++,buf++)
 #endif
@@ -2644,9 +2659,15 @@ void InterpolateMaskedWall (visobj_t * plane)
                   ScaleMaskedPost (p3->collumnofs[texture]+shape3,buf);
                }
             }
+#ifdef DOS
          top+=topinc<<2;
          bot+=botinc<<2;
          height+=dh<<2;
+#else
+         top+=topinc;
+         bot+=botinc;
+         height+=dh;
+#endif
          }
       }
 }
