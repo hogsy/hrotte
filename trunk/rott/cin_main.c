@@ -255,19 +255,20 @@ void R_DrawFilmColumn (byte * buf)
 	// This is *NOT* 100% correct - DDOI
 	int count;
 	int frac, fracstep;
+	byte *dest;
 
 	count = cin_yh - cin_yl;
 	if (count < 0) return;
 
-	buf += ylookup[cin_yl];
+	dest = buf + ylookup[cin_yl];
 
 	fracstep = cin_iscale;
 	frac = cin_texturemid + (cin_yl-cin_ycenter)*fracstep;
 
 	do
 	{
-		*buf = cin_source[(frac>>SFRACBITS)&127];
-		buf += MAXSCREENWIDTH;
+		*dest = cin_source[(frac>>SFRACBITS)&127];
+		dest += MAXSCREENWIDTH;
 		frac += fracstep;
 	} while (count--);
 }
