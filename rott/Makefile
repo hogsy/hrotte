@@ -39,12 +39,13 @@ ifeq ($(strip $(cygwin)),true)
 else
   SDL_CFLAGS := $(shell sdl-config --cflags)
   SDL_LDFLAGS := $(shell sdl-config --libs)
+  EXTRACFLAGS += -DUSE_EXECINFO=1
 endif
 
 
 CC = gcc
-CFLAGS = -g $(SDL_CFLAGS) -DUSE_SDL=1 -DPLATFORM_UNIX=1 -W -Wall -Wno-unused -DUSE_EXECINFO=1
-LDLIBS = $(SDL_LDFLAGS) -lSDL -lSDL_mixer -Wl,-E
+CFLAGS = -g $(SDL_CFLAGS) -DUSE_SDL=1 -DPLATFORM_UNIX=1 -W -Wall -Wno-unused $(EXTRACFLAGS)
+LDLIBS = $(SDL_LDFLAGS) -lSDL -lSDL_mixer $(EXTRALDFLAGS) -Wl,-E
 
 all: rott
 
