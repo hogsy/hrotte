@@ -817,12 +817,23 @@ void ScaleWeapon (int xoff, int y, int shapenum)
 
 	startx=x1;
 	startfrac=frac;
+
+#ifdef DOS
    for (plane=startx;plane<startx+4;plane++,startfrac+=dc_iscale)
+#endif
       {
       frac=startfrac;
+#ifdef DOS
       b=(byte *)bufferofs+(plane>>2);
+#else
+      b=(byte *)bufferofs+startx;
+#endif
       VGAWRITEMAP(plane&3);
+#ifdef DOS
       for (x1=plane; x1<=x2 ; x1+=4, frac += dc_iscale<<2,b++)
+#else
+      for (x1=startx; x1<=x2 ; x1++, frac += dc_iscale,b++)
+#endif
          ScaleClippedPost(((p->collumnofs[frac>>SFRACBITS])+shape),b);
       }
 }
