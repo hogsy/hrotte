@@ -555,22 +555,25 @@ void IN_PumpEvents(void)
 
 void INL_GetMouseDelta(int *x,int *y)
 {
+   IN_PumpEvents();
+
 #ifdef PLATFORM_DOS
    union REGS inregs;
    union REGS outregs;
 
    if (!MousePresent)
-      return;
-
-   inregs.w.ax = MDelta;
-   int386 (MouseInt, &inregs, &outregs);
-
-   *x = outregs.w.cx;
-   *y = outregs.w.dx;
+      *x = *y = 0;
+   else
+   {
+     inregs.w.ax = MDelta;
+     int386 (MouseInt, &inregs, &outregs);
+     *x = outregs.w.cx;
+     *y = outregs.w.dx;
+   }
 
 #elif USE_SDL
    *x = sdl_mouse_delta_x;
-   *x = sdl_mouse_delta_y;
+   *y = sdl_mouse_delta_y;
 
    sdl_mouse_delta_x = sdl_mouse_delta_y = 0;
 
