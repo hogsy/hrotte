@@ -949,7 +949,7 @@ boolean INL_StartJoy (word joy)
        SDL_JoystickEventState(SDL_ENABLE);
    }
 
-   if (joy > sdl_total_sticks) return (false);
+   if (joy >= sdl_total_sticks) return (false);
    sdl_joysticks[i] = SDL_JoystickOpen (joy);
 #endif
 
