@@ -1458,7 +1458,12 @@ void QuitGame ( void )
 #endif
       for (k = 0; k < 23; k++)
          printf ("\n");
+#if DOS
       memcpy ((byte *)0xB8000, txtscn, 4000);
+#else
+    STUB_FUNCTION;
+#endif
+
 #if (DEBUG == 1)
       px = ERRORVERSIONCOL;
       py = ERRORVERSIONROW;
