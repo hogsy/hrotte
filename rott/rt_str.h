@@ -72,35 +72,35 @@ typedef  struct
 // String rtns
 //
 
-void VW_DrawClippedString (int x, int y, char *string);
-void US_ClippedPrint (int x, int y, char *s);
+void VW_DrawClippedString (int x, int y, const char *string);
+void US_ClippedPrint (int x, int y, const char *s);
 
-void VWB_DrawPropString  (char *string);
-void VW_MeasurePropString (char *string, int *width, int *height);
+void VWB_DrawPropString  (const char *string);
+void VW_MeasurePropString (const char *string, int *width, int *height);
 
-void US_MeasureStr (int *width, int *height, char * s, ...);
+void US_MeasureStr (int *width, int *height, const char * s, ...);
 
-void VW_DrawPropString (char *string);
+void VW_DrawPropString (const char *string);
 
-void US_SetPrintRoutines (void (*measure)(char *, int *, int *, font_t *),
-                          void (*print)(char *));
-void US_Print (char *s);
-void US_BufPrint (char *s);
+void US_SetPrintRoutines (void (*measure)(const char *, int *, int *, font_t *),
+                          void (*print)(const char *));
+void US_Print (const char *s);
+void US_BufPrint (const char *s);
 void US_PrintUnsigned (unsigned long int n);
 void US_PrintSigned (long int n);
-void USL_PrintInCenter (char *s, Rect r);
-void US_PrintCentered (char *s);
-void US_CPrintLine (char *s);
-void US_CPrint (char *s);
+void USL_PrintInCenter (const char *s, Rect r);
+void US_PrintCentered (const char *s);
+void US_CPrintLine (const char *s);
+void US_CPrint (const char *s);
 
 
 //
 // Input rtns
 //
 
-boolean US_LineInput (int x, int y, char *buf, char *def, boolean escok,
+boolean US_LineInput (int x, int y, char *buf, const char *def, boolean escok,
                       int maxchars, int maxwidth, int color);
-boolean US_lineinput (int x, int y, char *buf, char *def, boolean escok,
+boolean US_lineinput (int x, int y, char *buf, const char *def, boolean escok,
                       int maxchars, int maxwidth, int color);
 int CalibrateJoystick(void);
 
@@ -115,9 +115,9 @@ void US_CenterWindow (int w, int h);
 // Intensity font rtns
 //
 
-void DrawIString (unsigned short int x, unsigned short int y, char *string, int flags);
-void DrawIntensityString (unsigned short int x, unsigned short int y, char *string, int color);
-void VW_MeasureIntensityPropString (char *string, int *width, int *height);
+void DrawIString (unsigned short int x, unsigned short int y, const char *string, int flags);
+void DrawIntensityString (unsigned short int x, unsigned short int y, const char *string, int color);
+void VW_MeasureIntensityPropString (const char *string, int *width, int *height);
 byte GetIntensityColor (byte pix);
 
 #include "myprint.h"
