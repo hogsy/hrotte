@@ -289,6 +289,12 @@ void *Z_Malloc (int size, int tag, void *user)
 //
         size += sizeof(memblock_t);     // account for size of block header
 
+#if defined(__sparc__)
+        /* ensure word alignment */
+        if (size % 4) {
+           size = size + (4 - size % 4);
+        }
+#endif
 
 //
 // if there is a free block behind the rover, back up over them

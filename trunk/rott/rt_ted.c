@@ -1141,7 +1141,7 @@ void PreCache( void )
    int ticdelay;
    unsigned tempbuf;
 
-#if defined(PLATFORM_MACOSX)
+#if defined(PLATFORM_MACOSX) || defined(__sparc__)
 #warning "Precaching is disabled. Fix."
 // Precaching confuses the byteswapping code, since we have
 // no simple way of knowing the type of each resource.
