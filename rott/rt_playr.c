@@ -18,7 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#ifdef DOS
 #include <dos.h>
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -249,8 +252,8 @@ void     PlayerMissileAttack(objtype* );
 void     Cmd_Use(objtype*);
 //void     ComError (char *error, ...);
 
-statetype s_free = {false,0,0,T_Free,NULL,&s_free};
-statetype s_inelevator = {false,0,420,T_Player,NULL,&s_player};
+statetype s_free = {false,0,0,T_Free,0,&s_free};
+statetype s_inelevator = {false,0,420,T_Player,0,&s_player};
 
 #if (SHAREWARE == 0)
 statetype s_dogwait = {true,SERIALDOG_W11,50,T_Player,SF_DOGSTATE,&s_serialdog};
@@ -259,7 +262,7 @@ statetype s_doguse = {true,SERIALDOG_W11,140,T_DogUse,SF_DOGSTATE,&s_serialdog};
 statetype s_doglick = {true,SERIALDOG_W11,0,T_DogLick,SF_DOGSTATE,&s_doglick};
 #endif
 
-statetype s_tag = {false,CASSATT_S1,20,T_Tag,NULL,&s_player};
+statetype s_tag = {false,CASSATT_S1,20,T_Tag,0,&s_player};
 
 static SWIFT_3DStatus SWIFTStatus;
 
@@ -285,6 +288,10 @@ static byte JoyDblClickPressed[ 4 ] = { false };
 
 static int PlayerRecording=-1;
 static int nettics;
+
+void Move_Player_From_Exit_To_Start(objtype *ob);
+void CheckTagGame(objtype *actor1,objtype*actor2);
+void CheckFlying(objtype*ob,playertype *pstate);
 
 /*
 ===============
@@ -2122,6 +2129,7 @@ int sensitivity_scalar[15] =
 
 void PollMouseMove (void)
 {
+#ifdef DOS
    union REGS inregs;
    union REGS outregs;
    short int  mousexmove,
@@ -2167,7 +2175,9 @@ void PollMouseMove (void)
 
 //   if (MY > 0)
 //      MX -= (MX/2);
-
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 
@@ -2233,6 +2243,7 @@ void PollJoystickMove (void)
 
 void StartVRFeedback (int guntype)
 {
+#ifdef DOS
    union REGS inregs;
    union REGS outregs;
 
@@ -2240,6 +2251,9 @@ void StartVRFeedback (int guntype)
    inregs.x.ebx = 1;
    inregs.x.ecx = guntype;
    int386 (0x33, &inregs, &outregs);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //******************************************************************************
@@ -2250,12 +2264,16 @@ void StartVRFeedback (int guntype)
 
 void StopVRFeedback (void)
 {
+#ifdef DOS
    union REGS inregs;
    union REGS outregs;
 
    inregs.x.eax = VR_FEEDBACK_SERVICE;
    inregs.x.ebx = 0;
    int386 (0x33, &inregs, &outregs);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //******************************************************************************
@@ -2268,6 +2286,7 @@ void StopVRFeedback (void)
 
 void PollVirtualReality (void)
 {
+#ifdef DOS
    union REGS inregs;
    union REGS outregs;
    short int  mousexmove,
@@ -2325,6 +2344,9 @@ void PollVirtualReality (void)
          buttonpoll[bt_run]=true;
          }
       }
+#else
+	STUB_FUNCTION;
+#endif      
 }
 
 
