@@ -18,13 +18,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include <stdio.h>
+#include <string.h>
+
+#ifdef DOS
 #include <conio.h>
 #include <dos.h>
 #include <i86.h>
-#include <string.h>
+#endif
 
 #include "rt_main.h"
-#include "rt_spball.h"
+#include "rt_spbal.h"
 #include "rt_def.h"
 #include "rt_in.h"
 #include "_rt_in.h"
@@ -126,7 +129,7 @@ char ScanChars[128] =    // Scan code names with single chars
 
 
 
-
+#ifdef DOS
 //****************************************************************************
 //
 // LOCALS
@@ -1263,3 +1266,4 @@ void QueueLetterInput (void)
       head = (head+1)&(KEYQMAX-1);
       }        // while
    }
+#endif

@@ -29,9 +29,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifdef DOS
 #include <dos.h>
 #include <mem.h>
 #include <conio.h>
+#endif
+
 #include "rt_def.h"
 #include "task_man.h"
 #include "isr.h"
@@ -88,6 +92,9 @@ int  ASCIINames[] =          // Unshifted ASCII for scan codes
 		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 6
 		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0           // 7
 													 };
+
+#ifdef DOS
+
 // Local Variables
 
 static task * timertask;
@@ -734,6 +741,4 @@ void I_ShutdownKeyboard (void)
 	_dos_setvect (KEYBOARDINT, oldkeyboardisr);
 	*(short *)0x41c = *(short *)0x41a;      // clear bios key buffer
 }
-
-
-
+#endif

@@ -14,6 +14,7 @@ rott: 	\
 	dosutil.o \
 	engine.o \
 	fx_man.o \
+	isr.o \
 	rt_actor.o \
 	rt_battl.o \
 	rt_build.o \
@@ -26,6 +27,7 @@ rott: 	\
 	rt_draw.o \
 	rt_floor.o \
 	rt_game.o \
+	rt_in.o \
 	rt_main.o \
 	rt_map.o \
 	rt_menu.o \
