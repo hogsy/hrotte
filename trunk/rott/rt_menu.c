@@ -1504,7 +1504,6 @@ int getASCII ( void )
 
 void ScanForSavedGames ()
 {
-#ifdef DOS
    struct find_t f;
    char filename[128];
    char str[45];
@@ -1540,9 +1539,6 @@ void ScanForSavedGames ()
       }
       else
          MainMenu[loadgame].active = CP_Inactive;
-#else
-	STUB_FUNCTION;
-#endif
 }
 
 
