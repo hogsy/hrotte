@@ -19,7 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // RT_FLOOR.C
 
+#ifdef DOS
 #include <conio.h>
+#endif
+
 #include "rt_def.h"
 #include "watcom.h"
 #include "rt_floor.h"
