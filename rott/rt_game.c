@@ -195,53 +195,64 @@ void V_ReDrawBkgnd (int x, int y, int width, int height, boolean shade)
 
    if (VW_MarkUpdateBlock (x, y, x+width-1, y+height-1))
    {
-#ifdef DOS
       for (planes = 0; planes < 4; planes++)
-#endif
       {
-#ifdef DOS
          src = (&(BkPic->data)+((80*200)*m)+(80*y)+(x>>2));
-#else
-         src = (&(BkPic->data)+(320*200)+(320*y)+x);
-#endif
          dest = origdest;
 
+#ifdef DOS
          VGAMAPMASK (mask);
+#else
+         dest += planes;
+#endif
 
          for (j = 0; j < height; j++)
          {
+            for (k = 0; k < (width/4); k++) {
+               if (shade) {
+                  *dest = *(colormap + ((MENUSHADELEVEL>>2)<<8) + *src++);
+               } else {
+                  *dest = *src++;
+               }
 #ifdef DOS
-            for (k = 0; k < (width/4); k++)
+               dest++;
 #else
-            for (k = 0; k < width; k++)
+               dest += 4;
 #endif
-               if (shade)
-                  *dest++ = *(colormap + ((MENUSHADELEVEL>>2)<<8) + *src++);
-               else
-                  *dest++ = *src++;
+            }
 
-#ifdef DOS
-            src += (80-(width/4));
+#ifndef DOS            
+            // draw the remainder.  did the DOS version even bother? - SBF
+            if ((width & 3) > planes) {
+               if (shade) {
+                  *dest = *(colormap + ((MENUSHADELEVEL>>2)<<8) + *src);
+               } else {
+                  *dest = *src;
+               }
+            }  
+#endif
+
+	    src += (80-(width/4));
+#ifdef DOS            
             dest += (linewidth-(width/4));
 #else
-            src += (80-width);
-            dest += (linewidth-width);
+            dest += (linewidth-(width&~3));
 #endif
          }
 
          m++;
+         
          mask <<= 1;
-#ifdef DOS
+
          if (mask == 16)
          {
             x+=4;
             mask = 1;
             m = 0;
+#ifdef DOS
             origdest++;
-         }
-#else
-	 origdest++;
 #endif
+         }
       }
    }
 }
