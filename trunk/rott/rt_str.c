@@ -796,6 +796,8 @@ boolean US_LineInput (int x, int y, char *buf, char *def, boolean escok,
 //      if (GameEscaped==true)
 //         PauseLoop ();
 
+      IN_PumpEvents();
+
       if (cursorvis)
          USL_XORICursor (x, y, s, cursor, color);
 
