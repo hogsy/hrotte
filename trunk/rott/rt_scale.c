@@ -1201,13 +1201,11 @@ void DrawNormalSprite (int x, int y, int shapenum)
 void R_DrawColumn (byte * buf)
 {
 	// This is *NOT* 100% correct - DDOI
-	int pixelcount, loopcount;
+	int count;
 	int frac, fracstep;
 
-	pixelcount = dc_yh - dc_yl + 1;
-	if (pixelcount < 0) return;
-
-	loopcount = pixelcount/2;
+	count = dc_yh - dc_yl;
+	if (count < 0) return;
 
 	buf += ylookup[dc_yl];
 
@@ -1219,7 +1217,7 @@ void R_DrawColumn (byte * buf)
 		*buf = shadingtable[dc_source[(frac>>SFRACBITS)&127]];
 		buf += MAXSCREENWIDTH;
 		frac += fracstep;
-	} while (loopcount--);
+	} while (count--);
 }
 
 void R_TransColumn (byte * buf)
@@ -1240,24 +1238,6 @@ void R_DrawClippedColumn (byte * buf)
 void R_DrawSolidColumn (int color, byte * buf)
 {
 	STUB_FUNCTION;
-}
-
-/* f_scale.asm */
-
-void R_DrawFilmColumn (byte * buf)
-{
-	STUB_FUNCTION;
-}
-
-void DrawFilmPost (byte * buf, byte * src, int height)
-{
-	while (height--) { 
-		*buf = *src;
-		
-		src++;
-		
-		buf += linewidth;
-	}
 }
 
 #endif
