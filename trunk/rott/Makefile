@@ -16,6 +16,7 @@ rott: 	engine.o \
 	rt_stat.o \
 	rt_state.o \
 	rt_ted.o \
+	rt_vid.o \
 	w_wad.o \
 	z_zone.o
 
