@@ -147,8 +147,13 @@ void PlayTurboGame( void );
 void Init_Tables (void);
 void CheckRemoteRidicule ( int scancode );
 
-int main ()
+int main (int argc, char *argv[])
 {
+#ifndef DOS
+	_argc = argc;
+	_argv = argv;
+#endif
+
    // Set which release version we're on
    gamestate.Version = ROTTVERSION;
 

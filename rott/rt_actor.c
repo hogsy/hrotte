@@ -1054,7 +1054,6 @@ void CheckBounds(objtype*ob)
 =
 =====================
 */
-void main ( void );
 
 void DoActor (objtype *ob)
    {

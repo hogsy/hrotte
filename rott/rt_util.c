@@ -19,16 +19,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "rt_def.h"
+
+#ifdef DOS
 #include <malloc.h>
 #include <dos.h>
+#include <conio.h>
+#include <io.h>
+#include <direct.h>
+#endif
+
 #include <stdarg.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <conio.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <io.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "watcom.h"
@@ -48,7 +53,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_view.h"
 #include "modexlib.h"
 #include "rt_cfg.h"
-#include <direct.h>
 //MED
 #include "memcheck.h"
 
@@ -311,6 +315,7 @@ void ClearBuffer( char * buf, int size )
 
 void Error (char *error, ...)
 {
+#ifdef DOS
    char msgbuf[300];
 	va_list	argptr;
    char i;
@@ -422,7 +427,9 @@ void Error (char *error, ...)
       {
       getch();
       }
-
+#else
+	STUB_FUNCTION;
+#endif
    exit (1);
 }
 
@@ -938,11 +945,15 @@ long	IntelLong (long l)
 
 void GetaPalette (byte *pal)
 {
+#ifdef DOS
 	int	i;
 
 	OUTP (PEL_READ_ADR,0);
 	for (i=0 ; i<768 ; i++)
 		pal[i] = inp (PEL_DATA)<<2;
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 /*
@@ -957,20 +968,28 @@ void GetaPalette (byte *pal)
 
 void SetaPalette (byte *pal)
 {
+#ifdef DOS
 	int	i;
 
 	OUTP (PEL_WRITE_ADR,0);
 	for (i=0 ; i<768 ; i++)
 		OUTP (PEL_DATA, pal[i]>>2);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 void GetPalette(char * pal)
 {
+#ifdef DOS
   int i;
 
   OUTP(0x03c7,0);
   for (i=0;i<256*3;i++)
      *(pal+(unsigned char)i)=inp(0x3c9)<<2;
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 void SetPalette ( char * pal )
@@ -1050,6 +1069,7 @@ void VL_NormalizePalette (byte *palette)
 
 void VL_SetPalette (byte *palette)
 {
+#ifdef DOS
    int   i;
 
    OUTP (PEL_WRITE_ADR, 0);
@@ -1058,6 +1078,9 @@ void VL_SetPalette (byte *palette)
       {
       OUTP (PEL_DATA, gammatable[(gammaindex<<6)+(*palette++)]);
       }
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 
@@ -1076,12 +1099,16 @@ void VL_SetPalette (byte *palette)
 
 void VL_GetPalette (byte *palette)
 {
+#ifdef DOS
    int   i;
 
    OUTP (PEL_READ_ADR, 0);
 
    for (i = 0; i < 768; i++)
       *palette++ = inp (PEL_DATA);
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 
@@ -1095,6 +1122,7 @@ void VL_GetPalette (byte *palette)
 
 void UL_DisplayMemoryError ( int memneeded )
 {
+#ifdef DOS
    char buf[4000];
    int i;
 
@@ -1127,6 +1155,9 @@ void UL_DisplayMemoryError ( int memneeded )
       {
       getch();
       }
+#else
+	STUB_FUNCTION;
+#endif
    exit (0);
 }
 
@@ -1141,6 +1172,7 @@ void UL_DisplayMemoryError ( int memneeded )
 
 void UL_printf (byte *str)
 {
+#ifdef DOS
    byte *s;
    byte *screen;
 
@@ -1157,6 +1189,9 @@ void UL_printf (byte *str)
       if ((*s < 32) && (*s > 0))
          s++;
    }
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 /*
@@ -1169,6 +1204,7 @@ void UL_printf (byte *str)
 
 void UL_ColorBox (int x, int y, int w, int h, int color)
 {
+#ifdef DOS
    byte *screen;
    int i,j;
 
@@ -1182,6 +1218,9 @@ void UL_ColorBox (int x, int y, int w, int h, int color)
          screen+=2;
          }
       }
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 //******************************************************************************
@@ -1220,6 +1259,20 @@ static PFV Switch;                        /* pointer to comparison routine      
 static int Width;                       /* width of an object in bytes                  */
 static char *Base;                      /* pointer to element [-1] of array             */
 
+
+static newsift_down(L,U) int L,U;
+{  int c;
+
+   while(1)
+      {c=L+L;
+      if(c>U) break;
+      if( (c+Width <= U) && ((*Comp)(Base+c+Width,Base+c)>0) ) c+= Width;
+      if ((*Comp)(Base+L,Base+c)>=0) break;
+      (*Switch)(Base+L, Base+c);
+      L=c;
+      }
+}
+
 void hsort(char * base, int nel, int width, int (*compare)(), void (*switcher)())
 {
 static int i,n,stop;
@@ -1250,20 +1303,6 @@ static int i,n,stop;
 }
 
 /*---------------------------------------------------------------------------*/
-static newsift_down(L,U) int L,U;
-{  int c;
-
-   while(1)
-      {c=L+L;
-      if(c>U) break;
-      if( (c+Width <= U) && ((*Comp)(Base+c+Width,Base+c)>0) ) c+= Width;
-      if ((*Comp)(Base+L,Base+c)>=0) break;
-      (*Switch)(Base+L, Base+c);
-      L=c;
-      }
-}
-
-
 
 //******************************************************************************
 //
@@ -1300,7 +1339,7 @@ char * UL_GetPath (char * path, char *dir)
       path++;
       dr++;
 
-      if ((*path == SLASHES) || (*path == NULL))
+      if ((*path == SLASHES) || (*path == 0))
          done = true;
    }
 
@@ -1327,6 +1366,7 @@ char * UL_GetPath (char * path, char *dir)
 
 boolean UL_ChangeDirectory (char *path)
 {
+#ifdef DOS
    char *p;
    char dir[9];
    char *d;
@@ -1361,6 +1401,11 @@ boolean UL_ChangeDirectory (char *path)
    }
 
    return (true);
+#else
+	STUB_FUNCTION;
+	
+	return false;
+#endif
 }
 
 
@@ -1383,6 +1428,7 @@ boolean UL_ChangeDirectory (char *path)
 
 boolean UL_ChangeDrive (char *drive)
 {
+#ifdef DOS
    unsigned d, total, tempd;
 
    d = toupper (*drive);
@@ -1396,6 +1442,11 @@ boolean UL_ChangeDrive (char *drive)
       return (false);
 
    return (true);
+#else
+	STUB_FUNCTION;
+	
+	return false;
+#endif
 }
 
 
