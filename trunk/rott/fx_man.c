@@ -30,6 +30,13 @@
 
 #define DUKESND_DEBUG       "DUKESND_DEBUG"
 
+#ifndef min
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef max
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
+#endif
 
 typedef struct __DUKECHANINFO
 {
@@ -55,6 +62,57 @@ static int maxReverbDelay = 256;
 static int mixerIsStereo = 1;
 static duke_channel_info *chaninfo = NULL;
 
+/* these come from the real ASS */
+#define MV_MaxPanPosition  31
+#define MV_NumPanPositions ( MV_MaxPanPosition + 1 )
+#define MV_MaxVolume       63
+
+#define MIX_VOLUME( volume ) \
+   ( ( max( 0, min( ( volume ), 255 ) ) * ( MV_MaxVolume + 1 ) ) >> 8 )
+   
+typedef struct
+{
+    unsigned char left;
+    unsigned char right;
+} Pan;
+    
+static Pan MV_PanTable[ MV_NumPanPositions ][ MV_MaxVolume + 1 ];
+
+static void MV_CalcPanTable
+   (
+   void
+   )
+
+   {
+   int   level;
+   int   angle;
+   int   distance;
+   int   HalfAngle;
+   int   ramp;
+
+   HalfAngle = ( MV_NumPanPositions / 2 );
+
+   for( distance = 0; distance <= MV_MaxVolume; distance++ )
+      {
+      level = ( 255 * ( MV_MaxVolume - distance ) ) / MV_MaxVolume;
+      for( angle = 0; angle <= HalfAngle / 2; angle++ )
+         {
+         ramp = level - ( ( level * angle ) /
+            ( MV_NumPanPositions / 4 ) );
+
+         MV_PanTable[ angle ][ distance ].left = ramp;
+         MV_PanTable[ HalfAngle - angle ][ distance ].left = ramp;
+         MV_PanTable[ HalfAngle + angle ][ distance ].left = level;
+         MV_PanTable[ MV_MaxPanPosition - angle ][ distance ].left = level;
+
+         MV_PanTable[ angle ][ distance ].right = level;
+         MV_PanTable[ HalfAngle - angle ][ distance ].right = level;
+         MV_PanTable[ HalfAngle + angle ][ distance ].right = ramp;
+         MV_PanTable[ MV_MaxPanPosition - angle ][ distance ].right = ramp;
+         }
+      }
+   }
+/* end ASS copy-pastage */
 
 #ifdef __WATCOMC__
 #pragma aux (__cdecl) channelDoneCallback;
@@ -352,6 +410,9 @@ int FX_Init(int SoundCard, int numvoices, int numchannels,
         return(FX_Error);
     } // if
 
+    // build pan tables
+    MV_CalcPanTable();
+    
     SDL_ClearError();
     if (SDL_Init(SDL_INIT_AUDIO) < 0)
     {
@@ -528,6 +589,8 @@ static int doSetPan(int handle, int vol, int left,
 {
     int retval = FX_Warning;
 
+    printf("handle:%d vol:%d left:%d right:%d\n", handle, vol, left, right);
+    
     if ((handle < 0) || (handle >= numChannels))
         setWarningMessage("Invalid handle in doSetPan().");
     else if ((checkIfPlaying) && (!Mix_Playing(handle)))
@@ -545,7 +608,7 @@ static int doSetPan(int handle, int vol, int left,
 
             else
             {
-//                Mix_SetPanning(handle, left, right);
+                Mix_SetPanning(handle, left, right);
             } // else
         } // if
         else
@@ -558,7 +621,7 @@ static int doSetPan(int handle, int vol, int left,
             else
             {
                 // volume must be from 0-128, so the ">> 1" converts.
-//                Mix_Volume(handle, vol >> 1);
+                Mix_Volume(handle, vol >> 1);
             } // else
         } // else
 
@@ -638,13 +701,37 @@ static int setupVocPlayback(char *ptr, int size, int priority, unsigned long cal
     return(FX_Ok);
 } // setupVocPlayback
 
-static void _FX_SetPosition(int chan, int angle, int distance)
+static int _FX_SetPosition(int chan, int angle, int distance)
 {
-printf("chan %d, angle %d, distance %d\n", chan, angle, distance);
-
     /* rescale angle from 0..31 to 0..360 to match SDL_mixer */
-    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 359.0), 
-        distance);
+//    Mix_SetPosition(chan, (Sint16) ((((float) angle) / 31.0) * 359.0), 
+//        distance);
+
+    int left;
+    int right;
+    int mid;
+    int volume;
+    int status;
+ 
+    printf("chan %d, angle %d, distance %d\n", chan, angle, distance);   
+    
+    if ( distance < 0 ) {
+        distance  = -distance;
+        angle    += MV_NumPanPositions / 2;
+    }
+    
+    volume = MIX_VOLUME( distance );
+    
+    // Ensure angle is within 0 - 31
+    angle &= MV_MaxPanPosition;
+    
+    left  = MV_PanTable[ angle ][ volume ].left;
+    right = MV_PanTable[ angle ][ volume ].right;
+    mid   = max( 0, 255 - distance );
+
+    status = doSetPan( chan, mid, left, right, 0 );
+    
+    return status;
 }
 
 int FX_PlayVOC(char *ptr, int pitchoffset,
@@ -779,6 +866,7 @@ int FX_PlayVOC3D_ROTT(char *ptr, int size, int pitchoffset, int angle, int dista
     _FX_SetPosition(chan, angle, distance);
 
     Mix_PlayChannel(chan, chunk, 0);
+
     return(FX_Ok + chan);
 } // FX_PlayVOC3D_ROTT
 
