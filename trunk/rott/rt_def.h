@@ -73,7 +73,11 @@ char *ltoa(long, char *, int);
 char *ultoa(unsigned long, char *, int);
 char getch(void);
 
+#if !defined(ANSIESC)
 #define STUB_FUNCTION fprintf(stderr,"STUB: %s at " __FILE__ ", line %d, thread %d\n",__FUNCTION__,__LINE__,getpid())
+#else
+#define STUB_FUNCTION
+#endif
 
 #define far
 #define cdecl

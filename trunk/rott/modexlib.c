@@ -389,7 +389,11 @@ void XFlipPage ( void )
 #include "SDL.h"
 
 /* rt_def.h isn't included, so I just put this here... */
+#if !defined(ANSIESC)
 #define STUB_FUNCTION fprintf(stderr,"STUB: %s at " __FILE__ ", line %d, thread %d\n",__FUNCTION__,__LINE__,getpid())
+#else
+#define STUB_FUNCTION
+#endif
 
 /*
 ====================

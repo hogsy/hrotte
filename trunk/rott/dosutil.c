@@ -165,9 +165,9 @@ void put_dos2ansi(byte attrib)
 	back = lookup[back]+10;
 
 	if (blink)
-		printf ("\x1b[%d;5;%dm\x1b[%dm", intens, fore, back);
+		printf ("%c[%d;5;%dm%c[%dm", 27, intens, fore, 27, back);
 	else
-		printf ("\x1b[%d;25;%dm\x1b[%dm", intens, fore, back);
+		printf ("%c[%d;25;%dm%c[%dm", 27, intens, fore, 27, back);
 }
 
 void DisplayTextSplash(byte *text, int l)
@@ -175,9 +175,9 @@ void DisplayTextSplash(byte *text, int l)
 	int i, x;
 	
 	//printf("%02X %02X %02X %02X\n", text[0], text[1], text[2], text[3]);
-	text += 4;
+	//text += 4;
 	//printf("%02X %02X %02X %02X\n", text[0], text[1], text[2], text[3]);
-	text += 2;
+	//text += 2;
 	
 	for (x = 0; x < l; x++) {
 		for (i = 0; i < 160; i += 2) {
@@ -190,6 +190,30 @@ void DisplayTextSplash(byte *text, int l)
 		printf("%c[m", 27);
 		printf("\n");
 	}
+}
+
+#include <execinfo.h>
+
+void print_stack (int level)
+{
+	void *array[64];
+	char **syms;
+	int size, i;
+
+	printf ("Stack dump:\n");
+	printf ("{\n");
+	size = backtrace (array, (sizeof (array))/(sizeof (array[0])));
+	syms = backtrace_symbols (array, size);
+	for (i=level+1; i<size;++i) {
+		printf ("\t%s\n",syms[i]);
+	}
+	free (syms);
+	/*
+	for (i = 2; i <size; ++i) {
+		printf ("\t%p\n", array[i]);
+	}
+	*/
+	printf ("}\n");
 }
 
 #if 0
