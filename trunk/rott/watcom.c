@@ -9,11 +9,8 @@
 
 fixed FixedMul(fixed a, fixed b)
 {
-	__int64 x = a;
-	__int64 y = b;
-	__int64 z = x * y + 0x8000;
-	
-	return (z >> 16) & 0xffffffff;
+	__int64 scratch1 = (__int64) a * (__int64) b + (__int64) 0x8000;
+	return (scratch1 >> 16) & 0xffffffff;
 }
 
 fixed FixedMulShift(fixed a, fixed b, fixed shift)
