@@ -1372,7 +1372,9 @@ void ShutDown ( void )
 
    ShutdownClientControls();
    I_ShutdownKeyboard();
+#ifdef DOS /* the UL_ErrorStartup() call is commented out... */
    UL_ErrorShutdown ();
+#endif
    ShutdownGameCommands();
    MU_Shutdown();
    I_ShutdownTimer();
