@@ -104,12 +104,12 @@ HighScore   Scores[MaxScores] =
 
 static int KeyX[4]  = {KEY1_X, KEY2_X, KEY3_X, KEY4_X};
 
-static char *Names[ 5 ] =
+static const char *Names[ 5 ] =
    {
    "Taradino", "Thi",     "Doug",  "Lorelei", "Ian Paul"
    };
 
-static char *LastNames[ 5 ] =
+static const char *LastNames[ 5 ] =
    {
    "Cassatt",  "Barrett", "Wendt", "Ni",      "Freeley"
    };
@@ -487,7 +487,7 @@ void DrawPlayScreen
       VW_MeasurePropString( LastNames[ character ], &width, &height );
 
       DrawGameString ( MEN_X + 44 - width, MEN_Y + 8,
-         Names[ character + 5 ], bufferofsonly );
+         LastNames[ character ], bufferofsonly );
 
       UpdateLives( locplayerstate->lives );
       UpdateScore( gamestate.score );
@@ -996,7 +996,7 @@ void StatusDrawColoredPic (unsigned x, unsigned y, pic_t *nums, boolean bufferof
 //
 //******************************************************************************
 
-void DrawGameString (int x, int y, char * str, boolean bufferofsonly)
+void DrawGameString (int x, int y, const char * str, boolean bufferofsonly)
 {
    unsigned tempbuf;
 
