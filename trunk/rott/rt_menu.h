@@ -50,7 +50,7 @@ typedef enum
    mn_largefont
    } mn_fontsize;
 
-typedef char *CP_MenuNames;
+typedef char CP_MenuNames[64];
 
 typedef struct
    {

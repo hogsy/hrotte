@@ -2809,7 +2809,19 @@ void GetFileName (boolean saveLBM)
    }
    while (_dos_findfirst (savename, 0, &fblock) == 0);
 #else
-	STUB_FUNCTION;
+	int i;
+	
+	for (i = 0; i < 9999; i++) {
+		if (saveLBM) {
+	   		sprintf(savename, "rott%04d.lbm", i);
+	   	} else {
+	   		sprintf(savename, "rott%04d.pcx", i);
+	   	}
+
+		if (access(savename, F_OK) != 0) {
+			return;
+		}
+	}
 #endif
 }
 

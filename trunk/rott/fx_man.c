@@ -361,7 +361,7 @@ int FX_Init(int SoundCard, int numvoices, int numchannels,
     } // if
 
     audio_format = (samplebits == 8) ? AUDIO_U8 : AUDIO_S16;
-    if (Mix_OpenAudio(mixrate, audio_format, numchannels, 4096) < 0)
+    if (Mix_OpenAudio(mixrate, audio_format, numchannels, 1024) < 0)
     {
         setErrorMessage(SDL_GetError());
         return(FX_Error);
@@ -595,7 +595,8 @@ int FX_SetFrequency(int handle, int frequency)
 //  and the SDL_mixer channel it will play on, respectively.
 //  If the value is not FX_Ok, then the warning or error message is set,
 //  and you should bail.
-static int setupVocPlayback(char *ptr, int priority, unsigned long callbackval,
+// size added by SBF for ROTT
+static int setupVocPlayback(char *ptr, int size, int priority, unsigned long callbackval,
                             int *chan, Mix_Chunk **chunk)
 {
     SDL_RWops *rw;
@@ -607,18 +608,24 @@ static int setupVocPlayback(char *ptr, int priority, unsigned long callbackval,
         return(FX_Error);
     } // if
 
-    // !!! FIXME: This could be a problem...SDL/SDL_mixer wants a RWops, which
-    // !!! FIXME:  is an i/o abstraction. Since we already have the VOC data
-    // !!! FIXME:  in memory, we fake it with a memory-based RWops. None of
-    // !!! FIXME:  this is a problem, except the RWops wants to know how big
-    // !!! FIXME:  its memory block is (so it can do things like seek on an
-    // !!! FIXME:  offset from the end of the block), and since we don't have
-    // !!! FIXME:  this information, we have to give it SOMETHING. My VOC
-    // !!! FIXME:  decoder never does seeks from EOF, nor checks for
-    // !!! FIXME:  end-of-file, so we should be fine. However, we've got a
-    // !!! FIXME:  limit of 10 megs for one file. I hope that'll cover it. :)
+    if (size == -1) {
+        // !!! FIXME: This could be a problem...SDL/SDL_mixer wants a RWops, which
+        // !!! FIXME:  is an i/o abstraction. Since we already have the VOC data
+        // !!! FIXME:  in memory, we fake it with a memory-based RWops. None of
+        // !!! FIXME:  this is a problem, except the RWops wants to know how big
+        // !!! FIXME:  its memory block is (so it can do things like seek on an
+        // !!! FIXME:  offset from the end of the block), and since we don't have
+        // !!! FIXME:  this information, we have to give it SOMETHING. My VOC
+        // !!! FIXME:  decoder never does seeks from EOF, nor checks for
+        // !!! FIXME:  end-of-file, so we should be fine. However, we've got a
+        // !!! FIXME:  limit of 10 megs for one file. I hope that'll cover it. :)
 
-    rw = SDL_RWFromMem((void *) ptr, (10 * 1024) * 1024);  /* yikes. */
+        rw = SDL_RWFromMem((void *) ptr, (10 * 1024) * 1024);  /* yikes. */
+    } else {
+        // A valid file size! Excellent.
+        rw = SDL_RWFromMem((void *) ptr, size);
+    }
+    
     *chunk = Mix_LoadWAV_RW(rw, 1);
     if (*chunk == NULL)
     {
@@ -643,7 +650,7 @@ int FX_PlayVOC(char *ptr, int pitchoffset,
     snddebug("Playing voice: mono (%d), left (%d), right (%d), priority (%d).\n",
                 vol, left, right, priority);
 
-    rc = setupVocPlayback(ptr, priority, callbackval, &chan, &chunk);
+    rc = setupVocPlayback(ptr, -1, priority, callbackval, &chan, &chunk);
     if (rc != FX_Ok)
         return(rc);
 
@@ -686,7 +693,7 @@ int FX_PlayLoopedVOC(char *ptr, long loopstart, long loopend,
                 vol, left, right, priority);
     snddebug("Looping: start (%ld), end (%ld).\n", loopstart, loopend);
 
-    rc = setupVocPlayback(ptr, priority, callbackval, &chan, &chunk);
+    rc = setupVocPlayback(ptr, -1, priority, callbackval, &chan, &chunk);
     if (rc != FX_Ok)
         return(rc);
 
@@ -722,7 +729,6 @@ int FX_PlayLoopedVOC(char *ptr, long loopstart, long loopend,
     return(FX_Ok + chan);
 } // FX_PlayLoopedVOC
 
-
 int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
        int priority, unsigned long callbackval)
 {
@@ -733,7 +739,7 @@ int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
     snddebug("Playing voice at angle (%d), distance (%d), priority (%d).\n",
                 angle, distance, priority);
 
-    rc = setupVocPlayback(ptr, priority, callbackval, &chan, &chunk);
+    rc = setupVocPlayback(ptr, -1, priority, callbackval, &chan, &chunk);
     if (rc != FX_Ok)
         return(rc);
 
@@ -743,6 +749,28 @@ int FX_PlayVOC3D(char *ptr, int pitchoffset, int angle, int distance,
     Mix_PlayChannel(chan, chunk, 0);
     return(FX_Ok + chan);
 } // FX_PlayVOC3D
+
+// ROTT Special - SBF
+int FX_PlayVOC3D_ROTT(char *ptr, int size, int pitchoffset, int angle, int distance,
+       int priority, unsigned long callbackval)
+{
+    int rc;
+    int chan;
+    Mix_Chunk *chunk;
+
+    snddebug("Playing voice at angle (%d), distance (%d), priority (%d).\n",
+                angle, distance, priority);
+
+    rc = setupVocPlayback(ptr, size, priority, callbackval, &chan, &chunk);
+    if (rc != FX_Ok)
+        return(rc);
+
+    // !!! FIXME: Need to do something with pitchoffset.
+
+    Mix_SetPosition(chan, (Uint8) ((((float) angle) / 31.0) * 255.0), distance);
+    Mix_PlayChannel(chan, chunk, 0);
+    return(FX_Ok + chan);
+} // FX_PlayVOC3D_ROTT
 
 
     // it's all the same to SDL_mixer.  :)
@@ -767,6 +795,13 @@ int FX_PlayWAV3D( char *ptr, int pitchoffset, int angle, int distance,
 {
     return(FX_PlayVOC3D(ptr, pitchoffset, angle, distance, priority, callbackval));
 } // FX_PlayWAV3D
+
+// ROTT Special - SBF
+int FX_PlayWAV3D_ROTT( char *ptr, int size, int pitchoffset, int angle, int distance,
+       int priority, unsigned long callbackval )
+{
+    return(FX_PlayVOC3D_ROTT(ptr, size, pitchoffset, angle, distance, priority, callbackval));
+} // FX_PlayWAV3D_ROTT
 
 
 int FX_PlayRaw( char *ptr, unsigned long length, unsigned rate,
