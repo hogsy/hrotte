@@ -2606,7 +2606,8 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
    byte *dest, *dest1, *dest2, *dest3, mask;
    byte *screen1, *screen2, *screen3;
    int  plane;
-
+   int w;
+   
 #ifdef DOS
    dest = (byte *)(ylookup[y]+(x>>2));
 #else
@@ -2618,9 +2619,7 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
    dest2 = (byte *)(dest+page2start);
    dest3 = (byte *)(dest+page3start);
 
-#ifdef DOS
    for (plane = 0; plane<4; plane++)
-#endif
    {
       VGAMAPMASK (mask);
 
@@ -2636,9 +2635,11 @@ void GM_MemToScreen (byte *source, int width, int height, int x, int y)
          memcpy (screen2, source, width);
          memcpy (screen3, source, width);
 #else
-         memcpy (screen1, source, width*4);
-         memcpy (screen2, source, width*4);
-         memcpy (screen3, source, width*4);
+	for (x = 0; x < width; x++) {
+		screen1[x*4+plane] = source[x];
+		screen2[x*4+plane] = source[x];
+		screen3[x*4+plane] = source[x];
+	}
 #endif
       }
 
