@@ -494,9 +494,9 @@ void VL_SetVGAPlaneMode ( void )
 
     screensize=MAXSCREENHEIGHT*MAXSCREENWIDTH;
 
-    page1start=sdl_surface->pixels;
-    page2start=sdl_surface->pixels;
-    page3start=sdl_surface->pixels;
+    page1start=(int)sdl_surface->pixels;
+    page2start=(int)sdl_surface->pixels;
+    page3start=(int)sdl_surface->pixels;
     displayofs = page1start;
     bufferofs = page2start;
     XFlipPage ();
