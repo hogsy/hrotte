@@ -72,6 +72,7 @@ int fontcolor;
 static int BKw;
 static int BKh;
    
+static char strbuf[MaxString];
 
 //******************************************************************************
 //
@@ -81,7 +82,7 @@ static int BKh;
 //
 //******************************************************************************
 
-void VW_DrawClippedString (int x, int y, char *string)
+void VW_DrawClippedString (int x, int y, const char *string)
 {
    int   width,height,ht;
    byte  *source;
@@ -130,12 +131,16 @@ void VW_DrawClippedString (int x, int y, char *string)
 //
 //******************************************************************************
 
-void US_ClippedPrint (int x, int y, char *s)
+void US_ClippedPrint (int x, int y, const char *string)
 {
    char  c,
          *se;
+   char  *s;
    int   startx;
 
+   strcpy(strbuf, string);
+   s = strbuf;
+   
    startx=x;
    while (*s)
    {
@@ -165,7 +170,7 @@ void US_ClippedPrint (int x, int y, char *s)
 //
 //******************************************************************************
 
-void VW_DrawPropString (char *string)
+void VW_DrawPropString (const char *string)
 {
 #ifdef DOS
    byte  pix;
@@ -260,7 +265,7 @@ void VW_DrawPropString (char *string)
 //
 //******************************************************************************
 
-void VWB_DrawPropString  (char *string)
+void VWB_DrawPropString  (const char *string)
 {
    int x;
    x = px;
@@ -278,7 +283,7 @@ void VWB_DrawPropString  (char *string)
 //
 //******************************************************************************
 
-void VW_DrawIPropString (char *string)
+void VW_DrawIPropString (const char *string)
 {
    byte  pix;
    int   width,step,height,ht;
@@ -350,7 +355,7 @@ void VW_DrawIPropString (char *string)
 //
 //******************************************************************************
 
-void VWB_DrawIPropString  (char *string)
+void VWB_DrawIPropString  (const char *string)
 {
    int x;
    x = px;
@@ -366,7 +371,7 @@ void VWB_DrawIPropString  (char *string)
 //
 //******************************************************************************
 
-void VWL_MeasureString (char *s, int *width, int *height, font_t *font)
+void VWL_MeasureString (const char *s, int *width, int *height, const font_t *font)
 {
    *height = font->height;
 
@@ -380,7 +385,7 @@ void VWL_MeasureString (char *s, int *width, int *height, font_t *font)
 //
 //******************************************************************************
 
-void VWL_MeasureIntensityString (char *s, int *width, int *height, cfont_t *font)
+void VWL_MeasureIntensityString (const char *s, int *width, int *height, const cfont_t *font)
 {
    *height = font->height;
 
@@ -394,7 +399,7 @@ void VWL_MeasureIntensityString (char *s, int *width, int *height, cfont_t *font
 //
 //******************************************************************************
 
-void VW_MeasureIntensityPropString (char *string, int *width, int *height)
+void VW_MeasureIntensityPropString (const char *string, int *width, int *height)
 {
    VWL_MeasureIntensityString (string, width, height, IFont);
 }
@@ -405,7 +410,7 @@ void VW_MeasureIntensityPropString (char *string, int *width, int *height)
 //
 //******************************************************************************
 
-void VW_MeasurePropString (char *string, int *width, int *height)
+void VW_MeasurePropString (const char *string, int *width, int *height)
 {
    VWL_MeasureString (string, width, height, CurrentFont);
 }
@@ -417,7 +422,7 @@ void VW_MeasurePropString (char *string, int *width, int *height)
 //
 //******************************************************************************
 
-void US_MeasureStr (int *width, int *height, char * s, ...)
+void US_MeasureStr (int *width, int *height, const char * s, ...)
 {
    char  c,
          *se,
@@ -468,8 +473,8 @@ void US_MeasureStr (int *width, int *height, char * s, ...)
 //
 //******************************************************************************
 
-void US_SetPrintRoutines (void (*measure)(char *, int *, int *, font_t *),
-                          void (*print)(char *))
+void US_SetPrintRoutines (void (*measure)(const char *, int *, int *, font_t *),
+                          void (*print)(const char *))
 {
    USL_MeasureString = measure;
    USL_DrawString    = print;
@@ -483,12 +488,16 @@ void US_SetPrintRoutines (void (*measure)(char *, int *, int *, font_t *),
 //
 //******************************************************************************
 
-void US_Print (char *s)
+void US_Print (const char *string)
 {
    char  c,
-         *se;
+         *se,
+         *s;
    int   w,h;
 
+   strcpy(strbuf, string);
+   s = strbuf;
+   
    while (*s)
    {
       se = s;
@@ -521,11 +530,15 @@ void US_Print (char *s)
 //
 //******************************************************************************
 
-void US_BufPrint (char *s)
+void US_BufPrint (const char *string)
 {
    char  c,
-         *se;
+         *se,
+         *s;
    int   startx;
+
+   strcpy(strbuf, string);
+   s = strbuf;
 
    startx=PrintX;
    while (*s)
@@ -586,7 +599,7 @@ void US_PrintSigned (long int n)
 //
 //******************************************************************************
 
-void USL_PrintInCenter (char *s, Rect r)
+void USL_PrintInCenter (const char *s, Rect r)
 {
    int   w,h,
          rw,rh;
@@ -606,7 +619,7 @@ void USL_PrintInCenter (char *s, Rect r)
 //
 //******************************************************************************
 
-void US_PrintCentered (char *s)
+void US_PrintCentered (const char *s)
 {
    Rect  r;
 
@@ -625,7 +638,7 @@ void US_PrintCentered (char *s)
 //
 //******************************************************************************
 
-void US_CPrintLine (char *s)
+void US_CPrintLine (const char *s)
 {
    int w, h;
 
@@ -647,10 +660,14 @@ void US_CPrintLine (char *s)
 //
 //******************************************************************************
 
-void US_CPrint (char *s)
+void US_CPrint (const char *string)
 {
    char  c,
-         *se;
+         *se,
+         *s;
+
+   strcpy(strbuf, string);
+   s = strbuf;
 
    while (*s)
    {
@@ -687,7 +704,7 @@ void US_CPrint (char *s)
 //
 //******************************************************************************
 
-static void USL_XORICursor (int x, int y, char *s, int cursor, int color)
+static void USL_XORICursor (int x, int y, const char *s, int cursor, int color)
 {
    static   boolean  status;     // VGA doesn't XOR...
    char     buf[MaxString];
@@ -746,7 +763,7 @@ static void USL_XORICursor (int x, int y, char *s, int cursor, int color)
 
 extern byte * IN_GetScanName (ScanCode scan);
 
-boolean US_LineInput (int x, int y, char *buf, char *def, boolean escok,
+boolean US_LineInput (int x, int y, char *buf, const char *def, boolean escok,
                       int maxchars, int maxwidth, int color)
 {
    boolean  redraw,
@@ -1038,7 +1055,7 @@ boolean US_LineInput (int x, int y, char *buf, char *def, boolean escok,
 //
 ///******************************************************************************
 
-boolean US_lineinput (int x, int y, char *buf, char *def, boolean escok,
+boolean US_lineinput (int x, int y, char *buf, const char *def, boolean escok,
                       int maxchars, int maxwidth, int color)
 {
    boolean  redraw,
@@ -1566,7 +1583,7 @@ int GetColor (int num)
 static int oldfontcolor = 0;
 static boolean highlight = false;
 
-void DrawIString (unsigned short int x, unsigned short int y, char *string, int flags)
+void DrawIString (unsigned short int x, unsigned short int y, const char *string, int flags)
 {
    char ch;
    char temp;
@@ -1646,7 +1663,7 @@ void DrawIString (unsigned short int x, unsigned short int y, char *string, int 
 //
 //******************************************************************************
 
-void DrawIntensityString (unsigned short int x, unsigned short int y, char *string, int color)
+void DrawIntensityString (unsigned short int x, unsigned short int y, const char *string, int color)
 {
    char ch;
 

@@ -76,12 +76,9 @@ static plane_t planelist[MAXPLANES],*planeptr;
 
 static int StringShade=16;
 
-extern void (*USL_MeasureString)(char *, int *, int *, font_t *);
+extern void (*USL_MeasureString)(const char *, int *, int *, font_t *);
 
-
-
-
-
+static char strbuf[MaxString];
 
 //******************************************************************************
 //
@@ -634,7 +631,7 @@ void SetAlternateMenuBuf ( void )
 //
 //******************************************************************************
 
-void SetMenuTitle ( char * menutitle )
+void SetMenuTitle ( const char * menutitle )
 {
   if (MenuBufStarted==false)
      Error("Called SetMenuTitle without menubuf started\n");
@@ -649,7 +646,7 @@ void SetMenuTitle ( char * menutitle )
 //
 //******************************************************************************
 
-void DrawMenuBufPicture (int x, int y, byte * pic, int w, int h)
+void DrawMenuBufPicture (int x, int y, const byte * pic, int w, int h)
 {
    byte *buffer;
    int i;
@@ -1179,7 +1176,7 @@ void DrawTMenuBufVLine (int x, int y, int height, boolean up)
 //
 //******************************************************************************
 
-void DrawMenuBufPropString (int px, int py, char *string)
+void DrawMenuBufPropString (int px, int py, const char *string)
 {
    byte  pix;
    int   width,height,ht;
@@ -1226,7 +1223,7 @@ void DrawMenuBufPropString (int px, int py, char *string)
 //
 //******************************************************************************
 
-void DrawMenuBufIString (int px, int py, char *string, int color)
+void DrawMenuBufIString (int px, int py, const char *string, int color)
 {
    byte  pix;
    int   width,height,ht;
@@ -1300,7 +1297,7 @@ void DrawMenuBufIString (int px, int py, char *string, int color)
 //
 //******************************************************************************
 
-void DrawTMenuBufPropString (int px, int py, char *string)
+void DrawTMenuBufPropString (int px, int py, const char *string)
 {
    byte  pix;
    int   width,height,ht;
@@ -1351,7 +1348,7 @@ void DrawTMenuBufPropString (int px, int py, char *string)
 //
 //******************************************************************************
 
-void MenuBufCPrintLine (char *s)
+void MenuBufCPrintLine (const char *s)
 {
    int w, h;
 
@@ -1372,22 +1369,22 @@ void MenuBufCPrintLine (char *s)
 //
 //******************************************************************************
 
-void MenuBufCPrint (char *s)
+void MenuBufCPrint (const char *string)
 {
-   static char buf[256];
    char  c,
-         *se;
+         *se,
+         *s;
 
     /* !!! FIXME: this is lame. */
-    if (strlen(s) >= sizeof (buf))
+    if (strlen(string) >= sizeof (strbuf))
     {
         fprintf(stderr, "buffer overflow!\n");
         return;
     }
 
     /* prevent writing to literal strings... ( MenubufCPrint("feh"); ) */
-    strcpy(buf, s);
-    s = buf;
+    strcpy(strbuf, string);
+    s = strbuf;
 
    while (*s)
    {
@@ -1414,7 +1411,7 @@ void MenuBufCPrint (char *s)
 //
 //******************************************************************************
 
-void MenuBufPrintLine (char *s)
+void MenuBufPrintLine (const char *s)
 {
    int w, h;
 
@@ -1435,11 +1432,15 @@ void MenuBufPrintLine (char *s)
 //
 //******************************************************************************
 
-void MenuBufPrint (char *s)
+void MenuBufPrint (const char *string)
 {
    char  c,
-         *se;
+         *se,
+         *s;
 
+   strcpy(strbuf, string);
+   s = strbuf;
+   
    while (*s)
    {
       se = s;
@@ -1465,7 +1466,7 @@ void MenuBufPrint (char *s)
 //
 //******************************************************************************
 
-void MenuTBufPrintLine (char *s, int shade)
+void MenuTBufPrintLine (const char *s, int shade)
 {
    int w, h;
 

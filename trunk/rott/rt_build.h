@@ -34,14 +34,14 @@ void ShutdownMenuBuf ( void );
 
 void ClearMenuBuf ( void );
 void SetAlternateMenuBuf ( void );
-void SetMenuTitle ( char * menutitle );
+void SetMenuTitle ( const char * menutitle );
 
 void PositionMenuBuf( int angle, int distance, boolean drawbackground );
 void RefreshMenuBuf( int time );
 void FlipMenuBuf ( void );
 
 void DrawMenuBufItem (int x, int y, int shapenum);
-void DrawMenuBufIString (int px, int py, char *string, int color);
+void DrawMenuBufIString (int px, int py, const char *string, int color);
 void DrawTMenuBufItem (int x, int y, int shapenum);
 void DrawIMenuBufItem (int x, int y, int shapenum, int color);
 void DrawColoredMenuBufItem (int x, int y, int shapenum, int color);
@@ -49,17 +49,17 @@ void DrawMenuBufPic (int x, int y, int shapenum);
 void DrawTMenuBufPic (int x, int y, int shapenum);
 void EraseMenuBufRegion (int x, int y, int width, int height);
 
-void DrawMenuBufPropString (int px, int py, char *string);
-void DrawTMenuBufPropString (int px, int py, char *string);
+void DrawMenuBufPropString (int px, int py, const char *string);
+void DrawTMenuBufPropString (int px, int py, const char *string);
 
 void DrawTMenuBufBox (int x, int y, int width, int height);
 void DrawTMenuBufHLine (int x, int y, int width, boolean up);
 void DrawTMenuBufVLine (int x, int y, int height, boolean up);
-void MenuBufCPrintLine (char *s);
-void MenuBufCPrint (char *s);
-void MenuBufPrint (char *s);
-void MenuTBufPrintLine (char *s, int shade);
+void MenuBufCPrintLine (const char *s);
+void MenuBufCPrint (const char *s);
+void MenuBufPrint (const char *s);
+void MenuTBufPrintLine (const char *s, int shade);
 
-void DrawMenuBufPicture (int x, int y, byte * pic, int w, int h);
+void DrawMenuBufPicture (int x, int y, const byte * pic, int w, int h);
 
 #endif
