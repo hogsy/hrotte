@@ -202,7 +202,7 @@ void V_ReDrawBkgnd (int x, int y, int width, int height, boolean shade)
 #ifdef DOS
          src = (&(BkPic->data)+((80*200)*m)+(80*y)+(x>>2));
 #else
-         src = (&(BkPic->data)+((80*200)*m)+(80*y)+x);
+         src = (&(BkPic->data)+(320*200)+(320*y)+x);
 #endif
          dest = origdest;
 

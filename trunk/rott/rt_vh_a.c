@@ -6,5 +6,5 @@
 
 void VH_UpdateScreen (void)
 {
-	// Not needed - DDOI
+	SDL_UpdateRect (SDL_GetVideoSurface (), 0, 0, 0, 0);
 }
