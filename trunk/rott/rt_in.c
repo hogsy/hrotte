@@ -48,6 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_cfg.h"
 //MED
 #include "memcheck.h"
+#include "keyb.h"
 
 #define MAXMESSAGELENGTH      (COM_MAXTEXTSTRINGLENGTH-1)
 
@@ -437,10 +438,11 @@ static int handle_keypad_enter_hack(const SDL_Event *event)
 
 static int sdl_key_filter(const SDL_Event *event)
 {
+	int k;
+    int keyon;
+    int strippedkey;
     SDL_GrabMode grab_mode = SDL_GRAB_OFF;
     int extended;
-    int tmp;
-    int lastkey;
 
     if ( (event->key.keysym.sym == SDLK_g) &&
          (event->key.state == SDL_PRESSED) &&
@@ -467,27 +469,50 @@ static int sdl_key_filter(const SDL_Event *event)
         return(0);
     } /* if */
 
-    lastkey = handle_keypad_enter_hack(event);
-    if (!lastkey)
+    k = handle_keypad_enter_hack(event);
+    if (!k)
     {
-        lastkey = scancodes[event->key.keysym.sym];
-        if (!lastkey)   /* No DOS equivalent defined. */
+        k = scancodes[event->key.keysym.sym];
+        if (!k)   /* No DOS equivalent defined. */
             return(0);
     } /* if */
 
-    extended = ((lastkey & 0xFF00) >> 8);
-    if (extended != 0)
-    {
-        KeyboardQueue[ Keytail ] = extended;
-        Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
-        lastkey = scancodes[event->key.keysym.sym] & 0xFF;
-    } /* if */
-
     if (event->key.state == SDL_RELEASED)
-        lastkey += 128;  /* +128 signifies that the key is released in DOS. */
+        k += 128;  /* +128 signifies that the key is released in DOS. */
 
-    KeyboardQueue[ Keytail ] = lastkey;
-    Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
+    if (event->key.keysym.sym == SDLK_PAUSE)
+        PausePressed = true;
+
+    else if (event->key.keysym.sym == SDLK_SCROLLOCK)
+        PanicPressed = true;
+
+    else
+    {
+        extended = ((k & 0xFF00) >> 8);
+
+        keyon = k & 0x80;
+        strippedkey = k & 0x7f;
+
+        if (extended != 0)
+        {
+            KeyboardQueue[ Keytail ] = extended;
+            Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
+            k = scancodes[event->key.keysym.sym] & 0xFF;
+            if (event->key.state == SDL_RELEASED)
+                k += 128;  /* +128 signifies that the key is released in DOS. */
+        }
+
+        if (keyon)        // Up event
+            Keystate[k&0x7f]=0;
+        else                 // Down event
+        {
+            Keystate[k]=1;
+            LastScan = k;
+        }
+
+        KeyboardQueue[ Keytail ] = k;
+        Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
+    }
 
     return(0);
 } /* sdl_key_filter */
@@ -965,6 +990,7 @@ void IN_Startup (void)
       return;
 
 #if USE_SDL
+// !!! FIXME: use keyb.h ...
     memset(scancodes, '\0', sizeof (scancodes));
     scancodes[SDLK_ESCAPE]          = 0x01;
     scancodes[SDLK_1]               = 0x02;
@@ -1491,6 +1517,8 @@ void IN_UpdateKeyboard (void)
 {
    int tail;
    int key;
+
+   IN_PumpEvents();
 
    if (Keytail != Keyhead)
    {
