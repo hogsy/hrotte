@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "watcom.h"
 #include "engine.h"
 #include "_engine.h"
-#include "rt_eng.h"
 #include "rt_draw.h"
 #include "rt_door.h"
 #include "rt_stat.h"
