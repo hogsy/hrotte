@@ -23,8 +23,43 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // RT_DEF.H Zee big one
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "develop.h"
 #define SAVE_SCREEN  1
+
+#if PLATFORM_UNIX
+#include <unistd.h>
+#include <sys/types.h>
+#include <limits.h>
+#include <dirent.h>
+#endif
+
+
+#if PLATFORM_DOS || PLATFORM_WIN32
+#define PATH_SEP_CHAR '\\'
+#define PATH_SEP_STR  "\\"
+#elif PLATFORM_UNIX
+#define PATH_SEP_CHAR '/'
+#define PATH_SEP_STR  "/"
+#define ROOTDIR       "/"
+#define CURDIR        "./"
+#elif PLATFORM_MACCLASSIC
+#define PATH_SEP_CHAR ':'
+#define PATH_SEP_STR  ":"
+#else
+#error please define your platform.
+#endif
+
+#if (!defined MAX_PATH)
+  #if (defined MAXPATHLEN)
+    #define MAX_PATH MAXPATHLEN
+  #elif (defined PATH_MAX)
+    #define MAX_PATH PATH_MAX
+  #else
+    #define MAX_PATH 256
+  #endif
+#endif
 
 //
 //

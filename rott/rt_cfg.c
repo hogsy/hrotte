@@ -926,6 +926,7 @@ void ReadConfig (void)
 
    GetPathFromEnvironment( filename, ApogeePath, SoundName );
    SetSoundDefaultValues ();
+
    if (access (filename, F_OK) == 0)
       {
       LoadScriptFile (filename);

@@ -80,7 +80,7 @@ static byte *lumpcheck;
 ====================
 */
 
-void W_AddFile (char *filename)
+void W_AddFile (char *_filename)
 {
         wadinfo_t               header;
         lumpinfo_t              *lump_p;
@@ -89,6 +89,10 @@ void W_AddFile (char *filename)
         int                             startlump;
         filelump_t              *fileinfo, singleinfo;
 
+        char filename[MAX_PATH];
+        strncpy(filename, _filename, sizeof (filename));
+        filename[sizeof (filename) - 1] = '\0';
+        FixFilePath(filename);
 //
 // read the entire file in
 //      FIXME: shared opens
@@ -162,6 +166,8 @@ void W_CheckWADIntegrity ( void )
    int crc;
 
    crc = CalculateCRC ((byte *)lumpinfo, numlumps*sizeof(lumpinfo_t) );
+setbuf(stdout, NULL);
+printf("\n\n\ncrc == (%d).\n\n\n", crc);
    if (crc != WADCHECKSUM)
       {
       printf("==============================================================================\n");
