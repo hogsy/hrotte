@@ -82,7 +82,7 @@ typedef struct
 
 #define	ROTTLAUNCHER ("ROTT.EXE")
 
-#if (__WATCOMC__ == 0)
+#if defined(DOS) && (__WATCOMC__ == 0)
 
 extern   rottcom_t   rottcom;
 extern   boolean     pause;

@@ -19,8 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "rt_def.h"
+
+#ifdef DOS
 #include <malloc.h>
 #include <dos.h>
+#endif
+
 #include <string.h>
 #include "sprites.h"
 #include <stdio.h>
@@ -212,6 +216,8 @@ static awallinfo_t animwallsinfo[MAXANIMWALLS] =
 
 int statcount;
 
+void AddRespawnStatic(respawn_t*stat);
+void DoLights (int tilex, int tiley);
 
 void AddToFreeStaticList(statobj_t*stat)
 { if (!firstemptystat)
