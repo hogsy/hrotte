@@ -19,11 +19,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "rt_def.h"
 #include "watcom.h"
+#include <stdio.h>
+#include <string.h>
+
+#ifdef DOS
 #include <malloc.h>
 #include <dos.h>
-#include <stdio.h>
 #include <conio.h>
-#include <string.h>
+#endif
+
 #include "modexlib.h"
 #include "rt_util.h"
 #include "rt_draw.h"
