@@ -5,6 +5,7 @@ all: rott
 
 rott: 	engine.o \
 	rt_actor.o \
+	rt_debug.o \
 	rt_door.o \
 	rt_draw.o \
 	rt_floor.o \
