@@ -2,7 +2,7 @@ CFLAGS=-g
 
 all: rott
 
-rott: engine.o
+rott: engine.o w_wad.o
 
 clean:
 	rm *.o

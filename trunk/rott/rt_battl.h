@@ -73,7 +73,7 @@ typedef enum
 // Battle modes
 //
 
-typedef enum
+enum
    {
    battle_StandAloneGame,
    battle_Normal,
@@ -92,7 +92,7 @@ typedef enum
 // Battle mode option : Gravity
 //
 
-//typedef enum
+//enum
 //   {
 //   bo_low_gravity,
 //   bo_normal_gravity,
@@ -103,7 +103,7 @@ typedef enum
 // Battle mode option : Speed
 //
 
-typedef enum
+enum
    {
    bo_normal_speed,
    bo_fast_speed
@@ -113,7 +113,7 @@ typedef enum
 // Battle mode option : Ammo
 //
 
-typedef enum
+enum
    {
    bo_one_shot,
    bo_normal_shots,
@@ -131,7 +131,7 @@ typedef enum
 // Battle mode option : Light levels
 //
 
-typedef enum
+enum
    {
    bo_light_dark,
    bo_light_normal,
@@ -145,7 +145,7 @@ typedef enum
 // Battle mode option : Number of kills
 //
 
-typedef enum
+enum
    {
    bo_kills_random   = -2,
    bo_kills_blind    = -1,
@@ -157,7 +157,7 @@ typedef enum
 // Battle mode option : Environment danger damage
 //
 
-typedef enum
+enum
    {
    bo_danger_normal = -1,
    bo_danger_low    = 1,

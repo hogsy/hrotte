@@ -46,6 +46,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LONG(a) ((int)a)
 #define M_PI            3.14159
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 //***************************************************************************
 //
 //    Screen Constants

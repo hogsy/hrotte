@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rottnet.h"
 #include "rt_battl.h"
 
-typedef enum
+enum
 {vl_low,
  vl_medium,
  vl_high,

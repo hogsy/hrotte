@@ -20,12 +20,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // W_wad.c
 
 #include <stdio.h>
-#include <conio.h>
 #include <string.h>
 #include <malloc.h>
-#include <io.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+
+#ifdef DOS
+#include <conio.h>
+#include <io.h>
+#endif
+
 #include "rt_def.h"
 #include "rt_util.h"
 #include "_w_wad.h"
@@ -162,7 +166,7 @@ void W_AddFile (char *filename)
 //
 // Fill in lumpinfo
 //
-        Z_Realloc(&lumpinfo,numlumps*sizeof(lumpinfo_t));
+        Z_Realloc((void **)&lumpinfo,numlumps*sizeof(lumpinfo_t));
 //        lumpinfo = realloc (lumpinfo, numlumps*sizeof(lumpinfo_t));
 //        if (!lumpinfo)
 //           Error("W_AddFile: Could not realloc %ld bytes",numlumps*sizeof(lumpinfo_t));
