@@ -166,8 +166,11 @@ statinfo stats[NUMSTATS] =
 {16,TOMLARVA1,stat_tomlarva,FL_ACTIVE|FL_SHOOTABLE|FL_BLOCK,2,4,150},
 {0,BULLETHOLE,stat_bullethole,FL_TRANSLUCENT},
 //MED
-//{0,COLLECTOR1,stat_collector,FL_ACTIVE|FL_BONUS,2,8,-1},
+#if (SHAREWARE == 1)
+{0,COLLECTOR1,stat_collector,FL_ACTIVE|FL_BONUS,2,8,-1},
+#else
 {0,DOPE1,stat_collector,FL_ACTIVE|FL_BONUS,2,8,-1},
+#endif
 {0,SPR_MINE1,stat_mine,FL_BONUS|FL_SHOOTABLE|FL_RESPAWN,0,0,10},
 {0,MISSMOKE1,stat_missmoke,FL_ACTIVE,6,4},
 {0,PLATFORM1,stat_disk,FL_BLOCK|FL_HEIGHTFLIPPABLE},

@@ -910,7 +910,7 @@ statetype s_guts2 = {false,GUTS2,3,T_Collide,SF_GUTS,&s_guts3};
 statetype s_guts1 = {false,GUTS1,3,T_Collide,SF_GUTS,&s_guts2};
 
 //MED
-/*
+#if (SHAREWARE == 1)
 statetype s_collectorwander8 = {false,COLLECTOR15,0,T_CollectorWander,0,&s_collectorwander1};
 statetype s_collectorwander7 = {false,COLLECTOR13,1,T_CollectorWander,0,&s_collectorwander8};
 statetype s_collectorwander6 = {false,COLLECTOR11,0,T_CollectorWander,0,&s_collectorwander7};
@@ -919,7 +919,7 @@ statetype s_collectorwander4 = {false,COLLECTOR7,0,T_CollectorWander,0,&s_collec
 statetype s_collectorwander3 = {false,COLLECTOR5,1,T_CollectorWander,0,&s_collectorwander4};
 statetype s_collectorwander2 = {false,COLLECTOR3,0,T_CollectorWander,0,&s_collectorwander3};
 statetype s_collectorwander1 = {false,COLLECTOR1,1,T_CollectorWander,0,&s_collectorwander2};
-*/
+#else
 
 statetype s_collectorwander8 = {false,DOPE8,2,T_CollectorWander,0,&s_collectorwander1};
 statetype s_collectorwander7 = {false,DOPE7,2,T_CollectorWander,0,&s_collectorwander8};
@@ -929,10 +929,11 @@ statetype s_collectorwander4 = {false,DOPE4,2,T_CollectorWander,0,&s_collectorwa
 statetype s_collectorwander3 = {false,DOPE3,2,T_CollectorWander,0,&s_collectorwander4};
 statetype s_collectorwander2 = {false,DOPE2,2,T_CollectorWander,0,&s_collectorwander3};
 statetype s_collectorwander1 = {false,DOPE1,2,T_CollectorWander,0,&s_collectorwander2};
+#endif
 
 
 //MED
-/*
+#if (SHAREWARE == 1)
 statetype s_collectorfdoor8 = {false,COLLECTOR15,0,T_CollectorFindDoor,0,&s_collectorfdoor1};
 statetype s_collectorfdoor7 = {false,COLLECTOR13,1,T_CollectorFindDoor,0,&s_collectorfdoor8};
 statetype s_collectorfdoor6 = {false,COLLECTOR11,0,T_CollectorFindDoor,0,&s_collectorfdoor7};
@@ -941,7 +942,7 @@ statetype s_collectorfdoor4 = {false,COLLECTOR7,0,T_CollectorFindDoor,0,&s_colle
 statetype s_collectorfdoor3 = {false,COLLECTOR5,1,T_CollectorFindDoor,0,&s_collectorfdoor4};
 statetype s_collectorfdoor2 = {false,COLLECTOR3,0,T_CollectorFindDoor,0,&s_collectorfdoor3};
 statetype s_collectorfdoor1 = {false,COLLECTOR1,1,T_CollectorFindDoor,0,&s_collectorfdoor2};
-*/
+#else
 
 statetype s_collectorfdoor8 = {false,DOPE8,2,T_CollectorFindDoor,0,&s_collectorfdoor1};
 statetype s_collectorfdoor7 = {false,DOPE7,2,T_CollectorFindDoor,0,&s_collectorfdoor8};
@@ -952,6 +953,7 @@ statetype s_collectorfdoor3 = {false,DOPE3,2,T_CollectorFindDoor,0,&s_collectorf
 statetype s_collectorfdoor2 = {false,DOPE2,2,T_CollectorFindDoor,0,&s_collectorfdoor3};
 statetype s_collectorfdoor1 = {false,DOPE1,2,T_CollectorFindDoor,0,&s_collectorfdoor2};
 
+#endif
 
 statetype s_timekeeper = {false,NOTHING,140,T_End,0,NULL};
 
