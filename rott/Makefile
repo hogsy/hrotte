@@ -41,6 +41,7 @@ rott: 	\
 	rt_stat.o \
 	rt_state.o \
 	rt_str.o \
+	rt_swift.o \
 	rt_ted.o \
 	rt_util.o \
 	rt_vh_a.o \

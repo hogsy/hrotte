@@ -30,13 +30,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef DOS
 #include <dos.h>
+#endif
+
 #include "rt_def.h"
 #include "rt_swift.h"
 #include "_rt_swft.h"
 //MED
 #include "memcheck.h"
 
+
+#ifdef DOS
 
 //****************************************************************************
 //
@@ -387,3 +393,38 @@ void far *allocDOS (unsigned nbytes, short *pseg, short *psel)
    }
    return pprot;
 }
+
+#else
+
+/* This isn't of much use in Linux. */
+
+int SWIFT_Initialize (void)
+{
+	STUB_FUNCTION;
+	
+	return 0;
+}
+
+void SWIFT_Terminate (void)
+{
+	STUB_FUNCTION;
+}
+
+void SWIFT_Get3DStatus (SWIFT_3DStatus far *pstat)
+{
+	STUB_FUNCTION;
+}
+
+void SWIFT_TactileFeedback (int d, int on, int off)
+{
+	STUB_FUNCTION;
+}
+
+unsigned SWIFT_GetDynamicDeviceData (void)
+{
+	STUB_FUNCTION;
+	
+	return 0;
+}
+
+#endif
