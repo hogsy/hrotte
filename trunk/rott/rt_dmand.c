@@ -17,7 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
+#ifdef DOS
 #include <mem.h>
+#endif
+
 #include "rt_def.h"
 #include "rt_util.h"
 #include "rt_sound.h"
@@ -112,7 +116,7 @@ void SD_StartIncomingSound ( void )
    Playingvoice = FX_StartDemandFeedPlayback ( SD_UpdatePlaybackSound,
                   RECORDINGSAMPLERATE,
                   0, 255, 255, 255, 255, -1);
-   if (Playingvoice==NULL)
+   if (Playingvoice==0)
       {
       SafeFree(PlaybackBuffer);
       Playback=false;

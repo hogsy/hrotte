@@ -17,13 +17,17 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
+#ifdef DOS
 #include <malloc.h>
 #include <dos.h>
+#include <io.h>
+#include <conio.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <io.h>
-#include <conio.h>
 #include <string.h>
 #include "cin_glob.h"
 #include "scriplib.h"
@@ -235,67 +239,3 @@ void PlayMovie ( char * name, boolean uselumpy )
 
    ShutdownCinematic ();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

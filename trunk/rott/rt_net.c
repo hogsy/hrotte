@@ -17,12 +17,16 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include <dos.h>
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <io.h>
 #include <fcntl.h>
+
+#ifdef DOS
+#include <dos.h>
+#include <io.h>
+#endif
 
 #include "rt_def.h"
 #include "rt_main.h"
@@ -117,6 +121,14 @@ static PlayerStatus[MAXPLAYERS];
 static int controldivisor=1;
 static int nextupdatetime;
 static boolean UpdateServer=true;
+
+void CheckForPacket ( void );
+void PrepareLocalPacket ( void );
+void SendSyncCheckPacket ( void );
+void AddModemSubPacket(void * incoming);
+void SetPlayerDescription( void * pkt );
+void UpdateDemoPlayback (int time);
+
 /*
 =============================================================================
 
@@ -1111,7 +1123,7 @@ int GetServerPacketSize (void * pkt)
          {
          ptr+=GetPacketSize(ptr);
          }
-      return (ptr-pkt);
+      return ((byte *)ptr-(byte *)pkt);
       }
    else
       return GetPacketSize(pkt);
@@ -3113,7 +3125,7 @@ void LoadDemo (int demonumber)
    GetDemoFilename (demonumber, demo);
    if (demobuffer!=NULL)
       FreeDemo();
-   size = LoadFile (demo, &demobuffer);
+   size = LoadFile (demo, (void **)&demobuffer);
    playstate = ex_demoplayback;
    demoptr = demobuffer;
    lastdemoptr = (demoptr+size);
