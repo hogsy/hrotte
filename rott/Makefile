@@ -46,7 +46,6 @@ rott: 	\
 	rt_swift.o \
 	rt_ted.o \
 	rt_util.o \
-	rt_vh_a.o \
 	rt_view.o \
 	rt_vid.o \
 	rt_err.o \
