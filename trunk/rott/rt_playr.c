@@ -2129,17 +2129,9 @@ int sensitivity_scalar[15] =
 
 void PollMouseMove (void)
 {
-#ifdef DOS
-   union REGS inregs;
-   union REGS outregs;
-   short int  mousexmove,
-              mouseymove;
+   int  mousexmove, mouseymove;
 
-   inregs.x.eax = MDelta;
-   int386 (0x33, &inregs, &outregs);
-
-   mousexmove = outregs.w.cx;
-	mouseymove = outregs.w.dx;
+   INL_GetMouseDelta(&mousexmove, &mouseymove);
 
    if (abs(mousexmove)>abs(mouseymove))
       mouseymove/=2;
@@ -2175,9 +2167,6 @@ void PollMouseMove (void)
 
 //   if (MY > 0)
 //      MX -= (MX/2);
-#else
-	STUB_FUNCTION;
-#endif
 }
 
 

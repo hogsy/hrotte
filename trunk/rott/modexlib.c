@@ -407,11 +407,13 @@ static SDL_Surface *sdl_backbuf = NULL;
 
 void GraphicsMode ( void )
 {
-	if (SDL_InitSubSystem (SDL_INIT_VIDEO)<0)
+	if (SDL_InitSubSystem (SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
 		Error ("Could not initialize SDL");
 	}
 
+    SDL_WM_SetCaption ("Rise of the Triad", "ROTT");
+    SDL_ShowCursor (0);
 	sdl_surface = SDL_SetVideoMode (320, 200, 8, 0);
 	if (sdl_surface == NULL)
 	{
