@@ -11,6 +11,12 @@
 #cygwin := false
 cygwin := autodetect
 
+# you only need to set these for Cygwin at the moment.
+SDL_INC_DIR = /cygdrive/c/SDL/include
+SDL_LIB_DIR = /cygdrive/c/SDL/lib
+
+
+# Don't touch anything below this line unless you know what you're doing.
 
 ifeq ($(strip $(cygwin)),autodetect)
   ifneq ($(strip $(shell gcc -v 2>&1 |grep "cygwin")),)
@@ -22,9 +28,6 @@ endif
 
 
 ifeq ($(strip $(cygwin)),true)
-  # (no choice on Cygwin right now...)
-  usedlls := false
-
   ifeq ($(strip $(SDL_INC_DIR)),please_set_me_cygwin_users)
     $(error Cygwin users need to set the SDL_INC_DIR envr var.)
   else
