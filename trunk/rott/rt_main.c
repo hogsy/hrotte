@@ -426,8 +426,11 @@ void DrawRottTitle ( void )
          strcat (title,itoa(ROTTMAJORVERSION,&buf[0],10));
          strcat (title,".");
 //MED
-//         strcat (title,itoa(ROTTMINORVERSION,&buf[0],10));
+#if (SHAREWARE==1)||(DOPEFISH==0)
+         strcat (title,itoa(ROTTMINORVERSION,&buf[0],10));
+#else
          strcat (title,"DFISH");
+#endif
 
          px=(80-strlen(title))>>1;
          py=0;
