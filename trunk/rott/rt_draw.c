@@ -2796,6 +2796,7 @@ void      ThreeDRefresh (void)
 
 void FlipPage ( void )
 {
+#ifdef DOS
    unsigned displaytemp;
 
    whereami=22;
@@ -2837,6 +2838,22 @@ void FlipPage ( void )
    bufferofs += screensize;
    if (bufferofs > page3start)
       bufferofs = page1start;
+#else
+
+   whereami=22;
+
+   if ( ( SHAKETICS != 0xFFFF ) && ( !inmenu ) && ( !GamePaused ) &&
+      ( !fizzlein ) )
+      {
+      ScreenShake ();
+      }
+      
+      /* TODO some shake thing */
+      
+      /* just call the one in modexlib.c */
+      XFlipPage();
+      
+#endif
 }
 
 
@@ -5595,9 +5612,33 @@ void DrawRow(int count, byte * dest, byte * src)
 	STUB_FUNCTION;
 }
 
+#define CEILINGCOLOR 24
+#define FLOORCOLOR 32
+
 void RefreshClear (void)
 {
-	STUB_FUNCTION;
+	int start, base;
+	
+	memset(spotvis, 0, sizeof(spotvis));
+	
+	if (fandc) {
+		return;
+	}
+	
+	start = min(centery, viewheight);
+	
+	if (start > 0) {
+		VL_Bar(0, 0, MAXSCREENWIDTH, start, CEILINGCOLOR);
+	} else {
+		start = 0;
+	}
+	
+	base = start;
+	
+	start = min(viewheight-start, viewheight);
+	if (start > 0) {
+		VL_Bar(0, base, MAXSCREENWIDTH, start, CEILINGCOLOR);
+	}
 }
 
 #endif
