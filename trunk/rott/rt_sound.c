@@ -1153,6 +1153,9 @@ int MU_GetNumForType ( int type )
 
 void MU_PlaySong ( int num )
 {
+   int lump;
+   int size;
+   
    if (MU_Started==false)
       return;
 
@@ -1166,11 +1169,16 @@ void MU_PlaySong ( int num )
 
    lastsongnumber=num;
 
-   currentsong=W_CacheLumpName(rottsongs[num].lumpname,PU_STATIC, CvtFixme, 1);
+   lump = W_GetNumForName(rottsongs[num].lumpname);
+   size = W_LumpLength(lump);
+   
+   currentsong=W_CacheLumpNum(lump,PU_STATIC, CvtFixme, 1);
+ 
    if (rottsongs[num].loopflag == loop_yes)
-      MUSIC_PlaySong(currentsong,MUSIC_LoopSong);
+      MUSIC_PlaySongROTT(currentsong,size,MUSIC_LoopSong);
    else
-      MUSIC_PlaySong(currentsong,MUSIC_PlayOnce);
+      MUSIC_PlaySongROTT(currentsong,size,MUSIC_PlayOnce);
+
    MU_SetVolume (MUvolume);
 }
 
