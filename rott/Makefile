@@ -16,6 +16,7 @@ rott: 	engine.o \
 	rt_playr.o \
 	rt_rand.o \
 	rt_scale.o \
+	rt_sound.o \
 	rt_stat.o \
 	rt_state.o \
 	rt_str.o \
