@@ -408,7 +408,7 @@ void     T_Roll(objtype*);
 void     T_BossDied (objtype *ob);
 boolean  QuickSpaceCheck(objtype*,int,int);
 void     PushWallMove(int num);
-void     SpawnNewObj(int,int,statetype*,classtype);
+void     SpawnNewObj(unsigned,unsigned,statetype*,classtype);
 void     SpawnSpring(int,int);
 void     SpawnFourWayGun(int,int);
 void     SpawnSnake(int tilex,int tiley);

@@ -420,8 +420,13 @@ static statetype * UPDATE_STATES[NUMSTATES][NUMENEMIES] =
 
 
 void T_Reset(objtype*ob);
-
-
+void ApplyGravity(objtype *ob);
+void BeginEnemyHurt(objtype *ob);
+void T_PlayDead(objtype *ob);
+void SpawnFirewall(objtype*ob,int which,int newz);
+void SelectKristChaseDir(objtype*ob);
+void ExplodeStatic(statobj_t*tempstat);
+void AvoidPlayerMissile(objtype*ob);
 
 static int     STOPSPEED         =    0x200;
 static int     PLAYERFRICTION    =    0xe000;
@@ -7837,7 +7842,7 @@ void T_BoulderMove(objtype*ob)
 //***************************** Esau ************************************
 
 
-static enum {
+enum {
   ESAU_USING_HOLES=1,
   ESAU_LEAVING_CONTROL_ROOM,
   ESAU_USING_TOUCH_PEDASTALS,
