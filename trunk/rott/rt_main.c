@@ -153,7 +153,7 @@ void CheckRemoteRidicule ( int scancode );
 extern void crash_print (int);
 #endif
 
-#if (PLATFORM_MACOSX == 1)
+#if defined(PLATFORM_MACOSX)
 int SDL_main(int argc, char *argv[])
 #else
 int main (int argc, char *argv[])

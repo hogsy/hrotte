@@ -838,7 +838,6 @@ void ScaleWeapon (int xoff, int y, int shapenum)
 	int    startx;
    int    plane;
 
-
    whereami=35;
    SetPlayerLightLevel();
    shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_patch_t, 1);
@@ -924,8 +923,7 @@ void DrawUnScaledSprite (int x, int y, int shapenum, int shade)
    int    startfrac;
    int    startx;
 	int    plane;
-
-
+        
    whereami=36;
    shadingtable=colormap+(shade<<8);
    centeryclipped=y;
@@ -1028,12 +1026,11 @@ void DrawPositionedScaledSprite (int x, int y, int shapenum, int height, int typ
 	int    plane;
 	int    size;
 
-
    whereami=38;
    shadingtable=colormap+(1<<12);
 	centeryclipped=y;
 	xcent=x;
-	shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_patch_t, 1);
+	shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_transpatch_t, 1);
 	p=(patch_t *)shape;
 	tp=(transpatch_t *)shape;
 
@@ -1257,7 +1254,6 @@ void DrawNormalPost (byte * src, byte * buf)
 
    whereami=40;
 
-   // Debug("DrawNormalPost: src %p, buf %p\n");
    while (1)
       {
       offset=*(src++);
@@ -1265,10 +1261,16 @@ void DrawNormalPost (byte * src, byte * buf)
          return;
       else
          {
-         length=*(src++);
-         for (s=0;s<length;s++)
-            *(buf+ylookup[offset+s])=*(src+s);
-         src+=length;
+            length=*(src++);
+            for (s=0;s<length;s++) {
+                // Spaced out a little for tracking a bug. Should be equivalent.
+                byte *saddr = src+s;
+                byte *daddr = buf + ylookup[offset + s];
+                byte val = *saddr;
+                *daddr = val;
+//                *(buf+ylookup[offset+s])=*(src+s);
+            }
+            src+=length;
          }
       }
 }
