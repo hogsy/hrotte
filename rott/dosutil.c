@@ -178,6 +178,15 @@ void print_stack (int level)
 	printf ("}\n");
 }
 
+void crash_print (int sig)
+{
+	printf ("OH NO OH NO ROTT CRASHED!\n");
+	printf ("Here is where:\n");
+	print_stack (1);
+	SDL_Quit ();
+	exit (1);
+}
+
 #if 0
 /* ** */
 
