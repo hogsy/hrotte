@@ -375,7 +375,6 @@ int SD_PlayIt ( int sndnum, int angle, int distance, int pitch )
 
    snd=W_CacheLumpNum(SoundNumber(sndnum),PU_STATIC, CvtNull, 1);
 
-#ifdef DOS
    if ( *snd == 'C' )
       {
       voice = FX_PlayVOC3D( snd, pitch, angle, distance,
@@ -386,24 +385,6 @@ int SD_PlayIt ( int sndnum, int angle, int distance, int pitch )
       voice = FX_PlayWAV3D( snd, pitch, angle, distance,
          sounds[sndnum].priority, (unsigned long) sndnum );
       }
-#else
-/* 
-   Oh boy.  The library used to implement these functions may need a 
-   file size.  So, let's just hack these in!
- */
-   if ( *snd == 'C' )
-      {
-      voice = FX_PlayVOC3D_ROTT( snd, W_LumpLength(SoundNumber(sndnum)),
-         pitch, angle, distance,
-         sounds[sndnum].priority, (unsigned long) sndnum );
-      }
-   else
-      {
-      voice = FX_PlayWAV3D_ROTT( snd, W_LumpLength(SoundNumber(sndnum)),
-         pitch, angle, distance,
-         sounds[sndnum].priority, (unsigned long) sndnum );
-      }
-#endif
 
    if ( voice < FX_Ok )
       {
