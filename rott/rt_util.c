@@ -1850,9 +1850,15 @@ boolean UL_ChangeDirectory (char *path)
 
    return (true);
 #else
-	STUB_FUNCTION;
+	if (!*path) {
+		return true;
+	}
 	
-	return false;
+	if (chdir (path) == -1) {
+	         return (false);
+	}
+	
+	return true;
 #endif
 }
 
