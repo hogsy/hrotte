@@ -5682,7 +5682,13 @@ void  DrawMenuPost (int height, byte * src, byte * buf)
 
 void  DrawMapPost (int height, byte * src, byte * buf)
 {
-	STUB_FUNCTION;
+	int frac = 0;
+	while (height--) {
+		*buf = src[frac >> 16];
+		
+		buf += linewidth;
+		frac += hp_srcstep;
+	}
 }
 
 void DrawRotRow(int count, byte * dest, byte * src)
