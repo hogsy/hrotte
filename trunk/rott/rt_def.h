@@ -116,9 +116,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     #define strcmpi(x, y) stricmp(x, y)
     #define _fstricmp(x, y) stricmp(x, y)
   #elif PLATFORM_UNIX
-    #define strcmpi(x, y) strcasecmp(x, y)
-    #define stricmp(x, y) strcasecmp(x, y)
-    #define _fstricmp(x, y) strcasecmp(x, y)
+    #ifndef strcmpi
+      #define strcmpi(x, y) strcasecmp(x, y)
+    #endif
+
+    #ifndef stricmp
+      #define stricmp(x, y) strcasecmp(x, y)
+    #endif
+
+    #ifndef _fstricmp
+      #define _fstricmp(x, y) strcasecmp(x, y)
+    #endif
+
     char *strupr(char *);
     char *itoa(int, char *, int);
     char *ltoa(long, char *, int);
