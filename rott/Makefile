@@ -5,7 +5,6 @@ LDLIBS = $(shell sdl-config --libs) -lSDL_mixer -Wl,-E
 all: rott
 
 rott: 	\
-        byteordr.o \
 	cin_actr.o \
 	cin_efct.o \
 	cin_evnt.o \
@@ -54,7 +53,8 @@ rott: 	\
 	scriplib.o \
 	w_wad.o \
 	watcom.o \
-	z_zone.o
+	z_zone.o \
+        byteordr.o
 	$(CC) $^ $(LDLIBS) -o $@
 
 clean:

@@ -397,7 +397,6 @@ void W_ReadLump (int lump, void *dest)
 
         readinglump=lump;
         lumpdest=dest;
-        printf("DANGER WILL ROBINSON: W_ReadLump(%i,%p), expect endianness headaches\n", lump, dest);
         if (lump >= numlumps)
                 Error ("W_ReadLump: %i >= numlumps",lump);
         if (lump < 0)
@@ -425,8 +424,6 @@ void W_WriteLump (int lump, void *src)
 {
    int        c;
    lumpinfo_t *l;
-
-   printf("DANGER WILL ROBINSON: W_WriteLump(%i,%p), expect endianness headaches\n", lump, src);
 
    if (lump >= numlumps)
       Error ("W_WriteLump: %i >= numlumps",lump);
