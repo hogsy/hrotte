@@ -37,6 +37,7 @@ rott: 	\
 	rt_rand.o \
 	rt_scale.o \
 	rt_sound.o \
+	rt_spbal.o \
 	rt_sqrt.o \
 	rt_stat.o \
 	rt_state.o \

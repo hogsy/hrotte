@@ -23,8 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_draw.h"
 #include "rt_playr.h"
 #include "isr.h"
-#include "mem.h"
-#include "stdlib.h"
+#include <stdlib.h>
 #include "rt_spbal.h"
 #include "_rt_spba.h"
 #include "sbconfig.h"
@@ -48,13 +47,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "version.h"
 #include "scriplib.h"
 #include <stdlib.h>
+
+#ifdef DOS
 #include <conio.h>
 #include <io.h>
 #include <fcntl.h>
 #include <dos.h>
+#include <mem.h>
+#endif
 //MED
 #include "memcheck.h"
 
+#ifdef DOS
 /* This file and associated .h files and Spaceball libraries:
    Copyright 1995 Spacetec IMC Corporation
 */
@@ -466,10 +470,38 @@ void CloseSpaceBall (void)
 // GetSpaceBallButtons ()
 //
 //******************************************************************************
-
+ 
 unsigned GetSpaceBallButtons (void)
 {
    SpwRawData sp;
 
    return ((SpwSimpleGet(0,&sp) & SPW_BUTTON_DOWN));
 }
+
+#else
+
+/* This isn't of much use in Linux. */
+
+void PollSpaceBall (void)
+{
+	STUB_FUNCTION;
+}
+
+void OpenSpaceBall (void)
+{
+	STUB_FUNCTION;
+}
+
+void CloseSpaceBall (void)
+{
+	STUB_FUNCTION;
+}
+
+unsigned GetSpaceBallButtons (void)
+{
+	STUB_FUNCTION;
+	
+	return 0;
+}
+
+#endif
