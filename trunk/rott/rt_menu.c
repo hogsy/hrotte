@@ -29,13 +29,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdarg.h>
 #include <fcntl.h>
-#include <conio.h>
 #include <string.h>
 #include <ctype.h>
+
+#ifdef DOS
+#include <conio.h>
 #include <dos.h>
 #include <io.h>
-#include <sys\types.h>
-#include <sys\stat.h>
+#endif
+
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "rt_def.h"
 #include "_rt_menu.h"
@@ -1196,6 +1200,29 @@ static char SaveName[ 13 ] = "ROTTGAM?.ROT\0";
 static byte *savedscreen;
 static mapfileinfo_t * mapinfo;
 
+void HideCursor
+   (
+   CP_iteminfo *item_i,
+   CP_itemtype *items,
+   int x,
+   int y,
+   int which
+   );
+void ShowCursor
+   (
+   CP_iteminfo *item_i,
+   CP_itemtype *items,
+   int x,
+   int *y,
+   int which,
+   int basey
+   );
+void CP_DrawSelectedGame (int w);
+void DrawStoredGame ( byte * pic, int episode, int area );
+void DrawCustomKeyboard (void);
+void DrawBattleModeName( int which );
+void DrawBattleModeDescription( int w );
+void DrawSoundSetupMainMenu( void );
 
 //******************************************************************************
 //
@@ -1473,6 +1500,7 @@ int getASCII ( void )
 
 void ScanForSavedGames ()
 {
+#ifdef DOS
    struct find_t f;
    char filename[128];
    char str[45];
@@ -1508,6 +1536,9 @@ void ScanForSavedGames ()
       }
       else
          MainMenu[loadgame].active = CP_Inactive;
+#else
+	STUB_FUNCTION;
+#endif
 }
 
 
@@ -3412,7 +3443,7 @@ void QuickSaveGame (void)
    loadname[8]='.';
 
    GetPathFromEnvironment( filename, ApogeePath, loadname );
-   length=LoadFile(filename,&buf);
+   length=LoadFile(filename,(void **)&buf);
    GetPathFromEnvironment( filename, ApogeePath, QUICKSAVEBACKUP );
    SaveFile(filename,buf,length);
    SafeFree(buf);
@@ -3434,7 +3465,7 @@ void QuickSaveGame (void)
       game.episode = gamestate.episode;
       game.area    = gamestate.mapon;
       game.version = ROTTVERSION;
-      strcpy (&game.message, &SaveGameNames[which][0]);
+      strcpy (game.message, &SaveGameNames[which][0]);
 
       if (SaveTheGame (which, &game) == true)
          {
@@ -3476,7 +3507,7 @@ void UndoQuickSaveGame (void)
       itoa(quicksaveslot,&loadname[7],16);
       loadname[8]='.';
       GetPathFromEnvironment( filename, ApogeePath, QUICKSAVEBACKUP );
-      length=LoadFile(filename,&buf);
+      length=LoadFile(filename,(void **)&buf);
       GetPathFromEnvironment( filename, ApogeePath, loadname );
       SaveFile(filename,buf,length);
       SafeFree(buf);
@@ -3546,7 +3577,7 @@ int CP_SaveGame ( void )
             game.episode=gamestate.episode;
             game.area=gamestate.mapon;
             game.version=ROTTVERSION;
-            strcpy (&game.message, input);
+            strcpy (game.message, input);
             strcpy (&SaveGameNames[which][0], input);
 
             if (SaveTheGame(which,&game)==true)
@@ -4733,6 +4764,7 @@ void WaitKeyUp (void)
 
 void ReadAnyControl (ControlInfo *ci)
 {
+#ifdef DOS
    union REGS inregs;
    union REGS outregs;
    int mouseactive = 0;
@@ -4887,6 +4919,9 @@ void ReadAnyControl (ControlInfo *ci)
          if (packet.tx > (MENU_AMT * 6))
             ci->dir = dir_East;
    }
+#endif
+#else
+	STUB_FUNCTION;
 #endif
 }
 
@@ -8038,7 +8073,7 @@ void ShowBattleOptions
       }
    ShowBattleOption( inmenu, PosX, PosY, 0, 9, "Danger Damage", string );
 
-   GetMapFileName ( &text );
+   GetMapFileName ( text );
    ShowBattleOption( inmenu, PosX, PosY, 0, 10, "Filename", text );
 
    itoa( numplayers, text, 10 );

@@ -178,7 +178,7 @@ void DoMainMenu (void);
 boolean CP_CheckQuick (byte scancode);
 void AdjustMenuStruct (void);
 void MenuFixup (void);
-int GetEpisode (int level);
+void GetEpisode (int level);
 void MN_PlayMenuSnd (int which);
 void CP_ViewScores (void);
 void ReadAnyControl (ControlInfo *ci);
