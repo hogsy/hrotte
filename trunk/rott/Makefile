@@ -10,6 +10,7 @@ rott: 	\
 	cin_glob.o \
 	cin_main.o \
 	cin_util.o \
+	dosutil.o \
 	engine.o \
 	rt_actor.o \
 	rt_battl.o \
