@@ -52,6 +52,9 @@ LDLIBS = $(SDL_LDFLAGS) -lSDL -lSDL_mixer $(EXTRALDFLAGS) -Wl,-E
 
 all: rott
 
+audiolib/audiolib.a:
+	$(MAKE) -C audiolib CC="$(CC)" CFLAGS="$(CFLAGS)" LDLIBS="$(LDLIBS)"
+
 rott: 	\
 	cin_actr.o \
 	cin_efct.o \
@@ -61,7 +64,6 @@ rott: 	\
 	cin_util.o \
 	dosutil.o \
 	engine.o \
-	fx_man.o \
 	isr.o \
 	modexlib.o \
 	rt_actor.o \
@@ -101,11 +103,15 @@ rott: 	\
 	w_wad.o \
 	watcom.o \
 	z_zone.o \
-	byteordr.o
+	byteordr.o \
+	dukemusc.o \
+	audiolib/audiolib.a
 	$(CC) $^ $(LDLIBS) -o $@
 
 clean:
-	rm -rf *.o
+	$(MAKE) -C audiolib clean
+	rm -rf rott *.o
 
 distclean: clean
+	$(MAKE) -C audiolib distclean
 	rm -rf *~
