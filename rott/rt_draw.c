@@ -5814,7 +5814,7 @@ void RefreshClear (void)
 	
 	start = min(viewheight-start, viewheight);
 	if (start > 0) {
-		VL_Bar(0, base, MAXSCREENWIDTH, start, CEILINGCOLOR);
+		VL_Bar(0, base, MAXSCREENWIDTH, start, FLOORCOLOR);
 	}
 }
 
