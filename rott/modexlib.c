@@ -403,6 +403,7 @@ void XFlipPage ( void )
 ====================
 */
 static SDL_Surface *sdl_surface = NULL;
+static SDL_Surface *sdl_backbuf = NULL;
 
 void GraphicsMode ( void )
 {
