@@ -830,8 +830,13 @@ void FixFilePath(char *filename)
                 continue;  /* absolute path; skip to next one. */
 
             *ptr = '\0';
-            if (lastsep == filename)
+            if (lastsep == filename) {
                 dir = opendir((*lastsep == PATH_SEP_CHAR) ? ROOTDIR : CURDIR);
+                
+                if (*lastsep == PATH_SEP_CHAR) {
+                    lastsep++;
+                }
+            } 
             else
             {
                 *lastsep = '\0';
