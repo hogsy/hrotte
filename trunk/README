@@ -4,7 +4,7 @@ ROTT Port README
 
 This is a port of Apogee's 3D action title Rise of the Triad, originally
 released in 1994.  This port duplicates the functionality of the original
-game on modern operating systems, including Linux, Win32, and OSX.
+game on modern operating systems, including Linux, Win32, and Mac OS X.
 
 This port makes use of the Simple Direct Media Layer, or SDL, and an additional
 library named SDL_mixer.  If you do not have these libraries installed, check
@@ -19,7 +19,7 @@ This software is not supported by 3D Realms, Apogee, or the porters.
 For reference, the primary contributors to this port are:
 
 Steven Fuller
-Ryan Gordon
+Ryan C. Gordon
 John Hall
 Dan Olson
 
