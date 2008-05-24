@@ -444,6 +444,18 @@ typedef enum    {
 		  ex_battledone
 } exit_t;
 
+// Types for cache lumps (for endian converters)
+enum    {
+	cache_other,
+	cache_pic_t,
+	cache_lpic_t,
+	cache_font_t,
+	cache_lbm_t,
+	cache_patch_t,
+	cache_transpatch_t,
+	cache_cfont_t
+};
+
 ////////////////////////////////////////////////////////////////////////////
 
 /////////////////      GLOBAL STRUCTURE TYPES     //////////////////////////

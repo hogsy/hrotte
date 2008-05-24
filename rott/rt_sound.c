@@ -66,6 +66,7 @@ static int NumBadSounds=0;
 static int remotestart;
 static boolean SoundsRemapped = false;
 
+#ifdef DOS
 int musicnums[ 11 ] = {
    -1, UltraSound, SoundBlaster, SoundMan16, ProAudioSpectrum,
    Awe32, SoundScape, WaveBlaster, GenMidi, SoundCanvas, Adlib
@@ -75,8 +76,19 @@ int fxnums[ 11 ] = {
    -1, UltraSound, SoundBlaster, SoundMan16, ProAudioSpectrum,
    Awe32, SoundScape, Adlib, SoundSource, TandySoundSource, PC
    };
+#else
+int musicnums[ 11 ] = {
+   -1, -1, -1, -1, -1, -1, SoundScape, -1, -1, -1, -1
+   };
 
+int fxnums[ 11 ] = {
+   -1, -1, -1, -1, -1, -1, SoundScape, -1, -1, -1, -1
+   };
+#endif
+
+#if 0
 void MU_SetupGUSInitFile( void );
+#endif
 
 int MUSIC_GetPosition( void ) {
    songposition pos;
@@ -127,7 +139,7 @@ void SD_MakeCacheable( unsigned long sndnum )
    if (sounds[sndnum].count>0)
       return;
    else
-      W_CacheLumpNum(SoundNumber(sndnum),PU_CACHE, CvtFixme, 1);
+      W_CacheLumpNum(SoundNumber(sndnum),PU_CACHE, CvtNull, 1);
 }
 
 #if 0
@@ -174,6 +186,7 @@ int SD_SetupFXCard ( int * numvoices, int * numbits, int * numchannels)
    card = fxnums[ FXMode ];
    if (card==-1) // Check if it is off
       return (0);
+#ifdef DOS
    if ( ( card == SoundBlaster ) || ( card == Awe32 ) )
       {
       extern fx_blaster_config SBSettings;
@@ -183,6 +196,7 @@ int SD_SetupFXCard ( int * numvoices, int * numbits, int * numchannels)
       }
    else
       {
+#endif
       status=FX_SetupCard( card, &device );
       if ( status == FX_Ok )
          {
@@ -190,7 +204,9 @@ int SD_SetupFXCard ( int * numvoices, int * numbits, int * numchannels)
          *numbits=device.MaxSampleBits;
          *numchannels=device.MaxChannels;
          }
+#ifdef DOS
       }
+#endif
 
    return (status);
    }
@@ -224,6 +240,7 @@ int SD_Startup ( boolean bombonerror )
 
    switch (card)
       {
+#ifdef DOS
       case UltraSound:
       case SoundBlaster:
       case SoundMan16:
@@ -231,10 +248,12 @@ int SD_Startup ( boolean bombonerror )
       case Awe32:
       case SoundSource:
       case TandySoundSource:
+#endif
       case SoundScape:
          soundstart=W_GetNumForName("digistrt")+1;
          soundtype=fx_digital;
          break;
+#ifdef DOS
       case Adlib:
          soundstart=W_GetNumForName("adstart")+1;
          soundtype=fx_muse;
@@ -243,6 +262,7 @@ int SD_Startup ( boolean bombonerror )
          soundstart=W_GetNumForName("pcstart")+1;
          soundtype=fx_muse;
          break;
+#endif
       default:
          Error("FX: Unsupported Card number %d",FXMode);
          break;
@@ -843,7 +863,7 @@ void SD_PreCacheSound ( int num )
    if ( SD_SoundOkay ( num ) == false )
       return;
 
-   PreCacheLump(SoundNumber(num),PU_CACHESOUNDS+sounds[num].priority);
+   PreCacheLump(SoundNumber(num),PU_CACHESOUNDS+sounds[num].priority,cache_other);
 }
 
 //***************************************************************************
@@ -1033,6 +1053,7 @@ int MU_Startup ( boolean bombonerror )
    if (card==-1) // Check if it is off
       return (0);
 
+#ifdef DOS
    if ( ( card == SoundBlaster ) || ( card == Awe32 ) || ( card == WaveBlaster ) )
       {
       if ( SD_Started == false )
@@ -1053,6 +1074,11 @@ int MU_Startup ( boolean bombonerror )
       }
 
    status=MUSIC_Init( card, MidiAddress );
+#else
+   /* Not DOS, no address config needed */
+   status=MUSIC_Init( card, 0 );
+#endif
+
 
    if (status != MUSIC_Ok) {
       if (bombonerror)
@@ -1086,6 +1112,8 @@ void MU_Shutdown (void)
    MUSIC_Shutdown();
    MU_Started=false;
 }
+
+#ifdef DOS
 //***************************************************************************
 //
 // MU_SetupGUSInitFile - initialize GUS stuff
@@ -1106,6 +1134,8 @@ void MU_SetupGUSInitFile( void )
       SaveFile (filename, W_CacheLumpNum(lump,PU_CACHE, CvtNull, 1), W_LumpLength(lump));
       }
 }
+
+#endif
 
 //***************************************************************************
 //
@@ -1152,8 +1182,8 @@ void MU_PlaySong ( int num )
 
    lump = W_GetNumForName(rottsongs[num].lumpname);
    size = W_LumpLength(lump);
-   
-   currentsong=W_CacheLumpNum(lump,PU_STATIC, CvtFixme, 1);
+
+   currentsong=W_CacheLumpNum(lump,PU_STATIC, CvtNull, 1);
 
 #ifdef PLATFORM_DOS
    if (rottsongs[num].loopflag == loop_yes)
@@ -1184,7 +1214,7 @@ void MU_StopSong ( void )
    MUSIC_StopSong ();
    if (currentsong)
       {
-      W_CacheLumpName(rottsongs[lastsongnumber].lumpname,PU_CACHE, CvtFixme, 1);
+      W_CacheLumpName(rottsongs[lastsongnumber].lumpname,PU_CACHE, CvtNull, 1);
       currentsong=0;
       }
 }

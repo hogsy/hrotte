@@ -476,7 +476,7 @@ void LoadTouchPlates(byte * buffer, int size)
   {memcpy(&dummy,buffer,sizeof(saved_touch_type));
 	temp = (touchplatetype*)Z_LevelMalloc(sizeof(touchplatetype),PU_LEVELSTRUCT,NULL);
 	if (!temp)
-		Error("LoadTouchplates: Failed on allocation of touchplates %ld of %ld",i,savedactions);
+		Error("LoadTouchplates: Failed on allocation of touchplates %d of %d",i,savedactions);
 	memset(temp,0,sizeof(*temp));
 
 	temp->tictime = dummy.tictime;
@@ -1194,7 +1194,7 @@ void SpawnDoor (int tilex, int tiley, int lock, int texture)
 
    doorobjlist[doornum]=(doorobj_t*)Z_LevelMalloc(sizeof(doorobj_t),PU_LEVELSTRUCT,NULL);
    if (!doorobjlist[doornum])
-      Error("SpawnDoor: Failed on allocation of door %ld ",doornum);
+      Error("SpawnDoor: Failed on allocation of door %d ",doornum);
    memset(doorobjlist[doornum],0,sizeof(doorobj_t));
    lastdoorobj=doorobjlist[doornum];
 
@@ -1374,8 +1374,8 @@ void SpawnDoor (int tilex, int tiley, int lock, int texture)
    if ((lock>0) && (lock<5))
       lastdoorobj->sidepic    = W_GetNumForName("lock1")+lock-1;
 
-   PreCacheLump(lastdoorobj->sidepic,PU_CACHEWALLS);
-   PreCacheLump(lastdoorobj->alttexture,PU_CACHEWALLS);
+   PreCacheLump(lastdoorobj->sidepic,PU_CACHEWALLS,cache_pic_t);
+   PreCacheLump(lastdoorobj->alttexture,PU_CACHEWALLS,cache_pic_t);
 
 	if (lastdoorobj->vertical==true)
 	{
@@ -1400,8 +1400,9 @@ void SpawnDoor (int tilex, int tiley, int lock, int texture)
          lastdoorobj->flags|=DF_MULTI;
 	}
 
-   for (i=0;i<9;i++)
-      PreCacheLump(lastdoorobj->texture+i,PU_CACHEWALLS);
+   PreCacheLump(lastdoorobj->texture,PU_CACHEWALLS,cache_pic_t);
+   for (i=1;i<9;i++) // only first texture is pic_t!
+      PreCacheLump(lastdoorobj->texture+i,PU_CACHEWALLS,cache_patch_t);
 	doornum++;
 	lastdoorobj++;
 	if (doornum==MAXDOORS)
@@ -1534,7 +1535,7 @@ void FixDoorAreaNumbers ( void )
          else if (lt)
 				MAPSPOT(tilex,tiley,0) = MAPSPOT(tilex-1,tiley,0);
 			else
-				Error("FixDoors: Couldn't fix up area at x=%ld y=%ld\n",tilex,tiley);
+				Error("FixDoors: Couldn't fix up area at x=%d y=%d\n",tilex,tiley);
 			}
 		else
 			{
@@ -1543,7 +1544,7 @@ void FixDoorAreaNumbers ( void )
          else if (up)
 				MAPSPOT(tilex,tiley,0) = MAPSPOT(tilex,tiley-1,0);
 			else
-				Error("FixDoors: Couldn't fix up area at x=%ld y=%ld\n",tilex,tiley);
+				Error("FixDoors: Couldn't fix up area at x=%d y=%d\n",tilex,tiley);
 			}
       if (IsDoorLinked(i))
          UtilizeDoor(i,LockLinkedDoor);
@@ -2585,20 +2586,20 @@ void SpawnMaskedWall (int tilex, int tiley, int which, int flags)
 
       for (i=1;i<AMW_NUMFRAMES;i++)
          {
-         PreCacheLump(lastmaskobj->bottomtexture+i,PU_CACHEWALLS);
+         PreCacheLump(lastmaskobj->bottomtexture+i,PU_CACHEWALLS,cache_transpatch_t);
          }
       SD_PreCacheSound(SD_GLASSBREAKSND);
 		}
    if (sidepic==true)
       {
-      PreCacheLump(lastmaskobj->sidepic,PU_CACHEWALLS);
+      PreCacheLump(lastmaskobj->sidepic,PU_CACHEWALLS,cache_pic_t);
       }
    if (lastmaskobj->bottomtexture>=0)
-      PreCacheLump(lastmaskobj->bottomtexture,PU_CACHEWALLS);
+      PreCacheLump(lastmaskobj->bottomtexture,PU_CACHEWALLS,cache_transpatch_t);
    if (lastmaskobj->toptexture>=0)
-      PreCacheLump(lastmaskobj->toptexture,PU_CACHEWALLS);
+      PreCacheLump(lastmaskobj->toptexture,PU_CACHEWALLS,cache_patch_t);
    if (lastmaskobj->midtexture>=0)
-      PreCacheLump(lastmaskobj->midtexture,PU_CACHEWALLS);
+      PreCacheLump(lastmaskobj->midtexture,PU_CACHEWALLS,cache_patch_t);
 	maskednum++;
 	lastmaskobj++;
 	if (maskednum==MAXMASKED)
@@ -2652,7 +2653,7 @@ void FixMaskedWallAreaNumbers ( void )
 			else if (dn)
 				MAPSPOT(tilex,tiley,0) = MAPSPOT(tilex,tiley+1,0);
 			else
-				Error("FixMaskedWalls: Couldn't fix up area at x=%ld y=%ld\n",tilex,tiley);
+				Error("FixMaskedWalls: Couldn't fix up area at x=%d y=%d\n",tilex,tiley);
 			}
 		else
 			{
@@ -2665,7 +2666,7 @@ void FixMaskedWallAreaNumbers ( void )
 			else if (lt)
 				MAPSPOT(tilex,tiley,0) = MAPSPOT(tilex-1,tiley,0);
 			else
-				Error("FixMaskedWalls: Couldn't fix up area at x=%ld y=%ld\n",tilex,tiley);
+				Error("FixMaskedWalls: Couldn't fix up area at x=%d y=%d\n",tilex,tiley);
 			}
 		maskobjlist[i]->areanumber = MAPSPOT(tilex,tiley,0)-AREATILE;
 		if ((maskobjlist[i]->areanumber <0) || (maskobjlist[i]->areanumber > NUMAREAS))
@@ -3309,7 +3310,7 @@ int GetAreaNumber ( int tilex, int tiley, int dir )
 	else if (rt)
 		return rt;
 	else
-		Error("Cannot find an area number for tile at x=%ld y=%ld\n",tilex,tiley);
+		Error("Cannot find an area number for tile at x=%d y=%d\n",tilex,tiley);
 	return -1;
 }
 
@@ -3352,7 +3353,7 @@ void SpawnPushWall (int tilex, int tiley, int lock, int texture, int dir, int ty
 
 	lastpwallobj->texture = texture;
    if (!texture&0x1000)
-	   PreCacheLump(texture,PU_CACHEWALLS);
+	   PreCacheLump(texture,PU_CACHEWALLS,cache_pic_t);
    lastpwallobj->areanumber = GetAreaNumber(tilex,tiley,lastpwallobj->dir);
 
    MAPSPOT (tilex, tiley, 0)=(word)(lastpwallobj->areanumber+AREATILE);
@@ -3911,7 +3912,7 @@ void WallMoving (int pwall)
             VW_UpdateScreen ();
             I_Delay (2000);
             }
-			Error ("PushWall Attempting to escape off the edge of the map\nIt is located at x=%ld y=%ld\nI'm Free!!!!\n",
+			Error ("PushWall Attempting to escape off the edge of the map\nIt is located at x=%d y=%d\nI'm Free!!!!\n",
 					  pw->tilex, pw->tiley);
 			}
 		}
@@ -4037,7 +4038,7 @@ void LoadPushWalls(byte * bufptr, int sz)
 
   num=sz/unitsize;
   if (pwallnum!=num)
-     Error("Different number of Push Walls when trying to load a game\npwallnum=%ld num=%ld",pwallnum,num);
+     Error("Different number of Push Walls when trying to load a game\npwallnum=%d num=%d",pwallnum,num);
 
   for (i=0;i<pwallnum;i++)
      {
@@ -4201,7 +4202,7 @@ void LoadMaskedWalls(byte * bufptr, int sz)
 
   num=sz/unitsize;
   if (maskednum!=num)
-     Error("Different number of Masked Walls when trying to load a game\nmaskednum=%ld num=%ld",maskednum,num);
+     Error("Different number of Masked Walls when trying to load a game\nmaskednum=%d num=%d",maskednum,num);
 
   for (i=0;i<maskednum;i++)
      {
@@ -4317,7 +4318,7 @@ void LoadDoors (byte * buf, int size)
 
    num=size/unitsize;
    if (doornum!=num)
-      Error("Different number of Doors when trying to load a game\ndoornum=%ld num=%ld",doornum,num);
+      Error("Different number of Doors when trying to load a game\ndoornum=%d num=%d",doornum,num);
 
    for (door = 0; door < doornum; door++)
    {

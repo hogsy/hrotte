@@ -5107,19 +5107,25 @@ void MusicVolume
    )
 
    {
+#ifdef DOS
    extern boolean SOUNDSETUP;
+#endif
 
    SliderMenu( &MUvolume, 254, 0, 33, 81, 225, 8, "block3", MUSIC_SetVolume,
       "Music Volume", "Low", "High" );
 
+#ifdef DOS
    if ( SOUNDSETUP )
       {
       DrawSoundSetupMainMenu();
       }
    else
       {
+#endif
       DrawControlMenu();
+#ifdef DOS
       }
+#endif
    }
 
 
@@ -5135,7 +5141,9 @@ void FXVolume
    )
 
    {
+#ifdef DOS
    extern boolean SOUNDSETUP;
+#endif
    int oldvolume;
 
    oldvolume = FXvolume;
@@ -5143,14 +5151,18 @@ void FXVolume
    SliderMenu( &FXvolume, 254, 0, 33, 81, 225, 8, "block3", FX_SetVolume,
       "Sound Volume", "Low", "High" );
 
+#ifdef DOS
    if ( SOUNDSETUP )
       {
       DrawSoundSetupMainMenu();
       }
    else
       {
+#endif
       DrawControlMenu();
+#ifdef DOS
       }
+#endif
    }
 
 
@@ -8705,6 +8717,7 @@ int CP_EnterCodeNameMenu
       }
    }
 
+#ifdef DOS
 void SS_DrawSBTypeMenu( void );
 void SS_SBTypeMenu( void );
 void SS_DrawPortMenu( void );
@@ -9454,6 +9467,7 @@ void SS_IrqMenu
 
    handlewhich = -1;
    }
+#endif
 
 
 //******************************************************************************
@@ -9588,6 +9602,8 @@ void CP_ErrorMsg
 
    MN_PlayMenuSnd( SD_ESCPRESSEDSND );
    }
+
+#ifdef DOS
 
 //****************************************************************************
 //
@@ -10313,3 +10329,4 @@ void SS_DrawBitMenu
 
    FlipMenuBuf();
    }
+#endif

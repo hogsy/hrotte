@@ -627,12 +627,12 @@ void SetupAnimatedWall(int which)
 
    if (DoPanicMapping()==true)
       {
-      PreCacheLump(aw->basetexture,PU_CACHEWALLS);
+      PreCacheLump(aw->basetexture,PU_CACHEWALLS,cache_pic_t);
       }
    else
       {
       for (i=aw->basetexture;i<aw->basetexture+animwallsinfo[which].numanims;i++)
-         PreCacheLump(i,PU_CACHEWALLS);
+         PreCacheLump(i,PU_CACHEWALLS,cache_pic_t);
       }
 }
 
@@ -846,29 +846,33 @@ void PreCacheStaticFrames(statobj_t*temp)
    int z,start,stop;
    int female=0,black=0;
 
-   PreCacheLump(temp->shapenum+shapestart,PU_CACHESPRITES);
+   if (temp->itemnumber != stat_bullethole &&
+       ((temp->itemnumber < stat_touch1) || (temp->itemnumber > stat_touch4)))
+      PreCacheLump(temp->shapenum+shapestart,PU_CACHESPRITES,cache_patch_t);
+   else
+      PreCacheLump(temp->shapenum+shapestart,PU_CACHESPRITES,cache_transpatch_t);
    for (z=0;z<temp->numanims;z++)
-      PreCacheLump(temp->shapenum+shapestart+z,PU_CACHESPRITES);
+      PreCacheLump(temp->shapenum+shapestart+z,PU_CACHESPRITES,cache_patch_t);
 
    if (temp->flags & FL_ROTATING)
       {
       for (z=1;z<8;z++)
-         PreCacheLump(temp->shapenum+shapestart+z,PU_CACHESPRITES);
+         PreCacheLump(temp->shapenum+shapestart+z,PU_CACHESPRITES,cache_patch_t);
       }
 
    if (temp->flags & FL_WOODEN)
       {
       start = W_GetNumForName("WFRAG1");
       stop = W_GetNumForName("WFRAG14");
-      PreCacheGroup(start,stop);
+      PreCacheGroup(start,stop,cache_patch_t);
       }
 
    if (temp->flags & FL_METALLIC)
       {
-      PreCacheLump(W_GetNumForName("MSHARDS"),PU_CACHESPRITES);
+      PreCacheLump(W_GetNumForName("MSHARDS"),PU_CACHESPRITES,cache_patch_t);
       start = W_GetNumForName("ROBODIE1");
       stop = W_GetNumForName("ROBODEAD");
-      PreCacheGroup(start,stop);
+      PreCacheGroup(start,stop,cache_patch_t);
       }
 
    female = ((locplayerstate->player == 1) || (locplayerstate->player == 3));
@@ -890,7 +894,7 @@ void PreCacheStaticFrames(statobj_t*temp)
       stop = W_GetNumForName("MPIST13");
 		}
 
-   PreCacheGroup(start,stop);
+   PreCacheGroup(start,stop,cache_patch_t);
 
    switch (temp->itemnumber)
       {
@@ -899,18 +903,18 @@ void PreCacheStaticFrames(statobj_t*temp)
       case stat_pedsilverkey:
       case stat_pedironkey:
       case stat_pedcrystalkey:
-         PreCacheLump(W_GetNumForName("PEDESTA"),PU_CACHESPRITES);
+         PreCacheLump(W_GetNumForName("PEDESTA"),PU_CACHESPRITES,cache_patch_t);
          break;
 
       case stat_bat:
          start = W_GetNumForName("EXBAT1");
          stop = W_GetNumForName("EXBAT7");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_knifestatue:
          start = W_GetNumForName("KNIFE1");
          stop = W_GetNumForName("KNIFE10");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_twopistol:
          if (female)
@@ -928,64 +932,66 @@ void PreCacheStaticFrames(statobj_t*temp)
             start = W_GetNumForName("RMPIST1");
             stop = W_GetNumForName("LMPIST3");
             }
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_mp40:
          start = W_GetNumForName("MP401");
          stop = W_GetNumForName("MP403");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_bazooka:
          start = W_GetNumForName("BAZOOKA1");
          stop = W_GetNumForName("BAZOOKA4");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_firebomb:
          start = W_GetNumForName("FBOMB1");
          stop = W_GetNumForName("FBOMB4");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_heatseeker:
          start = W_GetNumForName("HSEEK1");
          stop = W_GetNumForName("HSEEK4");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_drunkmissile:
          start = W_GetNumForName("DRUNK1");
          stop = W_GetNumForName("DRUNK4");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_firewall:
          start = W_GetNumForName("FIREW1");
          stop = W_GetNumForName("FIREW3");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_splitmissile:
          start = W_GetNumForName("SPLIT1");
          stop = W_GetNumForName("SPLIT4");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_kes:
          start = W_GetNumForName("KES1");
          stop = W_GetNumForName("KES6");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
       case stat_godmode:
          start = W_GetNumForName("GODHAND1");
          stop = W_GetNumForName("GODHAND8");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
 
          PreCacheGroup(W_GetNumForName("VAPO1"),
-                       W_GetNumForName("LITSOUL"));
+                       W_GetNumForName("LITSOUL"),
+                       cache_patch_t);
 
          PreCacheGroup(W_GetNumForName("GODFIRE1"),
-                       W_GetNumForName("GODFIRE4"));
+                       W_GetNumForName("GODFIRE4"),
+                       cache_patch_t);
 
          break;
       case stat_dogmode:
          start = W_GetNumForName("DOGNOSE1");
          stop = W_GetNumForName("DOGPAW4");
-         PreCacheGroup(start,stop);
+         PreCacheGroup(start,stop,cache_patch_t);
          break;
 
       default:
@@ -1021,7 +1027,7 @@ void LoadStatics( byte * buffer, int size)
 	{
 	temp = (statobj_t*)Z_LevelMalloc(sizeof(statobj_t),PU_LEVELSTRUCT,NULL);
 	if (!temp)
-		Error("LoadStatics: Failed on allocation of static %ld of %ld",i,stcount);
+		Error("LoadStatics: Failed on allocation of static %d of %d",i,stcount);
 	memset(temp,0,sizeof(*temp));
 	memcpy(&(dummy.x),buffer,sizeof(saved_stat_type));
 	temp->whichstat = statcount++;
@@ -1094,7 +1100,7 @@ void Set_NewZ_to_MapValue(fixed *newz,int zoffset,const char*errorstr,int tilex,
    else
       {
       if (z>levelheight)
-         Error ("You specified a height of %lx for the %s at tilex=%ld tiley=%ld when\n the level is only %ld high\n",
+         Error ("You specified a height of %x for the %s at tilex=%d tiley=%d when\n the level is only %d high\n",
                  zoffset,errorstr,tilex,tiley,levelheight);
       else
          *newz = nominalheight-(z<<6)-(zf<<2);
@@ -1228,7 +1234,7 @@ void SpawnStatic (int tilex, int tiley, int mtype, int zoffset)
 	  temp->areanumber = MAPSPOT(tilex,tiley,0)-AREATILE;
 	  temp->linked_to = -1;
 	  if ((temp->areanumber<=0) || (temp->areanumber>NUMAREAS))
-		  Error ("Sprite at x=%ld y=%ld type=%ld has an illegal areanumber\n",tilex,tiley,mtype);
+		  Error ("Sprite at x=%d y=%d type=%d has an illegal areanumber\n",tilex,tiley,mtype);
      if ( mtype == stat_mine )
         {
         temp->z = nominalheight;
@@ -1928,5 +1934,5 @@ void  SpawnStaticDamage(statobj_t * stat, int angle)
 	new->speed = 0;
 	new->flags = (FL_NEVERMARK|FL_ABP);
 	if ((new->x<=0) || (new->y<=0))
-	   Error("SpawnStaticDamage: bad x,y itemnumber=%ld\n",stat->itemnumber);
+	   Error("SpawnStaticDamage: bad x,y itemnumber=%d\n",stat->itemnumber);
 }

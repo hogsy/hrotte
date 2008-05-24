@@ -138,12 +138,12 @@ extern boolean insetupgame;
 extern char LevelName[80];
 extern boolean ISRTL;
 
-void PreCacheGroup(int,int);
+void PreCacheGroup(int,int,int); // added type
 void AssignTeams(void);
 void LoadTedMap( const char *extension, int mapnum );
 void SetupGameLevel(void);
 void ScanInfoPlane(void);
-void PreCacheLump( int lump, int level );
+void PreCacheLump( int lump, int level, int type ); // added type
 void SetupGameLevelAgain (void);
 void ScanInfoPlaneAgain (void);
 void PreCacheActor( int actor, int which );

@@ -331,7 +331,7 @@ void PrecacheFlic (flicevent * flic)
 {
    if (flic->usefile==false)
       {
-      W_CacheLumpName(flic->name,PU_CACHE, CvtFixme, 1);
+      W_CacheLumpName(flic->name,PU_CACHE, CvtNull, 1);
       }
 }
 
@@ -513,7 +513,7 @@ void DrawCinematicBackdrop ( backevent * back )
 */
 void PrecacheBack ( backevent * back )
 {
-   W_CacheLumpName( back->name, PU_CACHE, CvtFixme, 1);
+   W_CacheLumpName( back->name, PU_CACHE, CvtNull, 1);
 }
 
 
@@ -616,7 +616,7 @@ void DrawPalette (paletteevent * event)
 {
    byte * pal;
 
-   pal=W_CacheLumpName(event->name,PU_CACHE, CvtFixme, 1);
+   pal=W_CacheLumpName(event->name,PU_CACHE, CvtNull, 1);
    XFlipPage ();
    CinematicSetPalette (pal);
 }
@@ -631,7 +631,7 @@ void DrawPalette (paletteevent * event)
 
 void PrecachePalette (paletteevent * event)
 {
-   W_CacheLumpName(event->name,PU_CACHE, CvtFixme, 1);
+   W_CacheLumpName(event->name,PU_CACHE, CvtNull, 1);
 }
 
 

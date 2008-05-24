@@ -248,7 +248,7 @@ void CalcProjection ( void )
 
 //Hey, isn't this stuff already loaded in?
 //Why don't we make this a lump?
-   table=W_CacheLumpName("tables",PU_STATIC, CvtFixme, 1);
+   table=W_CacheLumpName("tables",PU_STATIC, CvtNull, 1);
    ptr=table;
 
 //
@@ -271,7 +271,7 @@ void CalcProjection ( void )
       pixelangle[centerx+i] =(short) -intang;
       frac+=(length*65536/centerx);
       }
-   table=W_CacheLumpName("tables",PU_CACHE, CvtFixme, 1);
+   table=W_CacheLumpName("tables",PU_CACHE, CvtNull, 1);
    SafeFree(pangle);
 }
 
@@ -580,7 +580,7 @@ void SetupLightLevels ( void )
 	if (((word)MAPSPOT(2,0,1)>=104) && ((word)MAPSPOT(2,0,1)<=105))
 		fog=(word)MAPSPOT(2,0,1)-104;
 	else
-		Error ("There is no Fog icon on map %ld\n",gamestate.mapon);
+		Error ("There is no Fog icon on map %d\n",gamestate.mapon);
 	if ((word)MAPSPOT(3,0,1)==139)
       {
       if (fog==0)
@@ -590,14 +590,14 @@ void SetupLightLevels ( void )
          memset (lights,0,MAPSIZE*MAPSIZE*(sizeof(unsigned long)));
          }
       else
-		   Error("You cannot use light sourcing on a level with fog on map %ld\n",gamestate.mapon);
+		   Error("You cannot use light sourcing on a level with fog on map %d\n",gamestate.mapon);
       }
 	else if ((word)MAPSPOT(3,0,1))
-		Error("You must use the lightsource icon or nothing at all at (3,0) in plane 1 on map %ld\n",gamestate.mapon);
+		Error("You must use the lightsource icon or nothing at all at (3,0) in plane 1 on map %d\n",gamestate.mapon);
    if (((word)MAPSPOT(2,0,0)>=LIGHTLEVELBASE) && ((word)MAPSPOT(2,0,0)<=LIGHTLEVELEND))
       glevel=(MAPSPOT(2,0,0)-LIGHTLEVELBASE);
 	else
-		Error("You must specify a valid darkness level icon at (2,0) on map %ld\n",gamestate.mapon);
+		Error("You must specify a valid darkness level icon at (2,0) on map %d\n",gamestate.mapon);
 
    SetLightLevels ( glevel );
 

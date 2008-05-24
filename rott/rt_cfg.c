@@ -101,10 +101,12 @@ int     MusicMode        = 0;
 int     MUvolume         = 196;
 int     FXvolume         = 196;
 
+#ifdef DOS
 fx_blaster_config SBSettings =
    {
    0x220, fx_SB, 7, 1, 5, 0x330, 0x620
    };
+#endif
 
 boolean mouseenabled     = 1;
 boolean usemouselook     = 0;
@@ -120,7 +122,9 @@ int     threshold        = 1;
 int     NumVoices        = 4;
 int     NumChannels      = 1;
 int     NumBits          = 8;
+#ifdef DOS
 int     MidiAddress      = 0x330;
+#endif
 boolean cybermanenabled  = false;
 boolean assassinenabled  = false;
 boolean spaceballenabled = false;
@@ -296,14 +300,17 @@ boolean ParseSoundFile (void)
 
       ReadInt ("NumBits",&NumBits);
 
+#ifdef DOS
       // Read in Midi Address
 
       ReadInt ("MidiAddress",&MidiAddress);
+#endif
 
       // Read in stereo reversal
 
       ReadBoolean ("StereoReverse",&stereoreversed);
 
+#ifdef DOS
       // Read in Sound Blaster info
       ReadUnsigned ("SBType",  &SBSettings.Type );
       ReadUnsigned ("SBPort",  &SBSettings.Address );
@@ -312,6 +319,7 @@ boolean ParseSoundFile (void)
       ReadUnsigned ("SBDma16", &SBSettings.Dma16 );
       ReadUnsigned ("SBMidi",  &SBSettings.Midi );
       ReadUnsigned ("SBEmu",   &SBSettings.Emu );
+#endif
    }
    else
       retval = false;
@@ -332,7 +340,9 @@ void SetSoundDefaultValues
    )
 
    {
+#ifdef DOS
    fx_blaster_config blaster;
+#endif
    int status;
 
    //
@@ -345,7 +355,6 @@ void SetSoundDefaultValues
    NumVoices   = 8;
    NumChannels = 2;
    NumBits     = 16;
-   MidiAddress = 0x330;
    stereoreversed = false;
    #else
    MusicMode   = 0;
@@ -355,7 +364,6 @@ void SetSoundDefaultValues
    NumBits     = 8;
    MidiAddress = 0x330;
    stereoreversed = false;
-   #endif
 
    status = FX_GetBlasterSettings( &blaster );
    if ( status == FX_Ok )
@@ -368,6 +376,7 @@ void SetSoundDefaultValues
       SBSettings.Midi      = blaster.Midi;
       SBSettings.Emu       = blaster.Emu;
       }
+   #endif
    }
 
 
@@ -1560,6 +1569,7 @@ void WriteSoundConfig
    SafeWriteString(file,"\n;\n");
    SafeWriteString(file,"; Music Modes\n");
    SafeWriteString(file,"; 0  -  Off\n");
+#ifdef DOS
    SafeWriteString(file,"; 1  -  UltraSound\n");
    SafeWriteString(file,"; 2  -  Sound Blaster\n");
    SafeWriteString(file,"; 3  -  Sound Man 16\n");
@@ -1570,6 +1580,9 @@ void WriteSoundConfig
    SafeWriteString(file,"; 8  -  General Midi\n");
    SafeWriteString(file,"; 9  -  Sound Canvas\n");
    SafeWriteString(file,"; 10 -  Adlib\n");
+#else
+   SafeWriteString(file,"; 6  -  On\n");
+#endif
    WriteParameter(file,"MusicMode        ",MusicMode);
 
    // Write out FX Mode
@@ -1577,6 +1590,7 @@ void WriteSoundConfig
    SafeWriteString(file,"\n;\n");
    SafeWriteString(file,"; FX Modes\n");
    SafeWriteString(file,"; 0  -  Off\n");
+#ifdef DOS
    SafeWriteString(file,"; 1  -  UltraSound\n");
    SafeWriteString(file,"; 2  -  Sound Blaster\n");
    SafeWriteString(file,"; 3  -  Sound Man 16\n");
@@ -1587,6 +1601,9 @@ void WriteSoundConfig
    SafeWriteString(file,"; 8  -  Disney Sound Source\n");
    SafeWriteString(file,"; 9  -  Tandy Sound Source\n");
    SafeWriteString(file,"; 10 -  PC Speaker\n");
+#else
+   SafeWriteString(file,"; 6  -  On\n");
+#endif
    WriteParameter(file,"FXMode           ",FXMode);
 
    // Write in Music Volume
@@ -1626,6 +1643,7 @@ void WriteSoundConfig
    SafeWriteString(file,"; 16 bit\n");
    WriteParameter(file,"NumBits          ",NumBits);
 
+#ifdef DOS
    // Write out Midi Address
 
    SafeWriteString(file,"\n;\n");
@@ -1640,6 +1658,7 @@ void WriteSoundConfig
    SafeWriteString(file,"; $370\n");
    SafeWriteString(file,"; $380\n");
    WriteParameterHex(file,"MidiAddress      ",MidiAddress);
+#endif
 
    // Write out stereo reversal
 
@@ -1649,6 +1668,7 @@ void WriteSoundConfig
    SafeWriteString(file,"; 1 reverse stereo\n");
    WriteParameter (file,"StereoReverse      ",stereoreversed);
 
+#ifdef DOS
    // Write out Sound Blaster info
 
    SafeWriteString(file,"\n;\n");
@@ -1660,6 +1680,7 @@ void WriteSoundConfig
    WriteParameter(file, "SBDma16          ", SBSettings.Dma16 );
    WriteParameterHex(file, "SBMidi           ", SBSettings.Midi );
    WriteParameterHex(file, "SBEmu            ", SBSettings.Emu );
+#endif
 
    close (file);
    }

@@ -333,7 +333,7 @@ void Error (char *error, ...)
 
    inerror++;
    if (inerror > 1)
-      return;
+      abort();
 
 
 	SetTextMode ();
@@ -435,12 +435,13 @@ void Error (char *error, ...)
       }
 
    close(handle);
-#endif
 
    if ( SOUNDSETUP )
       {
       getch();
       }
+
+#endif
 
    #if USE_SDL
    SDL_Quit();

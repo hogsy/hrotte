@@ -1101,6 +1101,7 @@ sdl_mouse_grabbed = 1;
     
     scancodes[SDLK_LALT]            = sc_Alt;
     scancodes[SDLK_RALT]            = sc_Alt;
+    scancodes[SDLK_MODE]            = sc_Alt;
     scancodes[SDLK_RCTRL]           = sc_Control;
     scancodes[SDLK_SPACE]           = sc_Space;
     scancodes[SDLK_CAPSLOCK]        = sc_CapsLock;

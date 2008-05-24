@@ -38,6 +38,7 @@ typedef enum
    {
 //   ASS_NoSound,
    SoundBlaster,
+#ifdef DOS
    ProAudioSpectrum,
    SoundMan16,
    Adlib,
@@ -45,11 +46,14 @@ typedef enum
    SoundCanvas,
    Awe32,
    WaveBlaster,
+#endif
    SoundScape,
    UltraSound,
+#ifdef DOS
    SoundSource,
    TandySoundSource,
    PC,
+#endif
    NumSoundCards
    } soundcardnames;
 

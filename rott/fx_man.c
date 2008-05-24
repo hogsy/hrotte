@@ -141,6 +141,7 @@ static void channelDoneCallback(int channel)
 //  go to the file that is specified in that variable. Otherwise, they
 //  are ignored for the expense of the function call. If DUKESND_DEBUG is
 //  set to "-" (without the quotes), then the output goes to stdout.
+static void snddebug(const char *fmt, ...) __attribute__((format(printf,1,2)));
 static void snddebug(const char *fmt, ...)
 {
     va_list ap;
@@ -159,6 +160,7 @@ static void snddebug(const char *fmt, ...)
 
 // FIXME: Consolidate this code.
 // Same as snddebug(), but a different tag is put on each line.
+static void musdebug(const char *fmt, ...) __attribute__((format(printf,1,2)));
 static void musdebug(const char *fmt, ...)
 {
     va_list ap;
@@ -297,22 +299,6 @@ static void setErrorMessage(const char *msg)
     errorMessage[sizeof (errorMessage) - 1] = '\0';
     snddebug("Error message set to [%s].", errorMessage);
 } // setErrorMessage
-
-
-int FX_GetBlasterSettings(fx_blaster_config *blaster)
-{
-    setErrorMessage("No SoundBlaster cards available.");
-    return(FX_Error);
-} // FX_GetBlasterSettings
-
-
-int FX_SetupSoundBlaster(fx_blaster_config blaster, int *MaxVoices,
-                         int *MaxSampleBits, int *MaxChannels)
-{
-    setErrorMessage("No SoundBlaster cards available.");
-    return(FX_Error);
-} // FX_SetupSoundBlaster
-
 
 int FX_SetupCard( int SoundCard, fx_device *device )
 {

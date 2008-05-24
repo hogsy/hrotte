@@ -614,7 +614,7 @@ void SpawnGunSmoke(int x, int y, int z, int angle, int bullethole)
 
 	if ((x<=0) || (y<=0))
       {
-      SoftError("SpawnGunSmoke: xy below angle=%ld\n",angle);
+      SoftError("SpawnGunSmoke: xy below angle=%d\n",angle);
       return;
       }
 
@@ -692,7 +692,7 @@ void  SpawnBlood(objtype * ob, int angle)
    NewState(new,&s_bloodspurt1);
 
    if ((new->x<=0) || (new->y<=0))
-	   Error("SpawnBlood: bad x,y obj->obclass=%ld\n",ob->obclass);
+	   Error("SpawnBlood: bad x,y obj->obclass=%d\n",ob->obclass);
    }
 
 void  SpawnMetalSparks(objtype * ob, int angle)
@@ -722,7 +722,7 @@ void  SpawnMetalSparks(objtype * ob, int angle)
 	else
 	 SD_PlaySoundRTP(SD_RICOCHET3SND,new->x,new->y);
 	if ((new->x<=0) || (new->y<=0))
-	   Error("SpawnMetalSparks: bad x,y obj->obclass=%ld\n",ob->obclass);
+	   Error("SpawnMetalSparks: bad x,y obj->obclass=%d\n",ob->obclass);
 }
 
 /*

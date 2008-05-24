@@ -1453,7 +1453,7 @@ void DrawPlayerWeapon (void)
 #endif
 
 		 default:
-         Error("Illegal weapon value = %ld\n",locplayerstate->weapon);
+         Error("Illegal weapon value = %d\n",locplayerstate->weapon);
          break;
 		}
 	 }
@@ -2243,7 +2243,7 @@ void WallRefresh (void)
       else
          viewangle = player->angle;
       if ((viewangle<0) && (viewangle>=FINEANGLES))
-         Error ("View angle out of range = %ld\n",viewangle);
+         Error ("View angle out of range = %d\n",viewangle);
       viewx = player->x;
       viewy = player->y;
       pheight = player->z + locplayerstate->playerheight + locplayerstate->heightoffset;

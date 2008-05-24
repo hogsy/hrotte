@@ -116,7 +116,9 @@ boolean dopefish;
 
 boolean newlevel = false;
 boolean infopause;
+#ifdef DOS
 boolean SOUNDSETUP=false;
+#endif
 boolean quiet = false;
 
 #if (DEVELOPMENT == 1)
@@ -308,6 +310,7 @@ int main (int argc, char *argv[])
             printf( "Sound FX disabled.\n" );
          }
 
+#ifdef DOS
       if ( status1 || status2 || status3 )
          {
          printf( "\n\nROTT was unable to initialize your " );
@@ -331,6 +334,7 @@ int main (int argc, char *argv[])
                  "Now entering sound setup.\n" );
          SOUNDSETUP = true;
          }
+#endif
 
       Init_Tables ();
       InitializeRNG ();
@@ -375,11 +379,13 @@ int main (int argc, char *argv[])
 //   SetBorderColor(155);
    SetViewSize(8);
 
+#ifdef DOS
    if ( SOUNDSETUP )
       {
       SwitchPalette( origpal, 35 );
       CP_SoundSetup();
       }
+#endif
 
    playstate = ex_titles;
 
@@ -450,8 +456,10 @@ void DrawRottTitle ( void )
       {
       SetTextMode();
       TurnOffTextCursor ();
+#ifdef DOS
       if (CheckParm ("SOUNDSETUP") == 0)
          {
+#endif
 #ifdef ANSIESC
          printf("\n\n\n");
 #endif
@@ -501,6 +509,7 @@ void DrawRottTitle ( void )
 #endif
 
          UL_ColorBox (0, 0, 80, 2, 0x1e);
+#ifdef DOS
          }
       else
          {
@@ -517,6 +526,7 @@ void DrawRottTitle ( void )
 
          UL_ColorBox (0, 0, 80, 1, 0x1e);
          }
+#endif
       }
    else
       {
@@ -535,7 +545,9 @@ void CheckCommandLineParameters( void )
    int i,n;
 
    infopause=false;
+#ifdef DOS
    SOUNDSETUP = false;
+#endif
    tedlevel=false;
    NoWait=false;
    NoSound=false;
@@ -597,7 +609,9 @@ void CheckCommandLineParameters( void )
       printf ("   MONO       - Enable mono-monitor support.\n");
       printf ("   SCREENSHOTS- Clean screen capture for shots.\n");
       printf ("   PAUSE      - Pauses startup screen information.\n");
+#ifdef DOS
       printf ("   SOUNDSETUP - Setup sound for ROTT\n");
+#endif
       printf ("   ENABLEVR   - Enable VR helmet input devices\n");
       printf ("   NOECHO     - Turn off sound reverb\n");
       printf ("   DEMOEXIT   - Exit program when demo is terminated\n");
@@ -763,7 +777,9 @@ void CheckCommandLineParameters( void )
          infopause=true;
          break;
        case 13:
+#ifdef DOS
           SOUNDSETUP = true;
+#endif
           break;
        case 14:
           startlevel = (ParseNum(_argv[i + 1])-1);
@@ -1175,8 +1191,9 @@ void GameLoop (void)
                   I_Delay(30);
                   SD_Play (SD_ACTORSQUISHSND);
                   tempbuf=bufferofs;
-                  bufferofs=displayofs;
+                  bufferofs=page1start; // fixed, was displayofs
                   DrawNormalSprite(320-94,200-41,W_GetNumForName("rsac"));
+						VW_UpdateScreen(); // fixed, was missing
                   bufferofs=tempbuf;
                   I_Delay(30);
 
@@ -1608,7 +1625,11 @@ boolean CheckForQuickLoad  (void )
 
 void ShutDown ( void )
 {
-   if ( ( standalone == false ) || ( SOUNDSETUP ) )
+   if ( ( standalone == false )
+#ifdef DOS
+        || ( SOUNDSETUP ) 
+#endif
+   )
       {
       WriteConfig ();
       }
@@ -1700,8 +1721,10 @@ void QuitGame ( void )
    printf("LIGHTRATE =%ld\n",GetLightRateTile());
    printf("\nCENTERY=%ld\n",centery);
 #else
+#ifdef DOS
    if ( !SOUNDSETUP )
       {
+#endif
 #if (SHAREWARE==0)
       txtscn = (byte *) W_CacheLumpNum (W_GetNumForName ("regend"), PU_CACHE, CvtNull, 1);
 #else
@@ -1728,15 +1751,19 @@ void QuitGame ( void )
 
       UL_printf (itoa(ROTTMINORVERSION,&buf[0],10));
 #endif
+#ifdef DOS
       }
 #endif
+#endif
 
+#ifdef DOS
    if ( SOUNDSETUP )
       {
       printf( "\nSound setup complete.\n"
               "Type ROTT to run the game.\n" );
       }
    ShutDown();
+#endif
 
    exit(0);
 }

@@ -357,7 +357,7 @@ int GetFloorCeilingLump ( int num )
          lump=W_GetNumForName("FLRCL16\0");
          break;
       default:
-         Error("Illegal Floor/Ceiling Tile = %ld\n",num);
+         Error("Illegal Floor/Ceiling Tile = %d\n",num);
          break;
       }
    return lump;
@@ -417,7 +417,7 @@ void SetPlaneViewSize (void)
     word crud;
 	 sky = (MAPSPOT(1,0,0) - 233);
     if ((sky<1) || (sky>6))
-       Error("Illegal Sky Tile = %ld\n",sky);
+       Error("Illegal Sky Tile = %d\n",sky);
     ceilingnum=1;
 	 crud=(word)MAPSPOT(1,0,1);
 	 if ((crud>=90) && (crud<=97))
@@ -425,7 +425,7 @@ void SetPlaneViewSize (void)
     else if ((crud>=450) && (crud<=457))
 		 horizonheight=crud-450+9;
 	 else
-       Error("You must specify a valid horizon height sprite icon over the sky at (2,0) on map %ld\n",gamestate.mapon);
+       Error("You must specify a valid horizon height sprite icon over the sky at (2,0) on map %d\n",gamestate.mapon);
 
     // Check for lightnign icon
 

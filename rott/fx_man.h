@@ -1,3 +1,4 @@
+
 /*
 Copyright (C) 1994-1995 Apogee Software, Ltd.
 
@@ -43,17 +44,6 @@ typedef struct
 #define MonoFx   1
 #define StereoFx 2
 
-typedef struct
-   {
-   unsigned long Address;
-   unsigned long Type;
-   unsigned long Interrupt;
-   unsigned long Dma8;
-   unsigned long Dma16;
-   unsigned long Midi;
-   unsigned long Emu;
-   } fx_blaster_config;
-
 enum FX_ERRORS
    {
    FX_Warning = -2,
@@ -67,6 +57,7 @@ enum FX_ERRORS
    FX_DPMI_Error
    };
 
+#ifdef DOS
 enum fx_BLASTER_Types
    {
    fx_SB     = 1,
@@ -75,12 +66,11 @@ enum fx_BLASTER_Types
    fx_SBPro2 = 4,
    fx_SB16   = 6
    };
+#endif
 
 
 char *FX_ErrorString( int ErrorNumber );
 int   FX_SetupCard( int SoundCard, fx_device *device );
-int   FX_GetBlasterSettings( fx_blaster_config *blaster );
-int   FX_SetupSoundBlaster( fx_blaster_config blaster, int *MaxVoices, int *MaxSampleBits, int *MaxChannels );
 int   FX_Init( int SoundCard, int numvoices, int numchannels, int samplebits, unsigned mixrate );
 int   FX_Shutdown( void );
 int   FX_SetCallBack( void ( *function )( unsigned long ) );

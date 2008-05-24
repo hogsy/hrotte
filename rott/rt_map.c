@@ -394,26 +394,40 @@ void DrawMap_MaskedShape (int x, int y, int lump, int type)
 =======================
 */
 
+/* Indices: mapscale, reduced coordinate */
+static const int arrowscale[4][5] =
+{{ 1,17,32,47,63},  /* Mapscale 0: 64 pixels/sprite */
+ { 1, 9,16,23,31},  /* Mapscale 1: 32 pixels/sprite */
+ { 1, 5, 8,11,15},  /* Mapscale 2: 16 pixels/sprite */
+ { 1, 3, 4, 5, 7}}; /* Mapscale 3:  8 pixels/sprite */
+
 void DrawMap_PlayerArrow (int x, int y, int dir)
 {
    int i;
-
+   
    x*=tilesize;
    y*=tilesize;
 
+   /* You can't draw a 4x4 arrow */
+   if(mapscale == 4)
+   {
+     VL_Bar(x+1,y+1,2,2,244);
+     return;
+   }
+
    for (i=0;i<6;i++)
       {
-      VL_DrawLine ((arrows[dir][i].x<<(4-mapscale))+x,
-                   (arrows[dir][i].y<<(4-mapscale))+y,
-                   (arrows[dir][i+1].x<<(4-mapscale))+x,
-                   (arrows[dir][i+1].y<<(4-mapscale))+y,
+      VL_DrawLine (arrowscale[mapscale][arrows[dir][i].x]+x,
+                   arrowscale[mapscale][arrows[dir][i].y]+y,
+                   arrowscale[mapscale][arrows[dir][i+1].x]+x,
+                   arrowscale[mapscale][arrows[dir][i+1].y]+y,
                    244
                   );
       }
-   VL_DrawLine (  (arrows[dir][6].x<<(4-mapscale))+x,
-                  (arrows[dir][6].y<<(4-mapscale))+y,
-                  (arrows[dir][0].x<<(4-mapscale))+x,
-                  (arrows[dir][0].y<<(4-mapscale))+y,
+   VL_DrawLine (  arrowscale[mapscale][arrows[dir][6].x]+x,
+                  arrowscale[mapscale][arrows[dir][6].y]+y,
+                  arrowscale[mapscale][arrows[dir][0].x]+x,
+                  arrowscale[mapscale][arrows[dir][0].y]+y,
                   244
                );
 }
@@ -560,7 +574,7 @@ void DrawMap( int cx, int cy )
                      DrawMap_Actor(i,j,a);
                      break;
                   default:
-                     SoftError("Unable to resolve actorat at x=%ld y=%ld which=%ld\n",mapx,mapy,a->which);
+                     SoftError("Unable to resolve actorat at x=%d y=%d which=%d\n",mapx,mapy,a->which);
                      break;
                   }
                }
@@ -729,7 +743,7 @@ void DrawFullMap( void )
                         *(buf)=egacolor[MAP_SPRITECOLOR];
                      break;
                   default:
-                     SoftError("Unable to resolve actorat at x=%ld y=%ld which=%ld\n",mapx,mapy,a->which);
+                     SoftError("Unable to resolve actorat at x=%d y=%d which=%d\n",mapx,mapy,a->which);
                      break;
                   }
                }

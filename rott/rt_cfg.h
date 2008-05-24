@@ -46,7 +46,9 @@ extern int     threshold;
 extern int     NumVoices;
 extern int     NumChannels;
 extern int     NumBits;
+#ifdef DOS
 extern int     MidiAddress;
+#endif
 extern boolean stereoreversed;
 extern boolean cybermanenabled;
 extern boolean assassinenabled;
