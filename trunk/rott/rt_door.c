@@ -745,7 +745,12 @@ void TriggerStuff(void)
             break;
             }
          }
-
+#if (BNACRASHPREVENT == 1)
+	  //SetTextMode (  ); qwert
+	  //	CRASH IN SHAREWARE 'ride em cowboy' BNA FIX
+      // DONT ALLOW BAD touchplate ( == 0 ) see rt_playr.c
+	  if (touchplate[i] == 0) {continue;}
+#endif
 
       if (!TRIGGER[i])
          continue;

@@ -30,8 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define HEIGHTFRACTION 6
 #define MAXVIEWSIZES   11
 
-#define FOCALWIDTH 160
-#define FPFOCALWIDTH 160.0
+//#define FOCALWIDTH 160//160
+//#define FPFOCALWIDTH 160.0//160.0
+ 
 
 #define NUMGAMMALEVELS 8
 #define GAMMAENTRIES (64*8)
@@ -74,7 +75,8 @@ typedef enum
    } playercolors;
 
 extern byte * playermaps[MAXPLAYERCOLORS];
-extern short  pixelangle[MAXVIEWWIDTH];
+//extern short  pixelangle[MAXVIEWWIDTH];
+extern short  pixelangle[800];
 extern byte   gammatable[GAMMAENTRIES];
 extern int    gammaindex;
 extern byte   uniformcolors[MAXPLAYERCOLORS];

@@ -39,12 +39,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "memcheck.h"
 #include "rt_util.h"
 
-
+void    SchrinkMemPicture();
+void StrechMemPicture ();
+void StrechFlipMemPicture ();
 // GLOBAL VARIABLES
 
-
+boolean StrechScreen=true;//bná++
+extern char *tmpPICbuf;
+char *sdl_surfacePTR;
+extern int iG_aimCross;
+extern int iG_X_center;
+extern int iG_Y_center;
+char 	   *iG_buf_center;
+  
 int    linewidth;
-int    ylookup[MAXSCREENHEIGHT];
+//int    ylookup[MAXSCREENHEIGHT];
+int    ylookup[600];//just set to max res
 byte  *page1start;
 byte  *page2start;
 byte  *page3start;
@@ -52,6 +62,10 @@ int    screensize;
 byte  *bufferofs;
 byte  *displayofs;
 boolean graphicsmode=false;
+char        *bufofsTopLimit;
+char        *bufofsBottomLimit;
+
+void DrawCenterAim ();
 
 #ifdef DOS
 
@@ -171,7 +185,7 @@ void VL_SetLineWidth (unsigned width)
 
    offset = 0;
 
-   for (i=0;i<MAXSCANLINES;i++)
+   for (i=0;i<iGLOBAL_SCREENHEIGHT;i++)
       {
       ylookup[i]=offset;
       offset += linewidth;
@@ -191,7 +205,7 @@ void VL_SetVGAPlaneMode ( void )
     GraphicsMode();
     VL_DePlaneVGA ();
     VL_SetLineWidth (48);
-    screensize=208*SCREENBWIDE;
+    screensize=208*iGLOBAL_SCREENBWIDE*2;//bna++ *2
     page1start=0xa0200;
     page2start=0xa0200+screensize;
     page3start=0xa0200+(2u*screensize);
@@ -426,12 +440,12 @@ void GraphicsMode ( void )
 
     SDL_WM_SetCaption ("Rise of the Triad", "ROTT");
     SDL_ShowCursor (0);
-    sdl_surface = SDL_SetVideoMode (320, 200, 8, flags);
-    
+//    sdl_surface = SDL_SetVideoMode (320, 200, 8, flags);
+    sdl_surface = SDL_SetVideoMode (iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT, 8, flags);    
 	if (sdl_surface == NULL)
 	{
 		Error ("Could not set video mode\n");
-	}
+	} 
 }
 
 /*
@@ -494,23 +508,36 @@ void VL_SetVGAPlaneMode ( void )
 //
 // set up lookup tables
 //
-   linewidth = 320;
+//bna--   linewidth = 320;
+   linewidth = iGLOBAL_SCREENWIDTH;
 
    offset = 0;
 
-   for (i=0;i<MAXSCANLINES;i++)
+   for (i=0;i<iGLOBAL_SCREENHEIGHT;i++)
       {
       ylookup[i]=offset;
       offset += linewidth;
       }
 
-    screensize=MAXSCREENHEIGHT*MAXSCREENWIDTH;
+//    screensize=MAXSCREENHEIGHT*MAXSCREENWIDTH;
+    screensize=iGLOBAL_SCREENHEIGHT*iGLOBAL_SCREENWIDTH;
+
+
 
     page1start=sdl_surface->pixels;
     page2start=sdl_surface->pixels;
     page3start=sdl_surface->pixels;
     displayofs = page1start;
     bufferofs = page2start;
+
+	iG_X_center = iGLOBAL_SCREENWIDTH / 2;
+	iG_Y_center = (iGLOBAL_SCREENHEIGHT / 2)+10 ;//+10 = move aim down a bit
+
+	iG_buf_center = bufferofs + (screensize/2);//(iG_Y_center*iGLOBAL_SCREENWIDTH);//+iG_X_center;
+
+	bufofsTopLimit =  bufferofs + screensize - iGLOBAL_SCREENWIDTH;
+	bufofsBottomLimit = bufferofs + iGLOBAL_SCREENWIDTH;
+
     XFlipPage ();
 }
 
@@ -637,7 +664,7 @@ void VL_ClearVideo (byte color)
   VGAMAPMASK(15);
   memset((byte *)(0xa000<<4),color,0x10000);
 #else
-  memset (sdl_surface->pixels, color, MAXSCREENWIDTH*MAXSCREENHEIGHT);
+  memset (sdl_surface->pixels, color, iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT);
 #endif
 }
 
@@ -657,9 +684,16 @@ void VL_DePlaneVGA (void)
 /* C version of rt_vh_a.asm */
 
 void VH_UpdateScreen (void)
-{
+{ 	
+
+	if ((StrechScreen==true)&&(iGLOBAL_SCREENWIDTH > 320)){//bna++
+		StrechMemPicture ();
+	}else{
+		DrawCenterAim ();
+	}
 	SDL_UpdateRect (SDL_GetVideoSurface (), 0, 0, 0, 0);
 }
+
 
 /*
 =================
@@ -685,8 +719,213 @@ void XFlipPage ( void )
    if (bufferofs > page3start)
       bufferofs = page1start;
 #else
+ 	if ((StrechScreen==true)&&(iGLOBAL_SCREENWIDTH > 320)){//bna++
+		StrechMemPicture ();
+	}else{
+		DrawCenterAim ();
+	}
    SDL_UpdateRect (sdl_surface, 0, 0, 0, 0);
+ 
 #endif
 }
 
 #endif
+
+
+
+
+
+
+// bna section -------------------------------------------
+void StrechMemPicture ()
+{
+
+		//strech mem //	   SetTextMode (  );
+   		byte *source,*target,*tmp,*tmp2;
+		int x,y,x1,y1;
+		int cnt,NbOfLines;
+		float Yratio,Xratio,old;
+
+		//strech pixels in X direction
+		source = ( byte * )( sdl_surface->pixels);//store screen in tmp pic mem
+		sdl_surfacePTR = source;
+		memcpy( tmpPICbuf, source, (200*iGLOBAL_SCREENWIDTH) );
+
+		source = tmpPICbuf;
+		target = ( byte * )( sdl_surface->pixels);//screen buffer
+
+	    Xratio = iGLOBAL_SCREENWIDTH * 10/ 320;
+		Xratio = (Xratio/10);
+		cnt = (int)Xratio; 
+		Xratio = (Xratio - cnt)/2; 
+		old = 0;
+
+		for (y=0;y<200;y++){
+			tmp = source;
+			tmp2 = target;
+			//write pixel x and x-1 in line 1
+			for (x=0;x<320;x++){
+				for (x1=0;x1<cnt;x1++){
+					//copy one pixel ----------------------
+					*(target++) = *(source) ;
+					old += Xratio;
+					//-----------------------------------
+					if (old > 1) {
+						//copy extra pixel
+						*(target++) = *(source) ;				
+						old -= 1;
+					}
+				}
+				source++;
+			}
+			source = tmp + iGLOBAL_SCREENWIDTH;
+			target = tmp2 + iGLOBAL_SCREENWIDTH;
+		}
+
+		//strech lines in Y direction
+		source = ( byte * )( sdl_surface->pixels);//store screen in tmp pic mem
+		memcpy( tmpPICbuf, source, (200*iGLOBAL_SCREENWIDTH) );
+
+		source = tmpPICbuf;
+		target = ( byte * )( sdl_surface->pixels);//screen buffer
+
+		Yratio = iGLOBAL_SCREENHEIGHT * 10/ 200;//we shall strech 200 lines to 480/600
+		Yratio = (Yratio/10);
+		cnt = (int)Yratio; //2
+		Yratio = (Yratio - cnt)/2; //.2
+		NbOfLines=0;//make sure we dont exeed iGLOBAL_SCREENHEIGHT or we get a crash
+		old = 0;
+
+		for (y=0;y<200;y++){
+			for (y1=0;y1<cnt;y1++){
+				//copy one line ----------------------
+				memcpy(target, source,iGLOBAL_SCREENWIDTH);
+				if (NbOfLines++ >= iGLOBAL_SCREENHEIGHT-1){goto stopx;}
+				target += (iGLOBAL_SCREENWIDTH);
+				old += Yratio;
+				//-----------------------------------
+				if (old > 1) {
+					//copy extra line
+					memcpy(target, source,iGLOBAL_SCREENWIDTH);				
+					if (NbOfLines++ >= iGLOBAL_SCREENHEIGHT-1){goto stopx;}
+					target += (iGLOBAL_SCREENWIDTH);
+					old -= 1;
+				}
+			}
+			source += iGLOBAL_SCREENWIDTH;
+		}
+stopx:;
+
+
+
+
+}
+
+
+void SchrinkMemPicture( byte * source)
+{ 
+	//schrink mem picure and plce it in tmpPICbuf
+   	byte *target,*tmp,*tmp2;
+	int x,y;
+	int cnt,NbOfLines;
+	float Yratio,Xratio,old;
+
+	target = tmpPICbuf;
+
+    Xratio = iGLOBAL_SCREENWIDTH * 10/ 320;
+	Xratio = (Xratio/10);
+	cnt = (int)Xratio; //2
+	Xratio = (Xratio - cnt)/2; //.2
+	old = 0;	
+
+	// delte redunted pixels
+	for (y=0;y<iGLOBAL_SCREENHEIGHT;y++){
+		tmp = source;
+		tmp2 = target;
+		for (x=0;x<iGLOBAL_SCREENWIDTH;x++){
+			//copy 1 pixel
+			*(target++) = *(source) ;
+			source += cnt;
+			old += Xratio;
+			if (old >= 1) {
+				source++;
+				old -= 1;
+			}
+		}
+		source = tmp + iGLOBAL_SCREENWIDTH;
+		target = tmp2 + iGLOBAL_SCREENWIDTH;
+	}
+	//delete every redunted lines
+	source = tmpPICbuf;//+(1* iGLOBAL_SCREENWIDTH);
+	target = tmpPICbuf;
+
+	Yratio = iGLOBAL_SCREENHEIGHT * 10 / 200;//we shall schrink 480/600 lines to 200  
+	Yratio = (Yratio/10);
+	cnt = (int)Yratio; //2
+	Yratio = (Yratio - cnt); //.2
+	NbOfLines=0;//make sure we dont exeed iGLOBAL_SCREENHEIGHT or we get a crash
+	old = 0;
+//SetTextMode (  );
+	for (y=0;y<200;y++){
+		//if (source > (tmpPICbuf+(iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT))){goto stopy;}
+		memcpy(target, source, iGLOBAL_SCREENWIDTH);	
+		source += (cnt * iGLOBAL_SCREENWIDTH);
+		old += Yratio;
+		if (old > 1) {
+			//delte extra line
+			source += iGLOBAL_SCREENWIDTH;
+			old -= 1;
+		}
+		target += iGLOBAL_SCREENWIDTH;
+	}
+
+//stopy:;	
+}
+
+// bna function added start
+extern	boolean ingame;
+int		iG_playerTilt;
+
+void DrawCenterAim ()
+{
+	int x;
+	if (iG_aimCross > 0){
+		if (( ingame == true )&&(iGLOBAL_SCREENWIDTH>320)){
+			  if ((iG_playerTilt <0 )||(iG_playerTilt >iGLOBAL_SCREENHEIGHT/2)){
+					iG_playerTilt = -(2048 - iG_playerTilt);
+			  }
+			  if (iGLOBAL_SCREENWIDTH == 640){ x = iG_playerTilt;iG_playerTilt=x/2; }
+			  iG_buf_center = bufferofs + ((iG_Y_center-iG_playerTilt)*iGLOBAL_SCREENWIDTH);//+iG_X_center;
+
+			  for (x=iG_X_center-10;x<=iG_X_center-4;x++){
+				  if ((iG_buf_center+x < bufofsTopLimit)&&(iG_buf_center+x > bufofsBottomLimit)){
+					 *(iG_buf_center+x) = 75;
+				  }
+			  }
+			  for (x=iG_X_center+4;x<=iG_X_center+10;x++){
+				  if ((iG_buf_center+x < bufofsTopLimit)&&(iG_buf_center+x > bufofsBottomLimit)){
+					 *(iG_buf_center+x) = 75;
+				  }
+			  }
+			  for (x=10;x>=4;x--){
+				  if (((iG_buf_center-(x*iGLOBAL_SCREENWIDTH)+iG_X_center) < bufofsTopLimit)&&((iG_buf_center-(x*iGLOBAL_SCREENWIDTH)+iG_X_center) > bufofsBottomLimit)){
+					 *(iG_buf_center-(x*iGLOBAL_SCREENWIDTH)+iG_X_center) = 75;
+				  }
+			  }
+			  for (x=4;x<=10;x++){
+				  if (((iG_buf_center-(x*iGLOBAL_SCREENWIDTH)+iG_X_center) < bufofsTopLimit)&&((iG_buf_center-(x*iGLOBAL_SCREENWIDTH)+iG_X_center) > bufofsBottomLimit)){
+					 *(iG_buf_center+(x*iGLOBAL_SCREENWIDTH)+iG_X_center) = 75;
+				  }
+			  }
+		}
+	}
+}
+// bna function added end
+
+
+
+
+// bna section -------------------------------------------
+
+
+

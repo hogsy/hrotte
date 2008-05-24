@@ -71,6 +71,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_str.h"
 #endif
 
+extern boolean usejump;
+
+
 specials CurrentSpecialsTimes =
       {
       60*VBLCOUNTER, // god
@@ -251,6 +254,7 @@ void     CheckWeaponChange (objtype * ob);
 void     PlayerMissileAttack(objtype* );
 void     Cmd_Use(objtype*);
 //void     ComError (char *error, ...);
+int      FinddTopYZANGLELIMITvalue(objtype *ob);
 
 statetype s_free = {false,0,0,T_Free,0,&s_free};
 statetype s_inelevator = {false,0,420,T_Player,0,&s_player};
@@ -1546,6 +1550,12 @@ void PlayNoWaySound ( void )
 ===============
 */
 
+boolean AreJumping = false;//bna added
+int		oldzval;
+int donttilt=0;
+
+
+
 void Cmd_Use (objtype*ob)
 {
    int             checkx,checky,doorn,
@@ -1633,6 +1643,27 @@ void Cmd_Use (objtype*ob)
 //       tempsprite = sprites[checkx][checky];
    if (doorn == (elevatorstart + 6))
       return;
+
+   //bna ++ jumpmode
+   //SetTextMode (  );
+   if (!BATTLEMODE){//dont use jump in battle, spoils sync
+   if (usejump == true){
+   if (pstate->buttonheld[bt_use]){
+   if ((AreJumping == false)&&(ob->z > 0)&&(doorn==0)){
+	    oldzval = ob->z;
+		ob->z -= 15;
+		ob->momentumz += GRAVITY;
+		AreJumping = true;
+		donttilt=10;
+		return;
+   } 
+		AreJumping = false;
+		return;
+   }
+   }
+   }
+   //bna 
+
 
    if (pstate->buttonheld[bt_use])
       return;
@@ -1799,8 +1830,28 @@ void Cmd_Use (objtype*ob)
 
          }
       }
-   else if ((tempwall) && (tempwall->which == WALL) && (ob==player))
+   else if ((tempwall) && (tempwall->which == WALL) && (ob==player)){
       PlayNoWaySound();
+   	  //bna ++ jumpmode
+   //SetTextMode (  );
+   if (!BATTLEMODE){//dint use jump in battle, spoils sync
+   if (usejump == true){
+   if (pstate->buttonheld[bt_use]){
+   if ((AreJumping == false)&&(ob->z > 0)&&(doorn==0)){
+	    oldzval = ob->z;
+		ob->z -= 15;
+		ob->momentumz += GRAVITY;
+		AreJumping = true;
+		donttilt=10;
+		return;
+   } 
+		AreJumping = false;
+		return;
+   }
+   }
+   }
+	  //bna 
+	  }
 //      else
 //         SD_PlaySoundRTP (SD_NOWAYSND,ob->x,ob->y);
 //   pstate->buttonheld[bt_use] = true;
@@ -1843,7 +1894,7 @@ void PollKeyboardButtons (void)
 // PollMouseButtons
 //
 //******************************************************************************
-
+extern boolean usemouselook;
 void PollMouseButtons (void)
    {
    int i;
@@ -1859,12 +1910,22 @@ void PollMouseButtons (void)
       press = buttons & mask;
 
       if ( press )
-         {
+         {//SetTextMode (  );
 //         if ( ( buttonmouse[ i ] != bt_nobutton ) &&
 //            ( DoubleClickCount[ i ] != 2 ) )
          if ( buttonmouse[ i ] != bt_nobutton )
             {
             buttonpoll[ buttonmouse[ i ] ] = true;
+			//bna added
+			if ((i == 1)&&(usemouselook == true)){
+			//if rightclick set horizon to 512 (normall)
+				playertype * pstate;
+				pstate=&PLAYERSTATE[consoleplayer];
+				pstate->horizon = 512;
+				// SetNormalHorizon(PLAYER[0]);
+			}
+			//bna added
+
             }
          }
 
@@ -2116,7 +2177,7 @@ void PollKeyboardMove
 //#define MOUSE_RY_SHIFT 12
 //#define MOUSE_TZ_SHIFT 3
 #define MOUSE_TZ_SENSITIVITY_SCALE 65535
-#define MOUSE_RY_SENSITIVITY_SCALE 18725
+#define MOUSE_RY_SENSITIVITY_SCALE 18725*2
 //#define MOUSE_RY_INPUT_SCALE 6000
 #define MOUSE_TZ_INPUT_SCALE 20
 int mouse_ry_input_scale = 5000;
@@ -2125,17 +2186,36 @@ int sensitivity_scalar[15] =
     {
     0,1,2,3,4,5,6,8,11,13,15,18,12,13,14
     };
-
 //#define MOUSE_RY_SCALE 65535
-
 //#define MOUSE_TZ_SCALE 65535
 #define MAXMOUSETURN 7000000
+
+/* use SDL mouse */
+#define USESDLMOUSE 1
+
+
+extern int inverse_mouse;
+ double Y_MouseSpeed=70;
 
 void PollMouseMove (void)
 {
    int  mousexmove, mouseymove;
+   double Ys;
+//SetTextMode();
 
+   Ys=(Y_MouseSpeed/100);
+//
+
+// const long inverse_mouse  = 1; //set  to -1 to invert mouse
+// inverse_mouse def moved to RT_CFG.C
+
+#ifdef USESDLMOUSE
    INL_GetMouseDelta(&mousexmove, &mouseymove);
+#else
+   PollMouse();//Uses DirectInput mouse in DInput.cpp
+   mousexmove=MX;
+   mouseymove=MY;
+#endif
 
    if (abs(mousexmove)>abs(mouseymove))
       mouseymove/=2;
@@ -2146,31 +2226,60 @@ void PollMouseMove (void)
 
 
    if ((abs (mouseymove)) >= threshold)
-      {
+      {//
       MY =  MOUSE_TZ_INPUT_SCALE*mouseymove;
+	  MY *= inverse_mouse;
+	  if (usemouselook == true){
+		  if (MY > 0){
+				playertype * pstate;
+				pstate=&PLAYERSTATE[consoleplayer];
+				//if (pstate->horizon > 512){
+					pstate->horizon -= Ys * (2*sensitivity_scalar[mouseadjustment]);
+				//}
+		  }
+		  else if (MY < 0){
+		  		playertype * pstate;
+				pstate=&PLAYERSTATE[consoleplayer];
+				//SetTextMode (  );
+				pstate->horizon += Ys * (2*sensitivity_scalar[mouseadjustment]);
+				//buttonpoll[ bt_horizonup ] = true;
+		  }
+		  MY = 0;
+	  }else{
+		 // MY += FixedMul(MY,mouseadjustment*MOUSE_TZ_SENSITIVITY_SCALE);
+		  if (abs(mouseymove)>200)
+			 {
+			 buttonpoll[bt_run]=true;
+			 // buttonpoll[ bt_lookup ] = true;
+			 }
+		  }
+	  }
 
-     // MY += FixedMul(MY,mouseadjustment*MOUSE_TZ_SENSITIVITY_SCALE);
-      if (abs(mouseymove)>200)
-         {
-         buttonpoll[bt_run]=true;
-         }
-      }
+
+
+		 
 
    if ((abs (mousexmove)) >= threshold)
-      {
+   {
       //MX = -MOUSE_RY_INPUT_SCALE*mousexmove;
       MX = -mouse_ry_input_scale*mousexmove;
       MX += FixedMul(MX,sensitivity_scalar[mouseadjustment]*MOUSE_RY_SENSITIVITY_SCALE);
    //   if (abs(MX) > MAXMOUSETURN)
      //   MX = MAXMOUSETURN*SGN(MX);
-      if (abs(mouseymove)>10)
-         {
-         buttonpoll[bt_run]=true;
-         }
-      }
-
+	  if (usemouselook == true){
+		  if (abs(mouseymove)>10)
+		  {
+			 buttonpoll[bt_run]=true;
+			  //buttonpoll[ bt_lookdown ] = true;
+		  }
+	  }
+   }
 //   if (MY > 0)
 //      MX -= (MX/2);
+
+//   MX=0;
+//   MY=0;
+
 }
 
 
@@ -2853,8 +2962,25 @@ void PollControls (void)
          AddPauseStateCommand(COM_PAUSE);
          }
       }
-	if (Keyboard[sc_Insert] && Keyboard[sc_X])
-      AddExitCommand();
+   if (Keyboard[sc_Insert] && Keyboard[sc_X]){
+	      AddExitCommand();
+   }
+//bna section
+   if (Keyboard[sc_5]){
+	//	 SetTextMode (  );
+      weaponscale +=  1000;
+	  //testval++;
+   }
+   if (Keyboard[sc_6]){
+	//	 SetTextMode (  );
+      weaponscale -=  1000;
+	  	//  testval--;
+   }
+//bna section end 
+
+
+
+
 
    for (i = (NUMTXBUTTONS-1); i >= 0; i--)
       {
@@ -3761,15 +3887,23 @@ void Thrust ( objtype * ob )
 
    index = touchindices[ob->tilex][ob->tiley];
 	if (index && (abs(ob->z - nominalheight) < 5))
-	 {if (!TRIGGER[index-1])
-		{if (touchplate[index-1]->complete)
-			SD_PlaySoundRTP(SD_BADTOUCHSND,ob->x,ob->y);
-		 else
-         {
-         SD_PlaySoundRTP(SD_TOUCHPLATESND,ob->x,ob->y);
-         if (ob == player)
-            AddMessage("Touchplate triggered.",MSG_GAME);         }
-		}
+	 {if (!TRIGGER[index-1]){
+#if (BNACRASHPREVENT == 1)
+		if (touchplate[index-1] != 0) { //	CRASH IN SHAREWARE 'ride em cowboy' BNA FIX
+			 //SetTextMode (  ); qwert  // DONT ALLOW BAD touchplate ( == 0 ) see rt_door.c
+#endif
+			 if (touchplate[index-1]->complete)
+				SD_PlaySoundRTP(SD_BADTOUCHSND,ob->x,ob->y);
+			 else {
+				SD_PlaySoundRTP(SD_TOUCHPLATESND,ob->x,ob->y);
+				if (ob == player)
+					AddMessage("Touchplate triggered.",MSG_GAME);  
+			 }
+#if (BNACRASHPREVENT == 1)
+		}else{SD_PlaySoundRTP(SD_BADTOUCHSND,ob->x,ob->y);} 
+		//	CRASH IN SHAREWARE 'ride em cowboy' BNA FIX
+#endif
+	}
 	  TRIGGER[index-1] = 1;
 	 }
 
@@ -4022,12 +4156,19 @@ void SetNormalHorizon (objtype * ob)
 =
 ===================
 */
-
+extern int iG_playerTilt;
+extern double dTopYZANGLELIMIT;
 void PlayerTiltHead (objtype * ob)
 {
 	playertype * pstate;
    int dyz=0;
    int yzangle;
+
+//bna++   jumpmode
+  if ((donttilt > 0)){
+	  donttilt--;
+	  return;
+  }
 
 	M_LINKSTATE(ob,pstate);
 
@@ -4158,22 +4299,139 @@ void PlayerTiltHead (objtype * ob)
       if ((abs(yzangle-pstate->horizon))<SNAPBACKSPEED)
          yzangle=pstate->horizon;
       }
+//SetTextMode();
+
+	if (yzangle != 512){
+		FinddTopYZANGLELIMITvalue(ob);
+	}
+
+
    yzangle+=dyz;
    if (yzangle-HORIZONYZOFFSET>YZANGLELIMIT)
        yzangle=HORIZONYZOFFSET+YZANGLELIMIT;
-   else if (yzangle-HORIZONYZOFFSET<-YZANGLELIMIT)
-       yzangle=HORIZONYZOFFSET-YZANGLELIMIT;
-
+/*   else if (yzangle-HORIZONYZOFFSET<-TopYZANGLELIMIT)//bnafix
+       yzangle=HORIZONYZOFFSET-TopYZANGLELIMIT;//bnafix
+dTopYZANGLELIMIT*/
+   else if (yzangle-HORIZONYZOFFSET<-dTopYZANGLELIMIT)//bnafix
+       yzangle=HORIZONYZOFFSET-dTopYZANGLELIMIT;//bnafix
    ob->yzangle=yzangle-HORIZONYZOFFSET;
    Fix(ob->yzangle);
+
+   iG_playerTilt = ob->yzangle;
+
 }
+
+//----------------------------------------------------------------------
+// bna added function
+// if a player is to close to wall, looking down max
+//,this func limit the dTopYZANGLELIMIT value when
+// facing a wall 
+#define SMALLANGLE 90
+//there is small angles where didnt work
+//so we check for them to = 90/2048 = aprox, 15 degrees
+int FinddTopYZANGLELIMITvalue(objtype *ob)
+{/*
+
+
+checkx = ob->tilex + 1;
+checky = ob->tiley + 1;
+if (actorat[checkx][checky]){
+	return 0;
+}
+return 1;
+
+checkx = ob->tilex ;
+checky = ob->tiley;
+
+// find which direction the player is facing
+//and check if it is a wall
+
+*/
+
+   //use lowest down angle		   	   	
+	dTopYZANGLELIMIT = (26*FINEANGLES/360);
+   
+	if (ob->angle < 256 || ob->angle > 1792) {
+	   if ((tilemap[ob->tilex + 1][ob->tiley])!=0){
+
+			return 0;
+	   }
+       //ob->dir = east;
+   }else if (ob->angle < 768) {
+	   if ((tilemap[ob->tilex][ob->tiley-1])!=0){
+			return 0;
+	   }
+   }else if (ob->angle < 1280) {
+	   if ((tilemap[ob->tilex-1][ob->tiley])!=0){
+			return 0;
+	   }
+   }else{
+	   if ((tilemap[ob->tilex][ob->tiley+1])!=0){
+			return 0;
+	   }
+   }
+
+
+   //use middle down angle
+   dTopYZANGLELIMIT = (42*FINEANGLES/360);
+
+   if ((ob->angle > 768-SMALLANGLE)&&(ob->angle <= 768)) { 
+   	   if ((tilemap[ob->tilex -1][ob->tiley])!=0){//ob->tiley-1
+			return 0;
+	   }
+   }
+   if ((ob->angle < 1280+SMALLANGLE)&&(ob->angle >= 1280)) { 
+   	   if ((tilemap[ob->tilex - 1][ob->tiley])!=0){//ob->tiley+1
+			return 0;
+	   }
+   } 
+   if ((ob->angle > 256)&&(ob->angle <= 256+SMALLANGLE)) { 
+   	   if ((tilemap[ob->tilex + 1][ob->tiley])!=0){//ob->tiley-1
+			return 0;
+	   }
+   }   
+   if ((ob->angle < 1792)&&(ob->angle >= 1792-SMALLANGLE)) { 
+   	   if ((tilemap[ob->tilex + 1][ob->tiley])!=0){//ob->tiley+1
+			return 0;
+	   }
+   } 
+   if ((ob->angle < 1280)&&(ob->angle >= 1280-SMALLANGLE)) { 
+   	   if ((tilemap[ob->tilex ][ob->tiley+1])!=0){//ob->tilex-1
+			return 0;
+	   }
+   } 
+   if ((ob->angle > 1792)&&(ob->angle <= 1792+SMALLANGLE)) { 
+   	   if ((tilemap[ob->tilex ][ob->tiley+1])!=0){//ob->tiley+1
+			return 0;
+	   }
+   } 
+   if ((ob->angle > 768)&&(ob->angle <= 768+SMALLANGLE)) { 
+   	   if ((tilemap[ob->tilex][ob->tiley-1])!=0){//ob->tiley-1
+			return 0;
+	   }
+   }
+   if ((ob->angle < 256)&&(ob->angle >= 256-SMALLANGLE)) { 
+   	   if ((tilemap[ob->tilex][ob->tiley-1])!=0){//ob->tiley-1
+			return 0;
+	   }
+   }
+
+   //use max down angle
+   dTopYZANGLELIMIT = (90*FINEANGLES/360);
+   return 1;
+}
+// bna added function end
+//----------------------------------------------------------------------
+
+
+
 
 /*
 ===================
 =
 = UpdatePlayers
 =
-===================
+=================== QWERTYU
 */
 void UpdatePlayers ( void )
 {
@@ -4182,6 +4440,11 @@ void UpdatePlayers ( void )
 
 	for (obj = FIRSTACTOR; obj->obclass==playerobj; obj = obj->next)
 		 {
+
+//ErrorDontQuit("obj->next = ",obj->next);
+#if (BNACRASHPREVENT == 1)//crashed here when oscuro and larves were all killed
+		if (obj->next == 0){return;}
+#endif
        obj->speed=FindDistance(obj->momentumx, obj->momentumy);
 //       M_LINKSTATE(obj,pstate);
 //       pstate->steptime-=obj->speed;

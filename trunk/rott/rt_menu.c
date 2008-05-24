@@ -132,6 +132,8 @@ battle_type BATTLE_Options[ battle_NumBattleModes ];
 
 int quicksaveslot=-1;
 
+extern char *tmpPICbuf;
+
 //******************************************************************************
 //
 // LOCALS
@@ -715,18 +717,22 @@ CP_MenuNames ControlMMenuNames[] =
    {
    "CONTROLS",
    "USER OPTIONS",
+   "EXT USER OPTIONS",//bna added
    "MUSIC VOLUME",
    "SOUND FX VOLUME"
-   };
 
-CP_iteminfo ControlMItems = {32, 48, 4, 0, 32, ControlMMenuNames, mn_largefont };
+   };
+CP_iteminfo ControlMItems = {32, 48-8, 5, 0, 32, ControlMMenuNames, mn_largefont };//bna added
+//CP_iteminfo ControlMItems = {32, 48, 4, 0, 32, ControlMMenuNames, mn_largefont };
 
 CP_itemtype ControlMMenu[] =
 {
    {2, "cntl\0",     'C', (menuptr)CP_Control},
    {1, "uopt\0",     'U', (menuptr)CP_OptionsMenu},
+   {1, "euopt\0", 'E', (menuptr)CP_ExtOptionsMenu},//bna added
    {1, "muvolumn\0", 'M', (menuptr)MusicVolume},
    {1, "fxvolumn\0", 'S', (menuptr)FXVolume}
+
 };
 
 CP_MenuNames OptionsNames[] =
@@ -741,6 +747,26 @@ CP_MenuNames OptionsNames[] =
    "VIOLENCE LEVEL",
    "SCREEN SIZE"
    };
+//bna added
+CP_MenuNames ExtOptionsNames[] =
+   {
+   "MOUSELOOK",
+   "INVERSE MOUSE",
+   "CROSS HAIR",
+   "JUMPING"
+
+   };
+CP_iteminfo ExtOptionsItems = { 20, MENU_Y, 4, 0, 43, ExtOptionsNames, mn_largefont };
+
+CP_itemtype ExtOptionsMenu[] =
+{
+   {1, "", 'M', NULL},
+   {1, "", 'I', NULL},
+   {1, "", 'C', NULL},
+   {1, "", 'J', NULL}
+};
+   
+//bna added end
 
 CP_iteminfo OptionsItems = { 20, MENU_Y, 9, 0, 43, OptionsNames, mn_largefont };
 
@@ -1479,11 +1505,26 @@ void SetUpControlPanel (void)
    byte * b;
    byte * s;
 
+//   int Xres = 320;//org
+//   int Yres = 200;//org
+   int Xres = 640;
+   int Yres = 400;
+
+   //dont work in 800x600 until we get a better screen schrinker
+  //  int Xres = iGLOBAL_SCREENWIDTH;//640;
+ //  int Yres = iGLOBAL_SCREENHEIGHT;//400;
+
+  Xres = 640;
+   Yres = 400;
+
+
+
    // Save the current game screen
 
-   savedscreen = SafeMalloc (16000);
+   //bna--savedscreen = SafeMalloc (16000);
+   savedscreen = SafeMalloc (16000*8);
 
-   // Copy the current screen to this buffer
+   // Copy the current save game screen (½ size) to this buffer
 
    if (RefreshPause==false)
       {
@@ -1493,20 +1534,34 @@ void SetUpControlPanel (void)
       FlipPage();
       GamePaused=true;
       }
+
+
    s=savedscreen;
-   for (i=0;i<320;i+=2)
-      {
-#ifdef DOS
-      VGAREADMAP(i&3);
-      b=(byte *)bufferofs+(i>>2);
-      for (j=0;j<100;j++,s++,b+=SCREENBWIDE<<1)
-         *s=*b;
-#else
-      b=(byte *)bufferofs+i;
-      for (j=0;j<100;j++,s++,b+=(MAXSCREENWIDTH<<1))
-         *s=*b;
-#endif
-      }
+
+
+    
+	  if (iGLOBAL_SCREENWIDTH == 320) { 
+		  for (i=0;i<Xres;i+=2)	{	  
+			  b=(byte *)bufferofs+i;
+			  for (j=0;j<100;j++,s++,b+=(iGLOBAL_SCREENWIDTH<<1))
+				 *s=*b;
+		  }
+	  }	  
+	  if (iGLOBAL_SCREENWIDTH >= 640) { 
+		  for (i=0;i<Xres;i+=4)	{		  
+			  b=(byte *)bufferofs+i;//schrink screen to 1/2 size
+			  for (j=0;j<(Yres/4);j++,s++,b+=(iGLOBAL_SCREENWIDTH<<1)*2)
+				 *s=*b;
+			  }
+	  }/*
+      if (iGLOBAL_SCREENWIDTH == 800) { 	 
+		  for (i=0;i<Xres;i+=8)		{	  
+			  b=(byte *)bufferofs+i;//schrink screen to 1/3 size
+			  for (j=0;j<(Yres/8);j++,s++,b+=(iGLOBAL_SCREENWIDTH<<1)*3)
+				 *s=*b;
+		  }
+
+      }*/
 
    ScanForSavedGames ();
 
@@ -1700,8 +1755,9 @@ void ControlPanel
 
    numdone = 0;
    StartGame = false;
-
+ 
    SetUpControlPanel();
+   StrechScreen=true;
    //
    // F-KEYS FROM WITHIN GAME
    //
@@ -1786,6 +1842,8 @@ menuitems CP_MainMenu
    // Main menu loop.  "Exit options" or "New game" exits
    //
    StartGame = false;
+   StrechScreen=true;
+
    while( !StartGame )
       {
       StartGame = false;
@@ -1803,6 +1861,7 @@ menuitems CP_MainMenu
                }
 
             StartGame = true;
+			StrechScreen=false;//bna++ shut off streech mode
             break;
 
          case -1:
@@ -1832,10 +1891,10 @@ menuitems CP_MainMenu
 //******************************************************************************
 
 void DrawMainMenu(void)
-{
+{    
 
    MenuNum = 1;
-
+		StrechScreen=true;//bna++ shut off streech mode
    //
    // CHANGE "GAME" AND "DEMO"
    //
@@ -2565,14 +2624,17 @@ void CP_OrderInfo
    int key;
    boolean newpage;
 
+
+
    maxpage = W_GetNumForName( "ORDRSTOP" ) - W_GetNumForName( "ORDRSTRT" ) - 2;
    newpage = false;
    page = 1;
 
    do
       {
+	  StrechScreen=true;//bna++
       DrawOrderInfo( page );
-
+	  StrechScreen=false;//bna++ turn off or screen will be strected every time it passes VW_UpdateScreen
       if ( newpage )
          {
          while( Keyboard[ key ] )
@@ -2637,7 +2699,7 @@ void CP_OrderInfo
 
    Keyboard[ key ] = 0;
    LastScan = 0;
-
+ StrechScreen=true;//bna++
    MN_PlayMenuSnd( SD_ESCPRESSEDSND );
    }
 
@@ -3111,7 +3173,10 @@ void CP_NewGame
 
    gamestate.battlemode = battle_StandAloneGame;
    StartGame = true;
+   StrechScreen=false;
    playstate = ex_resetgame;
+
+
    }
 
 //******************************************************************************
@@ -3136,6 +3201,7 @@ void CP_EndGame
    action = CP_DisplayMsg( ENDGAMESTR, 12 );
 
    StartGame = false;
+   StrechScreen=true;
    if ( action )
       {
       EndGameStuff ();
@@ -3241,6 +3307,7 @@ int DoLoad (int which)
       if (LoadTheGame (which, &game) == true)
       {
          MenuFixup ();
+		 StrechScreen=false;
          StartGame = true;
 			exit      = 1;
       }
@@ -3386,11 +3453,11 @@ void QuickSaveGame (void)
 #ifdef DOS
       VGAREADMAP(i&3);
       b=(byte *)bufferofs+(i>>2);
-      for (j=0;j<100;j++,s++,b+=SCREENBWIDE<<1)
+      for (j=0;j<100;j++,s++,b+=iGLOBAL_SCREENBWIDE<<1)
          *s=*b;
 #else
       b=(byte *)bufferofs+i;
-      for (j=0;j<100;j++,s++,b+=(MAXSCREENWIDTH<<1))
+      for (j=0;j<100;j++,s++,b+=(iGLOBAL_SCREENWIDTH<<1))
          *s=*b;
 #endif
       }
@@ -4969,6 +5036,7 @@ void DrawSTMenuBuf (int x, int y, int w, int h, boolean up)
 
 void DoMainMenu (void)
 {
+		StrechScreen=true;//bna++ shut on streech mode
    SetAlternateMenuBuf();
    ClearMenuBuf();
    DrawMainMenu();
@@ -5258,6 +5326,93 @@ void DrawOptionsMenu (void)
    DisplayInfo (0);
    FlipMenuBuf();
 }
+//****************************************************************************
+//
+// DrawExtOptionsMenu ()  () bna added
+//
+//****************************************************************************
+
+void DrawExtOptionsMenu (void)
+{
+   MenuNum = 1;
+
+   SetAlternateMenuBuf();
+   ClearMenuBuf();
+   SetMenuTitle ("Extended User Options");
+
+   MN_GetCursorLocation( &ExtOptionsItems, &ExtOptionsMenu[ 0 ] );
+   DrawMenu (&ExtOptionsItems, &ExtOptionsMenu[0]);
+   DrawExtOptionsButtons ();
+   DisplayInfo (0);
+
+   FlipMenuBuf();
+}
+extern long inverse_mouse;
+extern boolean usemouselook;
+extern int iG_aimCross;
+extern boolean usejump;
+
+void CP_ExtOptionsMenu (void)
+{
+   int which;
+
+   DrawExtOptionsMenu();
+
+   do
+   {
+      which = HandleMenu (&ExtOptionsItems, &ExtOptionsMenu[0], NULL);
+
+      switch (which)
+      {
+         case 0: usemouselook  ^= 1; DrawExtOptionsButtons (); break;
+         case 1: if (inverse_mouse == 1){
+					inverse_mouse = -1;
+				 }else{
+					inverse_mouse = 1;
+				 }
+				 DrawExtOptionsButtons (); 
+				 break;
+         case 2: iG_aimCross   ^= 1; DrawExtOptionsButtons (); break;
+         case 3: usejump       ^= 1; DrawExtOptionsButtons (); break;
+      }
+
+	} while (which >= 0);
+
+   DrawControlMenu();
+}
+void DrawExtOptionsButtons (void)
+{
+   int i,
+       on;
+   int button_on;
+   int button_off;
+
+   button_on  = W_GetNumForName ("snd_on");
+   button_off = W_GetNumForName ("snd_off");
+
+   for (i = 0; i < ExtOptionsItems.amount; i++)
+      if (ExtOptionsMenu[i].active != CP_Active3)
+      {
+         //
+         // DRAW SELECTED/NOT SELECTED GRAPHIC BUTTONS
+         //
+
+         on = 0;
+
+         switch (i)
+         {
+            case 0: if (usemouselook  == 1) on = 1; break;
+            case 1: if (inverse_mouse == -1)on = 1; break;
+            case 2: if (iG_aimCross   == 1) on = 1; break;
+            case 3: if (usejump       == 1) on = 1; break;
+         }
+
+         if (on)
+            DrawMenuBufItem (20+22, ExtOptionsItems.y+i*14-1, button_on);
+         else
+            DrawMenuBufItem (20+22, ExtOptionsItems.y+i*14-1, button_off);
+		}
+}
 
 //****************************************************************************
 //
@@ -5542,6 +5697,7 @@ void BattleGamePlayerSetup( void )
             if ( status )
                {
                StartGame   = true;
+			      StrechScreen=false;
                handlewhich = -2;
                playstate   = ex_resetgame;
                BATTLEMODE  = true;
@@ -6996,13 +7152,12 @@ char *sitemessage[] =
 
 #endif
 
-void CP_ModemGameMessage
-   (
-   int player
-   )
+void CP_ModemGameMessage (int player  )
 
    {
    int i;
+    StrechScreen=true;
+       // SetTextMode (  );
 
 	SetAlternateMenuBuf();
    ClearMenuBuf();
@@ -7053,6 +7208,8 @@ void CP_ModemGameMessage
 
    FlipMenuBuf();
 	RefreshMenuBuf (0);
+
+	 StrechScreen=false;
    }
 
 

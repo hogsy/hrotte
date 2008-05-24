@@ -59,6 +59,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 =============================================================================
 */
+extern int G_weaponscale;
+
+
 int    StatusBar = 0;
 int    lightninglevel=0;
 boolean  lightning=false;
@@ -83,10 +86,11 @@ byte * colormap;
 byte * redmap;
 byte * greenmap;
 byte * playermaps[MAXPLAYERCOLORS];
-short  pixelangle[MAXVIEWWIDTH];
+//short  pixelangle[MAXVIEWWIDTH];
+short  pixelangle[800];
 byte   gammatable[GAMMAENTRIES];
 int    gammaindex;
-int    focalwidth=FOCALWIDTH;
+int    focalwidth=160;
 int    yzangleconverter;
 byte   uniformcolors[MAXPLAYERCOLORS]={
                                        25,
@@ -166,7 +170,7 @@ void UpdatePeriodicLighting (void);
 */
 void ResetFocalWidth ( void )
 {
-   focalwidth=FOCALWIDTH;
+   focalwidth=iGLOBAL_FOCALWIDTH;//FOCALWIDTH;
    SetViewDelta();
 }
 
@@ -179,7 +183,7 @@ void ResetFocalWidth ( void )
 */
 void ChangeFocalWidth ( int amount )
 {
-   focalwidth=FOCALWIDTH+amount;
+   focalwidth=iGLOBAL_FOCALWIDTH+amount;//FOCALWIDTH+amount;
    SetViewDelta();
 }
 
@@ -194,13 +198,19 @@ void ChangeFocalWidth ( int amount )
 
 void SetViewDelta ( void )
 {
-
+//iGLOBAL_SCREENHEIGHT
+//iGLOBAL_SCREENWIDTH
 //
 // calculate scale value for vertical height calculations
 // and sprite x calculations
 //
-   scale = (centerx*focalwidth)/160;
-
+	if ( iGLOBAL_SCREENWIDTH == 320) {
+		scale = (centerx*focalwidth)/(160);
+	}else if ( iGLOBAL_SCREENWIDTH == 640) {
+		scale = (centerx*focalwidth)/(160);
+	}else if ( iGLOBAL_SCREENWIDTH == 800) {
+		scale = (centerx*focalwidth)/(160);
+	}
 //
 // divide heightnumerator by a posts distance to get the posts height for
 // the heightbuffer.  The pixel height is height>>HEIGHTFRACTION
@@ -285,14 +295,57 @@ void SetViewSize
    int screenx;
    int screeny;
    int topy;
+   /*
+  if (size>=10){
 
-   if ((size<0) || (size>=MAXVIEWSIZES))
-      Error("Illegal screen size = %ld\n",size);
+	   SetTextMode (  );
+	   screenx=screenx;
+	   return;
+   }
+*/
+
+	if ( iGLOBAL_SCREENWIDTH == 640) {
+		height = 0;//we use height as dummy cnt
+		viewsizes[height++]= 380; viewsizes[height++]= 336;
+        viewsizes[height++]= 428; viewsizes[height++]= 352;
+        viewsizes[height++]= 460; viewsizes[height++]= 368;
+        viewsizes[height++]= 492; viewsizes[height++]= 384;
+        viewsizes[height++]= 524; viewsizes[height++]= 400;
+        viewsizes[height++]= 556; viewsizes[height++]= 416;
+        viewsizes[height++]= 588; viewsizes[height++]= 432;
+        viewsizes[height++]= 640; viewsizes[height++]= 448;
+        viewsizes[height++]= 640; viewsizes[height++]= 464;
+        viewsizes[height++]= 640; viewsizes[height++]= 480;
+        viewsizes[height++]= 640; viewsizes[height++]= 480;
+	}else if ( iGLOBAL_SCREENWIDTH == 800) {
+		height = 0;
+		viewsizes[height++]= 556; viewsizes[height++]= 488;
+        viewsizes[height++]= 588; viewsizes[height++]= 504;
+        viewsizes[height++]= 620; viewsizes[height++]= 520;
+        viewsizes[height++]= 652; viewsizes[height++]= 536;
+        viewsizes[height++]= 684; viewsizes[height++]= 552;
+        viewsizes[height++]= 716; viewsizes[height++]= 568;
+        viewsizes[height++]= 748; viewsizes[height++]= 584;
+        viewsizes[height++]= 800; viewsizes[height++]= 600;
+        viewsizes[height++]= 800; viewsizes[height++]= 600;
+        viewsizes[height++]= 800; viewsizes[height++]= 600;
+        viewsizes[height++]= 800; viewsizes[height++]= 600;
+	}
+
+
+	if ((size<0) || (size>=MAXVIEWSIZES)){//bna added
+        printf("Illegal screen size = %d\n",size);
+		size = 8;//set default value
+		viewsize = 8;
+	}
+
+   //if ((size<0) || (size>=MAXVIEWSIZES))
+   //   Error("Illegal screen size = %ld\n",size);
 
    viewwidth  = viewsizes[ size << 1 ];         // must be divisable by 16
    viewheight = viewsizes[ ( size << 1 ) + 1 ]; // must be even
 
-   maxheight = 200;
+   maxheight = iGLOBAL_SCREENHEIGHT;
    topy      = 0;
 
    // Only keep the kills flag
@@ -314,33 +367,48 @@ void SetViewSize
       topy      += 16;
       }
 
+//   if ( size == 7 ){maxheight -= 16;}//bna++
+//   if ( size <= 6 ){topy -= 8;}//bna++
+
    if ( size < 8 )
       {
       // Turn on health and ammo bar
       StatusBar |= BOTTOM_STATUS_BAR;
+
       maxheight -= 16;
+
       }
    else if ( size < 10 )
       {
       // Turn on transparent health and ammo bar
       StatusBar |= STATUS_PLAYER_STATS;
       }
-
+   //   SetTextMode (  );
+   //   viewheight=viewheight;
    height = viewheight;
    if ( height > 168 )
-      {
-      // Prevent weapon from being scaled too big
-      height = 168;
-      }
+   {
+        // Prevent weapon from being scaled too big
+	    height = 168;
+	  	if ( iGLOBAL_SCREENWIDTH == 640) {
+			height = 260;
+		}else if ( iGLOBAL_SCREENWIDTH == 800) {
+			height = 360;
+		}
+   }
 
-   weaponscale = ( height << 16 ) / 168;
+   if ((G_weaponscale > 150)&&(G_weaponscale <600)){height = G_weaponscale;}
+   if ( iGLOBAL_SCREENWIDTH == 320) {G_weaponscale=G_weaponscale/2;}
+   weaponscale = ( height << 16 ) / 168;//( height << 16 ) = 170 * 65536
+
+  
    centerx     = viewwidth >> 1;
    centery     = viewheight >> 1;
    centeryfrac = (centery << 16);
-   yzangleconverter = ( 0xaf85 * viewheight ) / 200;
+   yzangleconverter = ( 0xaf85 * viewheight ) / iGLOBAL_SCREENHEIGHT;
 
    // Center the view horizontally
-   screenx = ( 320 - viewwidth ) >> 1;
+   screenx = ( iGLOBAL_SCREENWIDTH - viewwidth ) >> 1;
 
    if ( viewheight >= maxheight )
       {
@@ -370,7 +438,9 @@ void SetViewSize
 // Already being called in ResetFocalWidth
 //   SetViewDelta();
 
-   CalcProjection();
+
+     CalcProjection();
+
    }
 
 
@@ -410,10 +480,12 @@ void SetupScreen ( boolean flip )
    pic_t *shape;
 
    SetViewSize(viewsize);
+
    if ( viewsize < 7 )
       {
-      shape = W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
-      DrawTiledRegion( 0, 16, 320, 200 - 32, 0, 16, shape );
+      shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
+      //DrawTiledRegion( 0, 16, 320, 200 - 32, 0, 16, shape );
+      DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );//bna++
       }
 
    if ( viewsize == 0 )

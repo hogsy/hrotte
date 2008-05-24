@@ -19,6 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #ifndef _engine_public
 #define _engine_public
+
+#include "modexlib.h"
 //***************************************************************************
 //
 // ENGINE.C
@@ -36,8 +38,9 @@ typedef struct
   int      posttype;
   int      alttile;
 } wallcast_t;
-
-extern wallcast_t posts[321];
+extern wallcast_t posts[800+2];//bna++ JUST MAKE IT MAX RES
+//extern wallcast_t posts[642];//bna++
+//extern wallcast_t posts[321];
 
 extern int lasttilex;
 extern int lasttiley;

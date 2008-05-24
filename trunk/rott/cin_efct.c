@@ -253,8 +253,8 @@ void ScaleFilmPost (byte * src, byte * buf)
       bottomscreen = topscreen + (cin_invscale*length);
       cin_yl = (topscreen+FRACTIONUNIT-1)>>FRACTIONBITS;
       cin_yh = (bottomscreen-FRACTIONUNIT)>>FRACTIONBITS;
-      if (cin_yh >= MAXSCREENHEIGHT)
-         cin_yh = MAXSCREENHEIGHT-1;
+      if (cin_yh >= iGLOBAL_SCREENHEIGHT)
+         cin_yh = iGLOBAL_SCREENHEIGHT-1;
       if (cin_yl < 0)
          cin_yl = 0;
       if (cin_yl <= cin_yh)
@@ -354,10 +354,10 @@ void DrawCinematicBackground ( backevent * back )
    pic=(lpic_t *)W_CacheLumpName(back->name,PU_CACHE, Cvt_lpic_t, 1);
 
    height = pic->height;
-   if (height+back->yoffset>MAXSCREENHEIGHT)
-      height=MAXSCREENHEIGHT-back->yoffset;
+   if (height+back->yoffset>iGLOBAL_SCREENHEIGHT)
+      height=iGLOBAL_SCREENHEIGHT-back->yoffset;
 
-   if (height!=MAXSCREENHEIGHT)
+   if (height!=iGLOBAL_SCREENHEIGHT)
       DrawClearBuffer ();
 
    plane = 0;
@@ -372,9 +372,9 @@ void DrawCinematicBackground ( backevent * back )
       VGAWRITEMAP(plane);
 
 #ifdef DOS
-      for (i=plane;i<MAXSCREENWIDTH;i+=4,offset+=4,buf++)
+      for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,offset+=4,buf++)
 #else
-      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
+      for (i=0;i<iGLOBAL_SCREENWIDTH;i++,offset++,buf++)
 #endif
          {
          if (offset>=back->backdropwidth)
@@ -406,10 +406,10 @@ void DrawCinematicMultiBackground ( backevent * back )
    int height;
 
    height = back->height;
-   if (height+back->yoffset>MAXSCREENHEIGHT)
-      height=MAXSCREENHEIGHT-back->yoffset;
+   if (height+back->yoffset>iGLOBAL_SCREENHEIGHT)
+      height=iGLOBAL_SCREENHEIGHT-back->yoffset;
 
-   if (height!=MAXSCREENHEIGHT)
+   if (height!=iGLOBAL_SCREENHEIGHT)
       DrawClearBuffer ();
 
    plane = 0;
@@ -424,9 +424,9 @@ void DrawCinematicMultiBackground ( backevent * back )
       VGAWRITEMAP(plane);
 
 #ifdef DOS
-      for (i=plane;i<MAXSCREENWIDTH;i+=4,offset+=4,buf++)
+      for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,offset+=4,buf++)
 #else
-      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
+      for (i=0;i<iGLOBAL_SCREENWIDTH;i++,offset++,buf++)
 #endif
          {
          if (offset>=back->backdropwidth)
@@ -467,7 +467,7 @@ void DrawCinematicBackdrop ( backevent * back )
    toppost=-p->topoffset+back->yoffset;
 
    plane = 0;
-   
+
 #ifdef DOS
    for (plane=0;plane<4;plane++)
 #endif
@@ -478,9 +478,9 @@ void DrawCinematicBackdrop ( backevent * back )
       VGAWRITEMAP(plane);
 
 #ifdef DOS
-      for (i=plane;i<MAXSCREENWIDTH;i+=4,offset+=4,buf++)
+      for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,offset+=4,buf++)
 #else
-      for (i=0;i<MAXSCREENWIDTH;i++,offset++,buf++)
+      for (i=0;i<iGLOBAL_SCREENWIDTH;i++,offset++,buf++)
 #endif
          {
          if (offset>=back->backdropwidth)
@@ -552,7 +552,7 @@ void DrawCinematicSprite ( spriteevent * sprite )
 // calculate edges of the shape
 //
    x1 = (xcent+(tx*cin_invscale))>>FRACTIONBITS;
-   if (x1 >= MAXSCREENWIDTH)
+   if (x1 >= iGLOBAL_SCREENWIDTH)
       return;               // off the right side
    tx+=p->width;
    x2 = ((xcent+(tx*cin_invscale)) >>FRACTIONBITS) - 1 ;
@@ -568,7 +568,7 @@ void DrawCinematicSprite ( spriteevent * sprite )
       }
    else
       frac=0;
-   x2 = x2 >= MAXSCREENWIDTH ? (MAXSCREENWIDTH-1) : x2;
+   x2 = x2 >= iGLOBAL_SCREENWIDTH ? (iGLOBAL_SCREENWIDTH-1) : x2;
 
    cin_texturemid = (((p->origsize>>1)+p->topoffset)<<FRACTIONBITS)+(FRACTIONUNIT>>1);
    cin_sprtopoffset = (cin_ycenter<<16) - FixedMul(cin_texturemid,cin_invscale);
@@ -687,9 +687,9 @@ void DrawClearBuffer ( void )
 {
 #ifdef DOS
   VGAMAPMASK(15);
-  memset((byte *)bufferofs,0,SCREENBWIDE*MAXSCREENHEIGHT);
+  memset((byte *)bufferofs,0,iGLOBAL_SCREENBWIDE*iGLOBAL_SCREENHEIGHT);
 #else
-  memset((byte *)bufferofs,0,MAXSCREENWIDTH*MAXSCREENHEIGHT);
+  memset((byte *)bufferofs,0,iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT);
 #endif
 }
 
@@ -898,9 +898,9 @@ void ProfileDisplay ( void )
       VGAWRITEMAP(plane);
 
 #ifdef DOS
-      for (i=plane;i<MAXSCREENWIDTH;i+=4,buf++)
+      for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,buf++)
 #else
-      for (i=0;i<MAXSCREENWIDTH;i++,buf++)
+      for (i=0;i<iGLOBAL_SCREENWIDTH;i++,buf++)
 #endif
          {
          DrawFilmPost(buf,&src[0],200);
@@ -942,9 +942,9 @@ void DrawPostPic ( int lumpnum )
       VGAWRITEMAP(plane);
 
 #ifdef DOS
-      for (i=plane;i<MAXSCREENWIDTH;i+=4,src+=(pic->height<<2),buf++)
+      for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,src+=(pic->height<<2),buf++)
 #else
-      for (i=0;i<MAXSCREENWIDTH;i++,src+=pic->height,buf++)
+      for (i=0;i<iGLOBAL_SCREENWIDTH;i++,src+=pic->height,buf++)
 #endif
          {
          DrawFilmPost(buf,src,height);

@@ -335,6 +335,12 @@ void SetMessage
    int length;
    boolean found;
 
+   if (iGLOBAL_SCREENWIDTH >= 640){
+		CurrentFont = newfont1;//smallfont;
+   }else{
+		CurrentFont = smallfont;
+   }
+
 
    length = StringLength( text );
 
@@ -460,15 +466,15 @@ void UpdateMessages
 ====================
 */
 
-void DisplayMessage
-   (
-   int num,
-   int position
-   )
-
+void DisplayMessage   (int num,int position)
    {
    PrintX = 1;
-   PrintY = 2 + ( position * 9 );
+   if (iGLOBAL_SCREENWIDTH > 320){
+		PrintY = 2 + ( position * (9*2) );
+   }else{
+		PrintY = 2 + ( position * (9*1) );
+   }
+
 
    if ( SHOW_TOP_STATUS_BAR() )
       {
@@ -509,7 +515,14 @@ void DisplayMessage
       case MSG_MODEM:
          fontcolor = egacolor[ LIGHTBLUE ];
          DrawIString( PrintX, PrintY, "Message>", Messages[ num ].flags );
-         PrintX += 8 * 8;
+		 if ( iGLOBAL_SCREENWIDTH == 320) {
+			PrintX += 8 * 8;
+		 }else if ( iGLOBAL_SCREENWIDTH == 640) {
+			PrintX += 8 * 8*2;
+		 }else if ( iGLOBAL_SCREENWIDTH == 800) {
+			PrintX += 8 * 8*2;
+		 }
+
          fontcolor = egacolor[ LIGHTGRAY ];
          break;
 
@@ -572,8 +585,14 @@ void RestoreMessageBackground
             EraseMessage[ i ]--;
             if ( viewsize < 15 )
                {
-               shape = W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
-               DrawTiledRegion( 0, y, 320, 9, 0, y, shape );
+               shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );//w=32 h=8
+			   	   //SetTextMode (  );
+               //DrawTiledRegion( 0, y, 320, 9, 0, y, shape );KILLS_HEIGHT bna--
+				DrawTiledRegion( 0, y, iGLOBAL_SCREENWIDTH, 9, 0, y, shape );
+				DrawTiledRegion( 0, y+8, iGLOBAL_SCREENWIDTH, 9, 0, y, shape );
+				DrawTiledRegion( 0, y+16, iGLOBAL_SCREENWIDTH, 9, 0, y, shape );
+
+               //DrawTiledRegion( 0, y, iGLOBAL_SCREENWIDTH, 212, 0, y, shape );
                }
             if ( viewsize == 0 )
                {

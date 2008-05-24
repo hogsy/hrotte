@@ -154,12 +154,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //***************************************************************************
 #define VIEWGLOBAL              0x10000         // globals visable flush to wall
-#define VIEWWIDTH               320             // size of view window
-#define VIEWHEIGHT              200
-#define MAXSCANLINES            200             // size of ylookup table
+/*
+#define VIEWWIDTH               MAXSCREENWIDTH//320*2             // size of view window
+#define VIEWHEIGHT              MAXSCREENHEIGHT//200*2
+#define MAXSCANLINES            MAXSCREENHEIGHT//200*2             // size of ylookup table
+*/
 #define CHARWIDTH               2
 #define TILEWIDTH               4
 #define STATUSLINES             16
+
+
 
 //***************************************************************************
 //

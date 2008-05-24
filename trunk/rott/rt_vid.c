@@ -123,12 +123,67 @@ void VL_MemToScreen (byte *source, int width, int height, int x, int y)
 			destline = (byte *)(bufferofs+ylookup[y+j]+x);
 
 			for (i = 0; i < width; i++) {
-				*(destline + i*4 + plane) = *ptr++;
+//				if (ptr < bufferofs + toplimit) { //bnafix zxcvb
+					*(destline + i*4 + plane) = *ptr++;
+//				}
 			}			
 		}
 	}
 #endif
 }
+// bna function start
+void VL_MemToScreenClipped (byte *source, int width, int height, int x, int y);
+void VL_MemToScreenClipped (byte *source, int width, int height, int x, int y)
+{
+	byte *ptr, *destline;
+	int plane, i, j;//,toplimit;
+	ptr = source;
+	for (plane = 0; plane < 4; plane++) {
+		for (j = 0; j < height; j++) {
+			destline = (byte *)(bufferofs+ylookup[y+j]+x);
+			for (i = 0; i < width; i++) {
+				if (*ptr != 255){
+					*(destline + i*4 + plane) = *ptr++;
+				}else{ptr++;}
+			}			
+		}
+	}
+}
+
+//copy picture to mem (bufferofs) in doublesize
+void VL_MemStrechedToScreen (byte *source, int width, int height, int x, int y)
+{
+	byte *ptr, *destline,*tmp,*o;
+	int plane, i, j;
+	
+	tmp = bufferofs;
+	ptr = source;
+	
+	for (plane = 0; plane < 4; plane++) {
+		for (j = 0; j < height; j++) {
+			destline = (byte *)(bufferofs+(iGLOBAL_SCREENWIDTH*j)+ylookup[y+j]+x);
+			o = ptr;
+			for (i = 0; i < width; i+=1) {
+				*(destline + i*4 + plane) = *ptr;
+				destline++;
+				*(destline + i*4 + plane) = *ptr++;
+			}
+			ptr = o;
+
+			destline = (byte *)(bufferofs+iGLOBAL_SCREENWIDTH+(iGLOBAL_SCREENWIDTH*j)+ylookup[y+j]+x);
+			for (i = 0; i < width; i+=1) {
+				*(destline + i*4 + plane) = *ptr;
+				destline++;
+				*(destline + i*4 + plane) = *ptr++;
+
+			}	
+
+		}
+	}
+	bufferofs = tmp;
+}
+// bna function end
+
 
 //*************************************************************************
 //
@@ -229,9 +284,9 @@ void DrawTiledRegion
             }
 
 #ifdef DOS
-         origdest  += SCREENBWIDE;
+         origdest  += iGLOBAL_SCREENBWIDE;
 #else 
-         origdest += MAXSCREENWIDTH;
+         origdest += iGLOBAL_SCREENWIDTH;
 #endif
 
          sourceoff += sourcewidth;
@@ -1050,22 +1105,20 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
    byte *source = (byte *)&lbminfo->data;
    byte *buf;
    int  ht = lbminfo->height;
-#ifdef DOS
-   int  planes;
-   byte writemask;
-#endif
+
    int  x = 0;
    int  y;
    byte *origbuf;
    byte pal[768];
 
-#ifdef DOS
-   writemask   = 1 << (x&3);
-#endif
+
    orig = screen;
 
-   buf = (byte *) SafeMalloc (64000);
-
+   if (iGLOBAL_SCREENWIDTH <= 320){
+		buf = (byte *) SafeMalloc (64000);
+   }else{
+		buf = (byte *) SafeMalloc (iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT);
+   }
    origbuf = buf;
 
    VL_ClearBuffer (displayofs, 0);
@@ -1104,48 +1157,40 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
 		   count += rept;
 
    	} while (count < lbminfo->width);
+	  if (iGLOBAL_SCREENWIDTH > 320){
+		 buf += (iGLOBAL_SCREENWIDTH-320); //eg 800 - 320)
+	  }
    }
+	   //SetTextMode (  ); //12345678
 
-#ifdef DOS
-   for (planes = 0; planes < 4; planes++)
-#endif
    {
       int cnt;
 
       cnt = 0;
-      screen = orig;
+      screen = orig; 
       buf = origbuf;
       VGAMAPMASK (writemask);
 
-#ifdef DOS
-      for (y = 0; y < (lbminfo->height*lbminfo->width)>>2; y++)
-#else
-      for (y = 0; y < (lbminfo->height*lbminfo->width); y++)
-#endif
-      {
-#ifdef DOS
-         *screen++ = *(buf+(y*4)+planes);
-#else
-         *screen++ = *(buf+y);
-#endif
-#ifdef DOS
-         cnt++;
+	  //bna section start
+	  if (iGLOBAL_SCREENWIDTH <= 320){
+		  for (y = 0; y < (lbminfo->height*lbminfo->width); y++)
 
-         if (cnt == 80)
-         {
-            screen += 16;
-            cnt = 0;
-         }
-#endif
-      }
+		  {
+			 *screen++ = *(buf+y);
+		  }
+	  }else{
+		  for (y = 0; y < (lbminfo->height); y++){
+			  for (x = 0; x < iGLOBAL_SCREENWIDTH; x++){
+				 *screen++ = *(buf++);
+			  }
+		  }
+	  }
+	  // bna section end
 
-#ifdef DOS
-      writemask <<= 1;
-#endif
    }
 
    SafeFree(origbuf);
-
+   StrechScreen=true;//bna++ shut on streech mode
    if (flip==true)
       VW_UpdateScreen ();
 
@@ -1161,6 +1206,40 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
 
 void SetBorderColor (int color)
 {
+   // bna section start
+
+   byte  *cnt,*Ycnt,*b;
+
+   b=(byte *)bufferofs;
+
+   // color 56 could be used
+
+   //paint top red line
+   for (cnt=b;cnt<b+viewwidth;cnt++){
+	for (Ycnt=cnt;Ycnt<cnt+(5*iGLOBAL_SCREENWIDTH);Ycnt+=iGLOBAL_SCREENWIDTH){
+			*Ycnt = color;
+		}
+   }
+   //paint left red line
+   for (cnt=b;cnt<b+5;cnt++){
+	for (Ycnt=cnt;Ycnt<cnt+(viewheight*iGLOBAL_SCREENWIDTH);Ycnt+=iGLOBAL_SCREENWIDTH){
+			*Ycnt = color;
+		}
+   }
+   //paint right red line
+   for (cnt=b+(viewwidth-5);cnt<b+viewwidth;cnt++){
+	for (Ycnt=cnt;Ycnt<cnt+(viewheight*iGLOBAL_SCREENWIDTH);Ycnt+=iGLOBAL_SCREENWIDTH){
+			*Ycnt = color;
+		}
+   }
+   //paint lower red line
+   for (cnt=b+((viewheight-5)*iGLOBAL_SCREENWIDTH);cnt<b+((viewheight-5)*iGLOBAL_SCREENWIDTH)+viewwidth;cnt++){
+		for (Ycnt=cnt;Ycnt<b+(viewheight*iGLOBAL_SCREENWIDTH);Ycnt+=iGLOBAL_SCREENWIDTH){
+			 *Ycnt = color;
+		}
+   }
+   // bna section end
+
 #ifdef DOS
    inp  (STATUS_REGISTER_1);
    outp (ATR_INDEX,0x31);

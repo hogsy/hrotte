@@ -90,6 +90,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //******************************************************************************
 
+extern int G_weaponscale;
+
 boolean WriteSoundFile   = true;
 
 int     FXMode           = 0;
@@ -104,6 +106,10 @@ fx_blaster_config SBSettings =
    };
 
 boolean mouseenabled     = 1;
+boolean usemouselook     = 0;
+int     inverse_mouse    = 1; //set  to -1 to invert mouse
+boolean usejump          = 0;
+
 boolean joystickenabled  = 0;
 boolean joypadenabled    = 0;
 int     joystickport     = 0;
@@ -491,15 +497,20 @@ boolean ParseConfigFile (void)
    if (version == ROTTVERSION)
    {
       // Read in MouseEnabled
-
       ReadBoolean("MouseEnabled",&mouseenabled);
 
-      // Read in JoystickEnabled
+      // Read in UseMouseLook
+      ReadBoolean("UseMouseLook",&usemouselook);
 
+      ReadInt("InverseMouse",&inverse_mouse);
+
+	  // Read in UseJump
+      ReadBoolean("UseJump",&usejump);
+
+      // Read in JoystickEnabled
       ReadBoolean("JoystickEnabled",&joystickenabled);
 
       // Read in JoypadEnabled
-
       ReadBoolean("JoypadEnabled",&joypadenabled);
 
       // Read in JoystickPort
@@ -509,6 +520,19 @@ boolean ParseConfigFile (void)
       // Read in ViewSize
 
       ReadInt("ViewSize",&viewsize);
+
+      // Read in Weaponscale
+
+      ReadInt("Weaponscale",&G_weaponscale);//bna added
+	   if ((G_weaponscale <150)||(G_weaponscale>600)){
+		   if (iGLOBAL_SCREENWIDTH == 320){
+				G_weaponscale=168;
+		   }else if (iGLOBAL_SCREENWIDTH == 640){
+				G_weaponscale=299;		
+		   }else if (iGLOBAL_SCREENWIDTH == 800) {
+				G_weaponscale=376;
+		   }	   
+	   }
 
       // Read in MouseAdjustment
 
@@ -1683,6 +1707,24 @@ void WriteConfig (void)
    SafeWriteString(file,"; 0 - Mouse Disabled\n");
    WriteParameter(file,"MouseEnabled     ",mouseenabled);
 
+   // Write out UseMouseLook
+   SafeWriteString(file,"\n;\n");
+   SafeWriteString(file,"; 1 - UseMouseLook Enabled\n");
+   SafeWriteString(file,"; 0 - UseMouseLook Disabled\n");
+   WriteParameter(file,"UseMouseLook     ",usemouselook);
+
+   // Write out InverseMouse
+   SafeWriteString(file,"\n;\n");
+   SafeWriteString(file,"; 1 - Normal Mouse Enabled\n");
+   SafeWriteString(file,"; -1 - Inverse Mouse Enabled\n");
+   WriteParameter(file,"InverseMouse     ",inverse_mouse);
+
+   // Write out UseJump
+   SafeWriteString(file,"\n;\n");
+   SafeWriteString(file,"; 1 - usejump Enabled\n");
+   SafeWriteString(file,"; 0 - usejump Disabled\n");
+   WriteParameter(file,"UseJump          ",usejump);
+
    // Write out JoystickEnabled
 
    SafeWriteString(file,"\n;\n");
@@ -1710,6 +1752,25 @@ void WriteConfig (void)
    SafeWriteString(file,"; Size of View port.\n");
    SafeWriteString(file,"; (smallest) 0 - 10 (largest)\n");
    WriteParameter(file,"ViewSize         ",viewsize);
+
+   // Write out WEAPONSCALE  bna added
+
+   SafeWriteString(file,"\n;\n");
+   SafeWriteString(file,"; Size of Weaponscale.\n");
+   SafeWriteString(file,"; (smallest) 150 - 600 (largest)\n");
+   G_weaponscale = (weaponscale * 168 )/65536;
+
+   if ((G_weaponscale <150)||(G_weaponscale>600)){
+	   if (iGLOBAL_SCREENWIDTH == 320){
+			G_weaponscale=168;
+	   }else if (iGLOBAL_SCREENWIDTH == 640){
+			G_weaponscale=299;		
+	   }else if (iGLOBAL_SCREENWIDTH == 800) {
+			G_weaponscale=376;
+	   }	   
+   }
+   WriteParameter(file,"Weaponscale         ",G_weaponscale);
+
 
    // Write out MouseAdjustment
 

@@ -267,7 +267,7 @@ void R_DrawFilmColumn (byte * buf)
 
 	while (count--) {
 		*dest = cin_source[(frac>>SFRACBITS)];
-		dest += MAXSCREENWIDTH;
+		dest += iGLOBAL_SCREENWIDTH;
 		frac += fracstep;
 	}
 }
