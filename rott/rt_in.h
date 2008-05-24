@@ -147,9 +147,9 @@ extern int     threshold;
 
 extern boolean  Paused;
 extern volatile int LastScan;
-extern KeyboardDef KbdDefs;
+/* extern KeyboardDef KbdDefs;
 extern JoystickDef JoyDefs[];
-extern ControlType Controls[MAXPLAYERS];
+extern ControlType Controls[MAXPLAYERS]; */
 
 extern boolean  SpaceBallPresent;
 extern boolean  CybermanPresent;
