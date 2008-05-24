@@ -38,16 +38,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //MED
 #include "memcheck.h"
 #include "rt_util.h"
+#include "rt_net.h" // for GamePaused
 
-void    SchrinkMemPicture();
-void StrechMemPicture ();
-void StrechFlipMemPicture ();
+static void StretchMemPicture ();
 // GLOBAL VARIABLES
 
-boolean StrechScreen=true;//bná++
-extern char *tmpPICbuf;
-char *sdl_surfacePTR;
-extern int iG_aimCross;
+boolean StretchScreen=0;//bná++
+extern boolean iG_aimCross;
+extern boolean sdl_fullscreen;
 extern int iG_X_center;
 extern int iG_Y_center;
 char 	   *iG_buf_center;
@@ -421,7 +419,7 @@ void XFlipPage ( void )
 ====================
 */
 static SDL_Surface *sdl_surface = NULL;
-static SDL_Surface *sdl_backbuf = NULL;
+static SDL_Surface *unstretch_sdl_surface = NULL;
 
 void GraphicsMode ( void )
 {
@@ -441,6 +439,8 @@ void GraphicsMode ( void )
     SDL_WM_SetCaption ("Rise of the Triad", "ROTT");
     SDL_ShowCursor (0);
 //    sdl_surface = SDL_SetVideoMode (320, 200, 8, flags);
+    if (sdl_fullscreen)
+        flags = SDL_FULLSCREEN;
     sdl_surface = SDL_SetVideoMode (iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT, 8, flags);    
 	if (sdl_surface == NULL)
 	{
@@ -538,6 +538,8 @@ void VL_SetVGAPlaneMode ( void )
 	bufofsTopLimit =  bufferofs + screensize - iGLOBAL_SCREENWIDTH;
 	bufofsBottomLimit = bufferofs + iGLOBAL_SCREENWIDTH;
 
+    // start stretched
+    EnableScreenStretch();
     XFlipPage ();
 }
 
@@ -686,8 +688,8 @@ void VL_DePlaneVGA (void)
 void VH_UpdateScreen (void)
 { 	
 
-	if ((StrechScreen==true)&&(iGLOBAL_SCREENWIDTH > 320)){//bna++
-		StrechMemPicture ();
+	if (StretchScreen){//bna++
+		StretchMemPicture ();
 	}else{
 		DrawCenterAim ();
 	}
@@ -719,8 +721,8 @@ void XFlipPage ( void )
    if (bufferofs > page3start)
       bufferofs = page1start;
 #else
- 	if ((StrechScreen==true)&&(iGLOBAL_SCREENWIDTH > 320)){//bna++
-		StrechMemPicture ();
+ 	if (StretchScreen){//bna++
+		StretchMemPicture ();
 	}else{
 		DrawCenterAim ();
 	}
@@ -732,154 +734,59 @@ void XFlipPage ( void )
 #endif
 
 
-
-
-
-
-// bna section -------------------------------------------
-void StrechMemPicture ()
+void EnableScreenStretch(void)
 {
+   int i,offset;
+   
+   if (iGLOBAL_SCREENWIDTH <= 320 || StretchScreen) return;
+   
+   if (unstretch_sdl_surface == NULL)
+   {
+      /* should really be just 320x200, but there is code all over the
+         places which crashes then */
+      unstretch_sdl_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+         iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT, 8, 0, 0, 0, 0);
+   }
+	
+   displayofs = unstretch_sdl_surface->pixels +
+	(displayofs - (byte *)sdl_surface->pixels);
+   bufferofs  = unstretch_sdl_surface->pixels;
+   page1start = unstretch_sdl_surface->pixels;
+   page2start = unstretch_sdl_surface->pixels;
+   page3start = unstretch_sdl_surface->pixels;
+   StretchScreen = 1;	
+}
 
-		//strech mem //	   SetTextMode (  );
-   		byte *source,*target,*tmp,*tmp2;
-		int x,y,x1,y1;
-		int cnt,NbOfLines;
-		float Yratio,Xratio,old;
-
-		//strech pixels in X direction
-		source = ( byte * )( sdl_surface->pixels);//store screen in tmp pic mem
-		sdl_surfacePTR = source;
-		memcpy( tmpPICbuf, source, (200*iGLOBAL_SCREENWIDTH) );
-
-		source = tmpPICbuf;
-		target = ( byte * )( sdl_surface->pixels);//screen buffer
-
-	    Xratio = iGLOBAL_SCREENWIDTH * 10/ 320;
-		Xratio = (Xratio/10);
-		cnt = (int)Xratio; 
-		Xratio = (Xratio - cnt)/2; 
-		old = 0;
-
-		for (y=0;y<200;y++){
-			tmp = source;
-			tmp2 = target;
-			//write pixel x and x-1 in line 1
-			for (x=0;x<320;x++){
-				for (x1=0;x1<cnt;x1++){
-					//copy one pixel ----------------------
-					*(target++) = *(source) ;
-					old += Xratio;
-					//-----------------------------------
-					if (old > 1) {
-						//copy extra pixel
-						*(target++) = *(source) ;				
-						old -= 1;
-					}
-				}
-				source++;
-			}
-			source = tmp + iGLOBAL_SCREENWIDTH;
-			target = tmp2 + iGLOBAL_SCREENWIDTH;
-		}
-
-		//strech lines in Y direction
-		source = ( byte * )( sdl_surface->pixels);//store screen in tmp pic mem
-		memcpy( tmpPICbuf, source, (200*iGLOBAL_SCREENWIDTH) );
-
-		source = tmpPICbuf;
-		target = ( byte * )( sdl_surface->pixels);//screen buffer
-
-		Yratio = iGLOBAL_SCREENHEIGHT * 10/ 200;//we shall strech 200 lines to 480/600
-		Yratio = (Yratio/10);
-		cnt = (int)Yratio; //2
-		Yratio = (Yratio - cnt)/2; //.2
-		NbOfLines=0;//make sure we dont exeed iGLOBAL_SCREENHEIGHT or we get a crash
-		old = 0;
-
-		for (y=0;y<200;y++){
-			for (y1=0;y1<cnt;y1++){
-				//copy one line ----------------------
-				memcpy(target, source,iGLOBAL_SCREENWIDTH);
-				if (NbOfLines++ >= iGLOBAL_SCREENHEIGHT-1){goto stopx;}
-				target += (iGLOBAL_SCREENWIDTH);
-				old += Yratio;
-				//-----------------------------------
-				if (old > 1) {
-					//copy extra line
-					memcpy(target, source,iGLOBAL_SCREENWIDTH);				
-					if (NbOfLines++ >= iGLOBAL_SCREENHEIGHT-1){goto stopx;}
-					target += (iGLOBAL_SCREENWIDTH);
-					old -= 1;
-				}
-			}
-			source += iGLOBAL_SCREENWIDTH;
-		}
-stopx:;
-
-
-
-
+void DisableScreenStretch(void)
+{
+   if (iGLOBAL_SCREENWIDTH <= 320 || !StretchScreen) return;
+	
+   displayofs = sdl_surface->pixels +
+	(displayofs - (byte *)unstretch_sdl_surface->pixels);
+   bufferofs  = sdl_surface->pixels;
+   page1start = sdl_surface->pixels;
+   page2start = sdl_surface->pixels;
+   page3start = sdl_surface->pixels;
+   StretchScreen = 0;
 }
 
 
-void SchrinkMemPicture( byte * source)
-{ 
-	//schrink mem picure and plce it in tmpPICbuf
-   	byte *target,*tmp,*tmp2;
-	int x,y;
-	int cnt,NbOfLines;
-	float Yratio,Xratio,old;
-
-	target = tmpPICbuf;
-
-    Xratio = iGLOBAL_SCREENWIDTH * 10/ 320;
-	Xratio = (Xratio/10);
-	cnt = (int)Xratio; //2
-	Xratio = (Xratio - cnt)/2; //.2
-	old = 0;	
-
-	// delte redunted pixels
-	for (y=0;y<iGLOBAL_SCREENHEIGHT;y++){
-		tmp = source;
-		tmp2 = target;
-		for (x=0;x<iGLOBAL_SCREENWIDTH;x++){
-			//copy 1 pixel
-			*(target++) = *(source) ;
-			source += cnt;
-			old += Xratio;
-			if (old >= 1) {
-				source++;
-				old -= 1;
-			}
-		}
-		source = tmp + iGLOBAL_SCREENWIDTH;
-		target = tmp2 + iGLOBAL_SCREENWIDTH;
-	}
-	//delete every redunted lines
-	source = tmpPICbuf;//+(1* iGLOBAL_SCREENWIDTH);
-	target = tmpPICbuf;
-
-	Yratio = iGLOBAL_SCREENHEIGHT * 10 / 200;//we shall schrink 480/600 lines to 200  
-	Yratio = (Yratio/10);
-	cnt = (int)Yratio; //2
-	Yratio = (Yratio - cnt); //.2
-	NbOfLines=0;//make sure we dont exeed iGLOBAL_SCREENHEIGHT or we get a crash
-	old = 0;
-//SetTextMode (  );
-	for (y=0;y<200;y++){
-		//if (source > (tmpPICbuf+(iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT))){goto stopy;}
-		memcpy(target, source, iGLOBAL_SCREENWIDTH);	
-		source += (cnt * iGLOBAL_SCREENWIDTH);
-		old += Yratio;
-		if (old > 1) {
-			//delte extra line
-			source += iGLOBAL_SCREENWIDTH;
-			old -= 1;
-		}
-		target += iGLOBAL_SCREENWIDTH;
-	}
-
-//stopy:;	
+// bna section -------------------------------------------
+static void StretchMemPicture ()
+{
+  SDL_Rect src;
+  SDL_Rect dest;
+	
+  src.x = 0;
+  src.y = 0;
+  src.w = 320;
+  src.h = 200;
+  
+  dest.x = 0;
+  dest.y = 0;
+  dest.w = iGLOBAL_SCREENWIDTH;
+  dest.h = iGLOBAL_SCREENHEIGHT;
+  SDL_SoftStretch(unstretch_sdl_surface, &src, sdl_surface, &dest);
 }
 
 // bna function added start
@@ -889,7 +796,7 @@ int		iG_playerTilt;
 void DrawCenterAim ()
 {
 	int x;
-	if (iG_aimCross > 0){
+	if (iG_aimCross && !GamePaused){
 		if (( ingame == true )&&(iGLOBAL_SCREENWIDTH>320)){
 			  if ((iG_playerTilt <0 )||(iG_playerTilt >iGLOBAL_SCREENHEIGHT/2)){
 					iG_playerTilt = -(2048 - iG_playerTilt);
@@ -913,7 +820,7 @@ void DrawCenterAim ()
 				  }
 			  }
 			  for (x=4;x<=10;x++){
-				  if (((iG_buf_center-(x*iGLOBAL_SCREENWIDTH)+iG_X_center) < bufofsTopLimit)&&((iG_buf_center-(x*iGLOBAL_SCREENWIDTH)+iG_X_center) > bufofsBottomLimit)){
+				  if (((iG_buf_center+(x*iGLOBAL_SCREENWIDTH)+iG_X_center) < bufofsTopLimit)&&((iG_buf_center+(x*iGLOBAL_SCREENWIDTH)+iG_X_center) > bufofsBottomLimit)){
 					 *(iG_buf_center+(x*iGLOBAL_SCREENWIDTH)+iG_X_center) = 75;
 				  }
 			  }

@@ -321,7 +321,8 @@ void DrawTiledRegion
 
 void VWB_DrawPic (int x, int y, pic_t *pic)
 {
-   if (VW_MarkUpdateBlock (x, y, x+(pic->width<<2)-1, y+(pic->height)-1))
+   if (((iGLOBAL_SCREENWIDTH > 320) && !StretchScreen) ||
+       VW_MarkUpdateBlock (x, y, x+(pic->width<<2)-1, y+(pic->height)-1))
       VL_MemToScreen ((byte *)&pic->data, pic->width, pic->height, x, y);
 }
 
@@ -397,7 +398,8 @@ void VL_Bar (int x, int y, int width, int height, int color)
 
 void VWB_Bar (int x, int y, int width, int height, int color)
 {
-   if (VW_MarkUpdateBlock (x,y,x+width,y+height-1) )
+   if (((iGLOBAL_SCREENWIDTH > 320) && !StretchScreen) ||
+       VW_MarkUpdateBlock (x,y,x+width,y+height-1) )
       VL_Bar (x, y, width, height, color);
 }
 
@@ -1190,7 +1192,7 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
    }
 
    SafeFree(origbuf);
-   StrechScreen=true;//bna++ shut on streech mode
+   EnableScreenStretch();//bna++ shut on streech mode
    if (flip==true)
       VW_UpdateScreen ();
 

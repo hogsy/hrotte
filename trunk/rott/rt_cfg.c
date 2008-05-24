@@ -91,6 +91,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //******************************************************************************
 
 extern int G_weaponscale;
+extern boolean iG_aimCross;
 
 boolean WriteSoundFile   = true;
 
@@ -109,6 +110,7 @@ boolean mouseenabled     = 1;
 boolean usemouselook     = 0;
 int     inverse_mouse    = 1; //set  to -1 to invert mouse
 boolean usejump          = 0;
+boolean sdl_fullscreen   = 1;
 
 boolean joystickenabled  = 0;
 boolean joypadenabled    = 0;
@@ -507,6 +509,9 @@ boolean ParseConfigFile (void)
 	  // Read in UseJump
       ReadBoolean("UseJump",&usejump);
 
+      // Read in CrossHair
+      ReadBoolean("CrossHair",&iG_aimCross);
+
       // Read in JoystickEnabled
       ReadBoolean("JoystickEnabled",&joystickenabled);
 
@@ -516,6 +521,13 @@ boolean ParseConfigFile (void)
       // Read in JoystickPort
 
       ReadInt("JoystickPort",&joystickport);
+      
+      // Read in fullscreen
+      ReadBoolean("FullScreen", &sdl_fullscreen);
+      
+      // Read in resolution
+      ReadInt("ScreenWidth", &iGLOBAL_SCREENWIDTH);
+      ReadInt("ScreenHeight", &iGLOBAL_SCREENHEIGHT);
 
       // Read in ViewSize
 
@@ -1725,6 +1737,12 @@ void WriteConfig (void)
    SafeWriteString(file,"; 0 - usejump Disabled\n");
    WriteParameter(file,"UseJump          ",usejump);
 
+   // Write out CrossHair
+   SafeWriteString(file,"\n;\n");
+   SafeWriteString(file,"; 1 - CrossHair Enabled\n");
+   SafeWriteString(file,"; 0 - CrossHair Disabled\n");
+   WriteParameter(file,"CrossHair        ", iG_aimCross);
+
    // Write out JoystickEnabled
 
    SafeWriteString(file,"\n;\n");
@@ -1745,6 +1763,19 @@ void WriteConfig (void)
    SafeWriteString(file,"; 0 - Use Joystick Port 1\n");
    SafeWriteString(file,"; 1 - Use Joystick Port 2\n");
    WriteParameter(file,"JoystickPort     ",joystickport);
+
+   // Write out fullscreen
+   SafeWriteString(file,"\n;\n");
+   SafeWriteString(file,"; 0 - Start in windowed mode\n");
+   SafeWriteString(file,"; 1 - Start in fullscreen mode\n");
+   WriteParameter(file,"FullScreen       ",sdl_fullscreen);
+      
+   // Write out resolution
+   SafeWriteString(file,"\n;\n");
+   SafeWriteString(file,"; Screen Resolution, supported resolutions: \n");
+   SafeWriteString(file,"; 320x200, 640x480 and 800x600\n");
+   WriteParameter(file,"ScreenWidth      ",iGLOBAL_SCREENWIDTH);
+   WriteParameter(file,"ScreenHeight     ",iGLOBAL_SCREENHEIGHT);
 
    // Write out ViewSize
 

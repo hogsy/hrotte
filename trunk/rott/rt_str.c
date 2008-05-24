@@ -1455,7 +1455,8 @@ void US_DrawWindow (int x, int y, int w, int h)
 
 void US_CenterWindow (int w, int h)
 {
-   US_DrawWindow (((MaxX / 8) - w) / 2,((MaxY / 8) - h) / 2, w, h);
+   //HDG US_DrawWindow (((MaxX / 8) - w) / 2,  ((MaxY / 8) - h) / 2, w, h);
+   US_DrawWindow (((iGLOBAL_SCREENWIDTH / 8) - w) / 2,((iGLOBAL_SCREENHEIGHT / 8) - h) / 2, w, h);
 }
 
 
@@ -1521,7 +1522,7 @@ void DrawIntensityChar  ( char ch )
 
    mask = 1 << ( px & 3 );
 
-   if ((iGLOBAL_SCREENWIDTH <= 320)||(StrechScreen == true)){
+   if ((iGLOBAL_SCREENWIDTH <= 320)||(StretchScreen == true)){
 	   while( width-- )
 	   {
 		  VGAMAPMASK( mask );

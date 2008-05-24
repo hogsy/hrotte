@@ -74,8 +74,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // GLOBAL VARIABLES
 //========================================
 
-extern char *tmpPICbuf;
-extern int  iXmas;
 extern boolean  UseBaseMarker;
 
 teamtype TEAM[MAXPLAYERS];
@@ -1235,7 +1233,7 @@ void PreCache( void )
 				DrawNormalSprite (91+3+(Gs*(lastcache<<2)),573,W_GetNumForName ("led2"));//led2 progressbar
 				DrawNormalSprite (91+3+(Gs*(lastcache<<2)),573+3,W_GetNumForName ("led2"));//led2 progressbar
 			}
-			StrechScreen=false;//bna++
+			DisableScreenStretch();//bna++
 			VW_UpdateScreen ();//bna++
             lastcache++;
             ticdelay--;
@@ -1251,7 +1249,7 @@ void PreCache( void )
                }
             }
          }
-	  StrechScreen=false;//bna++
+	  DisableScreenStretch();//bna++
 	  VW_UpdateScreen ();//bna++
 	  //I_Delay(200);
       bufferofs=tempbuf;
@@ -1265,7 +1263,7 @@ void PreCache( void )
 		WHratio = WHratio/100;
 ///	iGLOBAL_SCREENWIDTH = 640;
 //	iGLOBAL_SCREENHEIGHT = 480;
-StrechScreen=false;
+DisableScreenStretch();
 
 	// Cache in fonts
 //	shape = W_CacheLumpNum (W_GetNumForName ("newfnt1"), PU_STATIC, Cvt_font_t, 1);
@@ -1285,7 +1283,7 @@ StrechScreen=false;
          while (!IN_CheckAck ())
             ;
          }
- //  StrechScreen=true;
+ //  EnableScreenStretch();
 #if (DEVELOPMENT == 1)
       tempbuf=bufferofs;
       bufferofs=displayofs;
@@ -5749,6 +5747,10 @@ void SetupGameLevel (void)
 	SNAKELEVEL = 0;
 	whichpath = 0;
 
+	// som of the code / calls below need bufferofs & friends to point
+	// to to the real screen, not the stretch buffer
+	DisableScreenStretch();//bna++ shut off streech mode
+
 	InitializePlayerstates();
 
 	ResetCheatCodes();
@@ -5898,6 +5900,8 @@ void SetupGameLevel (void)
 	insetupgame=false;
 
 	tedlevel = false;   // turn it off once we have done any ted stuff
+	
+	EnableScreenStretch();
 }
 
 

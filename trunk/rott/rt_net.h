@@ -263,6 +263,7 @@ extern byte     *demoptr,
 					 *lastdemoptr,
                 *demobuffer;
 extern boolean  demodone;
+extern int      predemo_violence;
 
 void     ControlPlayer (void);
 void     ControlRemote (objtype * ob);

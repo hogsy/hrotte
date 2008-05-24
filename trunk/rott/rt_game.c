@@ -95,7 +95,6 @@ HighScore   Scores[MaxScores] =
                {"Jim",20000,2,1},
                {"Steve",10000,1,1},
             };
-extern char *tmpPICbuf;
 
 //******************************************************************************
 //
@@ -1109,6 +1108,7 @@ void DrawGameString (int x, int y, const char * str, boolean bufferofsonly)
       tempbuf=bufferofs;
       bufferofs=page1start;
       VW_DrawPropString (str);
+#ifdef DOS
       px=x;
       py=y;
       bufferofs=page2start;
@@ -1117,6 +1117,7 @@ void DrawGameString (int x, int y, const char * str, boolean bufferofsonly)
       py=y;
       bufferofs=page3start;
       VW_DrawPropString (str);
+#endif
       bufferofs=tempbuf;
       }
 }
@@ -3421,11 +3422,11 @@ void LevelCompleted
    EndBonusSkip       = false;
    EndBonusStartY     = 90;
 
-   StrechScreen=true;
+   EnableScreenStretch();
    tmpPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE, Cvt_pic_t, 1 );
    VWB_DrawPic( 0, 0, tmpPic );
    VW_UpdateScreen();
-   StrechScreen=false;
+   DisableScreenStretch();
 
    IN_StartAck();
    EndBonusVoice = 0;
@@ -3531,9 +3532,9 @@ void LevelCompleted
    picbuf = (byte *)SafeMalloc (64000);
    memcpy(picbuf ,bufferofs ,64000);
 
-   StrechScreen=true;
+   EnableScreenStretch();
    VW_UpdateScreen();//tmpPICbuf is destroyed here
-   StrechScreen=false;
+   DisableScreenStretch();
    //copy it back
 
    memcpy(bufferofs ,picbuf , 64000);
@@ -3758,9 +3759,9 @@ EndBonusSkip = true;
     
 
 	//bna section 
-    StrechScreen=true;//bna++
+    EnableScreenStretch();//bna++
     VW_UpdateScreen();//bna++
-//    StrechScreen=false;//bna++
+//    DisableScreenStretch();//bna++
 	//bna section end
 
 
@@ -4211,7 +4212,7 @@ void BattleLevelCompleted ( int localplayer )
    int Player;
    char text[80];
 
-   StrechScreen=true;
+   EnableScreenStretch();
 
    IN_ClearKeysDown ();
 

@@ -164,7 +164,8 @@ extern int setup_homedir (void);
 //extern char G_argv[30][80];
 int G_weaponscale;
 extern int iDropDemo;
-extern int iG_aimCross;
+extern boolean iG_aimCross;
+extern boolean sdl_fullscreen;
 
 extern void ComSetTime ( void );
 extern void VH_UpdateScreen (void);
@@ -220,8 +221,6 @@ int main (int argc, char *argv[])
    gamestate.Product = ROTT_REGISTERED;
 #endif
 
-   SetRottScreenRes (640, 480);
-
    DrawRottTitle ();
    gamestate.randomseed=-1;
 
@@ -248,6 +247,8 @@ int main (int argc, char *argv[])
       GetMenuInfo ();
       }
 
+   SetRottScreenRes (iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT);
+   
 //   if (modemgame==true)
 //      {
 //      SCREENSHOTS=true;
@@ -571,6 +572,20 @@ void CheckCommandLineParameters( void )
       SetTextMode ();
       printf ("Rise of the Triad  (c) 1995 Apogee Software\n\n");
       printf ("COMMAND LINE PARAMETERS\n");
+      printf ("   AIM        - Give Aim Crosshair.\n");
+      printf ("   FULLSCREEN - Start in fullscreen mode\n");
+      printf ("   WINDOW     - Start in windowed mode\n");
+      printf ("   RESOLUTION - Specify the screen resolution to use\n");
+      printf ("              - next param is <widthxheight>, valid resolutions are:\n");
+      printf ("              - 320x200, 640x480 and 800x600\n");
+#if (SHAREWARE==0)
+      printf ("   FILERTL    - used to load Userlevels (RTL files)\n");
+      printf ("              - next parameter is RTL filename\n");
+      printf ("   FILERTC    - used to load Battlelevels (RTC files)\n");
+      printf ("              - next parameter is RTC filename\n");
+      printf ("   FILE       - used to load Extern WAD files\n");
+      printf ("              - next parameter is WAD filename\n");
+#endif
       printf ("   SPACEBALL  - Enable check for Spaceball.\n");
       printf ("   NOJOYS     - Disable check for joystick.\n");
       printf ("   NOMOUSE    - Disable check for mouse.\n");
@@ -593,6 +608,57 @@ void CheckCommandLineParameters( void )
       printf ("   MAXTIMELIMIT - Maximimum time to count down from\n");
       printf ("                next paramater is time in seconds\n");
       printf ("   DOPEFISH   - ?\n");
+      printf (" \n");
+      printf ("CONTROLS\n");
+      printf ("         Arrows           - Move\n");
+      printf ("         Ctrl             - Fire\n");
+      printf ("         Comma/Alt+left   - Sidestep Left\n");
+      printf ("         Period/Alt+right - Sidestep Right\n");
+      printf ("         Shift            - Run/Turn faster\n");
+      printf ("         Space            - Use/Open\n");
+      printf ("         1-4              - Choose Weapon\n");
+      printf ("         5-6              - Scale Weapon Up/Down\n");
+      printf ("         Enter            - Swap Weapon\n");
+      printf ("         Backspace        - Turn 180\n");
+      printf ("         Delete           - Drop Weapon\n");
+      printf ("         +/-              - Change Viewsize\n");
+      printf ("         PgUp/PgDn        - Look Up/Down\n");
+      printf ("         Home/End         - Aim Up/Down\n");
+      printf ("         [ ]              - Sound Volumen\n");
+      printf ("         ( )              - Music Volumen\n");
+      printf ("         Tab              - Enter Automapper\n");
+      printf (" \n");
+      printf ("AUTO-MAPPER\n");
+      printf ("         Arrows           - Scroll around\n");
+      printf ("         PgUp             - Zoom Out\n");
+      printf ("         PgDn             - Zoom In\n");
+      printf ("         Tab              - Exit Auto-Mapper\n");
+      printf (" \n");
+      printf ("HOTKEYS\n");
+      printf ("         F1               - Help\n");
+      printf ("         F2               - Save Game\n");
+      printf ("         F3               - Restore Game\n");
+      printf ("         F4               - Controls/Sound/Music\n");
+      printf ("         F5               - Change Detail Level\n");
+      printf ("         F6               - Quick Save\n");
+      printf ("         F7               - Messages On/Off\n");
+      printf ("         F8               - End Game\n");
+      printf ("         F9               - Quick Load\n");
+      printf ("         F10              - Quit\n");
+      printf ("         F11              - Gamma Correction\n");
+      printf (" \n");
+      printf ("COMM-BAT\n");
+      printf ("         F1 - F10         - RemoteRidicule(tm) sounds\n");
+      printf ("         F12              - Live RemoteRidicule\n");
+      printf ("         T                - Type message to all\n");
+      printf ("         Z                - Type directed message\n");
+      printf ("         Tab              - Toggle KillCount display\n");
+      printf (" \n");
+      printf ("SCREENSHOOT\n");
+#ifdef DOS /* makes no sense under Linux as there are no lbm viewers there */
+      printf ("         Alt+V            - Screenshoot in LBM format\n");
+#endif
+      printf ("         Alt+C            - Screenshoot in PCX format\n");
       exit (0);
       }
 
@@ -738,25 +804,49 @@ void CheckCommandLineParameters( void )
 void SetupWads( void )
 {
    char  *newargs[99];
-	int argnum = 0;
-#if (SHAREWARE==0)
-   int arg;
-#endif
+   int i, arg, argnum = 0;
    char tempstr[129];
+   char *PStrings[] = {"AIM", "FULLSCREEN", "WINDOW", "RESOLUTION", NULL };
 
-#if (SHAREWARE==0)
-
-
-   // Check for aimcross
-   arg = CheckParm ("aim");
-   if (arg!=0)
+   // These must be checked here so that they can override the cfg file
+   for (i = 1;i < _argc;i++)
    {
-		iG_aimCross = 1;
-   }else{
-		iG_aimCross = 0;
+      arg = US_CheckParm(_argv[i],PStrings);
+      switch(arg)
+      {
+         case 0:
+            iG_aimCross = 1;
+            break;
+         case 1:
+            sdl_fullscreen = 1;
+            break;
+         case 2:
+            sdl_fullscreen = 0;
+            break;
+         case 3:
+            i++;
+            if (i < _argc)
+            {
+               int width, height;
+               if ( (sscanf(_argv[i], "%dx%d", &width, &height) == 2) &&
+                    ( ( (width == 320) && (height == 200) ) ||
+                      ( (width == 640) && (height == 480) ) ||
+                      ( (width == 800) && (height == 600) ) ) )
+               {
+                 iGLOBAL_SCREENWIDTH  = width;
+                 iGLOBAL_SCREENHEIGHT = height;
+               }
+               else
+                  printf("Invalid resolution parameter: %s\n", _argv[i]);
+            }
+            else
+               printf("Missing resolution parameter\n");
+            break;
+      }
    }
 
 
+#if (SHAREWARE==0)
    // Check for rtl files 	
    arg = CheckParm ("filertl");
    if (arg!=0)
@@ -1049,7 +1139,7 @@ void GameLoop (void)
 		 
             BATTLE_Shutdown();
             MU_StartSong(song_title);
-			StrechScreen=true;
+			EnableScreenStretch();
             if ((NoWait==false)&&(!modemgame))
                {
                byte dimpal[768];
@@ -1095,9 +1185,7 @@ void GameLoop (void)
                      break;
                      }
 
-                  if (iGLOBAL_SCREENWIDTH > 320) { //need fixing, crashes by 320 ,bna
 					DoCreditScreen ();
-				  }
                   if ((!LastScan) && (!IN_GetMouseButtons()))
                      CheckHighScore (0, 0, false);
 #if (SHAREWARE==0)
@@ -1147,7 +1235,7 @@ void GameLoop (void)
          case ex_resetgame:
 
   // SetTextMode (  ); //12345678
-			 StrechScreen=true;//bna++ shut on streech mode 
+	    EnableScreenStretch();//bna++ shut on streech mode 
             InitCharacter();
 
             InitializeMessages();
@@ -1232,7 +1320,7 @@ void GameLoop (void)
             MenuFixup ();
             playstate=ex_stillplaying;
 
-			StrechScreen=false;//bna++ shut off streech mode
+	    DisableScreenStretch();//bna++ shut off streech mode
 
          break;
 
@@ -1257,7 +1345,7 @@ void GameLoop (void)
 //		   SetTextMode (  ); //12345678
             Died ();
             StopWind();
-			 StrechScreen=false;//bna++ shut off streech mode
+			 DisableScreenStretch();//bna++ shut off streech mode
             while (damagecount>0)
                DoBorderShifts();
 
@@ -1438,6 +1526,11 @@ void GameLoop (void)
             demoplayback = false;
 
             Z_FreeTags (PU_LEVELSTRUCT, PU_LEVELEND);       // Free current level
+            if (predemo_violence != -1)
+            {
+               gamestate.violence = predemo_violence;
+               predemo_violence = -1;
+            }
             playstate=ex_titles;
          break;
 
@@ -1486,7 +1579,7 @@ boolean CheckForQuickLoad  (void )
 
    {
 
-   StrechScreen=true;//bna++
+   EnableScreenStretch();//bna++
 
    if ( pickquick )
       {
@@ -1831,7 +1924,7 @@ void PauseLoop ( void )
 				pic_t *shape;
 				shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
 				DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );
-				StrechScreen=false;//dont strech when we go BACK TO GAME
+				DisableScreenStretch();//dont strech when we go BACK TO GAME
 				DrawPlayScreen(true);//repaint ammo and life stat
 				VW_UpdateScreen ();//update screen
 		  }
@@ -2319,6 +2412,7 @@ void PollKeyboard
       // Shrink screen
       if ( Keyboard[ sc_Minus ] )
          {
+         Keyboard[ sc_Minus ] = false; // HDG debounce
          if ( viewsize > 0 )
             {
             viewsize--;
@@ -2329,6 +2423,7 @@ void PollKeyboard
       // Expand screen
       if ( Keyboard[ sc_Plus ] )
          {
+         Keyboard[ sc_Plus ] = false; // HDG debounce
          if ( viewsize < MAXVIEWSIZES - 1 )
             {
             viewsize++;
@@ -2542,12 +2637,29 @@ void PollKeyboard
             {
             SaveScreen( false );
             }
+#ifdef DOS /* makes no sense under Linux as there are no lbm viewers there */
          else if ( Keyboard[ sc_Alt] && Keyboard[ sc_V ] )
             {
             SaveScreen( true );
             }
+#endif
       #endif
       }
+#ifdef USE_SDL
+      /* SDL doesn't send proper release events for these */
+      if (Keystate[sc_CapsLock])
+      {
+         Keystate[sc_CapsLock]++;
+         if (Keystate[sc_CapsLock] == 3)
+            Keystate[sc_CapsLock] = 0;
+      }
+      if (Keystate[0x45]) /* numlock */ 
+      {
+         Keystate[0x45]++;
+         if (Keystate[0x45] == 3)
+            Keystate[0x45] = 0;
+      }
+#endif
    waminot();
    }
 
@@ -3082,14 +3194,22 @@ void SaveScreen (boolean saveLBM)
 
    if (saveLBM)
    {
-      WriteLBMfile (filename, buffer, 320, 200);
+      WriteLBMfile (filename, buffer, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT);
+#if (DEVELOPMENT == 1)
       while (Keyboard[sc_CapsLock] && Keyboard[sc_C])
+#else
+      while (Keyboard[sc_Alt] && Keyboard[sc_V])
+#endif
            IN_UpdateKeyboard ();
    }
    else
    {
       WritePCX (filename, buffer);
+#if (DEVELOPMENT == 1)
       while (Keyboard[sc_CapsLock] && Keyboard[sc_X])
+#else
+      while (Keyboard[sc_Alt] && Keyboard[sc_C])
+#endif
            IN_UpdateKeyboard ();
    }
 

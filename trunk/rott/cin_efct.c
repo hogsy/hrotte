@@ -308,7 +308,9 @@ void DrawFlic ( flicevent * flic )
 
    DrawBlankScreen ( );
 
+#ifdef DOS
    VL_SetVGAPlaneMode ();
+#endif
 
    CinematicSetPalette (curpal);
 
@@ -885,6 +887,7 @@ void ProfileDisplay ( void )
    int i;
    int plane;
    byte src[200];
+   int width = StretchScreen? 320:iGLOBAL_SCREENWIDTH;
 
    DrawClearBuffer ();
 
@@ -898,9 +901,9 @@ void ProfileDisplay ( void )
       VGAWRITEMAP(plane);
 
 #ifdef DOS
-      for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,buf++)
+      for (i=plane;i<width;i+=4,buf++)
 #else
-      for (i=0;i<iGLOBAL_SCREENWIDTH;i++,buf++)
+      for (i=0;i<width;i++,buf++)
 #endif
          {
          DrawFilmPost(buf,&src[0],200);
@@ -924,6 +927,7 @@ void DrawPostPic ( int lumpnum )
    int i;
    int plane;
    int height;
+   int width = StretchScreen? 320:iGLOBAL_SCREENWIDTH;
 
    pic=(lpic_t *)W_CacheLumpNum(lumpnum,PU_CACHE, Cvt_lpic_t, 1);
 
@@ -942,9 +946,9 @@ void DrawPostPic ( int lumpnum )
       VGAWRITEMAP(plane);
 
 #ifdef DOS
-      for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,src+=(pic->height<<2),buf++)
+      for (i=plane;i<width;i+=4,src+=(pic->height<<2),buf++)
 #else
-      for (i=0;i<iGLOBAL_SCREENWIDTH;i++,src+=pic->height,buf++)
+      for (i=0;i<width;i++,src+=pic->height,buf++)
 #endif
          {
          DrawFilmPost(buf,src,height);
