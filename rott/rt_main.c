@@ -3241,7 +3241,7 @@ void WritePCX (char * file, byte * source)
        *    unlike in CONVERT.EXE.
        */
 
-   memset (&pcxHDR, sizeof(PCX_HEADER), 0);
+   memset (&pcxHDR, 0, sizeof(PCX_HEADER));
 
    pcxHDR.manufacturer  = 10;
    pcxHDR.version       = 5;
@@ -3274,7 +3274,7 @@ void WritePCX (char * file, byte * source)
   //
    SafeWrite(pcxhandle,&pcxHDR, sizeof (PCX_HEADER));
 
-   memset (buffer1, GAP_SIZE, 0);
+   memset (buffer1, 0, GAP_SIZE);
 
    SafeWrite (pcxhandle, &buffer1, GAP_SIZE);
 
