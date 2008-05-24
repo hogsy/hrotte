@@ -47,13 +47,18 @@ endif
 
 
 CC = gcc
-CFLAGS = -g $(SDL_CFLAGS) -DUSE_SDL=1 -DPLATFORM_UNIX=1 -W -Wall -Wno-unused -Wno-pointer-sign $(EXTRACFLAGS)
-LDLIBS = $(SDL_LDFLAGS) -lSDL -lSDL_mixer $(EXTRALDFLAGS) -Wl,-E
+CFLAGS += -g -W -Wall -Wno-unused -Wno-pointer-sign
+ALL_CFLAGS = $(SDL_CFLAGS) -DUSE_SDL=1 -DPLATFORM_UNIX=1 $(CFLAGS) $(EXTRACFLAGS)
+LDFLAGS += -Wl,-E
+LDLIBS = $(LDFLAGS) $(SDL_LDFLAGS) -lSDL -lSDL_mixer $(EXTRALDFLAGS)
+
+%.o: %.c
+	$(CC) $(ALL_CFLAGS) -c $< -o $@
 
 all: rott
 
 audiolib/audiolib.a:
-	$(MAKE) -C audiolib CC="$(CC)" CFLAGS="$(CFLAGS)" LDLIBS="$(LDLIBS)"
+	$(MAKE) -C audiolib CC="$(CC)" CFLAGS="$(ALL_CFLAGS)" LDLIBS="$(LDLIBS)"
 
 rott: 	\
 	cin_actr.o \

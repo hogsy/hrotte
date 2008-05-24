@@ -968,9 +968,9 @@ NoRTC:;
    // Normal ROTT wads
 
 #if (SHAREWARE)
-   newargs [argnum++] = "huntbgin.wad";
+   newargs [argnum++] = DATADIR "HUNTBGIN.WAD";
 #else
-   newargs [argnum++] = "darkwar.wad";
+   newargs [argnum++] = DATADIR "DARKWAR.WAD";
 #endif
 
 //   newargs [argnum++] = "credits.wad";
@@ -990,7 +990,7 @@ NoRTC:;
       }
    else
       {
-      newargs [argnum++] = "remote1.rts";
+      newargs [argnum++] = DATADIR "REMOTE1.RTS";
       }
 
    newargs [argnum++] = NULL;
