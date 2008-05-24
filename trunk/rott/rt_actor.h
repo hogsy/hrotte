@@ -315,7 +315,7 @@ extern  objtype          *new,**objlist,
 extern  void             *actorat[MAPSIZE][MAPSIZE];
 extern  int              angletodir[ANGLES];
 extern _2Dpoint          SNAKEPATH[512];
-extern  int              STOPSPEED;
+/* extern  int              STOPSPEED; */
 extern  int              FRICTION;
 
 extern  int              objcount;
