@@ -105,23 +105,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern  int      ylookup[MAXSCREENHEIGHT];      // Table of row offsets
 extern  int      linewidth;
-extern  int      page1start;
-extern  int      page2start;
-extern  int      page3start;
+extern  byte    *page1start;
+extern  byte    *page2start;
+extern  byte    *page3start;
 extern  int      screensize;
-extern  unsigned bufferofs;
-extern  unsigned displayofs;
+extern  byte    *bufferofs;
+extern  byte    *displayofs;
 extern  boolean  graphicsmode;
 
 
 void  GraphicsMode ( void );
 void  SetTextMode ( void );
 void  VL_SetVGAPlaneMode ( void );
-void  VL_ClearBuffer (unsigned buf, byte color);
+void  VL_ClearBuffer (byte *buf, byte color);
 void  VL_ClearVideo (byte color);
 void  VL_DePlaneVGA (void);
 void  VL_CopyDisplayToHidden ( void );
-void  VL_CopyBufferToAll ( unsigned buffer );
+void  VL_CopyBufferToAll ( byte *buffer );
 void  VL_CopyPlanarPage ( byte * src, byte * dest );
 void  VL_CopyPlanarPageToMemory ( byte * src, byte * dest );
 void  XFlipPage ( void );

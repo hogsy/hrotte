@@ -998,7 +998,7 @@ void StatusDrawColoredPic (unsigned x, unsigned y, pic_t *nums, boolean bufferof
 
 void DrawGameString (int x, int y, const char * str, boolean bufferofsonly)
 {
-   unsigned tempbuf;
+   byte *tempbuf;
 
    px=x;
    py=y;
@@ -1543,8 +1543,8 @@ void DrawTime
 
 void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *src, boolean bufferofsonly)
 {
-   byte *olddest;
-   byte *dest;
+   int olddest;
+   int dest;
    int x;
    int y;
    int planes;
@@ -1554,9 +1554,9 @@ void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *
    mask = 1 << (xpos&3);
 
 #ifdef DOS
-   olddest = (byte *)(ylookup[ypos] + (xpos>>2));
+   olddest = ylookup[ypos] + (xpos>>2);
 #else
-   olddest = (byte *)(ylookup[ypos] + xpos);
+   olddest = ylookup[ypos] + xpos;
 #endif
 
    for (planes = 0; planes < 4; planes++)
@@ -1637,8 +1637,8 @@ void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *
 
 void DrawColoredMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *src, boolean bufferofsonly, int color)
 {
-   byte *olddest;
-   byte *dest;
+   int olddest;
+   int dest;
    int x;
    int y;
    int planes;
@@ -1651,9 +1651,9 @@ void DrawColoredMPPic (int xpos, int ypos, int width, int height, int heightmod,
    mask = 1 << (xpos&3);
 
 #ifdef DOS
-   olddest = (byte *)(ylookup[ypos] + (xpos>>2));
+   olddest = ylookup[ypos] + (xpos>>2);
 #else
-   olddest = (byte *)(ylookup[ypos] + xpos);
+   olddest = ylookup[ypos] + xpos;
 #endif
 
    for (planes = 0; planes < 4; planes++)
@@ -1822,8 +1822,8 @@ void DrawTriads
 
 void DrawPPic (int xpos, int ypos, int width, int height, byte *src, int num, boolean up, boolean bufferofsonly)
 {
-   byte *olddest;
-   byte *dest;
+   int olddest;
+   int dest;
    int x;
    int y;
    int planes;
@@ -1847,9 +1847,9 @@ void DrawPPic (int xpos, int ypos, int width, int height, byte *src, int num, bo
    mask = 1;
 
 #ifdef DOS
-   olddest = (byte *)(ylookup[ypos] + (xpos>>2));
+   olddest = ylookup[ypos] + (xpos>>2);
 #else
-   olddest = (byte *)(ylookup[ypos] + xpos);
+   olddest = ylookup[ypos] + xpos;
 #endif
 
    for (planes = 0; planes < 4; planes++)
@@ -2254,7 +2254,7 @@ void DrawPauseXY (int x, int y)
 void DrawPause (void)
 {
    pic_t *p;
-   int bufftemp = bufferofs;
+   byte *bufftemp = bufferofs;
 
    bufferofs -= screenofs;
 
@@ -2610,15 +2610,16 @@ void  DrawEpisodeLevel (int x, int y)
 
 void GM_MemToScreen (byte *source, int width, int height, int x, int y)
 {
-   byte *dest, *dest1, *dest2, *dest3, mask;
+   int dest;
+   byte *dest1, *dest2, *dest3, mask;
    byte *screen1, *screen2, *screen3;
    int  plane;
    int w;
    
 #ifdef DOS
-   dest = (byte *)(ylookup[y]+(x>>2));
+   dest = ylookup[y]+(x>>2);
 #else
-   dest = (byte *)(ylookup[y]+x);
+   dest = ylookup[y]+x;
 #endif
    mask = 1 << (x&3);
 
@@ -4450,7 +4451,7 @@ void DoLoadGameAction (void)
 {
    if ((SaveTime+1) < GetTicCount())
    {
-      int temp = bufferofs;
+      byte *temp = bufferofs;
 
       bufferofs = displayofs;
       SaveTime = GetTicCount();

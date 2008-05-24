@@ -32,8 +32,8 @@ typedef signed char Char;		/* Signed 8 bits. */
 typedef unsigned char Uchar;	/* Unsigned 8 bits. */
 typedef short Short;			/* Signed 16 bits please. */
 typedef unsigned short Ushort;	/* Unsigned 16 bits please. */
-typedef long Long;				/* Signed 32 bits. */
-typedef unsigned long Ulong;	/* Unsigned 32 bits. */
+typedef int Long;				/* Signed 32 bits. */
+typedef unsigned int Ulong;	/* Unsigned 32 bits. */
 
 typedef int Boolean;			/* TRUE or FALSE value. */
 typedef int ErrCode;			/* ErrXXX or Success. */

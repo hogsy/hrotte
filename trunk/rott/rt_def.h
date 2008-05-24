@@ -299,8 +299,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef unsigned char           byte;
 typedef unsigned short int      word;
-typedef unsigned long           longword;
-typedef long fixed;
+typedef unsigned int            longword;
+typedef int fixed;
 
 
 //////////////////////////////////////////////////////////////////////////

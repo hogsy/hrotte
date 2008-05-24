@@ -151,7 +151,7 @@ typedef struct statstruct
 		  short int         whichstat;
 		  short int         areanumber;
 
-		  int               linked_to;
+		  long              linked_to;
 		  struct statstruct *statnext;
 		  struct statstruct *statprev;
 		  struct statstruct *nextactive;
@@ -167,8 +167,7 @@ typedef struct respstruct
 		  int               spawnz;
 		  struct respstruct *next;
 		  struct respstruct *prev;
-        int linked_to;
-
+                  long              linked_to;
 } respawn_t;
 
 
@@ -205,8 +204,8 @@ extern   animwall_t     animwalls[MAXANIMWALLS];
 void Set_NewZ_to_MapValue(fixed*,int,const char*,int,int);
 void RemoveFromFreeStaticList(statobj_t*);
 void CheckCriticalStatics(void);
-void ActivateLight(int);
-void DeactivateLight(int);
+void ActivateLight(long);
+void DeactivateLight(long);
 void TurnOnLight(int,int);
 void TurnOffLight(int,int);
 void MakeStatActive(statobj_t*);
