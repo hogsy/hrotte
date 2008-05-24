@@ -38,6 +38,6 @@ void myputch( char ch );
 int  printstring( char *string );
 int  printnum( int number );
 int  printunsigned( unsigned long number, int radix );
-int  myprintf( char *fmt, ... );
+int  myprintf( char *fmt, ... ) __attribute__((format(printf,1,2)));
 
 #endif

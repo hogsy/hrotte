@@ -242,7 +242,7 @@ void W_InitMultipleFiles (char **filenames)
 //
         lumpcache = calloc (numlumps, sizeof(*lumpcache));
         if (!lumpcache)
-           Error("W_InitFiles: lumpcache malloc failed size=%ld\n",numlumps<<2);
+           Error("W_InitFiles: lumpcache malloc failed size=%d\n",numlumps<<2);
 
         if (!quiet)
            printf("W_Wad: Wad Manager Started NUMLUMPS=%ld\n",(long int)numlumps);
@@ -250,7 +250,9 @@ void W_InitMultipleFiles (char **filenames)
         lumpcheck=SafeMalloc(numlumps);
         memset(lumpcheck,255,numlumps);
 #endif
+#ifdef DOS
         if (!SOUNDSETUP)
+#endif
            W_CheckWADIntegrity ();
 }
 
@@ -495,7 +497,7 @@ void    *W_CacheLumpNum (int lump, int tag, converter_t converter, int numrec)
 #else
                 Z_Malloc (W_LumpLength (lump), tag, &lumpcache[lump]);
                 W_ReadLump (lump, lumpcache[lump]);
-                Debug("Invoking endian converter on %p, %i records\n", lump, numrec);
+                Debug("Invoking endian converter on %p, %i records\n", lumpcache[lump], numrec);
                 converter(lumpcache[lump], numrec);
 #endif
         }

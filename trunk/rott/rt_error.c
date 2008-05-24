@@ -121,7 +121,7 @@ void (__interrupt __far *olddivisr) () = NULL;
 //
 //******************************************************************************
 
-void UL_UserMessage (int x, int y, char *str, ...)
+void UL_UserMessage (int x, int y, char *str, ...) __attribute__((format(printf,3,4)))
 {
    va_list strptr;
    char buf[128];

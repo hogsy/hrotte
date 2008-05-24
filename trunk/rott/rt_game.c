@@ -4846,7 +4846,7 @@ boolean SaveTheGame (int num, gamestorage_t * game)
    int myticcount;
    
 	if (num > 15 || num < 0)
-		Error("Illegal Saved game value=%ld\n",num);
+		Error("Illegal Saved game value=%d\n",num);
 
    //
    // Save Alternate Game Level information for reloading game
@@ -5168,7 +5168,7 @@ boolean LoadTheGame (int num, gamestorage_t * game)
         int myticcount;
 
 	if (num>15 || num<0)
-		Error("Illegal Load game value=%ld\n",num);
+		Error("Illegal Load game value=%d\n",num);
 
 	// Create the proper file name
 
@@ -5241,6 +5241,9 @@ boolean LoadTheGame (int num, gamestorage_t * game)
 	DoLoadGameAction ();
 	SetupGameLevel();
 
+	// This prevents a nasty glitch when loading some saved games
+	PreCacheGroup(W_GetNumForName("BULLETHO"),W_GetNumForName("ALTBHO"),cache_transpatch_t);	
+	
 	// Door Tag
 
 	size=4;
@@ -5517,7 +5520,7 @@ void GetSavedMessage (int num, char * message)
    int    size;
 
    if (num>15 || num<0)
-      Error("Illegal Load game value=%ld\n",num);
+      Error("Illegal Load game value=%d\n",num);
 
    // Create the proper file name
 
@@ -5559,7 +5562,7 @@ void GetSavedHeader (int num, gamestorage_t * game)
    int    size;
 
    if (num>15 || num<0)
-      Error("Illegal Load game value=%ld\n",num);
+      Error("Illegal Load game value=%d\n",num);
 
    // Create the proper file name
 

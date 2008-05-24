@@ -38,6 +38,6 @@ DECLARE_CONVERTER(patch_t);
 DECLARE_CONVERTER(transpatch_t);
 DECLARE_CONVERTER(cfont_t);
 void CvtNull(void *lmp, int num);
-void CvtFixme(void *lmp, int num);
+converter_t CvtForType(int type);
 
 #endif

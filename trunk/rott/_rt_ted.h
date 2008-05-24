@@ -36,6 +36,7 @@ typedef struct
 {
 	int  lump;
 	int  cachelevel;
+	int  type; // To make precaching possible on big endian machines
 } cachetype;
 
 //========================================

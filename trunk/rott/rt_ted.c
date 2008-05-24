@@ -258,7 +258,7 @@ void ShutdownPreCache( void )
 =
 ======================
 */
-void PreCacheLump( int lump, int level )
+void PreCacheLump( int lump, int level, int type ) // added type
 {
    int i;
 
@@ -275,7 +275,8 @@ void PreCacheLump( int lump, int level )
       if (cachelist[i].lump==lump)
          return;
    cachelist[cacheindex].lump=lump;
-   cachelist[cacheindex++].cachelevel=level;
+   cachelist[cacheindex].cachelevel=level;
+   cachelist[cacheindex++].type=type;
    if (cacheindex==MAXPRECACHE)
       Error("MaxPreCache reached\n");
 }
@@ -290,7 +291,7 @@ void PreCacheLump( int lump, int level )
 =
 ======================
 */
-void PreCacheGroup( int start, int end )
+void PreCacheGroup( int start, int end, int type ) // added type
 {
 	int i;
    int j;
@@ -319,7 +320,8 @@ void PreCacheGroup( int start, int end )
       if (found==0)
          {
          cachelist[cacheindex].lump=j;
-         cachelist[cacheindex++].cachelevel=PU_CACHEACTORS;
+         cachelist[cacheindex].cachelevel=PU_CACHEACTORS;
+         cachelist[cacheindex++].type=type;
 
          if (cacheindex==MAXPRECACHE)
             Error("MaxPreCache reached\n");
@@ -349,7 +351,7 @@ void PreCachePlayers(void )
 		 {pstate = &PLAYERSTATE[i];
         start=W_GetNumForName("CASSHO11")+(pstate->player*REMOTEOFFSET);
         end  =W_GetNumForName("CASWDEAD")+(pstate->player*REMOTEOFFSET);
-		  PreCacheGroup(start,end);
+		  PreCacheGroup(start,end,cache_patch_t);
 		 }
 	 }
 }
@@ -465,10 +467,10 @@ void PreCacheActor( int actor, int which )
 
 			start=W_GetNumForName("OBBOLO1");
          end  =W_GetNumForName("OBBOLO4");
-			PreCacheGroup(start,end);
+			PreCacheGroup(start,end,cache_patch_t);
 			start=W_GetNumForName("NET1");
 			end  =W_GetNumForName("NET4");
-			PreCacheGroup(start,end);
+			PreCacheGroup(start,end,cache_patch_t);
 
 			start = SD_OVERP1SEESND;
 			end = SD_OVERPDIESND;
@@ -543,7 +545,7 @@ void PreCacheActor( int actor, int which )
 
 			start=W_GetNumForName("TEGREN1");
 			end  =W_GetNumForName("TGRENF6");
-			PreCacheGroup(start,end);
+			PreCacheGroup(start,end,cache_patch_t);
 			start=W_GetNumForName("TRISHOO1");
 			end  =W_GetNumForName("TRIWDEAD");
 			//end  =W_GetNumForName("TRIUSE28");
@@ -569,7 +571,7 @@ void PreCacheActor( int actor, int which )
 
          start = W_GetNumForName("MONFIRE1");
          end = W_GetNumForName("MONFIRE4");
-         PreCacheGroup(start,end);
+         PreCacheGroup(start,end,cache_patch_t);
 
 
          if (IS_ALTERNATE_ACTOR(new))
@@ -619,7 +621,7 @@ void PreCacheActor( int actor, int which )
 
 			start=W_GetNumForName("MINE1");
 			end  =W_GetNumForName("MINE4");
-			PreCacheGroup(start,end);
+			PreCacheGroup(start,end,cache_patch_t);
 			start=W_GetNumForName("HSIT1");
 			end  =W_GetNumForName("HDOPE8");
 			break;
@@ -632,7 +634,7 @@ void PreCacheActor( int actor, int which )
 
 			start=W_GetNumForName("LIGNING1");
 			end  =W_GetNumForName("FSPARK4");
-			PreCacheGroup(start,end);
+			PreCacheGroup(start,end,cache_patch_t);
 			start=W_GetNumForName("TOMS1");
 			end  =W_GetNumForName("TOHRH8");
 			break;
@@ -667,7 +669,7 @@ void PreCacheActor( int actor, int which )
 
 			start=W_GetNumForName("GUNEMP1");
 			end  =W_GetNumForName("GUNEMPF8");
-			PreCacheGroup(start,end);
+			PreCacheGroup(start,end,cache_patch_t);
 			start=W_GetNumForName("GRISE11");
 			end  =W_GetNumForName("GDEAD2");
 			break;
@@ -675,7 +677,7 @@ void PreCacheActor( int actor, int which )
 		case wallopobj:
 			start=W_GetNumForName("BSTAR1");
 			end  =W_GetNumForName("BSTAR4");
-			PreCacheGroup(start,end);
+			PreCacheGroup(start,end,cache_patch_t);
 			start=W_GetNumForName("BCRAFT1");
 			end  =W_GetNumForName("BCRAFT16");
 			break;
@@ -824,7 +826,7 @@ void PreCacheActor( int actor, int which )
 			break;
 		}
    if ((start>=0) && (end>=0))
-      PreCacheGroup(start,end);
+      PreCacheGroup(start,end,cache_patch_t);
 }
 
 
@@ -862,7 +864,7 @@ void MiscPreCache( void )
    // cache in bullet hole graphics
    start=W_GetNumForName("BULLETHO");
    end=W_GetNumForName("ALTBHO");
-	PreCacheGroup(start,end);
+	PreCacheGroup(start,end,cache_transpatch_t);
 
 
    // cache in explosions
@@ -871,24 +873,24 @@ void MiscPreCache( void )
       {
       start=W_GetNumForName("EXPLOS1");
       end  =W_GetNumForName("EXPLOS20");
-      PreCacheGroup(start,end);
+      PreCacheGroup(start,end,cache_patch_t);
       }
    else
       {
       start=W_GetNumForName("EXPLOS1");
       end  =W_GetNumForName("GREXP25");
-      PreCacheGroup(start,end);
+      PreCacheGroup(start,end,cache_patch_t);
       }
 
 	// cache in misc player sprites
 	start=W_GetNumForName("BLOODS1");
 	end  =W_GetNumForName("PLATFRM5");
-	PreCacheGroup(start,end);
+	PreCacheGroup(start,end,cache_patch_t);
 
    // cache in missile smoke
 	start=W_GetNumForName("MISSMO11");
 	end  =W_GetNumForName("MISSMO14");
-   PreCacheGroup(start,end);
+   PreCacheGroup(start,end,cache_patch_t);
 
 #if (DEVELOPMENT == 1)
 	// cache in all weapon sounds
@@ -898,26 +900,28 @@ void MiscPreCache( void )
 #if (SHAREWARE == 0)
    start=W_GetNumForName("KNIFE1");
    end  =W_GetNumForName("DOGPAW4");
-   PreCacheGroup(start,end);
+   PreCacheGroup(start,end,cache_patch_t);
 	// cache in kinetic sphere
    start=W_GetNumForName("KSPHERE1");
 	end  =W_GetNumForName("KSPHERE4");
-   PreCacheGroup(start,end);
+   PreCacheGroup(start,end,cache_patch_t);
 
 #else
    start=W_GetNumForName("MPIST11");
    end  =W_GetNumForName("GODHAND8");
-   PreCacheGroup(start,end);
+   PreCacheGroup(start,end,cache_patch_t);
 #endif
 
 
    // cache in god mode stuff
 
 	PreCacheGroup(W_GetNumForName("VAPO1"),
-	              W_GetNumForName("LITSOUL"));
+	              W_GetNumForName("LITSOUL"),
+	              cache_patch_t);
 
 	PreCacheGroup(W_GetNumForName("GODFIRE1"),
-					  W_GetNumForName("GODFIRE4"));
+					  W_GetNumForName("GODFIRE4"),
+					  cache_patch_t);
 
 
 #endif
@@ -926,17 +930,17 @@ void MiscPreCache( void )
    // cache in rubble
    start=W_GetNumForName("RUBBLE1");
 	end  =W_GetNumForName("RUBBLE10");
-   PreCacheGroup(start,end);
+   PreCacheGroup(start,end,cache_patch_t);
 
    // cache in guts
    start=W_GetNumForName("GUTS1");
    end  =W_GetNumForName("GUTS12");
-   PreCacheGroup(start,end);
+   PreCacheGroup(start,end,cache_patch_t);
 
    // cache in player missile
    start=W_GetNumForName("BJMISS1");
 	end  =W_GetNumForName("BJMISS16");
-   PreCacheGroup(start,end);
+   PreCacheGroup(start,end,cache_patch_t);
 
    if (gamestate.violence >= vl_high)
       {                                  // cache in all gibs
@@ -950,7 +954,7 @@ void MiscPreCache( void )
          start = W_GetNumForName("PART1");
          end = W_GetNumForName("GEYE3");
          }
-      PreCacheGroup(start,end);
+      PreCacheGroup(start,end,cache_patch_t);
       }
 }
 
@@ -1158,13 +1162,6 @@ void PreCache( void )
 #define  PRECACHELED2Y 12
 */
 
-#if defined(PLATFORM_MACOSX) || defined(__sparc__)
-#warning "Precaching is disabled. Fix."
-// Precaching confuses the byteswapping code, since we have
-// no simple way of knowing the type of each resource.
-    return;
-#endif
-
    if (CachingStarted==false)
       {
       if (loadedgame==false)
@@ -1185,11 +1182,11 @@ void PreCache( void )
       total=0;
 
       tempbuf=bufferofs;
-      bufferofs=displayofs;
+      bufferofs=page1start; // fixed, was displayofs
       ticdelay=CACHETICDELAY;
       for (i=1;i<cacheindex;i++)
 			{
-         dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel, CvtFixme, 1);
+         dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel, CvtForType(cachelist[i].type), 1);
          total+=W_LumpLength(cachelist[i].lump);
          newheap=Z_UsedHeap();
 			currentmem=(newheap*MAXLEDS)/maxheapsize;
@@ -1212,6 +1209,7 @@ void PreCache( void )
 			}
 
             lastmem++;
+				VW_UpdateScreen (); // was missing, fixed
             }
          currentcache=(i*MAXLEDS)/(cacheindex+1);
          while (lastcache<=currentcache)
@@ -1247,6 +1245,7 @@ void PreCache( void )
                   }
                ticdelay=CACHETICDELAY;
                }
+				VW_UpdateScreen (); // was missing, fixed
             }
          }
 	  DisableScreenStretch();//bna++
@@ -1314,7 +1313,7 @@ DisableScreenStretch();
       {
       for (i=1;i<cacheindex;i++)
          {
-			dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel, CvtNull, 1);
+			dummy=W_CacheLumpNum(cachelist[i].lump,cachelist[i].cachelevel, CvtForType(cachelist[i].type), 1);
          DoLoadGameAction ();
          }
       ShutdownPreCache ();
@@ -1323,8 +1322,8 @@ DisableScreenStretch();
       {
       OpenMapDebug();
 
-      MapDebug("Map Number %ld\n",gamestate.mapon);
-      MapDebug("sizeoflevel=%ld\n",Z_UsedLevelHeap());
+      MapDebug("Map Number %d\n",gamestate.mapon);
+      MapDebug("sizeoflevel=%d\n",Z_UsedLevelHeap());
       }
 #if (PRECACHETEST == 1)
    SoftError("<<<<<<<<<<<<<<<<<<<<<<<Precaching done\n");
@@ -1718,7 +1717,7 @@ word GetMapCRC
 void GetAlternateMapInfo (mapfileinfo_t * mapinfo, AlternateInformation *info)
 {
    if (UL_ChangeDirectory (info->path) == false)
-      Error ("ERROR : Can't change to alternate directory %s!\n");
+      Error ("ERROR : Can't change to alternate directory %s!\n", info->path);
 
    GetMapFileInfo (mapinfo, info->file);
 
@@ -1864,7 +1863,7 @@ void LoadTedMap
 
    if ( close( maphandle ) )
       {
-      Error( "Error closing Ted file Error #%ld", errno );
+      Error( "Error closing Ted file Error #%d", errno );
       }
    }
 
@@ -1945,10 +1944,10 @@ void CountAreaTiles(void)
 
 #define InitWall(lump,index,newx,newy)      \
    {                                        \
-   PreCacheLump(lump,PU_CACHEWALLS);        \
-   if (W_LumpLength(lump) == 0)             \
-      Error("%s being used in shareware at %ld %ld",   \
-      W_GetNameForNum(lump),newx,newy);               \
+   PreCacheLump(lump,PU_CACHEWALLS,cache_pic_t);  \
+   if (W_LumpLength(lump) == 0)                   \
+      Error("%s being used in shareware at %d %d",\
+      W_GetNameForNum(lump),newx,newy);           \
    actorat[newx][newy]= &walls[index];      \
    tempwall = (wall_t*)actorat[newx][newy]; \
    tempwall->which = WALL;                  \
@@ -2022,10 +2021,10 @@ void SetupWalls( void )
          if ((tile > 75) && (tile <= 79))
             {
             lump = tilemap[i][j] = GetLumpForTile(tile);
-            PreCacheLump(lump,PU_CACHEWALLS);
-            PreCacheLump(elevatorstart+5,PU_CACHEWALLS);
-            PreCacheLump(elevatorstart+6,PU_CACHEWALLS);
-            PreCacheLump(elevatorstart+7,PU_CACHEWALLS);
+            PreCacheLump(lump,PU_CACHEWALLS,cache_pic_t);
+            PreCacheLump(elevatorstart+5,PU_CACHEWALLS,cache_pic_t);
+            PreCacheLump(elevatorstart+6,PU_CACHEWALLS,cache_pic_t);
+            PreCacheLump(elevatorstart+7,PU_CACHEWALLS,cache_pic_t);
             tilemap[i][j]|=0x2000;
             if (MAPSPOT(i,j,2)==0)
                MAPSPOT(i,j,2)=21;
@@ -2828,7 +2827,7 @@ void SetupMaskedWalls( void )
                      SpawnMaskedWall(i,j,mw_platform7,MW_ABOVEPASSABLE);
                      break;
                   default:
-                     Error ("Illegal Maskedwall platform value at x=%ld y=%ld\n",i,j);
+                     Error ("Illegal Maskedwall platform value at x=%d y=%d\n",i,j);
                      break;
 						}
 #if 0
@@ -2845,7 +2844,7 @@ void SetupMaskedWalls( void )
 #endif
                }
             else
-               Error("You have what appears to be a platform ontop\n a wall at x=%ld y=%ld\n",i,j);
+               Error("You have what appears to be a platform ontop\n a wall at x=%d y=%d\n",i,j);
             }
          }
 }
@@ -2949,7 +2948,7 @@ void SetupPushWalls( void )
                   temp=tilemap[i][j]&0x1fff;
 			         tilemap[i][j] = pwallnum;
 			         if (MAPSPOT(i,j,2))
-                     Error("You cannot link a pushwall which has no direction associated\n with it at x=%ld y=%ld\n",i,j);
+                     Error("You cannot link a pushwall which has no direction associated\n with it at x=%d y=%d\n",i,j);
 						else
 			            SpawnPushWall(i,j,0,temp,nodir,0);
 			         }
@@ -3010,7 +3009,7 @@ int GetPushWallNumber( int tx, int ty )
    for (i=0;i<pwallnum;i++)
       if ( (pwallobjlist[i]->tilex==tx) && (pwallobjlist[i]->tiley==ty))
          return i;
-   Error ("Could not find a push wall at x=%ld y=%ld\n",tx,ty);
+   Error ("Could not find a push wall at x=%d y=%d\n",tx,ty);
    return -1;
 }
 
@@ -3061,7 +3060,7 @@ void SetupPushWallLinks( void )
 								Link_To_Touchplate(touchx,touchy,ActivatePushWall,NULL,GetPushWallNumber(i,j),0);
                         }
 				         else
-				            Error("tried to link a pushwall at x=%ld y=%ld to a non-existent touchplate\n",i,j);
+				            Error("tried to link a pushwall at x=%d y=%d to a non-existent touchplate\n",i,j);
 			            }
 			         }
 		         break;
@@ -3071,7 +3070,7 @@ void SetupPushWallLinks( void )
 		            {
 			         if (MAPSPOT(i,j,2))
 			            {
-                     Error("You shouldn't be linking a nondirectional-push wall at x=%ld y=%ld\n",i,j);
+                     Error("You shouldn't be linking a nondirectional-push wall at x=%d y=%d\n",i,j);
                      }
                   }
                break;
@@ -3096,7 +3095,7 @@ void SetupPushWallLinks( void )
 								Link_To_Touchplate(touchx,touchy,ActivateMoveWall,NULL,GetPushWallNumber(i,j),0);
                         }
 				         else
-				            Error("tried to link a turbomovewall at x=%ld y=%ld to a non-existent touchplate\n",i,j);
+				            Error("tried to link a turbomovewall at x=%d y=%d to a non-existent touchplate\n",i,j);
                      }
                   }
 		         break;
@@ -3122,7 +3121,7 @@ void SetupPushWallLinks( void )
 								Link_To_Touchplate(touchx,touchy,ActivateMoveWall,NULL,GetPushWallNumber(i,j),0);
                         }
 				         else
-				            Error("tried to link a movewall at x=%ld y=%ld to a non-existent touchplate\n",i,j);
+				            Error("tried to link a movewall at x=%d y=%d to a non-existent touchplate\n",i,j);
                      }
                   }
 		         break;
@@ -3342,7 +3341,7 @@ int GetDoorNumber( int tx, int ty )
    for (i=0;i<doornum;i++)
       if ( (doorobjlist[i]->tilex==tx) && (doorobjlist[i]->tiley==ty))
          return i;
-   Error ("Could not find a door at x=%ld y=%ld\n",tx,ty);
+   Error ("Could not find a door at x=%d y=%d\n",tx,ty);
    return -1;
 }
 
@@ -3411,7 +3410,7 @@ void SetupDoorLinks (void)
                                             LinkedOpenDoor, doornumber, 0);
                   }
                   else
-                     Error ("tried to link a door at x=%ld y=%ld to a non-existent touchplate",i,j);
+                     Error ("tried to link a door at x=%d y=%d to a non-existent touchplate",i,j);
                }
             }
          }
@@ -3453,7 +3452,7 @@ void FindTimeTile ( int * x, int * y )
      *y=yy-1;
      return;
      }
-  Error ("Could not find an end time for a clock linked item\nat x=%ld y=%ld\n",*x,*y);
+  Error ("Could not find an end time for a clock linked item\nat x=%d y=%d\n",*x,*y);
 }
 
 
@@ -3681,7 +3680,7 @@ void LinkActor (objtype *ob,int tilex,int tiley,
             }
          }
       else
-         Error("tried to link an object at x=%ld y=%ld to a non-existent touchplate supposedly at x=%ld y=%ld",tilex,tiley,touchx,touchy);
+         Error("tried to link an object at x=%d y=%d to a non-existent touchplate supposedly at x=%d y=%d",tilex,tiley,touchx,touchy);
       }
 
    if (tilemap[tilex][tiley])
@@ -4114,7 +4113,7 @@ void SetupLights(void)
 									  sprites[i][j]->linked_to = touchindices[touchx][touchy]-1;
 									 }
 								 else
-									 Error("tried to link a light at x=%ld y=%ld to a non-existent touchplate",i,j);
+									 Error("tried to link a light at x=%d y=%d to a non-existent touchplate",i,j);
 								}
 							 else
 								{if (touchindices[touchx][touchy])
@@ -4122,7 +4121,7 @@ void SetupLights(void)
 									  sprites[i][j]->linked_to = touchindices[touchx][touchy]-1;
 									 }
 								 else
-									 Error("tried to link a light at x=%ld y=%ld to a non-existent touchplate",i,j);
+									 Error("tried to link a light at x=%d y=%d to a non-existent touchplate",i,j);
 								 sprites[i][j]->flags |= FL_LIGHTON;
 								}
 							}
@@ -4132,7 +4131,7 @@ void SetupLights(void)
 							  sprites[i][j]->linked_to = touchindices[touchx][touchy]-1;
 							 }
 						  else
-							 Error("tried to link a light at x=%ld y=%ld to a non-existent touchplate",i,j);
+							 Error("tried to link a light at x=%d y=%d to a non-existent touchplate",i,j);
 						  sprites[i][j]->flags |= FL_LIGHTON;
 						 }
 
@@ -4164,31 +4163,31 @@ void PrintMapStats (void)
    OpenMapDebug();
 
    total=0;
-   MapDebug("MAP STATS Map Number %ld\n",gamestate.mapon);
+   MapDebug("MAP STATS Map Number %d\n",gamestate.mapon);
    MapDebug("=======================\n");
    size=pwallnum*sizeof(pwallobj_t);
    total+=size;
-   MapDebug("Number of PushWalls   : %4ld size = %6ld\n",pwallnum,size);
+   MapDebug("Number of PushWalls   : %4d size = %6d\n",pwallnum,size);
    size=maskednum*sizeof(maskedwallobj_t);
    total+=size;
-   MapDebug("Number of MaskedWalls : %4ld size = %6ld\n",maskednum,size);
+   MapDebug("Number of MaskedWalls : %4d size = %6d\n",maskednum,size);
    size=doornum*sizeof(doorobj_t);
    total+=size;
-   MapDebug("Number of Doors       : %4ld size = %6ld\n",doornum,size);
+   MapDebug("Number of Doors       : %4d size = %6d\n",doornum,size);
    size=lasttouch*sizeof(touchplatetype);
    total+=size;
-   MapDebug("Number of TouchPlates : %4ld size = %6ld\n",lasttouch,size);
+   MapDebug("Number of TouchPlates : %4d size = %6d\n",lasttouch,size);
    size=_numelevators*sizeof(elevator_t);
    total+=size;
-   MapDebug("Number of Elevators   : %4ld size = %6ld\n",_numelevators,size);
+   MapDebug("Number of Elevators   : %4d size = %6d\n",_numelevators,size);
    size=statcount*sizeof(statobj_t);
    total+=size;
-   MapDebug("Number of Sprites     : %4ld size = %6ld\n",statcount,size);
+   MapDebug("Number of Sprites     : %4d size = %6d\n",statcount,size);
    size=objcount*sizeof(objtype);
    total+=size;
-   MapDebug("Number of Actors      : %4ld size = %6ld\n",objcount,size);
-   MapDebug("Number of Clocks      : %4ld\n",numclocks);
-   MapDebug("\nTotal size of level : %6ld\n",total);
+   MapDebug("Number of Actors      : %4d size = %6d\n",objcount,size);
+   MapDebug("Number of Clocks      : %4d\n",numclocks);
+   MapDebug("\nTotal size of level : %6d\n",total);
 }
 
 
@@ -4461,7 +4460,7 @@ void PrintTileStats (void)
 
    OpenMapDebug();
 
-   MapDebug("TILE STATS Map Number %ld\n",gamestate.mapon);
+   MapDebug("TILE STATS Map Number %d\n",gamestate.mapon);
    MapDebug("=======================\n\n");
 
 
@@ -4500,7 +4499,7 @@ void PrintTileStats (void)
    MapDebug("-----------------------\n");
    for (i=0;i<1000;i++)
      if (tally[i]!=0)
-        MapDebug("  %4ld    %4ld\n",i,tally[i]);
+        MapDebug("  %4d    %4d\n",i,tally[i]);
 
 // Doors
    memset(tally,0,sizeof(tally));
@@ -4521,7 +4520,7 @@ void PrintTileStats (void)
    MapDebug("-----------------------\n");
    for (i=0;i<1000;i++)
      if (tally[i]!=0)
-        MapDebug("  %4ld    %4ld\n",i,tally[i]);
+        MapDebug("  %4d    %4d\n",i,tally[i]);
 
 // MaskedWalls
    memset(tally,0,sizeof(tally));
@@ -4543,7 +4542,7 @@ void PrintTileStats (void)
    MapDebug("-----------------------\n");
    for (i=0;i<1000;i++)
      if (tally[i]!=0)
-        MapDebug("  %4ld    %4ld\n",i,tally[i]);
+        MapDebug("  %4d    %4d\n",i,tally[i]);
 // Platforms
    memset(tally,0,sizeof(tally));
    MapDebug("=======================\n");
@@ -4563,7 +4562,7 @@ void PrintTileStats (void)
    MapDebug("-----------------------\n");
    for (i=0;i<1000;i++)
      if (tally[i]!=0)
-        MapDebug("  %4ld    %4ld\n",i,tally[i]);
+        MapDebug("  %4d    %4d\n",i,tally[i]);
 
 // Actors
    memset(tally,0,sizeof(tally));
@@ -4590,9 +4589,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nLowGuards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Sneaky Low Guards
    easytotal=0;
@@ -4603,9 +4602,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nSneakyLowGuards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // High Guards
    easytotal=0;
@@ -4616,9 +4615,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nHighGuards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // OverPatrol Guards
    easytotal=0;
@@ -4629,9 +4628,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nOverPatrolGuards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Strike Guards
    easytotal=0;
@@ -4642,9 +4641,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nStrikeGuards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // TriadEnforcer Guards
    easytotal=0;
@@ -4655,9 +4654,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nTriadEnforcer Guards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Lightning Guards
    easytotal=0;
@@ -4668,9 +4667,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nLightningGuards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Random Actors
    easytotal=0;
@@ -4679,7 +4678,7 @@ void PrintTileStats (void)
       easytotal+=tally[i];
    MapDebug("\nRandom Actors\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",easytotal);
+   MapDebug("    Total=%4d\n",easytotal);
 
 // Monks
    easytotal=0;
@@ -4690,9 +4689,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nMonks\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Fire Monks
    easytotal=0;
@@ -4703,9 +4702,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nFire Monks\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Robo Guards
    easytotal=0;
@@ -4716,9 +4715,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nRoboGuards\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Ballistikrafts
    easytotal=0;
@@ -4729,9 +4728,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nBallistikrafts\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Boulders
    easytotal=0;
@@ -4742,8 +4741,8 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nBoulders\n");
    MapDebug("-----------------------\n");
-   MapDebug("Boulders=%4ld\n",easytotal);
-   MapDebug("BoulderHoles=%4ld\n",hardtotal);
+   MapDebug("Boulders=%4d\n",easytotal);
+   MapDebug("BoulderHoles=%4d\n",hardtotal);
 
 // PushColumns
    easytotal=0;
@@ -4760,7 +4759,7 @@ void PrintTileStats (void)
       easytotal+=tally[i];
    MapDebug("\nPushColumns\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",easytotal);
+   MapDebug("    Total=%4d\n",easytotal);
 
 // Gun Emplacements
    easytotal=0;
@@ -4771,9 +4770,9 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nGun Emplacements\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // 4-way guns
    easytotal=0;
@@ -4784,49 +4783,49 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\n4-way guns\n");
    MapDebug("-----------------------\n");
-   MapDebug("EasyTotal=%4ld\n",easytotal);
-   MapDebug("HardTotal=%4ld\n",hardtotal);
-   MapDebug("    Total=%4ld\n",easytotal+hardtotal);
+   MapDebug("EasyTotal=%4d\n",easytotal);
+   MapDebug("HardTotal=%4d\n",hardtotal);
+   MapDebug("    Total=%4d\n",easytotal+hardtotal);
 
 // Stabbers from above
    MapDebug("\nStabbers from above\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[412]);
+   MapDebug("    Total=%4d\n",tally[412]);
 
 // Stabbers from below
    MapDebug("\nStabbers from below\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[430]);
+   MapDebug("    Total=%4d\n",tally[430]);
 
 // Crushing pillar from above
    MapDebug("\nCrushing pillar from above\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[413]);
+   MapDebug("    Total=%4d\n",tally[413]);
 
 // Crushing pillar from below
    MapDebug("\nCrushing pillar from below\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[431]);
+   MapDebug("    Total=%4d\n",tally[431]);
 
 // Above Spinner
    MapDebug("\nAbove Spinner\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[156]);
+   MapDebug("    Total=%4d\n",tally[156]);
 
 // Ground Spinner
    MapDebug("\nGround Spinner\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[174]);
+   MapDebug("    Total=%4d\n",tally[174]);
 
 // Spinner from above
    MapDebug("\nSpinner from above\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[157]);
+   MapDebug("    Total=%4d\n",tally[157]);
 
 // Spinner from below
    MapDebug("\nSpinner from below\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[175]);
+   MapDebug("    Total=%4d\n",tally[175]);
 
 // Bosses
    easytotal=0;
@@ -4834,12 +4833,12 @@ void PrintTileStats (void)
       easytotal+=tally[i];
    MapDebug("\nBosses\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",easytotal);
+   MapDebug("    Total=%4d\n",easytotal);
 
 // Spring Boards
    MapDebug("\nSpring Boards\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",tally[193]);
+   MapDebug("    Total=%4d\n",tally[193]);
 
 // Above FlameJets
    easytotal=0;
@@ -4850,8 +4849,8 @@ void PrintTileStats (void)
       hardtotal+=tally[i];
    MapDebug("\nFlameJets\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Above=%4ld\n",easytotal);
-   MapDebug("   Ground=%4ld\n",hardtotal);
+   MapDebug("    Above=%4d\n",easytotal);
+   MapDebug("   Ground=%4d\n",hardtotal);
 
 // Fire Chutes
    easytotal=0;
@@ -4859,7 +4858,7 @@ void PrintTileStats (void)
       easytotal+=tally[i];
    MapDebug("\nFireChutes\n");
    MapDebug("-----------------------\n");
-   MapDebug("    Total=%4ld\n",easytotal);
+   MapDebug("    Total=%4d\n",easytotal);
 
 // Sprites
    MapDebug("=======================\n");
@@ -4869,22 +4868,22 @@ void PrintTileStats (void)
    MapDebug("-----------------------\n");
    for (i=1;i<=72;i++)
       if (tally[i]!=0)
-         MapDebug("  %4ld    %4ld\n",i,tally[i]);
+         MapDebug("  %4d    %4d\n",i,tally[i]);
    for (i=210;i<=210;i++)
       if (tally[i]!=0)
-         MapDebug("  %4ld    %4ld\n",i,tally[i]);
+         MapDebug("  %4d    %4d\n",i,tally[i]);
    for (i=228;i<=233;i++)
       if (tally[i]!=0)
-         MapDebug("  %4ld    %4ld\n",i,tally[i]);
+         MapDebug("  %4d    %4d\n",i,tally[i]);
    for (i=246;i<=255;i++)
       if (tally[i]!=0)
-         MapDebug("  %4ld    %4ld\n",i,tally[i]);
+         MapDebug("  %4d    %4d\n",i,tally[i]);
    for (i=260;i<=273;i++)
       if (tally[i]!=0)
-         MapDebug("  %4ld    %4ld\n",i,tally[i]);
+         MapDebug("  %4d    %4d\n",i,tally[i]);
    for (i=282;i<=284;i++)
       if (tally[i]!=0)
-         MapDebug("  %4ld    %4ld\n",i,tally[i]);
+         MapDebug("  %4d    %4d\n",i,tally[i]);
 }
 
 //***************************************************************************
@@ -5805,7 +5804,7 @@ void SetupGameLevel (void)
 		nominalheight = maxheight-32;
 		}
 	else
-		Error("You must specify a valid height sprite icon at (2,0) on map %ld\n",gamestate.mapon);
+		Error("You must specify a valid height sprite icon at (2,0) on map %d\n",gamestate.mapon);
 
 /*
    if ( ( BATTLEMODE ) && ( !gamestate.BattleOptions.SpawnDangers ) )
@@ -6630,7 +6629,8 @@ void SetupStatics(void)
 
 
 					PreCacheGroup(W_GetNumForName("EXBAT1"),
-									  W_GetNumForName("EXBAT7"));
+									  W_GetNumForName("EXBAT7"),
+									  cache_patch_t);
 
 
 
@@ -6640,9 +6640,11 @@ void SetupStatics(void)
 					break;
 				case 47:
 					PreCacheGroup(W_GetNumForName("KNIFE1"),
-									  W_GetNumForName("KNIFE10"));
+									  W_GetNumForName("KNIFE10"),
+									  cache_patch_t);
 					PreCacheGroup(W_GetNumForName("ESTATUE1"),
-									  W_GetNumForName("ESTATUE8"));
+									  W_GetNumForName("ESTATUE8"),
+									  cache_patch_t);
 
 						SpawnStatic(i,j,tile-23,spawnz);
 					break;
@@ -6652,15 +6654,18 @@ void SetupStatics(void)
 
                if ((locplayerstate->player == 1) || (locplayerstate->player == 3))
 					  PreCacheGroup(W_GetNumForName("RFPIST1"),
-										 W_GetNumForName("LFPIST3"));
+										 W_GetNumForName("LFPIST3"),
+										 cache_patch_t);
 
                else if (locplayerstate->player == 2)
 					  PreCacheGroup(W_GetNumForName("RBMPIST1"),
-										 W_GetNumForName("LBMPIST3"));
+										 W_GetNumForName("LBMPIST3"),
+										 cache_patch_t);
 
 					else
 					  PreCacheGroup(W_GetNumForName("RMPIST1"),
-										 W_GetNumForName("LMPIST3"));
+										 W_GetNumForName("LMPIST3"),
+										 cache_patch_t);
 
                SpawnStatic(i,j,tile-23,spawnz);
 
@@ -6669,7 +6674,8 @@ void SetupStatics(void)
 
 					SD_PreCacheSound(SD_ATKMP40SND);
 					PreCacheGroup(W_GetNumForName("MP401"),
-									  W_GetNumForName("MP403"));
+									  W_GetNumForName("MP403"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					break;
 
@@ -6678,7 +6684,8 @@ void SetupStatics(void)
 					SD_PreCacheSound(SD_MISSILEFLYSND);
 					SD_PreCacheSound(SD_BAZOOKAFIRESND);
 					PreCacheGroup(W_GetNumForName("BAZOOKA1"),
-									  W_GetNumForName("BAZOOKA4"));
+									  W_GetNumForName("BAZOOKA4"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					if (loadedgame == false)
 						gamestate.missiletotal ++;
@@ -6690,7 +6697,8 @@ void SetupStatics(void)
 					SD_PreCacheSound(SD_MISSILEFLYSND);
 					SD_PreCacheSound(SD_FIREBOMBFIRESND);
 					PreCacheGroup(W_GetNumForName("FBOMB1"),
-									  W_GetNumForName("FBOMB4"));
+									  W_GetNumForName("FBOMB4"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					if (loadedgame == false)
 						gamestate.missiletotal ++;
@@ -6700,7 +6708,8 @@ void SetupStatics(void)
 					SD_PreCacheSound(SD_MISSILEFLYSND);
 					SD_PreCacheSound(SD_HEATSEEKFIRESND);
 					PreCacheGroup(W_GetNumForName("HSEEK1"),
-									  W_GetNumForName("HSEEK4"));
+									  W_GetNumForName("HSEEK4"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					if (loadedgame == false)
 						gamestate.missiletotal ++;
@@ -6710,7 +6719,8 @@ void SetupStatics(void)
 					SD_PreCacheSound(SD_MISSILEFLYSND);
 					SD_PreCacheSound(SD_DRUNKFIRESND);
 					PreCacheGroup(W_GetNumForName("DRUNK1"),
-									  W_GetNumForName("DRUNK4"));
+									  W_GetNumForName("DRUNK4"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					if (loadedgame == false)
 						gamestate.missiletotal ++;
@@ -6721,11 +6731,14 @@ void SetupStatics(void)
 					SD_PreCacheSound(SD_FLAMEWALLFIRESND);
 					SD_PreCacheSound(SD_FLAMEWALLSND);
 					PreCacheGroup(W_GetNumForName("FIREW1"),
-									  W_GetNumForName("FIREW3"));
+									  W_GetNumForName("FIREW3"),
+									  cache_patch_t);
 					PreCacheGroup(W_GetNumForName("FWALL1"),
-									  W_GetNumForName("FWALL15"));
+									  W_GetNumForName("FWALL15"),
+									  cache_patch_t);
 					PreCacheGroup(W_GetNumForName("SKEL1"),
-									  W_GetNumForName("SKEL48"));
+									  W_GetNumForName("SKEL48"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					if (loadedgame == false)
 						gamestate.missiletotal ++;
@@ -6739,7 +6752,8 @@ void SetupStatics(void)
 					SD_PreCacheSound(SD_SPLITFIRESND);
 					SD_PreCacheSound(SD_SPLITSND);
 					PreCacheGroup(W_GetNumForName("SPLIT1"),
-									  W_GetNumForName("SPLIT4"));
+									  W_GetNumForName("SPLIT4"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					if (loadedgame == false)
 						gamestate.missiletotal ++;
@@ -6757,9 +6771,11 @@ void SetupStatics(void)
 					SD_PreCacheSound(SD_GRAVBUILDSND);
 
 					PreCacheGroup(W_GetNumForName("KES1"),
-									  W_GetNumForName("KES6"));
+									  W_GetNumForName("KES6"),
+									  cache_patch_t);
 					PreCacheGroup(W_GetNumForName("KSPHERE1"),
-									  W_GetNumForName("KSPHERE4"));
+									  W_GetNumForName("KSPHERE4"),
+									  cache_patch_t);
 						SpawnStatic(i,j,tile-23,spawnz);
 					if (loadedgame == false)
 						gamestate.missiletotal ++;
@@ -6859,13 +6875,16 @@ void SetupStatics(void)
 
 
 					PreCacheGroup(W_GetNumForName("GODHAND1"),
-									  W_GetNumForName("GODHAND8"));
+									  W_GetNumForName("GODHAND8"),
+									  cache_patch_t);
 
 					PreCacheGroup(W_GetNumForName("VAPO1"),
-									  W_GetNumForName("LITSOUL"));
+									  W_GetNumForName("LITSOUL"),
+									  cache_patch_t);
 
 					PreCacheGroup(W_GetNumForName("GODFIRE1"),
-									  W_GetNumForName("GODFIRE4"));
+									  W_GetNumForName("GODFIRE4"),
+									  cache_patch_t);
 
 						SpawnStatic(i,j,stat_godmode,spawnz);
 					if (loadedgame == false)
@@ -6875,7 +6894,7 @@ void SetupStatics(void)
 				case 253:
 
                #if (SHAREWARE == 1)
-                  Error("DogMode Power up in shareware at x=%ld y=%ld\n",i,j);
+                  Error("DogMode Power up in shareware at x=%d y=%d\n",i,j);
                #endif
 
                SD_PreCacheSoundGroup(SD_DOGMODEPANTSND,SD_DOGMODELICKSND);
@@ -6887,7 +6906,8 @@ void SetupStatics(void)
 
 
 					PreCacheGroup(W_GetNumForName("DOGNOSE1"),
-									  W_GetNumForName("DOGPAW4"));
+									  W_GetNumForName("DOGPAW4"),
+									  cache_patch_t);
 						SpawnStatic(i,j,stat_dogmode,spawnz);
 					if (loadedgame == false)
 						gamestate.supertotal ++;
@@ -6998,7 +7018,7 @@ void RaiseSprites( int x, int y, int count, int dir )
       else if (ActorIsSpring(x+(dx*count),y+(dy*count)))
          d=0;
       else
-         Error("Cannot find a spring board around a ramp ascension near x=%ld y=%ld\n",x,y);
+         Error("Cannot find a spring board around a ramp ascension near x=%d y=%d\n",x,y);
 
       hc=((maxheight+20)<<16)/(count+1);
       h=hc<<1;
@@ -7030,7 +7050,7 @@ void LoftSprites( void )
                while (StaticUndefined(x+count,y))
                   count++;
                if (count<3)
-                  Error ("Are You kidding me? You are trying to loft <3 sprites in an arc??? \n x=%ld y=%ld\n",x,y);
+                  Error ("Are You kidding me? You are trying to loft <3 sprites in an arc??? \n x=%d y=%d\n",x,y);
                RaiseSprites(x,y,count,1);
                }
             else if (StaticUndefined(x,y+1))
@@ -7039,11 +7059,11 @@ void LoftSprites( void )
                while (StaticUndefined(x,y+count))
                   count++;
                if (count<3)
-                  Error ("Are You kidding me? You are trying to loft <3 sprites??? \n x=%ld y=%ld\n",x,y);
+                  Error ("Are You kidding me? You are trying to loft <3 sprites??? \n x=%d y=%d\n",x,y);
                RaiseSprites(x,y,count,0);
                }
             else
-               Error ("Sprite Lofter is confused around x=%ld y=%ld\n",x,y);
+               Error ("Sprite Lofter is confused around x=%d y=%d\n",x,y);
             }
          }
       }

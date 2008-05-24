@@ -1030,7 +1030,7 @@ void DrawPositionedScaledSprite (int x, int y, int shapenum, int height, int typ
    shadingtable=colormap+(1<<12);
 	centeryclipped=y;
 	xcent=x;
-	shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_transpatch_t, 1);
+	shape=W_CacheLumpNum(shapenum,PU_CACHE, Cvt_patch_t, 1); // was transpatch, fixed
 	p=(patch_t *)shape;
 	tp=(transpatch_t *)shape;
 
@@ -1324,9 +1324,9 @@ void DrawNormalSprite (int x, int y, int shapenum)
    p = (patch_t *)shape;
 
    if (((x-p->leftoffset)<0) || ((x-p->leftoffset+p->width)>iGLOBAL_SCREENWIDTH))
-      Error ("DrawNormalSprite: x is out of range x=%ld\n",x-p->leftoffset+p->width);
+      Error ("DrawNormalSprite: x is out of range x=%d\n",x-p->leftoffset+p->width);
    if (((y-p->topoffset)<0) || ((y-p->topoffset+p->height)>iGLOBAL_SCREENHEIGHT))
-      Error ("DrawNormalSprite: y is out of range y=%ld\n",y-p->topoffset+p->height);
+      Error ("DrawNormalSprite: y is out of range y=%d\n",y-p->topoffset+p->height);
 
    startx=x-p->leftoffset;
    buffer = (byte*)bufferofs+ylookup[y-p->topoffset];

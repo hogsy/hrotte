@@ -247,7 +247,7 @@ boolean ReadPacket (void)
       if (crc!=sentcrc)
          {
          badpacket=1;
-         SoftError("BADPKT at %ld\n",GetTicCount());
+         SoftError("BADPKT at %d\n",GetTicCount());
          }
       if (networkgame==false)
          {

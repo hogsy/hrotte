@@ -73,7 +73,7 @@ void  SetRNGindex ( int i )
 {
    rndindex=i;
 //#if (DEVELOPMENT == 1)
-   SoftError("RNG index set at %ld\n",i);
+   SoftError("RNG index set at %d\n",i);
 //#endif
 }
 
@@ -98,7 +98,7 @@ int GetRNGindex ( void )
 int   GameRNG ( char * string, int val )
 {
    rndindex = (rndindex+1)&(SIZE_OF_RANDOM_TABLE-1);
-   SoftError("RNG - num=%3ld called from=%s val=%ld\n",RandomTable[rndindex],string,val);
+   SoftError("RNG - num=%3d called from=%s val=%d\n",RandomTable[rndindex],string,val);
    return RandomTable[rndindex];
 }
 #else

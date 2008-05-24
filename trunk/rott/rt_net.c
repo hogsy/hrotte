@@ -505,7 +505,7 @@ void StartupClientControls ( void )
    if (modemgame==true)
       {
       controlupdatetime=controlsynctime+(VBLCOUNTER*2);
-      SoftError("Controls started at %ld\n",controlupdatetime);
+      SoftError("Controls started at %d\n",controlupdatetime);
       }
    else if (demoplayback || demorecord)
       {
@@ -1084,7 +1084,7 @@ int GetPacketSize (void * pkt)
          size=sizeof(MoveType)+sizeof(COM_SoundType);
          break;
       default:
-         Error("Unhandled packet type in GetPacketSize type=%ld",((MoveType *)pkt)->type);
+         Error("Unhandled packet type in GetPacketSize type=%d",((MoveType *)pkt)->type);
          break;
       }
 
@@ -1217,7 +1217,7 @@ void ResendLocalPackets (int time, int dest, int numpackets)
 
    if (pkt->time!=time)
       {
-      Error( "CLIENT: Could not find packet to resend\ntime=%ld packettime=%ld controlupdatetime=%ld\n",
+      Error( "CLIENT: Could not find packet to resend\ntime=%d packettime=%d controlupdatetime=%d\n",
              time, pkt->time, controlupdatetime);
       }
    else
@@ -1291,7 +1291,7 @@ void ResendServerPackets (int time, int dest, int numpackets)
 
    if (serverpkt->time!=time)
       {
-      Error( "SERVER: Could not find packet to resend\ntime=%ld packettime=%ld serverupdatetime=%ld\n",
+      Error( "SERVER: Could not find packet to resend\ntime=%d packettime=%d serverupdatetime=%d\n",
              time, serverpkt->time,serverupdatetime);
       }
    else
@@ -1362,18 +1362,18 @@ void ResendPacket (void * pkt, int dest)
    request=(COM_RequestType * )pkt;
    time=request->time;
 
-   ComError( "RESEND request received at %ld\n packet time=%ld dest=%ld numpackets=%ld\n",
+   ComError( "RESEND request received at %d\n packet time=%d dest=%d numpackets=%d\n",
              GetTicCount(), time, dest, request->numpackets);
 
    if (IsServer==true)
       {
       if ((dest==server) && (standalone==false))
          Error("Trying to resend packets to client on top of server\n");
-      ComError( "RESEND SERVER serverupdatetime=%ld\n",serverupdatetime);
+      ComError( "RESEND SERVER serverupdatetime=%d\n",serverupdatetime);
       if (IsServerCommandReady ( time ) == true)
          ResendServerPackets(time,dest,request->numpackets);
       else
-         ComError( "RESEND SERVER time=%ld is not ready\n",time);
+         ComError( "RESEND SERVER time=%d is not ready\n",time);
       }
    else
       {
@@ -1396,7 +1396,7 @@ void FixupPacket (void * pkt, int src)
 
    fix=(COM_FixupType *)pkt;
 
-   ComError( "Fixup received at %ld, time=%ld numpackets=%ld\n", GetTicCount(), fix->time, fix->numpackets);
+   ComError( "Fixup received at %d, time=%d numpackets=%d\n", GetTicCount(), fix->time, fix->numpackets);
 #if 0
    if (networkgame==false)
       FixingPackets=false;
@@ -1413,7 +1413,7 @@ void FixupPacket (void * pkt, int src)
          {
          if (ClientCommandStatus(src, time)!=cs_fixing)
             {
-            ComError("Server Received fixup with no bad packet time=%ld from %ld\n",time,src);
+            ComError("Server Received fixup with no bad packet time=%d from %d\n",time,src);
             }
          else
             {
@@ -1425,7 +1425,7 @@ void FixupPacket (void * pkt, int src)
          {
          if (ServerCommandStatus(time)!=cs_fixing)
             {
-            ComError("Client Received fixup with no bad packet time=%ld from %ld\n",time,src);
+            ComError("Client Received fixup with no bad packet time=%d from %d\n",time,src);
             }
          else
             {
@@ -1473,7 +1473,7 @@ void CheckForSyncCheck ( void )
          }
       if (oldpolltime>lastsynccheck)
          {
-         Error("Missed a player sync check time=%ld\n",oldpolltime);
+         Error("Missed a player sync check time=%d\n",oldpolltime);
          }
       }
 }
@@ -1513,40 +1513,40 @@ void ProcessSyncCheckPacket (void * pkt, int src)
       }
    if (sync->randomindex!=PlayerSync[0].randomindex)
       {
-      Error("Player %ld is unsynced localindex=%ld remoteindex=%ld\n"
-            "Unsynced Player x=%x y=%x a=%ld z=%ld name=%s\n",
+      Error("Player %d is unsynced localindex=%d remoteindex=%d\n"
+            "Unsynced Player x=%x y=%x a=%d z=%d name=%s\n",
              src, PlayerSync[0].randomindex, sync->randomindex,
              PlayerSync[src].x, PlayerSync[src].y, PlayerSync[src].angle,
              PlayerSync[src].z,PLAYERSTATE[src].codename);
       }
    if (sync->x!=PlayerSync[src].x)
       {
-      Error("Player %ld is unsynced local x=%ld remote x=%ld\n"
-            "Unsynced Player x=%x y=%x a=%ld z=%ld name=%s\n",
+      Error("Player %d is unsynced local x=%d remote x=%d\n"
+            "Unsynced Player x=%x y=%x a=%d z=%d name=%s\n",
              src,PlayerSync[src].x,sync->x,
              PlayerSync[src].x, PlayerSync[src].y, PlayerSync[src].angle,
              PlayerSync[src].z,PLAYERSTATE[src].codename);
       }
    if (sync->y!=PlayerSync[src].y)
       {
-      Error("Player %ld is unsynced local y=%ld remote y=%ld\n"
-            "Unsynced Player x=%x y=%x a=%ld z=%ld name=%s\n",
+      Error("Player %d is unsynced local y=%d remote y=%d\n"
+            "Unsynced Player x=%x y=%x a=%d z=%d name=%s\n",
              src,PlayerSync[src].y,sync->y,
              PlayerSync[src].x, PlayerSync[src].y, PlayerSync[src].angle,
              PlayerSync[src].z,PLAYERSTATE[src].codename);
       }
    if (sync->z!=PlayerSync[src].z)
       {
-      Error("Player %ld is unsynced local z=%ld remote z=%ld\n"
-            "Unsynced Player x=%x y=%x a=%ld z=%ld name=%s\n",
+      Error("Player %d is unsynced local z=%d remote z=%d\n"
+            "Unsynced Player x=%x y=%x a=%d z=%d name=%s\n",
              src,PlayerSync[src].z,sync->z,
              PlayerSync[src].x, PlayerSync[src].y, PlayerSync[src].angle,
              PlayerSync[src].z,PLAYERSTATE[src].codename);
       }
    if (sync->angle!=PlayerSync[src].angle)
       {
-      Error("Player %ld is unsynced local angle=%ld remote angle=%ld\n"
-            "Unsynced Player x=%x y=%x a=%ld z=%ld name=%s\n",
+      Error("Player %d is unsynced local angle=%d remote angle=%d\n"
+            "Unsynced Player x=%x y=%x a=%d z=%d name=%s\n",
              src,PlayerSync[src].angle,sync->angle,
              PlayerSync[src].x, PlayerSync[src].y, PlayerSync[src].angle,
              PlayerSync[src].z,PLAYERSTATE[src].codename);
@@ -1773,7 +1773,7 @@ void ProcessPacket (void * pkt, int src)
          break;
 
       default:
-         Error("ProcessPacket: Unknown packet type=%ld\n",((MoveType *)pkt)->type);
+         Error("ProcessPacket: Unknown packet type=%d\n",((MoveType *)pkt)->type);
       }
 }
 
@@ -1836,7 +1836,7 @@ void AddServerPacket(void * pkt, int src)
 
    if (src!=server)
       {
-      Error("Received server packet from non-server src=%ld\n",src);
+      Error("Received server packet from non-server src=%d\n",src);
       }
 
    serverpkt=(COM_ServerHeaderType *)pkt;
@@ -1855,7 +1855,7 @@ void AddServerPacket(void * pkt, int src)
          {
          RequestPacket ( LastCommandTime[src] , src , numpackets );
 
-         ComError("AddServerPacket: Request packet time=%ld lct=%ld numpackets=%ld\n",
+         ComError("AddServerPacket: Request packet time=%d lct=%d numpackets=%d\n",
                   serverpkt->time, LastCommandTime[src], numpackets
                  );
          }
@@ -1901,7 +1901,7 @@ void AddClientPacket (void * pkt, int src)
          ProcessSoundAndDeltaPacket(packet, src);
          break;
       default:
-         Error("AddClientPacket: Unknown packet type = %ld\n",packet->type);
+         Error("AddClientPacket: Unknown packet type = %d\n",packet->type);
       }
 }
 
@@ -1970,7 +1970,7 @@ void AddPacket (void * pkt, int src)
             {
             RequestPacket ( LastCommandTime[src] , src , numpackets );
 
-            ComError("AddPacket: Request packet time=%ld lct=%ld numpackets=%ld\n",
+            ComError("AddPacket: Request packet time=%d lct=%d numpackets=%d\n",
                      packet->time, LastCommandTime[src], numpackets
                      );
             }
@@ -2569,7 +2569,7 @@ void ControlPlayerObj (objtype * ob)
             {
             ProcessPlayerCommand (num);
             if (demoplayback||demorecord) {
-               SoftError("x=%4lx y=%4lx a=%4lx time=%5ld\n",player->x,player->y,player->angle,oldpolltime);
+               SoftError("x=%4x y=%4x a=%4x time=%5d\n",player->x,player->y,player->angle,oldpolltime);
 	    }
             break;
             }
@@ -2588,7 +2588,7 @@ void ControlPlayerObj (objtype * ob)
 
          if (GetTicCount()>savetime)
             {
-            SoftError("Client timeout oldpolltime=%ld\n",oldpolltime);
+            SoftError("Client timeout oldpolltime=%d\n",oldpolltime);
             if (IsServer==false)
                RequestPacket(oldpolltime, server, controldivisor);
             if (networkgame==true)
@@ -2687,7 +2687,7 @@ void UpdatePlayerObj ( int player )
    pstate->topspeed=MaxSpeedForCharacter(pstate);
 
    if (demoplayback||demorecord) {
-      SoftError("  dmx=%4lx dmy=%4lx da=%4lx time=%5ld\n",pstate->dmomx,pstate->dmomy,pstate->angle>>11,oldpolltime);
+      SoftError("  dmx=%4x dmy=%4x da=%4x time=%5d\n",pstate->dmomx,pstate->dmomy,pstate->angle>>11,oldpolltime);
    }
 #if 0
 #if (DEVELOPMENT == 1)
@@ -3260,7 +3260,7 @@ void RecordDemoCmd (void)
 {
    DemoType * dtime;
 
-   SoftError("Demo command recorded at %ld\n",controlupdatetime);
+   SoftError("Demo command recorded at %d\n",controlupdatetime);
    dtime=(DemoType *)demoptr;
    dtime->time = controlupdatetime;
    dtime->momx = (controlbuf[0]>>1);
@@ -3287,7 +3287,7 @@ void AddDemoCmd (void)
    // get info from demo buffer
    //
 
-   SoftError("Demo command played at %ld\n",controlupdatetime);
+   SoftError("Demo command played at %d\n",controlupdatetime);
    if (demoplayback==true)
       {
       dtime=(DemoType *)demoptr;

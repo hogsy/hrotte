@@ -122,7 +122,7 @@ memzone_t *Z_AllocateZone (int size)
 
         header = malloc (size+sizeof(memzone_t));
         if (!header)
-                Error ("Z_AllocateZone: Couldn't malloc %i bytes avail=%ld\n",
+                Error ("Z_AllocateZone: Couldn't malloc %zd bytes avail=%d\n",
                 size+sizeof(memzone_t), Z_AvailHeap());
         header->size = size;
         Z_ClearZone (header);
@@ -542,7 +542,7 @@ void Z_DumpHeap (int lowtag, int hightag)
                         SoftError("ERROR: two consecutive free blocks\n");
 		}
         }
-        SoftError("Total Size of blocks = %ld\n",totalsize);
+        SoftError("Total Size of blocks = %d\n",totalsize);
 
         SoftError("LEVEL ZONE\n");
         SoftError("zone size: %i  location: %p\n",levelzone->size,levelzone);
@@ -571,7 +571,7 @@ void Z_DumpHeap (int lowtag, int hightag)
                         SoftError("ERROR: two consecutive free blocks\n");
 		}
         }
-        SoftError("Total Size of blocks = %ld\n",totalsize);
+        SoftError("Total Size of blocks = %d\n",totalsize);
 
 }
 

@@ -44,7 +44,7 @@ boolean StringsNotEqual (char * s1, char * s2, int length);
 void  GetPalette(char * pal);
 void  ClearGraphicsScreen( void );
 void  ClearBuffer( char * buf, int size );
-void  Error (char *error, ...);
+void  Error (char *error, ...) __attribute__((noreturn,format(printf,1,2)));
 void  StartupSoftError ( void );
 void  ShutdownSoftError ( void );
 int   CheckParm (char *check);
@@ -88,7 +88,7 @@ void  VL_SetPalette (byte *palette);
 void  VL_GetPalette (byte *palette);
 void  UL_printf (byte *str);
 void  VL_NormalizePalette (byte *palette);
-void  MapDebug (char *error, ...);
+void  MapDebug (char *error, ...) __attribute__((format(printf,1,2)));
 void  OpenMapDebug ( void );
 void  UL_ColorBox (int x, int y, int w, int h, int color);
 
@@ -149,11 +149,11 @@ void _dos_getdate(struct dosdate_t *date);
 
 #if (SOFTERROR==1)
 
-void  SoftwareError (char *error, ...);
+void  SoftwareError (char *error, ...) __attribute__((format(printf,1,2)));
 #define SoftError  SoftwareError
 
 #else
-void  SoftwareError (char *error, ...);
+void  SoftwareError (char *error, ...) __attribute__((format(printf,1,2)));
 //#define SoftError  SoftwareError
 
 #define SoftError  if (1) {} else SoftwareError
@@ -164,12 +164,12 @@ void  SoftwareError (char *error, ...);
 
 #if (DEBUG==1)
 
-void  DebugError (char *error, ...);
+void  DebugError (char *error, ...) __attribute__((format(printf,1,2)));
 #define Debug  DebugError
 
 #else
 
-void  DebugError (char *error, ...);
+void  DebugError (char *error, ...) __attribute__((format(printf,1,2)));
 #define Debug  DebugError
 //#define Debug
 

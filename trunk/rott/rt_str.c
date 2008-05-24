@@ -1517,8 +1517,8 @@ void DrawIntensityChar  ( char ch )
    dest = origdest;
 
    ch -= 31;
-   width = IFont->width[ (unsigned int)ch ];
-   source = ( ( byte * )IFont ) + IFont->charofs[ (unsigned int)ch ];
+   width = IFont->width[ (unsigned char)ch ];
+   source = ( ( byte * )IFont ) + IFont->charofs[ (unsigned char)ch ];
 
    mask = 1 << ( px & 3 );
 
