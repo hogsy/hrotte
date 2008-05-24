@@ -5959,6 +5959,7 @@ void SetupRandomActors(void)
 		  ambush = (GameRandomNumber("rand actor",0) < 128);
 		  i = randloc[locindex].x;
 		  j = randloc[locindex].y;
+		  tile = mapplanes[1][j*mapwidth + i];
 		  SpawnStand(randomtype,i,j,tile-122,ambush);
 		  used[locindex] = 1;
         PreCacheActor(randomtype,0);
