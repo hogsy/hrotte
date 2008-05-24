@@ -95,6 +95,7 @@ byte     *demoptr,
 			*lastdemoptr,
          *demobuffer=NULL;
 boolean  demodone = false;
+int      predemo_violence = -1;
 int oldmomx;
 int oldmomy;
 int oldspdang;
@@ -3080,6 +3081,7 @@ void GetDemoFilename (int demonumber, char * filename)
 
    filename[4] = (char)('0' + (byte)demonumber);
    filename[6] = (char)('0' + (byte)gamestate.violence);
+   FixFilePath(filename);
 }
 //****************************************************************************
 //
@@ -3095,8 +3097,19 @@ boolean DemoExists (int demonumber)
    if (access (demo, F_OK) == 0)
       return true;
    else
-      return false;
-
+   {
+      /* Saves the users violence level, only do this once, otherwise
+         we might override the saved level with one already modified by us */
+      if (predemo_violence == -1)
+         predemo_violence = gamestate.violence;
+      /* The demos distributed with rott are all for a violence level of 3 */
+      gamestate.violence = 3;
+      GetDemoFilename (demonumber, &demo[0]);
+      if (access (demo, F_OK) == 0)
+         return true;
+      else
+         return false;
+   }
 }
 
 //****************************************************************************

@@ -801,7 +801,7 @@ void I_Delay ( int delay )
    delay=(VBLCOUNTER*delay)/10;
    IN_ClearKeysDown();
    time=GetTicCount();
-   while (!LastScan && GetTicCount()<time+delay)
+   while (!LastScan && !IN_GetMouseButtons() && GetTicCount()<time+delay)
       {
       	IN_UpdateKeyboard();
       }

@@ -80,8 +80,6 @@ Global Variables                                                                
 =============================================================================
 */
 
-extern char *tmpPICbuf;
-extern char *sdl_surfacePTR;
 int iG_masked;
 
 int whereami=-1;
@@ -3073,7 +3071,7 @@ void DoLoadGameSequence ( void )
    shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
    DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );//bna++
    DrawPlayScreen(false);
-   StrechScreen = false;
+   DisableScreenStretch();
    SHAKETICS = 0xFFFF;
    //bna section end
 }
@@ -3136,7 +3134,7 @@ void StartupRotateBuffer ( int masked)
       //memset(RotatedImage,0xff,131072*8);
 
       if ((masked == false)&&(iGLOBAL_SCREENWIDTH == 800)) {
-		StrechScreen = false;
+		DisableScreenStretch();
 		// SetTextMode (  );
 
 		k=(28*512);//14336;
@@ -3152,7 +3150,7 @@ void StartupRotateBuffer ( int masked)
 			   //k+=512*2;
 		   }
 	  }else if ((masked == false)&&(iGLOBAL_SCREENWIDTH == 640)) {
-		StrechScreen = false;
+		DisableScreenStretch();
 		k=(28*512);//14336;
 		   for (a=0;a<iGLOBAL_SCREENHEIGHT;a++){
 			   for (b=0;b<iGLOBAL_SCREENWIDTH;b++){
@@ -3216,7 +3214,7 @@ void ScaleAndRotateBuffer (int startangle, int endangle, int startscale, int end
 
    time = time;
 ////zxcv
-	StrechScreen=false;//bna++
+	DisableScreenStretch();//bna++
 
 
    anglestep=((endangle-startangle)<<16)/time;
@@ -3250,7 +3248,7 @@ void ScaleAndRotateBuffer (int startangle, int endangle, int startscale, int end
 	   pic_t *shape;
 	   shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
 	   DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );//bna++
-	   StrechScreen=false;//dont strech when we go BACK TO GAME
+	   DisableScreenStretch();//dont strech when we go BACK TO GAME
 	   DrawPlayScreen(true);//repaint ammo and life stat
   }
 }
@@ -3675,7 +3673,7 @@ void ShutdownScreenSaver ( void )
 #define MAXSPEED  8
 void UpdateScreenSaver ( void )
 {
-	//StrechScreen = true;
+	//EnableScreenStretch();
    if (ScreenSaver->time!=-1)
       {
       ScreenSaver->time-=tics;
@@ -4367,7 +4365,7 @@ void DoEndCinematic ( void )
    int i;
 
    byte pal[768];
-	StrechScreen = true;
+	EnableScreenStretch();
 
    viewwidth = 320;//MAXSCREENWIDTH;
    viewheight = 200;//MAXSCREENHEIGHT;
@@ -5532,7 +5530,7 @@ void DIPCredits ( void )
 
 void DoEndCinematic ( void )
 {
-	StrechScreen = true;
+	EnableScreenStretch();
 
    viewwidth = 320;//MAXSCREENWIDTH;
    viewheight = 200;//MAXSCREENHEIGHT;
@@ -5768,7 +5766,7 @@ void DoCreditScreen ( void )
    byte * bkgnd;
    font_t * oldfont;
    int i;
-	StrechScreen = true;
+	EnableScreenStretch();
    viewwidth = 320;//MAXSCREENWIDTH;
    viewheight = 200;//MAXSCREENHEIGHT;
 

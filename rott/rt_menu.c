@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <io.h>
 #elif PLATFORM_UNIX
 #include <unistd.h>
+#include <SDL/SDL.h>
 #endif
 
 #include <sys/types.h>
@@ -131,8 +132,6 @@ boolean loadedgame = false;
 battle_type BATTLE_Options[ battle_NumBattleModes ];
 
 int quicksaveslot=-1;
-
-extern char *tmpPICbuf;
 
 //******************************************************************************
 //
@@ -753,17 +752,18 @@ CP_MenuNames ExtOptionsNames[] =
    "MOUSELOOK",
    "INVERSE MOUSE",
    "CROSS HAIR",
-   "JUMPING"
-
+   "JUMPING",
+   "FULLSCREEN"
    };
-CP_iteminfo ExtOptionsItems = { 20, MENU_Y, 4, 0, 43, ExtOptionsNames, mn_largefont };
+CP_iteminfo ExtOptionsItems = { 20, MENU_Y, 5, 0, 43, ExtOptionsNames, mn_largefont };
 
 CP_itemtype ExtOptionsMenu[] =
 {
    {1, "", 'M', NULL},
    {1, "", 'I', NULL},
    {1, "", 'C', NULL},
-   {1, "", 'J', NULL}
+   {1, "", 'J', NULL},
+   {1, "", 'F', NULL}
 };
    
 //bna added end
@@ -1757,7 +1757,7 @@ void ControlPanel
    StartGame = false;
  
    SetUpControlPanel();
-   StrechScreen=true;
+   EnableScreenStretch();
    //
    // F-KEYS FROM WITHIN GAME
    //
@@ -1842,7 +1842,7 @@ menuitems CP_MainMenu
    // Main menu loop.  "Exit options" or "New game" exits
    //
    StartGame = false;
-   StrechScreen=true;
+   EnableScreenStretch();
 
    while( !StartGame )
       {
@@ -1861,7 +1861,7 @@ menuitems CP_MainMenu
                }
 
             StartGame = true;
-			StrechScreen=false;//bna++ shut off streech mode
+			DisableScreenStretch();//bna++ shut off streech mode
             break;
 
          case -1:
@@ -1894,7 +1894,7 @@ void DrawMainMenu(void)
 {    
 
    MenuNum = 1;
-		StrechScreen=true;//bna++ shut off streech mode
+		EnableScreenStretch();//bna++ shut off streech mode
    //
    // CHANGE "GAME" AND "DEMO"
    //
@@ -2632,9 +2632,9 @@ void CP_OrderInfo
 
    do
       {
-	  StrechScreen=true;//bna++
+	  EnableScreenStretch();//bna++
       DrawOrderInfo( page );
-	  StrechScreen=false;//bna++ turn off or screen will be strected every time it passes VW_UpdateScreen
+	  DisableScreenStretch();//bna++ turn off or screen will be strected every time it passes VW_UpdateScreen
       if ( newpage )
          {
          while( Keyboard[ key ] )
@@ -2699,7 +2699,7 @@ void CP_OrderInfo
 
    Keyboard[ key ] = 0;
    LastScan = 0;
- StrechScreen=true;//bna++
+ EnableScreenStretch();//bna++
    MN_PlayMenuSnd( SD_ESCPRESSEDSND );
    }
 
@@ -3173,7 +3173,7 @@ void CP_NewGame
 
    gamestate.battlemode = battle_StandAloneGame;
    StartGame = true;
-   StrechScreen=false;
+   DisableScreenStretch();
    playstate = ex_resetgame;
 
 
@@ -3201,7 +3201,7 @@ void CP_EndGame
    action = CP_DisplayMsg( ENDGAMESTR, 12 );
 
    StartGame = false;
-   StrechScreen=true;
+   EnableScreenStretch();
    if ( action )
       {
       EndGameStuff ();
@@ -3307,7 +3307,7 @@ int DoLoad (int which)
       if (LoadTheGame (which, &game) == true)
       {
          MenuFixup ();
-		 StrechScreen=false;
+		 DisableScreenStretch();
          StartGame = true;
 			exit      = 1;
       }
@@ -5036,7 +5036,7 @@ void DrawSTMenuBuf (int x, int y, int w, int h, boolean up)
 
 void DoMainMenu (void)
 {
-		StrechScreen=true;//bna++ shut on streech mode
+		EnableScreenStretch();//bna++ shut on streech mode
    SetAlternateMenuBuf();
    ClearMenuBuf();
    DrawMainMenu();
@@ -5351,6 +5351,7 @@ extern long inverse_mouse;
 extern boolean usemouselook;
 extern int iG_aimCross;
 extern boolean usejump;
+extern boolean sdl_fullscreen;
 
 void CP_ExtOptionsMenu (void)
 {
@@ -5374,6 +5375,13 @@ void CP_ExtOptionsMenu (void)
 				 break;
          case 2: iG_aimCross   ^= 1; DrawExtOptionsButtons (); break;
          case 3: usejump       ^= 1; DrawExtOptionsButtons (); break;
+         case 4:
+            if (SDL_WM_ToggleFullScreen(SDL_GetVideoSurface()))
+            {
+               sdl_fullscreen ^= 1;
+               DrawExtOptionsButtons ();
+            }
+            break;
       }
 
 	} while (which >= 0);
@@ -5405,6 +5413,7 @@ void DrawExtOptionsButtons (void)
             case 1: if (inverse_mouse == -1)on = 1; break;
             case 2: if (iG_aimCross   == 1) on = 1; break;
             case 3: if (usejump       == 1) on = 1; break;
+            case 4: if (sdl_fullscreen== 1) on = 1; break;
          }
 
          if (on)
@@ -5697,7 +5706,7 @@ void BattleGamePlayerSetup( void )
             if ( status )
                {
                StartGame   = true;
-			      StrechScreen=false;
+			      DisableScreenStretch();
                handlewhich = -2;
                playstate   = ex_resetgame;
                BATTLEMODE  = true;
@@ -7156,7 +7165,7 @@ void CP_ModemGameMessage (int player  )
 
    {
    int i;
-    StrechScreen=true;
+    EnableScreenStretch();
        // SetTextMode (  );
 
 	SetAlternateMenuBuf();
@@ -7209,7 +7218,7 @@ void CP_ModemGameMessage (int player  )
    FlipMenuBuf();
 	RefreshMenuBuf (0);
 
-	 StrechScreen=false;
+	 DisableScreenStretch();
    }
 
 

@@ -47,7 +47,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "w_wad.h"
 
 extern int		iDemoNames;
-extern int iG_aimCross;
+extern boolean iG_aimCross;
 
 
 extern void DisplayMessage   (int num,int position);
@@ -424,7 +424,7 @@ void DoWarp (void)
    int level;
 
 
-	StrechScreen=true;//bna++ shut on streech mode
+	EnableScreenStretch();//bna++ shut on streech mode
 
 
    MU_StoreSongPosition();
@@ -445,13 +445,13 @@ void DoWarp (void)
 		pic_t *shape;
 		shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
 		DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );
-		StrechScreen=false;//dont strech when we go BACK TO GAME
+		DisableScreenStretch();//dont strech when we go BACK TO GAME
 		DrawPlayScreen(true);//repaint ammo and life stat
 		VW_UpdateScreen ();//update screen
   }
    //bna section end
 
-	StrechScreen=true;//bna++ shut on streech mode
+	EnableScreenStretch();//bna++ shut on streech mode
    while( Keyboard[ sc_Escape ] )
       {
 		IN_UpdateKeyboard();
@@ -475,7 +475,7 @@ void DoWarp (void)
       }
    else
       {
-	   StrechScreen=false;//dont strech when we go BACK TO GAME
+	   DisableScreenStretch();//dont strech when we go BACK TO GAME
       SetupScreen(true);
       }
 
@@ -494,7 +494,7 @@ void DoJukeBox  (void)
 
    {
 	if (iGLOBAL_SCREENWIDTH > 320) {
-		StrechScreen=true;//bna++ shut on streech mode
+		EnableScreenStretch();//bna++ shut on streech mode
 	}
    StopWind();
    ShutdownClientControls();
@@ -512,7 +512,7 @@ void DoJukeBox  (void)
 		pic_t *shape;
 		shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
 		DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );
-		StrechScreen=false;//dont strech when we go BACK TO GAME
+		DisableScreenStretch();//dont strech when we go BACK TO GAME
 		DrawPlayScreen(true);//repaint ammo and life stat
 		VW_UpdateScreen ();//update screen
   }
@@ -707,7 +707,7 @@ void DoShroomsModePowerup (void)
 
 void RestartNormal (void)
 {
-	StrechScreen=true;//bna
+	EnableScreenStretch();//bna
 	DoNormalThing ();
 
    AddMessage ("Restart to level 1", MSG_CHEAT);
@@ -1037,7 +1037,7 @@ void EndDemo ( void )
 	IN_ClearKeyboardQueue ();
 
    StartupClientControls();
-   StrechScreen = false;
+   DisableScreenStretch();
 }
 
 
@@ -1082,7 +1082,7 @@ void RecordDemoQuery ( void )
       if ((level > 0) && (level < 9))
 #endif
          {
-			StrechScreen=true;//bna
+			EnableScreenStretch();//bna
 			 gamestate.mapon = level-1;
 			 playstate = ex_demorecord;
          }
@@ -1140,7 +1140,7 @@ void PlaybackDemoQuery ( void )
 
    StartupClientControls();
 
-   StrechScreen = true;
+   EnableScreenStretch();
 }
 
 /*

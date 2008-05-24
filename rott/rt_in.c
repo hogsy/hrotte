@@ -104,6 +104,7 @@ static word *sdl_stick_button_state = NULL;
 static word sdl_sticks_joybits = 0;
 static int sdl_mouse_grabbed = 0;
 static unsigned int scancodes[SDLK_LAST];
+extern boolean sdl_fullscreen;
 #endif
 
 
@@ -213,7 +214,7 @@ static int sdl_mouse_motion_filter(SDL_Event const *event)
     } /* if */
     else
     {
-        if (sdl_mouse_grabbed)
+        if (sdl_mouse_grabbed || sdl_fullscreen)
         {
           	mouse_relative_x = event->motion.xrel;
        	    mouse_relative_y = event->motion.yrel;
@@ -459,11 +460,14 @@ static int sdl_key_filter(const SDL_Event *event)
          (event->key.state == SDL_PRESSED) &&
          (event->key.keysym.mod & KMOD_CTRL) )
     {
+      if (!sdl_fullscreen)
+      {
         sdl_mouse_grabbed = ((sdl_mouse_grabbed) ? 0 : 1);
         if (sdl_mouse_grabbed)
             grab_mode = SDL_GRAB_ON;
         SDL_WM_GrabInput(grab_mode);
-        return(0);
+      }
+      return(0);
     } /* if */
 
     else if ( ( (event->key.keysym.sym == SDLK_RETURN) ||
@@ -471,14 +475,18 @@ static int sdl_key_filter(const SDL_Event *event)
               (event->key.state == SDL_PRESSED) &&
               (event->key.keysym.mod & KMOD_ALT) )
     {
-        SDL_Surface *surface = SDL_GetVideoSurface();
-        if (surface != NULL)
-        {
-            Uint32 sdl_flags = surface->flags;
-            attempt_fullscreen_toggle(&surface, &sdl_flags);
-        } /* if */
+        if (SDL_WM_ToggleFullScreen(SDL_GetVideoSurface()))
+            sdl_fullscreen ^= 1;
         return(0);
     } /* if */
+
+    /* HDG: put this above the scancode lookup otherwise it is never reached */
+    if ( (event->key.keysym.sym == SDLK_PAUSE) &&
+         (event->key.state == SDL_PRESSED))
+    {
+        PausePressed = true;
+        return(0);
+    }
 
     k = handle_keypad_enter_hack(event);
     if (!k)
@@ -487,14 +495,14 @@ static int sdl_key_filter(const SDL_Event *event)
         if (!k)   /* No DOS equivalent defined. */
             return(0);
     } /* if */
-
-    if (event->key.state == SDL_RELEASED)
+    
+    /* Fix elweirdo SDL capslock/numlock handling, always treat as press */
+    if ( (event->key.keysym.sym != SDLK_CAPSLOCK) &&
+         (event->key.keysym.sym != SDLK_NUMLOCK)  &&
+         (event->key.state == SDL_RELEASED) )
         k += 128;  /* +128 signifies that the key is released in DOS. */
 
-    if (event->key.keysym.sym == SDLK_PAUSE)
-        PausePressed = true;
-
-    else if (event->key.keysym.sym == SDLK_SCROLLOCK)
+    if (event->key.keysym.sym == SDLK_SCROLLOCK)
         PanicPressed = true;
 
     else
@@ -1120,7 +1128,9 @@ sdl_mouse_grabbed = 1;
     scancodes[SDLK_HOME]            = sc_Home;
     scancodes[SDLK_UP]              = sc_UpArrow;
     scancodes[SDLK_PAGEUP]          = sc_PgUp;
-    scancodes[SDLK_KP_MINUS]        = 0xE04A;
+    // Make this a normal minus, for viewport changing
+    //scancodes[SDLK_KP_MINUS]        = 0xE04A;
+    scancodes[SDLK_KP_MINUS]        = sc_Minus;
     scancodes[SDLK_KP4]             = sc_LeftArrow;
     scancodes[SDLK_KP5]             = 0x4C;
     scancodes[SDLK_KP6]             = sc_RightArrow;
