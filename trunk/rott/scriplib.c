@@ -43,7 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 char    token[MAXTOKEN];
 char    name[MAXTOKEN*2];
-char    scriptfilename[30];
+char    scriptfilename[512];
 char    *scriptbuffer,*script_p,*scriptend_p;
 int     scriptline;
 boolean endofscript;
@@ -63,7 +63,7 @@ void LoadScriptFile (char *filename)
 
 	size = LoadFile (filename, (void **)&scriptbuffer);
 
-   strcpy(&scriptfilename[0],filename);
+	snprintf(scriptfilename, sizeof(scriptfilename), "%s", filename);
 	script_p = scriptbuffer;
 	scriptend_p = script_p + size;
 	scriptline = 1;
