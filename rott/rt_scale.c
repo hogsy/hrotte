@@ -1107,18 +1107,26 @@ void DrawPositionedScaledSprite (int x, int y, int shapenum, int height, int typ
 =
 =================
 */
+extern int G_gmasklump;
 void DrawScreenSizedSprite (int lump)
 {
-   byte *shape;
+	//draws gasmask among other things zxcv
+   byte *shape,*src;
    int      frac;
    patch_t *p;
    int      x1,x2;
    int      tx;
-   int      plane;
+//   int      plane;
    byte * b;
    int    startfrac;
 
+   int  offset;
+   int  length;
+   int  topscreen;
+   int  bottomscreen;
+   byte  *cnt,*Ycnt;
 
+  // SetTextMode (  );
    whereami=39;
    shadingtable=colormap+(1<<12);
    shape=W_CacheLumpNum(lump,PU_CACHE, Cvt_patch_t, 1);
@@ -1126,6 +1134,7 @@ void DrawScreenSizedSprite (int lump)
    dc_invscale=(viewwidth<<16)/p->origsize;
    tx=-p->leftoffset;
    centeryclipped=viewheight>>1;
+   //centeryclipped=(viewheight>>1)+43;
 //
 // calculate edges of the shape
 //
@@ -1149,27 +1158,43 @@ void DrawScreenSizedSprite (int lump)
 
    startfrac=0;
 
-#ifdef DOS
-   for (plane=0;plane<4;plane++,startfrac+=dc_iscale)
-#endif
-
       {
       frac=startfrac;
-
-#ifdef DOS
-      b=(byte *)bufferofs+(plane>>2);
-      VGAWRITEMAP(plane&3);
-#else
       b=(byte *)bufferofs;
-#endif
 
-#ifdef DOS
-      for (x1=plane;x1<=x2;x1+=4, frac += (dc_iscale<<2),b++)
-#else
+	  /////////////  BNA PATCH //////////////////////////////////////////////////////////
+	     //gmasklump=W_GetNumForName("p_gmask"); //=783
+	     //perhaps I should have painted the mask in a seperate buffer
+	     //and streched it and copyet it back, but that would demand
+	     //a new buffer (size=800x600) and slowed the game down so ?
+
+		 // if its the gasmask, paint black patches at hires
+		 if ((lump == G_gmasklump)&&(iGLOBAL_SCREENWIDTH>320)) { 
+			src = ((p->collumnofs[frac>>SFRACBITS])+shape);
+			offset=*(src++);
+			length=*(src++);
+			topscreen = sprtopoffset + (dc_invscale*offset);
+			bottomscreen = topscreen + (dc_invscale*length);
+			dc_yl = (topscreen+SFRACUNIT-1)>>SFRACBITS;//=41  viewheight=584
+			dc_yh = ((bottomscreen-1)>>SFRACBITS);//=540      viewwidth =800
+			//paint upper black patch in gasmask
+			for (cnt=b;cnt<b+viewwidth;cnt++){
+				for (Ycnt=cnt;Ycnt<cnt+(dc_yl*iGLOBAL_SCREENWIDTH);Ycnt+=iGLOBAL_SCREENWIDTH){
+				 *Ycnt = 36;
+				}
+			}
+			//paint lower black patch in gasmask
+			for (cnt=b+(dc_yh*iGLOBAL_SCREENWIDTH);cnt<b+(dc_yh*iGLOBAL_SCREENWIDTH)+viewwidth;cnt++){
+				for (Ycnt=cnt;Ycnt<b+(viewheight*iGLOBAL_SCREENWIDTH);Ycnt+=iGLOBAL_SCREENWIDTH){
+				 *Ycnt = 36;
+				}
+			}
+		 }
+      ///////////////////////////////////////////////////////////////////////////////////
       for (x1=0;x1<=x2;x1++, frac += dc_iscale,b++)
-#endif
+
          {
-         ScaleClippedPost(((p->collumnofs[frac>>SFRACBITS])+shape),b);
+             ScaleClippedPost(((p->collumnofs[frac>>SFRACBITS])+shape),b);
          }
       }
 }
@@ -1298,9 +1323,9 @@ void DrawNormalSprite (int x, int y, int shapenum)
    shape = W_CacheLumpNum (shapenum, PU_CACHE, Cvt_patch_t, 1);
    p = (patch_t *)shape;
 
-   if (((x-p->leftoffset)<0) || ((x-p->leftoffset+p->width)>320))
+   if (((x-p->leftoffset)<0) || ((x-p->leftoffset+p->width)>iGLOBAL_SCREENWIDTH))
       Error ("DrawNormalSprite: x is out of range x=%ld\n",x-p->leftoffset+p->width);
-   if (((y-p->topoffset)<0) || ((y-p->topoffset+p->height)>200))
+   if (((y-p->topoffset)<0) || ((y-p->topoffset+p->height)>iGLOBAL_SCREENHEIGHT))
       Error ("DrawNormalSprite: y is out of range y=%ld\n",y-p->topoffset+p->height);
 
    startx=x-p->leftoffset;
@@ -1344,8 +1369,9 @@ void R_DrawColumn (byte * buf)
 	frac = dc_texturemid + (dc_yl-centery)*fracstep;
 
 	while (count--) {
+		//*dest = test++;
 		*dest = shadingtable[dc_source[(frac>>SFRACBITS)]];
-		dest += MAXSCREENWIDTH;
+		dest += iGLOBAL_SCREENWIDTH;
 		frac += fracstep;
 	}
 }
@@ -1363,7 +1389,7 @@ void R_TransColumn (byte * buf)
 	while (count--)
 	{
 		*dest = shadingtable[*dest];
-		dest += MAXSCREENWIDTH;
+		dest += iGLOBAL_SCREENWIDTH;
 	}
 }
 
@@ -1385,30 +1411,33 @@ void R_DrawWallColumn (byte * buf)
 	fracstep <<= 10;
 
 	while (count--) {
+		//*dest = 6;
 		*dest = shadingtable[dc_source[(((unsigned)frac)>>26)]];
-		dest += MAXSCREENWIDTH;
+		dest += iGLOBAL_SCREENWIDTH;
 		frac += fracstep;
 	}
 }
 
 void R_DrawClippedColumn (byte * buf)
 {
-	// This is *NOT* 100% correct - DDOI
+	// This is *NOT* 100% correct - DDOI zxcv
 	int count;
 	int frac, fracstep;
 	byte *dest;
+//		byte *b;int y;
 
 	count = dc_yh - dc_yl + 1;
 	if (count < 0) return;
 
-	dest = buf + ylookup[dc_yl];
+   dest = buf + ylookup[dc_yl];
+
 
 	fracstep = dc_iscale;
 	frac = dc_texturemid + (dc_yl-centeryclipped)*fracstep;
 
 	while (count--) {
 		*dest = shadingtable[dc_source[(((unsigned)frac)>>SFRACBITS)]];
-		dest += MAXSCREENWIDTH;
+		dest += iGLOBAL_SCREENWIDTH;
 		frac += fracstep;
 	}
 }
@@ -1427,7 +1456,7 @@ void R_DrawSolidColumn (int color, byte * buf)
 	while (count--)
 	{
 		*dest = (byte)color;
-		dest += MAXSCREENWIDTH;
+		dest += iGLOBAL_SCREENWIDTH;
 	}
 }
 

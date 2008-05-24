@@ -84,14 +84,26 @@ void W_AddFile (char *_filename)
         wadinfo_t               header;
         lumpinfo_t              *lump_p;
         unsigned                i;
-        int                             handle, length;
-        int                             startlump;
+        int                     handle, length;
+        int                     startlump;
         filelump_t              *fileinfo, singleinfo;
 
         char filename[MAX_PATH];
+        char buf[MAX_PATH+100];//bna++
+
         strncpy(filename, _filename, sizeof (filename));
         filename[sizeof (filename) - 1] = '\0';
         FixFilePath(filename);
+
+		//bna section start
+		if (access (filename, 0) != 0) {
+			strcpy (buf,"Error, Could not find User file '");
+			strcat (buf,filename);
+			strcat (buf,"', ignoring file");
+			printf(buf);
+		}
+		//bna section end
+
 //
 // read the entire file in
 //      FIXME: shared opens

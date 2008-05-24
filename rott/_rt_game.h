@@ -65,16 +65,25 @@ typedef struct {
 #define LEADER_NAME_Y ( LEADER_Y + 2 )
 #define LEADER_WIDTH  88
 #define LEADER_HEIGHT 16
-
+/* bna++
 #define HEALTH_X  20
 #define HEALTH_Y  185
 
 #define AMMO_X    300
 #define AMMO_Y    184
+*/
+//--------------------
+#define HEALTH_X  20*2
+#define HEALTH_Y  (185*2)+16
+
+#define AMMO_X    300*2
+#define AMMO_Y    (184*2)+16
+//--------------------
 
 #define SCORE_X   4
 #define SCORE_Y   0
 
+/*
 #define KEY1_X    152
 #define KEY2_X    160
 #define KEY3_X    168
@@ -89,7 +98,23 @@ typedef struct {
 
 #define MEN_X     216
 #define MEN_Y     0
+*/
+//--------------------
+#define KEY1_X    152
+#define KEY2_X    160
+#define KEY3_X    168
+#define KEY4_X    176
+#define KEY_Y     0
 
+#define POWER_X   (184)
+#define POWER_Y   0
+
+#define ARMOR_X   200
+#define ARMOR_Y   0
+
+#define MEN_X     216
+#define MEN_Y     0
+//--------------------
 #define HOUR_X    7
 #define MIN_X     26
 #define SEC_X     45

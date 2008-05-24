@@ -153,11 +153,25 @@ void CheckCommandLineParameters( void );
 void PlayTurboGame( void );
 void Init_Tables (void);
 void CheckRemoteRidicule ( int scancode );
+void SetRottScreenRes (int Width, int Height);
 
 #ifndef DOS
 extern void crash_print (int);
 extern int setup_homedir (void);
 #endif
+
+//extern int G_argc;
+//extern char G_argv[30][80];
+int G_weaponscale;
+extern int iDropDemo;
+extern int iG_aimCross;
+
+extern void ComSetTime ( void );
+extern void VH_UpdateScreen (void);
+extern void RottConsole ( void );
+extern void	ReadDelay(long delay);
+extern void RecordDemoQuery ( void );
+
 
 int main (int argc, char *argv[])
 {
@@ -205,6 +219,8 @@ int main (int argc, char *argv[])
 #else
    gamestate.Product = ROTT_REGISTERED;
 #endif
+
+   SetRottScreenRes (640, 480);
 
    DrawRottTitle ();
    gamestate.randomseed=-1;
@@ -730,8 +746,91 @@ void SetupWads( void )
 
 #if (SHAREWARE==0)
 
-   // Check for User wads
 
+   // Check for aimcross
+   arg = CheckParm ("aim");
+   if (arg!=0)
+   {
+		iG_aimCross = 1;
+   }else{
+		iG_aimCross = 0;
+   }
+
+
+   // Check for rtl files 	
+   arg = CheckParm ("filertl");
+   if (arg!=0)
+   {
+	   FILE *f;char buf[32];
+	   if (_argv[arg+1] != 0) { //are there a filename included
+		   strcpy (tempstr,_argv[arg+1]);//copy it to tempstr
+		   if (strlen (tempstr) < MAX_PATH) {
+			   if (access (tempstr, 0) != 0) { //try open
+				  	strcat (tempstr,".rtc");//non exists, try add .rtc
+					if (access (tempstr, 0) != 0) { //try open again
+						//stil no useful filename
+						strcat (tempstr," not found, skipping RTL file ");
+						printf(tempstr);
+						goto NoRTL;
+					}
+			   }
+			   if((f = fopen( tempstr, "r" )) == NULL ){ //try opnong file
+					strcat (tempstr," not could not be opened, skipping RTL file ");
+					printf(tempstr);
+					goto NoRTL;
+			   }else{
+					fread(buf,3,3,f);//is the 3 first letters RTL (RTC)
+				    if (((strstr(buf,"RTL") != 0)||strstr(buf,"RTC") != 0)) {
+						strcpy (GameLevels.file,tempstr);
+						GameLevels.avail++;
+						strcpy (buf,"Adding ");
+						strcat (buf,tempstr);
+						printf(buf);
+					}
+					fclose(f);
+			   }
+		   }
+	   }else{printf("Missing RTL filename");}
+   }
+NoRTL:;
+   // Check for rtc files
+   arg = CheckParm ("filertc");
+   if (arg!=0)
+   {
+	   FILE *f;char buf[32];
+	   if (_argv[arg+1] != 0) { //are there a filename included
+		   strcpy (tempstr,_argv[arg+1]);//copy it to tempstr
+		   if (strlen (tempstr) < MAX_PATH) {
+			   if (access (tempstr, 0) != 0) { //try open
+				  	strcat (tempstr,".rtc");//non exists, try add .rtc
+					if (access (tempstr, 0) != 0) { //try open again
+						//stil no useful filename
+						strcat (tempstr," not found, skipping RTC file ");
+						printf(tempstr);
+						goto NoRTL;
+					}
+			   }
+			   if((f = fopen( tempstr, "r" )) == NULL ){ //try opening file
+					strcat (tempstr," not could not be opened, skipping RTC file ");
+					printf(tempstr);
+					goto NoRTL;
+			   }else{
+					fread(buf,3,3,f);//is the 3 first letters RTL (RTC)
+				    if (((strstr(buf,"RTL") != 0)||strstr(buf,"RTC") != 0)) {
+						strcpy (BattleLevels.file,tempstr);
+						BattleLevels.avail++;
+						strcpy (buf,"Adding ");
+						strcat (buf,tempstr);
+						printf(buf);
+					}
+					fclose(f);
+			   }
+		   }
+	   }else{printf("Missing RTC filename");}
+   }
+NoRTC:;
+
+   // Check for User wads
    arg = CheckParm ("file");
    if (arg!=0)
       {
@@ -836,7 +935,7 @@ void Init_Tables (void)
 	blockstart = &blockstarts[0];
 	for (y=0;y<UPDATEHIGH;y++)
 		for (x=0;x<UPDATEWIDE;x++)
-			*blockstart++ = SCREENWIDTH*16*y+x*TILEWIDTH;
+			*blockstart++ = iG_SCREENWIDTH*16*y+x*TILEWIDTH;
 
 	for (i = 0; i < 0x300; i++)
 		*(origpal+(unsigned int)i) = (*(origpal+(unsigned int)i))>>2;
@@ -940,14 +1039,17 @@ void GameLoop (void)
          CalcTics();
          CalcTics();
 
+
          playstate = ex_titles;
          }
 
 		switch (playstate)
 		   {
          case ex_titles:
+		 
             BATTLE_Shutdown();
             MU_StartSong(song_title);
+			StrechScreen=true;
             if ((NoWait==false)&&(!modemgame))
                {
                byte dimpal[768];
@@ -993,7 +1095,9 @@ void GameLoop (void)
                      break;
                      }
 
-                  DoCreditScreen ();
+                  if (iGLOBAL_SCREENWIDTH > 320) { //need fixing, crashes by 320 ,bna
+					DoCreditScreen ();
+				  }
                   if ((!LastScan) && (!IN_GetMouseButtons()))
                      CheckHighScore (0, 0, false);
 #if (SHAREWARE==0)
@@ -1036,10 +1140,14 @@ void GameLoop (void)
                NoWait = false;
                SwitchPalette(origpal,35);
                CP_MainMenu();
+
                }
          break;
 
          case ex_resetgame:
+
+  // SetTextMode (  ); //12345678
+			 StrechScreen=true;//bna++ shut on streech mode 
             InitCharacter();
 
             InitializeMessages();
@@ -1123,6 +1231,9 @@ void GameLoop (void)
 
             MenuFixup ();
             playstate=ex_stillplaying;
+
+			StrechScreen=false;//bna++ shut off streech mode
+
          break;
 
          case ex_stillplaying:
@@ -1143,10 +1254,10 @@ void GameLoop (void)
 
          case ex_died:
             loadit = done = false;
-
+//		   SetTextMode (  ); //12345678
             Died ();
             StopWind();
-
+			 StrechScreen=false;//bna++ shut off streech mode
             while (damagecount>0)
                DoBorderShifts();
 
@@ -1371,12 +1482,12 @@ void GameLoop (void)
    waminot();
    }
 
-boolean CheckForQuickLoad
-   (
-   void
-   )
+boolean CheckForQuickLoad  (void )
 
    {
+
+   StrechScreen=true;//bna++
+
    if ( pickquick )
       {
       SetupMenuBuf();
@@ -1715,6 +1826,17 @@ void PauseLoop ( void )
       oldpolltime++;
       if (GamePaused==false)
          {
+   			//bna++ section
+		  if (( playstate == ex_stillplaying )&&(iGLOBAL_SCREENWIDTH > 320)){
+				pic_t *shape;
+				shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
+				DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );
+				StrechScreen=false;//dont strech when we go BACK TO GAME
+				DrawPlayScreen(true);//repaint ammo and life stat
+				VW_UpdateScreen ();//update screen
+		  }
+		  StartupClientControls();
+		   //bna section end
          break;
          }
 		}
@@ -2707,7 +2829,7 @@ void WriteLBMfile (char *filename, byte *data, int width, int height)
    int     handle;
    int     i;
 
-   lbm = lbmptr = (byte *) SafeMalloc (65000);
+   lbm = lbmptr = (byte *) SafeMalloc ((iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT)+4000);
 
 //
 // start FORM
@@ -2916,7 +3038,8 @@ void SaveScreen (boolean saveLBM)
       ThreeDRefresh ();
    doublestep = 2 - DetailLevel;
 
-   buffer = (byte *) SafeMalloc (65000);
+   //buffer = (byte *) SafeMalloc (65000);
+   buffer = (byte *) SafeMalloc ((iGLOBAL_SCREENHEIGHT*iGLOBAL_SCREENWIDTH)+4000);
 
 #if (BETA == 1)
    if (SCREENSHOTS == false)
@@ -2949,10 +3072,13 @@ void SaveScreen (boolean saveLBM)
    }
 #endif
 
-   VL_CopyPlanarPageToMemory(screen,buffer);
+
 
    GetFileName (saveLBM);
    GetPathFromEnvironment( filename, ApogeePath, savename );
+   //   
+	memcpy(buffer,screen , iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT);//bna	
+   //bna--VL_CopyPlanarPageToMemory(screen,buffer);
 
    if (saveLBM)
    {
@@ -3003,15 +3129,15 @@ void WritePCX (char * file, byte * source)
 
    pcxHDR.bitsperpixel  = 8;           //bpp;
    pcxHDR.xmin          = pcxHDR.ymin = 0;
-   pcxHDR.xmax          = 319;         //bitmap->box.w - 1;
-   pcxHDR.ymax          = 199;         //bitmap->box.h - 1;
-   pcxHDR.hres          = 320;         //N_COLUMNS;
-   pcxHDR.vres          = 200;         //N_LINES;
+   pcxHDR.xmax          = iGLOBAL_SCREENWIDTH - 1;
+   pcxHDR.ymax          = iGLOBAL_SCREENHEIGHT - 1;
+   pcxHDR.hres          = iGLOBAL_SCREENWIDTH;         //N_COLUMNS;
+   pcxHDR.vres          = iGLOBAL_SCREENHEIGHT;         //N_LINES;
 
   // bytesperline doesn't take into account multiple planes.
   // Output in same format as bitmap (planar vs packed).
   //
-   pcxHDR.bytesperline  = 320;         //bitmap->width;
+   pcxHDR.bytesperline  = iGLOBAL_SCREENWIDTH;         //bitmap->width;
 
    pcxHDR.nplanes       = 1;           //bitmap->planes;
    pcxHDR.reserved      = 0;
@@ -3032,15 +3158,15 @@ void WritePCX (char * file, byte * source)
 
    SafeWrite (pcxhandle, &buffer1, GAP_SIZE);
 
-   tempbuffer = (byte *) SafeMalloc (65000);
+   tempbuffer = (byte *) SafeMalloc ((iGLOBAL_SCREENHEIGHT*iGLOBAL_SCREENWIDTH)+4000);
    bptr = tempbuffer;
    totalbytes = 0;
 
   //
   // Write to a bit-packed file.
   //
-	for (y = 0;  y < 200;  ++y) 		// for each line in band
-		if (PutBytes (((unsigned char *) (source+(y*320))),
+	for (y = 0;  y < iGLOBAL_SCREENHEIGHT;  ++y) 		// for each line in band
+		if (PutBytes (((unsigned char *) (source+(y*iGLOBAL_SCREENWIDTH))),
 						  pcxHDR.bytesperline))
          Error ("Error writing PCX bit-packed line!\n");
 

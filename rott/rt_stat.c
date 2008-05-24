@@ -1113,7 +1113,7 @@ void Set_NewZ_to_MapValue(fixed *newz,int zoffset,const char*errorstr,int tilex,
 */
 
 
-
+int BaseMarkerZ;//bna++			
 
 void SpawnStatic (int tilex, int tiley, int mtype, int zoffset)
 {statobj_t * temp;
@@ -1345,6 +1345,10 @@ void SpawnStatic (int tilex, int tiley, int mtype, int zoffset)
 		 }
 
 //=====================================================================//
+	//bna added
+	// BaseMarkerZ used to adjust height in s_basemarker1
+	// in SpawnNewObj(i,j,&s_basemarker1,inertobj); 
+	BaseMarkerZ=temp->z;//bna++	BaseMarkerZ = spawnz;
 
      PreCacheStaticFrames(temp);
 

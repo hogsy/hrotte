@@ -575,7 +575,8 @@ void RefreshMenuBuf( int time )
 
    for (i=0;i<=time;i+=tics)
       {
-      PositionMenuBuf (0,NORMALVIEW,false);
+      //PositionMenuBuf (0,NORMALVIEW,false);
+      PositionMenuBuf (0,NORMALVIEW,true);//bna++ in not true bg in menu is no redrawn
       }
 }
 

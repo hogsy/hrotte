@@ -74,7 +74,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // GLOBAL VARIABLES
 //========================================
 
-
+extern char *tmpPICbuf;
+extern int  iXmas;
+extern boolean  UseBaseMarker;
 
 teamtype TEAM[MAXPLAYERS];
 int numareatiles[NUMAREAS+1];
@@ -1141,6 +1143,23 @@ void PreCache( void )
    int ticdelay;
    byte *tempbuf;
 
+   double Gs;
+   Gs = (iGLOBAL_SCREENWIDTH*100/320);
+   Gs = Gs / 100;
+
+//SetTextMode (  );
+
+/*
+#define  PRECACHEBARX 28
+#define  PRECACHEBARY 178
+
+#define  PRECACHELED1X 9
+#define  PRECACHELED1Y 8
+
+#define  PRECACHELED2X 9
+#define  PRECACHELED2Y 12
+*/
+
 #if defined(PLATFORM_MACOSX) || defined(__sparc__)
 #warning "Precaching is disabled. Fix."
 // Precaching confuses the byteswapping code, since we have
@@ -1177,18 +1196,47 @@ void PreCache( void )
          newheap=Z_UsedHeap();
 			currentmem=(newheap*MAXLEDS)/maxheapsize;
          while (lastmem<=currentmem)
-            {
-            DrawNormalSprite (PRECACHEBARX+PRECACHELED1X+(lastmem<<2),
+            {//SetTextMode (  );
+   			if ( iGLOBAL_SCREENWIDTH == 320) {
+				DrawNormalSprite (PRECACHEBARX+PRECACHELED1X+(lastmem<<2),
                               PRECACHEBARY+PRECACHELED1Y,
-                              W_GetNumForName ("led1"));
+                              W_GetNumForName ("led1"));//led1 progressbar
+			}else if ( iGLOBAL_SCREENWIDTH == 640) {
+				DrawNormalSprite (72+(Gs*(lastmem<<2)),446,W_GetNumForName ("led1"));//led1 progressbar
+				DrawNormalSprite (72+(Gs*(lastmem<<2)),446+3,W_GetNumForName ("led1"));//led1 progressbar
+				DrawNormalSprite (72+3+(Gs*(lastmem<<2)),446,W_GetNumForName ("led1"));//led1 progressbar
+				DrawNormalSprite (72+3+(Gs*(lastmem<<2)),446+3,W_GetNumForName ("led1"));//led1 progressbar
+			}else if ( iGLOBAL_SCREENWIDTH == 800) {
+				DrawNormalSprite (91+(Gs*(lastmem<<2)),559,W_GetNumForName ("led1"));//led1 progressbar
+				DrawNormalSprite (91+(Gs*(lastmem<<2)),559+3,W_GetNumForName ("led1"));//led1 progressbar
+				DrawNormalSprite (91+3+(Gs*(lastmem<<2)),559,W_GetNumForName ("led1"));//led1 progressbar
+				DrawNormalSprite (91+3+(Gs*(lastmem<<2)),559+3,W_GetNumForName ("led1"));//led1 progressbar
+			}
+
             lastmem++;
             }
          currentcache=(i*MAXLEDS)/(cacheindex+1);
          while (lastcache<=currentcache)
             {
-            DrawNormalSprite (PRECACHEBARX+PRECACHELED2X+(lastcache<<2),
+
+   			if ( iGLOBAL_SCREENWIDTH == 320) {
+				DrawNormalSprite (PRECACHEBARX+PRECACHELED2X+(lastcache<<2),
                               PRECACHEBARY+PRECACHELED2Y,
-                              W_GetNumForName ("led2"));
+                              W_GetNumForName ("led2"));//led2 progressbar
+			}else if ( iGLOBAL_SCREENWIDTH == 640) {
+				DrawNormalSprite (72+(Gs*(lastcache<<2)),458,W_GetNumForName ("led2"));//led2 progressbar
+				DrawNormalSprite (72+(Gs*(lastcache<<2)),458+3,W_GetNumForName ("led2"));//led2 progressbar
+				DrawNormalSprite (72+3+(Gs*(lastcache<<2)),458,W_GetNumForName ("led2"));//led2 progressbar
+				DrawNormalSprite (72+3+(Gs*(lastcache<<2)),458+3,W_GetNumForName ("led2"));//led2 progressbar
+			
+			}else if ( iGLOBAL_SCREENWIDTH == 800) {
+				DrawNormalSprite (91+(Gs*(lastcache<<2)),573,W_GetNumForName ("led2"));//led2 progressbar
+				DrawNormalSprite (91+(Gs*(lastcache<<2)),573+3,W_GetNumForName ("led2"));//led2 progressbar
+				DrawNormalSprite (91+3+(Gs*(lastcache<<2)),573,W_GetNumForName ("led2"));//led2 progressbar
+				DrawNormalSprite (91+3+(Gs*(lastcache<<2)),573+3,W_GetNumForName ("led2"));//led2 progressbar
+			}
+			StrechScreen=false;//bna++
+			VW_UpdateScreen ();//bna++
             lastcache++;
             ticdelay--;
             if (ticdelay==0)
@@ -1203,28 +1251,41 @@ void PreCache( void )
                }
             }
          }
+	  StrechScreen=false;//bna++
+	  VW_UpdateScreen ();//bna++
+	  //I_Delay(200);
       bufferofs=tempbuf;
       ShutdownPreCache ();
 
       if ( BATTLEMODE )
          {
          int width,height;
-         char buf[30];
+         char buf[30];//byte * shape;
+		double WHratio = 16200/200;
+		WHratio = WHratio/100;
+///	iGLOBAL_SCREENWIDTH = 640;
+//	iGLOBAL_SCREENHEIGHT = 480;
+StrechScreen=false;
 
-         CurrentFont = smallfont;
+	// Cache in fonts
+//	shape = W_CacheLumpNum (W_GetNumForName ("newfnt1"), PU_STATIC, Cvt_font_t, 1);
+//	bigfont = (font_t *)shape;
+         CurrentFont = newfont1;//smallfont;
+
          strcpy( buf, "Press Any Key" );
          US_MeasureStr (&width, &height, &buf[ 0 ] );
-         PrintX = (320-width) / 2;
-         PrintY = 162;
-         VWB_TBar (PrintX-2, PrintY-2, width+4, height+4);
+         PrintX = (iGLOBAL_SCREENWIDTH-(width)) / 2;
+         PrintY = WHratio*iGLOBAL_SCREENHEIGHT;//162;
+         //VWB_TBar (PrintX-2, PrintY-2, width+4, height+4);
          US_BufPrint (&buf[0]);
+
          VW_UpdateScreen();
 
          IN_StartAck();
          while (!IN_CheckAck ())
             ;
          }
-
+ //  StrechScreen=true;
 #if (DEVELOPMENT == 1)
       tempbuf=bufferofs;
       bufferofs=displayofs;

@@ -100,14 +100,14 @@ void VW_DrawClippedString (int x, int y, const char *string)
       source = ((byte *)CurrentFont)+CurrentFont->charofs[ch];
       while (width--)
          {
-         if ((x>=0) && (x<MAXSCREENWIDTH))
+         if ((x>=0) && (x<iGLOBAL_SCREENWIDTH))
             {
             y=oy;
             VGAWRITEMAP(x&3);
             height = ht;
             while (height--)
                {
-               if ((y>=0) && (y<MAXSCREENHEIGHT))
+               if ((y>=0) && (y<iGLOBAL_SCREENHEIGHT))
                   {
                   if (*source>0)
 #ifdef DOS
@@ -1494,28 +1494,25 @@ byte GetIntensityColor (byte pix)
 //
 //******************************************************************************
 
-void DrawIntensityChar
-   (
-   char ch
-   )
-
+void DrawIntensityChar  ( char ch )
    {
+
    byte  pix;
-   int   width;
-   int   height;
+   int   px1,py1;
+   int   width,w1;
+   int   height,h1;
    int   ht;
-   byte  *source;
+   byte  *source,*src1;
    byte  *dest;
-   byte  *origdest;
+   byte  *origdest,*orgdst1;
    int   mask;
+
+   px1 = px;py1 = py;
 
    ht = IFont->height;
 
-#ifdef DOS
-   origdest = ( byte * )( bufferofs + ylookup[ py ] + ( px >> 2 ) );
-#else
    origdest = ( byte * )( bufferofs + ylookup[ py ] + px );
-#endif
+
    dest = origdest;
 
    ch -= 31;
@@ -1524,37 +1521,62 @@ void DrawIntensityChar
 
    mask = 1 << ( px & 3 );
 
-   while( width-- )
-      {
-      VGAMAPMASK( mask );
+   if ((iGLOBAL_SCREENWIDTH <= 320)||(StrechScreen == true)){
+	   while( width-- )
+	   {
+		  VGAMAPMASK( mask );
 
-      height = ht;
-      while( height-- )
-         {
-         pix = *source;
-         if ( pix != 0xFE )
-            {
-            *dest = GetIntensityColor( pix );
-            }
+		  height = ht;
+		  while( height-- )
+			 {
+			 pix = *source;
+			 if ( pix != 0xFE )
+				{
+				*dest = GetIntensityColor( pix );
+				}
 
-         source++;
-         dest += linewidth;
-         }
+			 source++;
+			 dest += linewidth;
+			 }
 
-      px++;
-#ifdef DOS
-      mask <<= 1;
-      if ( mask == 16 )
-         {
-         mask = 1;
-         origdest++;
-         }
-#else
-      origdest++;
-#endif
-      dest = origdest;
-      }
-   }
+		  px++;
+		  origdest++;
+		  dest = origdest;
+	   }
+	}else{//strech letter in x any direction
+	   w1 = width;
+	   h1 = ht;
+	   orgdst1 = origdest;
+	   src1 = source;
+	   while( width-- )
+	   {
+		  VGAMAPMASK( mask );
+
+		  height = ht;
+		  while( height-- )
+			 {
+			 pix = *source;
+			 if ( pix != 0xFE )
+				{
+				*dest = GetIntensityColor( pix );
+				*(dest+iGLOBAL_SCREENWIDTH) = GetIntensityColor( pix );
+
+				*(dest+1) = GetIntensityColor( pix );
+				*(dest+1+iGLOBAL_SCREENWIDTH) = GetIntensityColor( pix );
+				}
+
+			 source++;
+			 dest += linewidth*2;
+			 }
+
+		  px++;px++;
+		  origdest++;origdest++;
+		  dest = origdest;
+	   }
+
+	}
+
+}
 
 
 //******************************************************************************
@@ -1614,14 +1636,33 @@ void DrawIString (unsigned short int x, unsigned short int y, const char *string
                temp = *string++;
                temp = toupper (temp);
 
-               // Force fontcolor to a specific color
+               // Force fontcolor to a specific color egacolor[ RED ];
                if (temp == 'N')
                {
                   temp         = *string++;
                   fontcolor    = GetColor (temp);
                   oldfontcolor = fontcolor;
                }
-
+			   //bna added
+               else if (temp == 'X')
+               {
+				  temp         = *string;
+                  fontcolor    = egacolor[ RED ];
+                  oldfontcolor = fontcolor;
+               }
+               else if (temp == 'Y')
+               {
+				   temp         = *string;
+                  fontcolor    = egacolor[ YELLOW ];
+                  oldfontcolor = fontcolor;
+               }
+               else if (temp == 'Z')
+               {
+				   temp         = *string;
+                  fontcolor    = egacolor[ GREEN ];
+                  oldfontcolor = fontcolor;
+               }
+			   //bna added end
                // Restore fontcolor to a previous color
                else if (temp == 'O')
                {

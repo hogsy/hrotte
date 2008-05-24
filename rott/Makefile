@@ -105,7 +105,8 @@ rott: 	\
 	z_zone.o \
 	byteordr.o \
 	dukemusc.o \
-	audiolib/audiolib.a
+	audiolib/audiolib.a \
+	winrott.o
 	$(CC) $^ $(LDLIBS) -o $@
 
 clean:

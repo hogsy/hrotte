@@ -44,6 +44,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <ctype.h>
 //MED
 #include "memcheck.h"
+#include "w_wad.h"
+
+extern int		iDemoNames;
+extern int iG_aimCross;
+
+
+extern void DisplayMessage   (int num,int position);
 
 
 typedef struct {
@@ -127,6 +134,8 @@ enum
    WEAPONFIREWALLALT,         // give firewall
 	WEAPONGOD,                 // give godhand
 	WEAPONGODALT,              // give godhand
+	AIMCROSS,                 // bna++
+	AIMCROSSALT,              // give bna++
 
 #if (SHAREWARE == 0)
 
@@ -156,7 +165,7 @@ enum
    MAXCODES
 };
 
-CodeStruct Codes[MAXCODES + 4] =
+CodeStruct Codes[MAXCODES + 6] =
 {
 	{"KCITSPID",    8},        // enable cheats
 	{"CCE\\",       4},        // enable cheats
@@ -214,11 +223,11 @@ CodeStruct Codes[MAXCODES + 4] =
 	{"PFO\\",       4},        // all keys, armor, 100% health, MP40, heatseek
 	{"EM68",        4},        // kill player
 	{"EID\\",       4},        // kill player
-	{"NEER",        4},        // re-enter level
+	{"REEN",        4},        // re-enter level
 	{"LER\\",       4},        // re-enter level
    {"OOWNHOJ",     7},        // give double pistol
 	{"2WG\\",       4},        // give double pistol
-	{"MEGULP",      6},        // give mp40
+	{"EMGULP",      6},        // give mp40
 	{"3WG\\",       4},        // give mp40
 	{"ALLINAV",     7},        // give bazooka
 	{"4WG\\",       4},        // give bazooka
@@ -232,6 +241,10 @@ CodeStruct Codes[MAXCODES + 4] =
 	{"8WG\\",       4},        // give firewall
 	{"AYEES",       5},        // give god hand
    {"9WG\\",       4},        // give god hand
+	{"MIA",       3},        // give aim bna++
+   {"MIA\\",       4},        // give aim bna++
+
+
 
 #if (SHAREWARE == 0)
 
@@ -370,7 +383,7 @@ void DoGodMode (void)
 =
 ================
 */
-
+#include "byteordr.h"//bna++
 void DoWarp (void)
 {
 /*
@@ -410,6 +423,10 @@ void DoWarp (void)
 
    int level;
 
+
+	StrechScreen=true;//bna++ shut on streech mode
+
+
    MU_StoreSongPosition();
    MU_StartSong( song_secretmenu);
    StopWind();
@@ -423,6 +440,18 @@ void DoWarp (void)
    CleanUpControlPanel();
    ShutdownMenuBuf();
 
+   	//bna++ section
+  if (( playstate == ex_stillplaying )&&(iGLOBAL_SCREENWIDTH > 320)){
+		pic_t *shape;
+		shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
+		DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );
+		StrechScreen=false;//dont strech when we go BACK TO GAME
+		DrawPlayScreen(true);//repaint ammo and life stat
+		VW_UpdateScreen ();//update screen
+  }
+   //bna section end
+
+	StrechScreen=true;//bna++ shut on streech mode
    while( Keyboard[ sc_Escape ] )
       {
 		IN_UpdateKeyboard();
@@ -446,6 +475,7 @@ void DoWarp (void)
       }
    else
       {
+	   StrechScreen=false;//dont strech when we go BACK TO GAME
       SetupScreen(true);
       }
 
@@ -460,12 +490,12 @@ void DoWarp (void)
 ================
 */
 
-void DoJukeBox
-   (
-   void
-   )
+void DoJukeBox  (void)
 
    {
+	if (iGLOBAL_SCREENWIDTH > 320) {
+		StrechScreen=true;//bna++ shut on streech mode
+	}
    StopWind();
    ShutdownClientControls();
 
@@ -476,6 +506,17 @@ void DoJukeBox
 
    CleanUpControlPanel();
    ShutdownMenuBuf();
+
+   	//bna++ section
+  if (( playstate == ex_stillplaying )&&(iGLOBAL_SCREENWIDTH > 320)){
+		pic_t *shape;
+		shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
+		DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );
+		StrechScreen=false;//dont strech when we go BACK TO GAME
+		DrawPlayScreen(true);//repaint ammo and life stat
+		VW_UpdateScreen ();//update screen
+  }
+   //bna section end
 
    SetupScreen(true);
 
@@ -666,6 +707,7 @@ void DoShroomsModePowerup (void)
 
 void RestartNormal (void)
 {
+	StrechScreen=true;//bna
 	DoNormalThing ();
 
    AddMessage ("Restart to level 1", MSG_CHEAT);
@@ -995,6 +1037,7 @@ void EndDemo ( void )
 	IN_ClearKeyboardQueue ();
 
    StartupClientControls();
+   StrechScreen = false;
 }
 
 
@@ -1039,8 +1082,9 @@ void RecordDemoQuery ( void )
       if ((level > 0) && (level < 9))
 #endif
          {
-         gamestate.mapon = level-1;
-         playstate = ex_demorecord;
+			StrechScreen=true;//bna
+			 gamestate.mapon = level-1;
+			 playstate = ex_demorecord;
          }
       }
 
@@ -1095,6 +1139,8 @@ void PlaybackDemoQuery ( void )
    IN_ClearKeyboardQueue ();
 
    StartupClientControls();
+
+   StrechScreen = true;
 }
 
 /*
@@ -1442,6 +1488,19 @@ void CheckCode (int which)
          case FANDCONALT:
             FloorandCeiling (true);
          break;
+
+
+         case AIMCROSS:
+         case AIMCROSSALT:
+            if (iG_aimCross == 0) {
+			    iG_aimCross = 1;
+				AddMessage("Crosshair on",MSG_GAME);
+			}else{
+				iG_aimCross = 0;
+				AddMessage("Crosshair off",MSG_GAME);
+			}
+         break;
+
 
          case BULLETARMOR:
          case BULLETARMORALT:

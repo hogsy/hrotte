@@ -75,21 +75,25 @@ byte *   mr_src;
 
 static byte     *floor;
 static byte     *ceiling;
-static int xstarts[MAXVIEWHEIGHT];
+//static int xstarts[MAXVIEWHEIGHT];
+static int xstarts[600];//set to max hight res
 static byte * skysegs[MAXSKYSEGS];
 static byte * skydata[MAXSKYDATA];
 static int      horizonheight;
 static int      centerskypost;
 static int      oldsky=-1;
 
+
+//bna fixit skyerror by 800x600 clouds not big enough
+
 void DrawSky( void )
 {
 
    byte * src;
    int dest;
-   int plane;
+//   int plane;
    int height;
-   int height2;
+//   int height2;
    int ang;
    int angle;
    int ofs;
@@ -106,11 +110,11 @@ void DrawSky( void )
       {
       ofs=centerskypost;
       }
-   else if (((centerskypost-ofs)+viewheight)>399)
+   else if (((centerskypost-ofs)+viewheight)>1799)
       {
-      ofs=-(399-(centerskypost+viewheight));
+      ofs=-(1799-(centerskypost+viewheight));
       }
-
+//ofs=centerskypost;
 #ifdef DOS
    if (doublestep>0)
       {
@@ -200,9 +204,9 @@ void DrawFullSky( void )
       {
       ofs=centerskypost;
       }
-   else if (((centerskypost-ofs)+viewheight)>399)
+   else if (((centerskypost-ofs)+viewheight)>599)
       {
-      ofs=-(399-(centerskypost+viewheight));
+      ofs=-(599-(centerskypost+viewheight));
       }
 
    bufferofs+=screenofs;
@@ -269,16 +273,23 @@ void MakeSkyData ( void )
    byte * ptr;
    int c;
 
-   temp=SafeMalloc(256*400);
+   temp=SafeMalloc(256*800);
 
    ptr=temp;
 
    for (c=0;c<256;c++)
       {
+
       memcpy(ptr,skydata[1]+(c*200),200);
       ptr+=200;
+ 
       memcpy(ptr,skydata[0]+(c*200),200);
       ptr+=200;
+
+      //memcpy(ptr,skydata[1]+(c*200),200);
+      //ptr+=200;
+      //memcpy(ptr,skydata[0]+(c*200),200);
+      //ptr+=200;
       }
    skydata[0]=temp;
 }
@@ -425,7 +436,7 @@ void SetPlaneViewSize (void)
 	else
 	 ceilingnum = MAPSPOT(1,0,0)-197;
 
-	floornum = MAPSPOT(0,0,0)-179;
+	floornum = MAPSPOT(0,0,0)-(179);
 
    floornum = GetFloorCeilingLump ( floornum );
    //ceilingnum = GetFloorCeilingLump ( ceilingnum );

@@ -644,9 +644,9 @@ void DrawFullMap( void )
 #endif
 
 #ifdef DOS
-      for (mapy=0;mapy<mapheight;mapy++,buf+=SCREENBWIDE)
+      for (mapy=0;mapy<mapheight;mapy++,buf+=iGLOBAL_SCREENBWIDE)
 #else
-      for (mapy=0;mapy<mapheight;mapy++,buf+=MAXSCREENWIDTH)
+      for (mapy=0;mapy<mapheight;mapy++,buf+=iGLOBAL_SCREENWIDTH)
 #endif
          {
          if ((mapx==player->tilex ) && (mapy==player->tiley))
@@ -898,6 +898,7 @@ void DoMap (int cx, int cy)
    int quitkey;
    ControlInfo control;
 
+StrechScreen = true;//bna++
 
    ShutdownClientControls();
 
@@ -1035,6 +1036,16 @@ void DoMap (int cx, int cy)
      else if (y<-(yscale<<15))
         y=-(yscale<<15);
      }
+
+  if ( playstate == ex_stillplaying )	  {//bna++
+	   pic_t *shape;
+	   shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
+	   DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );//bna++
+	   StrechScreen=false;//dont strech when we go BACK TO GAME
+	   VW_UpdateScreen ();
+	   DrawPlayScreen(true);//repaint ammo and life stat
+
+  }
    while (Keyboard[quitkey])
       IN_UpdateKeyboard ();
 

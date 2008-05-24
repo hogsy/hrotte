@@ -287,14 +287,9 @@ void *Z_Malloc (int size, int tag, void *user)
 // scan through the block list looking for the first free block
 // of sufficient size, throwing out any purgable blocks along the way
 //
-        size += sizeof(memblock_t);     // account for size of block header
+//        size += sizeof(memblock_t);     // account for size of block header
+        size = (size + sizeof(memblock_t) + 3)&~3;     // account for size of block header
 
-#if defined(__sparc__)
-        /* ensure word alignment */
-        if (size % 4) {
-           size = size + (4 - size % 4);
-        }
-#endif
 
 //
 // if there is a free block behind the rover, back up over them
@@ -392,7 +387,8 @@ void *Z_LevelMalloc (int size, int tag, void *user)
 // scan through the block list looking for the first free block
 // of sufficient size, throwing out any purgable blocks along the way
 //
-        size += sizeof(memblock_t);     // account for size of block header
+//        size += sizeof(memblock_t);     // account for size of block header
+        size = (size + sizeof(memblock_t) + 3)&~3;     // account for size of block header
 
 
 //

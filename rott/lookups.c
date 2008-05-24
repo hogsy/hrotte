@@ -118,7 +118,8 @@ void CalcPixelAngles ( void )
     for (i=0;i<PANGLES;i++)
        {
        // start 1/2 pixel over, so viewangle bisects two middle pixels
-       tang = ((((double)i*160.0)+80.0)/(FPFOCALWIDTH*(double)PANGLES));
+       //tang = ((((double)i*160.0)+80.0)/(FPFOCALWIDTH*(double)PANGLES));
+       tang = ((((double)i*160.0)+80.0)/(dGLOBAL_FPFOCALWIDTH*(double)PANGLES));
        angle = atan(tang);
        intang = ((long)(angle*radtoint));
        pangle[i] = intang;

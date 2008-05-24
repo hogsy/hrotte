@@ -66,6 +66,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //MED
 #include "memcheck.h"
 
+
+extern void VH_UpdateScreen (void);
+
+
+
+//int testval;
 /*
 =============================================================================
 
@@ -73,6 +79,10 @@ Global Variables                                                                
 
 =============================================================================
 */
+
+extern char *tmpPICbuf;
+extern char *sdl_surfacePTR;
+int iG_masked;
 
 int whereami=-1;
 
@@ -153,6 +163,8 @@ static int      pretics[3];
 static int      preindex;
 static int      netlump;
 static int      gmasklump;
+
+int      G_gmasklump;
 
 static const int weaponshape[NUMWEAPGRAPHICS] =
      {
@@ -274,6 +286,7 @@ void BuildTables (void)
    netlump=W_GetNumForName("net1");
 #endif
    gmasklump=W_GetNumForName("p_gmask");
+   G_gmasklump = gmasklump;
 
    preindex=0;
    pretics[0]=0x10000;
@@ -2928,29 +2941,30 @@ void TurnShakeOff
    OUTP (CRTC_INDEX, CRTC_STARTLOW);
    OUTP (CRTC_DATA, (displayofs&0x000000FF));
 //   _enable();
+   SHAKETICS = 0xFFFF;
    }
 
 //******************************************************************************
 //
 // DrawScaledScreen
-//
+// draw sreen after reentering fro restore game
 //******************************************************************************
 
 void DrawScaledScreen(int x, int y, int step, byte * src)
 {
     int     xfrac;
     int     yfrac;
-    int     plane;
+//    int     plane;
     int     i,j;
     byte    * p;
     byte    * buf;
     int     xsize;
     int     ysize;
 
-    xsize=(320<<16)/step;
-    if (xsize>320) xsize=320;
-    ysize=(200<<16)/step;
-    if (ysize>200) ysize=200;
+    xsize=(iGLOBAL_SCREENWIDTH<<16)/step;
+    if (xsize>iGLOBAL_SCREENWIDTH) xsize=iGLOBAL_SCREENWIDTH;
+    ysize=(iGLOBAL_SCREENHEIGHT<<16)/step;
+    if (ysize>iGLOBAL_SCREENHEIGHT) ysize=iGLOBAL_SCREENHEIGHT;
 
 #ifdef DOS
     for (plane=x;plane<x+4;plane++)
@@ -2962,7 +2976,7 @@ void DrawScaledScreen(int x, int y, int step, byte * src)
 #endif
        for (j=y;j<y+ysize;j++)
           {
-          p=src+(320*(yfrac>>16));
+          p=src+(iGLOBAL_SCREENWIDTH*(yfrac>>16));
 #ifdef DOS
           buf=(byte *)bufferofs+ylookup[j]+(plane>>2);
 #else
@@ -3010,7 +3024,12 @@ void DoLoadGameSequence ( void )
    int time;
    int i;
    byte * destscreen;
+   pic_t *shape;//bna++
+   
+   
 
+   
+   
    fizzlein=false;
    x=(18+SaveGamePicX)<<16;
    y=(30+SaveGamePicY)<<16;
@@ -3020,10 +3039,11 @@ void DoLoadGameSequence ( void )
    dy=(-y)/time;
    ds=-((s-0x1000000)/time);
 
-   destscreen=SafeMalloc(64000);
+   destscreen=SafeMalloc(64000*8);//bna fixme
 
    SetupScreen(false);
    ThreeDRefresh();
+
    FlipPage();
    FlipPage();
 
@@ -3042,12 +3062,20 @@ void DoLoadGameSequence ( void )
       if (y<0) y=0;
       s+=(ds*tics);
       }
+
    DrawScaledScreen(0,0,0x10000,destscreen);
    FlipPage();
    VL_CopyDisplayToHidden ();
    SafeFree(destscreen);
    CalcTics();
    CalcTics();
+   	//bna++ section
+   shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
+   DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );//bna++
+   DrawPlayScreen(false);
+   StrechScreen = false;
+   SHAKETICS = 0xFFFF;
+   //bna section end
 }
 
 //******************************************************************************
@@ -3059,33 +3087,93 @@ byte * RotatedImage;
 boolean RotateBufferStarted = false;
 void StartupRotateBuffer ( int masked)
 {
-   int i,a,b;
+	int k;////zxcv
+   int a,b;
+
+//   int Xres = 320;//org
+//   int Yres = 200;//org
+   int   Xres =   iGLOBAL_SCREENWIDTH;//bna val 800
+   int   Yres = iGLOBAL_SCREENHEIGHT;//bna val 600
+
+
+   iG_masked = masked;
 
    if (RotateBufferStarted == true)
       return;
 
    RotateBufferStarted = true;
 
-   RotatedImage=SafeMalloc(131072);
-   if (masked==0)
-      memset(RotatedImage,0,131072);
-   else
-      memset(RotatedImage,0xff,131072);
-#ifdef DOS
-   for (i=0;i<4;i++)
-#endif
-      {
-      VGAREADMAP(i);
-      for (a=0;a<200;a++)
-#ifdef DOS
-         for (b=0;b<80;b++)
-            *(RotatedImage+99+i+((a+28)<<9)+(b<<2))=*((byte *)bufferofs+(a*linewidth)+b);
-#else
-         for (b=0;b<320;b++)
-            *(RotatedImage+99+((a+28)<<9)+b)=*((byte *)bufferofs+(a*linewidth)+b);
-#endif
-      }
+   //   RotatedImage=SafeMalloc(131072);org
+   //RotatedImage=SafeMalloc(131072*8);
+   if (iGLOBAL_SCREENWIDTH == 320) {
+		RotatedImage=SafeMalloc(131072);
+   }else if (iGLOBAL_SCREENWIDTH == 640) { 
+		RotatedImage=SafeMalloc(131072*4);
+   }else if (iGLOBAL_SCREENWIDTH == 800) { 
+		RotatedImage=SafeMalloc(131072*8);
+   }
+//SetupScreen(false);//used these 2 to test screen size
+//VW_UpdateScreen ();
+   if (masked==0) {
+	   if (iGLOBAL_SCREENWIDTH == 320) {
+		  memset(RotatedImage,0,131072);
+	   }else if (iGLOBAL_SCREENWIDTH == 640) { 
+		  memset(RotatedImage,0,131072*4);
+	   }else if (iGLOBAL_SCREENWIDTH == 800) { 
+		  //memset(RotatedImage,0,131072);//org
+		  memset(RotatedImage,0,131072*8);
+	   }
+   } else {
+	   if (iGLOBAL_SCREENWIDTH == 320) {
+		  memset(RotatedImage,0xff,131072);
+	   }else if (iGLOBAL_SCREENWIDTH == 640) { 
+		  memset(RotatedImage,0xff,131072*4);
+	   }else if (iGLOBAL_SCREENWIDTH == 800) { 
+		  memset(RotatedImage,0xff,131072*8);
+	   }
+   }
+      //memset(RotatedImage,0xff,131072);//org
+      //memset(RotatedImage,0xff,131072*8);
+
+      if ((masked == false)&&(iGLOBAL_SCREENWIDTH == 800)) {
+		StrechScreen = false;
+		// SetTextMode (  );
+
+		k=(28*512);//14336;
+		//k=((0+28)<<10);//28672
+		   for (a=0;a<iGLOBAL_SCREENHEIGHT;a++){
+			   for (b=0;b<iGLOBAL_SCREENWIDTH;b++){
+					//*(RotatedImage+99+((a+28)<<9)+b)   =   *((byte *)bufferofs+(a*linewidth)+b);
+					// 99 is some offset value
+					k = ((a+28)<<10);
+					*(RotatedImage+(k)+b)   =   *((byte *)bufferofs+(a*linewidth)+b);
+					//*(RotatedImage+b)   =   *((byte *)bufferofs+(a*linewidth)+b);
+			   }
+			   //k+=512*2;
+		   }
+	  }else if ((masked == false)&&(iGLOBAL_SCREENWIDTH == 640)) {
+		StrechScreen = false;
+		k=(28*512);//14336;
+		   for (a=0;a<iGLOBAL_SCREENHEIGHT;a++){
+			   for (b=0;b<iGLOBAL_SCREENWIDTH;b++){
+					k = ((a+28)<<10);
+					*(RotatedImage+(k)+b)   =   *((byte *)bufferofs+(a*linewidth)+b);
+			   }
+		   }
+
+	  }else if ((masked == true)||(iGLOBAL_SCREENWIDTH == 320)) {
+		  for (a=0;a<200;a++){
+			 for (b=0;b<320;b++)
+				*(RotatedImage+99+((a+28)<<9)+b)=*((byte *)bufferofs+(a*linewidth)+b);
+		  }
+	  }
+
 }
+/* copier liner af 1024 bredde
+a=0=14436 a=1=14848 a=2=15360 a=3=15872  -> 512 i difference
+*(RotatedImage+(512)+0) = bufferofs+(0*800)+0);
+*(RotatedImage+(512)+100) = bufferofs+(100*800)+0);
+*/
 
 //******************************************************************************
 //
@@ -3116,30 +3204,59 @@ void ScaleAndRotateBuffer (int startangle, int endangle, int startscale, int end
    int scale;
    int i;
 
+
+//bna section
+//   int Xh = 160;//org
+//   int Yh = 100;//org
+
+   int Xh = iGLOBAL_SCREENWIDTH/2;
+   int Yh = iGLOBAL_SCREENHEIGHT/2;
+ //  Xh = 259;
+ //  Yh = 109;
+
+   time = time;
+////zxcv
+	StrechScreen=false;//bna++
+
+
    anglestep=((endangle-startangle)<<16)/time;
    scalestep=((endscale-startscale)<<6)/time;
 
    angle=(startangle<<16);
+     
    scale=(startscale<<6);
 
    CalcTics();
    CalcTics();
    for (i=0;i<time;i+=tics)
-      {
-      DrawRotatedScreen(160,100, (byte *)bufferofs,(angle>>16)&(FINEANGLES-1),scale>>6,0);
+      {//zxcv
+      DrawRotatedScreen(Xh,Yh, (byte *)bufferofs,(angle>>16)&(FINEANGLES-1),scale>>6,0);
       FlipPage();
       scale+=(scalestep*tics);
       angle+=(anglestep*tics);
       CalcTics();
       }
-   DrawRotatedScreen(160,100, (byte *)bufferofs,endangle&(FINEANGLES-1),endscale,0);
+
+   DrawRotatedScreen(Xh,Yh, (byte *)bufferofs,endangle&(FINEANGLES-1),endscale,0);
    FlipPage();
-   DrawRotatedScreen(160,100, (byte *)bufferofs,endangle&(FINEANGLES-1),endscale,0);
+   DrawRotatedScreen(Xh,Yh, (byte *)bufferofs,endangle&(FINEANGLES-1),endscale,0);
    FlipPage();
-   DrawRotatedScreen(160,100, (byte *)bufferofs,endangle&(FINEANGLES-1),endscale,0);
+   DrawRotatedScreen(Xh,Yh, (byte *)bufferofs,endangle&(FINEANGLES-1),endscale,0);
    CalcTics();
    CalcTics();
+   //I_Delay (240);//bna++
+   	//bna++ section
+  if ( playstate == ex_stillplaying )	  {//bna++
+	   pic_t *shape;
+	   shape =  ( pic_t * )W_CacheLumpName( "backtile", PU_CACHE, Cvt_pic_t, 1 );
+	   DrawTiledRegion( 0, 16, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT - 32, 0, 16, shape );//bna++
+	   StrechScreen=false;//dont strech when we go BACK TO GAME
+	   DrawPlayScreen(true);//repaint ammo and life stat
+  }
 }
+   //bna section end
+
+
 
 //******************************************************************************
 //
@@ -3173,60 +3290,70 @@ void RotateBuffer (int startangle, int endangle, int startscale, int endscale, i
 //******************************************************************************
 
 void DrawRotatedScreen(int cx, int cy, byte *destscreen, int angle, int scale, int masked)
-{
+{//ZXCV
    int     c, s;
    int     xst, xct;
    int     y;
-   int     plane;
-   byte    * screen;
 
+   byte    * screen;
+   //int Xres = 320;//old value
+   //int Yres = 200;//old val
+
+   int Xr = iGLOBAL_SCREENWIDTH;//640;
+   int Yr = (iGLOBAL_SCREENHEIGHT);//400; //bna aaaa fix
+
+//	   SetTextMode (  );
    c = FixedMulShift(scale,costable[angle],11);
    s = FixedMulShift(scale,sintable[angle],11);
-   xst = (((-cx)*s)+(128<<16))-(cy*c);
-   xct = (((-cx)*c)+(256<<16)+(1<<18)-(1<<16))+(cy*s);
-#ifdef DOS
-   mr_xstep=s<<2;
-   mr_ystep=c<<2;
-#else
+
+//   c = c/2; //these values are to rotate degres or?
+//   s = s/2;
+//   xst & xct= start center values ;
+   if ((iGLOBAL_SCREENWIDTH == 320 )||(masked == true)) {
+	   xst = (((-cx)*s)+(128<<16))-(cy*c);
+	   xct = (((-cx)*c)+(256<<16)+(1<<18)-(1<<16))+(cy*s);
+   }
+   else if ((iGLOBAL_SCREENWIDTH == 640 )&&(masked == false)) {
+	   xst = (((-cx)*s)+((268)<<16))-(cy*c);
+	   xct = (((-cx)*c)+((317)<<16)+(1<<18)-(1<<16))+(cy*s);
+   }//y=268;x=317
+   else if ((iGLOBAL_SCREENWIDTH == 800 )&&(masked == false)) {
+	   xst = (((-cx)*s)+((328)<<16))-(cy*c);
+	   xct = (((-cx)*c)+((397)<<16)+(1<<18)-(1<<16))+(cy*s);
+   }//328 397
+
    mr_xstep=s;
    mr_ystep=c;
-#endif
-   screen=destscreen;
+
+  
+   if ((iGLOBAL_SCREENWIDTH == 800)&&(masked==0)) {
+        screen=destscreen+iGLOBAL_SCREENWIDTH;//bna aaaa fix
+   }else{
+		screen=destscreen;
+   }
 
    if (masked==0)
       {
-#ifdef DOS
-      for (plane=0;plane<4;plane++,xst+=s,xct+=c)
-#endif
-         {
+		 // paint hole 800x600 screen
+		 { 
          mr_yfrac=xct;
          mr_xfrac=xst;
          VGAWRITEMAP(plane);
-         for (y=0; y<200; y++,mr_xfrac+=c,mr_yfrac-=s)
-#ifdef DOS
-            DrawRotRow(((320-plane)>>2)+1,screen+ylookup[y]+(plane>>2),RotatedImage);
-#else
-            DrawRotRow(320,screen+ylookup[y],RotatedImage);
-#endif
+         for (y=0; y<Yr; y++,mr_xfrac+=c,mr_yfrac-=s)
+            DrawRotRow(Xr,screen+ylookup[y],RotatedImage);
          }
       }
    else
       {
-#ifdef DOS
-      for (plane=0;plane<4;plane++,xst+=s,xct+=c)
-#endif
          {
          mr_yfrac=xct;
          mr_xfrac=xst;
          VGAWRITEMAP(plane);
-         for (y=0; y<200; y++,mr_xfrac+=c,mr_yfrac-=s)
-#ifdef DOS
-            DrawMaskedRotRow(((320-plane)>>2)+1,screen+ylookup[y]+(plane>>2),RotatedImage);
-#else
-            DrawMaskedRotRow(320,screen+ylookup[y],RotatedImage);
-#endif
+         for (y=0; y<Yr; y++,mr_xfrac+=c,mr_yfrac-=s)
+            DrawMaskedRotRow(Xr,screen+ylookup[y],RotatedImage);
          }
       }
+
 }
 
 
@@ -3346,8 +3473,14 @@ void ApogeeTitle (void)
          goto apogeeexit;
       }
 
+ //  I_Delay(65); //bna added
 apogeeexit:
+
+   VL_ClearBuffer (bufferofs, 0); //bna added
+   MenuFadeOut(); //bna added
+   VH_UpdateScreen (); //bna added
    ShutdownRotateBuffer ();
+
 }
 
 #if (SHAREWARE==0)
@@ -3498,6 +3631,16 @@ void StartupScreenSaver ( void )
    ScreenSaver=(screensaver_t *)SafeMalloc(sizeof(screensaver_t));
    ScreenSaver->phase=0;
    ScreenSaver->pausetime=PAUSETIME;
+   if (iGLOBAL_SCREENWIDTH == 320){
+		ScreenSaver->pausex=120;
+		ScreenSaver->pausey=84;
+   }else if (iGLOBAL_SCREENWIDTH == 640){
+		ScreenSaver->pausex=240;
+		ScreenSaver->pausey=201;
+   }else if (iGLOBAL_SCREENWIDTH == 800){
+		ScreenSaver->pausex=300;
+		ScreenSaver->pausey=252;
+   }
    ScreenSaver->pausex=120;
    ScreenSaver->pausey=84;
    SetupScreenSaverPhase();
@@ -3517,6 +3660,9 @@ void ShutdownScreenSaver ( void )
 
    ShutdownRotateBuffer ();
    SafeFree(ScreenSaver);
+   	//bna section 
+   StartupClientControls();
+		   
 }
 
 //******************************************************************************
@@ -3529,6 +3675,7 @@ void ShutdownScreenSaver ( void )
 #define MAXSPEED  8
 void UpdateScreenSaver ( void )
 {
+	//StrechScreen = true;
    if (ScreenSaver->time!=-1)
       {
       ScreenSaver->time-=tics;
@@ -3548,9 +3695,9 @@ void UpdateScreenSaver ( void )
       ScreenSaver->dx=abs(ScreenSaver->dx);
       ScreenSaver->dy+=(RandomNumber("Rotate",0)>>6)-2;
       }
-   else if (ScreenSaver->x>320-SPINSIZE)
+   else if (ScreenSaver->x>iGLOBAL_SCREENWIDTH-SPINSIZE)
       {
-      ScreenSaver->x=320-SPINSIZE;
+      ScreenSaver->x=iGLOBAL_SCREENWIDTH-SPINSIZE;
       ScreenSaver->dx=-(abs(ScreenSaver->dx));
       ScreenSaver->dy+=(RandomNumber("Rotate",0)>>6)-2;
       }
@@ -3560,9 +3707,9 @@ void UpdateScreenSaver ( void )
       ScreenSaver->dy=abs(ScreenSaver->dy);
       ScreenSaver->dx+=(RandomNumber("Rotate",0)>>6)-2;
       }
-   else if (ScreenSaver->y>200-SPINSIZE)
+   else if (ScreenSaver->y>iGLOBAL_SCREENHEIGHT-SPINSIZE)
       {
-      ScreenSaver->y=200-SPINSIZE;
+      ScreenSaver->y=iGLOBAL_SCREENHEIGHT-SPINSIZE;
       ScreenSaver->dy=-(abs(ScreenSaver->dy));
       ScreenSaver->dx+=(RandomNumber("Rotate",0)>>6)-2;
       }
@@ -3577,11 +3724,19 @@ void UpdateScreenSaver ( void )
 
    ScreenSaver->pausetime-=tics;
    if (ScreenSaver->pausetime<=0)
-      {
+   {
       ScreenSaver->pausetime=PAUSETIME;
-      ScreenSaver->pausex=RandomNumber ("pausex",0)%240;
-      ScreenSaver->pausey=RandomNumber ("pausey",0)%168;
-      }
+	  if (iGLOBAL_SCREENWIDTH == 320){
+		  ScreenSaver->pausex=RandomNumber ("pausex",0)%240;
+		  ScreenSaver->pausey=RandomNumber ("pausey",0)%168;
+      }else if (iGLOBAL_SCREENWIDTH == 640){
+		  ScreenSaver->pausex=RandomNumber ("pausex",0)%480;
+		  ScreenSaver->pausey=RandomNumber ("pausey",0)%403;
+	  }else if (iGLOBAL_SCREENWIDTH == 800){
+		  ScreenSaver->pausex=RandomNumber ("pausex",0)%600;
+		  ScreenSaver->pausey=RandomNumber ("pausey",0)%504;
+	  }
+   }
    DrawPauseXY (ScreenSaver->pausex, ScreenSaver->pausey);
 
    FlipPage();
@@ -3958,10 +4113,10 @@ void DoZIntro (void)
 
 void DrawBackground ( byte * bkgnd )
 {
-   int plane;
+//   int plane;
    int size;
 
-   size=linewidth*200;
+   size=linewidth*400;
 
 #ifdef DOS
    for (plane=0;plane<4;plane++)
@@ -3982,10 +4137,10 @@ void DrawBackground ( byte * bkgnd )
 
 void PrepareBackground ( byte * bkgnd )
 {
-   int plane;
+//   int plane;
    int size;
 
-   size=linewidth*200;
+   size=linewidth*400;
 
 #ifdef DOS
    for (plane=0;plane<4;plane++)
@@ -4212,10 +4367,10 @@ void DoEndCinematic ( void )
    int i;
 
    byte pal[768];
+	StrechScreen = true;
 
-
-   viewwidth = MAXSCREENWIDTH;
-   viewheight = MAXSCREENHEIGHT;
+   viewwidth = 320;//MAXSCREENWIDTH;
+   viewheight = 200;//MAXSCREENHEIGHT;
 
    MU_StartSong(song_youwin);
 
@@ -5377,8 +5532,10 @@ void DIPCredits ( void )
 
 void DoEndCinematic ( void )
 {
-   viewwidth = MAXSCREENWIDTH;
-   viewheight = MAXSCREENHEIGHT;
+	StrechScreen = true;
+
+   viewwidth = 320;//MAXSCREENWIDTH;
+   viewheight = 200;//MAXSCREENHEIGHT;
    MU_FadeOut ( 1000 );
    MU_StopSong ();
 
@@ -5611,13 +5768,16 @@ void DoCreditScreen ( void )
    byte * bkgnd;
    font_t * oldfont;
    int i;
-
-   viewwidth = MAXSCREENWIDTH;
-   viewheight = MAXSCREENHEIGHT;
+	StrechScreen = true;
+   viewwidth = 320;//MAXSCREENWIDTH;
+   viewheight = 200;//MAXSCREENHEIGHT;
 
    bkgnd=SafeMalloc(800*linewidth);
+
    trilogo=W_GetNumForName("trilogo");
    VL_DrawPostPic (trilogo);
+//  SetTextMode (  );
+
    PrepareBackground ( bkgnd );
 
    oldfont=CurrentFont;
@@ -5711,7 +5871,7 @@ void DoMicroStoryScreen ( void )
 
    FlipPage();
    MenuFadeIn();
-   I_Delay (280);
+   I_Delay (100);//240
 
    VL_FadeOut (0, 255, 0, 0, 0, 20);
 }
@@ -5743,22 +5903,85 @@ void  DrawMapPost (int height, byte * src, byte * buf)
 void DrawRotRow(int count, byte * dest, byte * src)
 {
 	unsigned eax, ecx, edx;
+//	unsigned a, b, c,d;
+	 byte * srctmp;
+	 byte * desttmp;
 
 	ecx = mr_yfrac;
 	edx = mr_xfrac;
 
-	while (count--) {
-		eax = edx >> 16;
-		if (eax < 256 && (ecx >> 16) < 512) {
-			eax = (eax << 9) | ((ecx << 7) >> (32-9));
+	if ((iGLOBAL_SCREENWIDTH == 320)||(iG_masked==true))  
+	{
+		while (count--) {
+			eax = edx >> 16;
+			if (eax < 256 && (ecx >> 16) < 512) {
+				eax = (eax << 9) | ((ecx << 7) >> (32-9));
+			} else {
+				eax = 0;
+			}
+			
+			*dest++ = src[eax];
+			
+			edx += mr_xstep;
+			ecx += mr_ystep;
+		}
+	}else if (iGLOBAL_SCREENWIDTH == 640) {
+		while (count--) {
+			eax = edx >> 16;
+			if (eax < (256*2.0) && (ecx >> 16) < (512*1.8)) {
+				eax = (eax << 10) | ((ecx << 6) >> (32-10));
+			} else {
+				eax = 0;
+			}
+			
+			*dest++ = src[eax];
+			
+			edx += mr_xstep;
+			ecx += mr_ystep;
+		}
+	}else if (iGLOBAL_SCREENWIDTH == 800) {
+
+
+
+	srctmp = src;
+	desttmp = dest;
+
+	desttmp -= (iGLOBAL_SCREENWIDTH*1);
+
+	ecx = mr_yfrac;
+	edx = mr_xfrac;
+	//count = 800
+//zxcv
+	while (count--) { 
+		eax = edx >> 16;//edx=4146069504 eax=63264  edx/eax = 65536->0x10000
+		 
+		//a=(eax << 9); //=eax*512
+		//a=(eax << 7); //=eax*128
+		//a=512|128; = 640;
+		//SetTextMode (  );
+		//a=(ecx >> 16);//ecx=4102225920 a=62595   ecx/65536 = 62595
+
+		//         Y-dir                    x-dir
+		if (eax < (256*2.5) && (ecx >> 16) < (512*2)) {
+			//eax = (eax << 9) | ((ecx << 7) >> (32-9));
+			eax = (eax << 10) | ((ecx << 6) >> (32-10));
+	/*		eax = (eax * 512*2) ;
+								//(23)
+			eax += 	 ((ecx ) >> (32-9));//ecx=196608
+			*/
 		} else {
 			eax = 0;
+
+			
 		}
-		
-		*dest++ = src[eax];
+ 		//desttmp -= centeroffset;	
+		*desttmp++ = srctmp[eax];
+		//*desttmp++ = srctmp[eax];
 		
 		edx += mr_xstep;
 		ecx += mr_ystep;
+	}
+
 	}
 }
 
@@ -5788,15 +6011,58 @@ void DrawMaskedRotRow(int count, byte * dest, byte * src)
 
 void DrawSkyPost (byte * buf, byte * src, int height)
 {
-	while (height--) {
-		*buf = shadingtable[*src];
-		
-		buf += linewidth;
-		src++;
+// bna fix for missing sky by high res eg 800x600
+// when sky is >400 (max skyheight) then reverse mouintain to missing spot
+// there should be 200 line of mouintain (400+200) = 600 height lines
+// not the best solution but what it works
+
+	if (iGLOBAL_SCREENWIDTH > 320){
+	// bna section start
+		//int n = 0;
+		int orgh = 0;//height;
+		if (height > 400){orgh=height;}
+
+		while (height--) {
+			if ((orgh > 0)&&( height<(orgh-400))){
+				src-=2;
+				*buf = shadingtable[*src];
+			}else{
+
+				*buf = shadingtable[*src];
+			}
+			buf += linewidth;
+			src++;
+		}
+	// bna section end
 	}
+	else {
+	// org code
+		while (height--) {
+			*buf = shadingtable[*src];
+			
+			buf += linewidth;
+			src++;
+		}
+	//	
+	}
+  
+	/*
+	int lw = linewidth * 2;
+	int h  = height;
+
+	while (h--) {
+		*(buf) = shadingtable[*src];
+		buf += lw;
+		*(buf) = shadingtable[*src];
+		buf += lw;
+		
+		//buf += lw;
+		src++;
+		
+	}*/
 }
 
-#define CEILINGCOLOR 24
+#define CEILINGCOLOR 24 //default color when no sky or floor
 #define FLOORCOLOR 32
 
 void RefreshClear (void)
@@ -5812,7 +6078,7 @@ void RefreshClear (void)
 	start = min(centery, viewheight);
 	
 	if (start > 0) {
-		VL_Bar(0, 0, MAXSCREENWIDTH, start, CEILINGCOLOR);
+		VL_Bar(0, 0, iGLOBAL_SCREENHEIGHT, start, CEILINGCOLOR);
 	} else {
 		start = 0;
 	}
@@ -5821,7 +6087,7 @@ void RefreshClear (void)
 	
 	start = min(viewheight-start, viewheight);
 	if (start > 0) {
-		VL_Bar(0, base, MAXSCREENWIDTH, start, FLOORCOLOR);
+		VL_Bar(0, base, iGLOBAL_SCREENHEIGHT, start, FLOORCOLOR);
 	}
 }
 
