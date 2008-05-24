@@ -1171,7 +1171,7 @@ short	KeepShort (short l)
 }
 
 
-long	SwapLong (long l)
+int	SwapLong (int l)
 {
 	byte	b1,b2,b3,b4;
 
@@ -1180,10 +1180,10 @@ long	SwapLong (long l)
 	b3 = (l>>16)&255;
 	b4 = (l>>24)&255;
 
-	return ((long)b1<<24) + ((long)b2<<16) + ((long)b3<<8) + b4;
+	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
 }
 
-long	KeepLong (long l)
+int	KeepLong (int l)
 {
 	return l;
 }
@@ -1194,7 +1194,7 @@ long	KeepLong (long l)
 #undef SwapShort
 #undef SwapLong
 
-void SwapIntelLong(long *l)
+void SwapIntelLong(int *l)
 {
     *l = IntelLong(*l);
 }
@@ -1204,7 +1204,7 @@ void SwapIntelShort(short *s)
     *s = IntelShort(*s);
 }
 
-void SwapIntelLongArray(long *l, int num)
+void SwapIntelLongArray(int *l, int num)
 {
     while (num--) {
         SwapIntelLong(l);

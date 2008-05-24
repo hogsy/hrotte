@@ -43,14 +43,14 @@ typedef struct
 typedef struct
 {
         short   RLEWtag;
-        long            headeroffsets[100];
+        int             headeroffsets[100];
         byte            tileinfo[1];
 } mapfiletype;
 
 
 typedef struct
 {
-		  long            planestart[3];
+        int   planestart[3];
         word  planelength[3];
         word  width,height;
         char            name[16];

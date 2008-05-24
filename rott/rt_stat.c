@@ -397,7 +397,7 @@ void TurnOffLight(int tilex,int tiley)
 }
 
 
-void ActivateLight(int light)
+void ActivateLight(long light)
 {statobj_t*tstat;
 
  tstat = (statobj_t*)light;
@@ -409,7 +409,7 @@ void ActivateLight(int light)
 }
 
 
-void DeactivateLight(int light)
+void DeactivateLight(long light)
 {statobj_t*tstat;
 
  tstat = (statobj_t*)light;

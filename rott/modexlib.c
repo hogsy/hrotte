@@ -45,12 +45,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int    linewidth;
 int    ylookup[MAXSCREENHEIGHT];
-int    page1start;
-int    page2start;
-int    page3start;
+byte  *page1start;
+byte  *page2start;
+byte  *page3start;
 int    screensize;
-unsigned bufferofs;
-unsigned displayofs;
+byte  *bufferofs;
+byte  *displayofs;
 boolean graphicsmode=false;
 
 #ifdef DOS
@@ -248,7 +248,7 @@ void VL_CopyPlanarPageToMemory ( byte * src, byte * dest )
 =
 =======================
 */
-void VL_CopyBufferToAll ( unsigned buffer )
+void VL_CopyBufferToAll ( byte *buffer )
 {
    int plane;
 
@@ -506,9 +506,9 @@ void VL_SetVGAPlaneMode ( void )
 
     screensize=MAXSCREENHEIGHT*MAXSCREENWIDTH;
 
-    page1start=(int)sdl_surface->pixels;
-    page2start=(int)sdl_surface->pixels;
-    page3start=(int)sdl_surface->pixels;
+    page1start=sdl_surface->pixels;
+    page2start=sdl_surface->pixels;
+    page3start=sdl_surface->pixels;
     displayofs = page1start;
     bufferofs = page2start;
     XFlipPage ();
@@ -570,7 +570,7 @@ void VL_CopyPlanarPageToMemory ( byte * src, byte * dest )
 =
 =======================
 */
-void VL_CopyBufferToAll ( unsigned buffer )
+void VL_CopyBufferToAll ( byte *buffer )
 {
 #ifdef DOS
    int plane;
@@ -611,7 +611,7 @@ void VL_CopyDisplayToHidden ( void )
 =================
 */
 
-void VL_ClearBuffer (unsigned buf, byte color)
+void VL_ClearBuffer (byte *buf, byte color)
 {
 #ifdef DOS
   VGAMAPMASK(15);

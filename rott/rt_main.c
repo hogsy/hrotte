@@ -962,7 +962,7 @@ void GameLoop (void)
                while ((!LastScan) && (!IN_GetMouseButtons()))
                   {
                   int i;
-                  unsigned tempbuf;
+                  byte *tempbuf;
                   MenuFadeOut();
                   ClearGraphicsScreen();
                   SetPalette(&dimpal[0]);

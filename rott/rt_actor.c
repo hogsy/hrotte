@@ -88,7 +88,7 @@ short             colheight[15];
 
 byte              deathshapeoffset[8] = {0,7,7,8,8,9,8,7};
 
-unsigned          MAXFUNCTION,MINFUNCTION,MAXSTATE,MINSTATE;
+unsigned long     MAXFUNCTION,MINFUNCTION,MAXSTATE,MINSTATE;
 
 objtype           *PLAYER0MISSILE;
 objtype           *SCREENEYE;
@@ -992,16 +992,16 @@ void A_Steal(objtype*ob)
 void FindAddresses(void)
 {
  int i;
- unsigned tstate,tfunct;
+ unsigned long tstate,tfunct;
 
- MINFUNCTION = 0xffffffff;
+ MINFUNCTION = -1l;
  MAXFUNCTION = 0x00000000;
- MINSTATE = 0xffffffff;
+ MINSTATE = -1l;
  MAXSTATE = 0x00000000;
 
  for(i=0;i<MAXSTATES;i++)
    {
-   tstate = (unsigned)(statetable[i]);
+   tstate = (unsigned long)(statetable[i]);
    if (tstate < MINSTATE)
       MINSTATE = tstate;
 
@@ -1009,7 +1009,7 @@ void FindAddresses(void)
       MAXSTATE = tstate;
    if (statetable[i]!=NULL)
       {
-      tfunct = (unsigned)(statetable[i]->think);
+      tfunct = (unsigned long)(statetable[i]->think);
       if (tfunct < MINFUNCTION)
          MINFUNCTION = tfunct;
 
@@ -1021,10 +1021,10 @@ void FindAddresses(void)
 
 void CheckBounds(objtype*ob)
 {
- unsigned tstate,tfunct;
+ unsigned long tstate,tfunct;
 
-  tstate = (unsigned)(ob->state);
-  tfunct = (unsigned)(ob->state->think);
+  tstate = (unsigned long)(ob->state);
+  tfunct = (unsigned long)(ob->state->think);
 
  if ((tfunct < MINFUNCTION) || (tfunct > MAXFUNCTION) ||
 	  (tstate < MINSTATE) || (tstate > MAXSTATE))
@@ -10068,7 +10068,7 @@ void T_DarkmonkLandAndFire(objtype*ob)
 		 if (ob->hitpoints <= 0)
 			{objtype*column = (objtype*)(ob->whatever);
 
-          EnableObject((int)column);
+          EnableObject((long)column);
 			 ob->whatever = NULL;
 
 			 KillActor(ob);
@@ -10433,7 +10433,7 @@ void  A_DmonkAttack(objtype*ob)
         {
         objtype*column = (objtype*)(ob->whatever);
 
-        EnableObject((int)column);
+        EnableObject((long)column);
         ob->whatever = NULL;
 
         KillActor(ob);
@@ -10663,7 +10663,7 @@ void DamageStaticObject(statobj_t*tempstat,int damage)
             {touchplatetype *tplate;
 
              for(tplate=touchplate[tempstat->linked_to];tplate;tplate = tplate->nextaction)
-                if (tplate->whichobj == (int)(tempstat))
+                if (tplate->whichobj == (long)(tempstat))
                    RemoveTouchplateAction(tplate,tempstat->linked_to);
             }
 
@@ -10879,7 +10879,7 @@ void ExplodeStatic(statobj_t*tempstat)
        (tempstat->itemnumber == stat_tntcrate)
       )
       {
-      tempstat->linked_to = (int)(LASTSTAT);
+      tempstat->linked_to = (long)(LASTSTAT);
       tempstat->flags |= FL_RESPAWN;
       }
 
@@ -10900,7 +10900,7 @@ void ExplodeStatic(statobj_t*tempstat)
 
 
 
-void EnableObject(int object)
+void EnableObject(long object)
    {
    objtype* ob;
    int i,gasicon;
@@ -10951,7 +10951,7 @@ void EnableObject(int object)
       }
    }
 
-void DisableObject(int object)
+void DisableObject(long object)
 {objtype*ob;
 
  ob = (objtype*)object;

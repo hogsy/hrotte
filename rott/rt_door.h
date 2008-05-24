@@ -124,11 +124,11 @@ typedef struct pwallstruct
 } pwallobj_t;
 
 typedef struct tplate
-{ void (*action)(int);
-  void (*swapaction)(int);
+{ void (*action)(long);
+  void (*swapaction)(long);
   struct tplate * nextaction;
   struct tplate * prevaction;
-  int whichobj;
+  long whichobj;
   byte tictime;
   byte ticcount;
   byte triggered;
@@ -213,9 +213,9 @@ void OperateElevatorDoor(int);
 
 
 int  PlatformHeight(int,int);
-void Link_To_Touchplate(word, word, void (*)(int), void (*)(int),int, int);
+void Link_To_Touchplate(word, word, void (*)(long), void (*)(long), long, int);
 void TriggerStuff(void);
-void ClockLink(void (*)(int),void(*)(int),int,int);
+void ClockLink(void (*)(long),void(*)(long),long,int);
 void RecursiveConnect(int);
 void ConnectAreas(void);
 void InitAreas(void);
@@ -234,8 +234,8 @@ void MovePWalls(void);
 void WallPushing (int pwall);
 void PushWall (int pwall, int dir);
 void OperatePushWall (int pwall, int dir, boolean localplayer );
-void ActivatePushWall (int pwall);
-void ActivateMoveWall (int pwall);
+void ActivatePushWall (long pwall);
+void ActivateMoveWall (long pwall);
 int  UpdateMaskedWall (int num);
 
 void FixDoorAreaNumbers ( void );
@@ -262,8 +262,8 @@ void SaveElevators(byte ** buffer,int *size);
 void LoadElevators(byte * buffer,int size);
 
 void MakeWideDoorVisible ( int doornum );
-void LinkedCloseDoor (int door);
-void LinkedOpenDoor (int door);
+void LinkedCloseDoor (long door);
+void LinkedOpenDoor (long door);
 int IsWall (int tilex, int tiley);
 int IsDoor (int tilex, int tiley);
 int IsMaskedWall (int tilex, int tiley);

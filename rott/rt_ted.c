@@ -1139,7 +1139,7 @@ void PreCache( void )
    int lastmem=0;
    int lastcache=0;
    int ticdelay;
-   unsigned tempbuf;
+   byte *tempbuf;
 
 #if defined(PLATFORM_MACOSX) || defined(__sparc__)
 #warning "Precaching is disabled. Fix."
@@ -1329,7 +1329,7 @@ void CheckRTLVersion
    {
    int  filehandle;
    char RTLSignature[ 4 ];
-   unsigned long RTLVersion;
+   unsigned int RTLVersion;
 
    filehandle = SafeOpenRead( filename );
 
@@ -1395,12 +1395,12 @@ void ReadROTTMap
       SEEK_SET );
    SafeRead( filehandle, &RTLMap, sizeof( RTLMap ) );
 
-    SwapIntelLong((long *)&RTLMap.used);
-    SwapIntelLong((long *)&RTLMap.CRC);
-    SwapIntelLong((long *)&RTLMap.RLEWtag);
-    SwapIntelLong((long *)&RTLMap.MapSpecials);
-    SwapIntelLongArray((long *)&RTLMap.planestart, NUMPLANES);
-    SwapIntelLongArray((long *)&RTLMap.planelength, NUMPLANES);
+    SwapIntelLong((int *)&RTLMap.used);
+    SwapIntelLong((int *)&RTLMap.CRC);
+    SwapIntelLong((int *)&RTLMap.RLEWtag);
+    SwapIntelLong((int *)&RTLMap.MapSpecials);
+    SwapIntelLongArray((int *)&RTLMap.planestart, NUMPLANES);
+    SwapIntelLongArray((int *)&RTLMap.planelength, NUMPLANES);
 
    if ( !RTLMap.used )
       {
@@ -3568,7 +3568,7 @@ void LinkElevatorDiskGroups(void)
 
 
 void LinkActor (objtype *ob,int tilex,int tiley,
-                void (*action)(int),void (*swapaction)(int)
+                void (*action)(long),void (*swapaction)(long)
                )
    {
 	word  touchx,touchy;
@@ -3585,7 +3585,7 @@ void LinkActor (objtype *ob,int tilex,int tiley,
       if ((clockx == tilex) && (clocky == tiley))
          {
          clocklinked = 1;
-         ClockLink(EnableObject,DisableObject,(int)ob,k);
+         ClockLink(EnableObject,DisableObject,(long)ob,k);
          }
       }
 
@@ -3612,9 +3612,9 @@ void LinkActor (objtype *ob,int tilex,int tiley,
 
 
          if (tswitch && (tswitch->flags & FL_ON))
-            Link_To_Touchplate(touchx,touchy,swapaction,action,(int)ob,0);
+            Link_To_Touchplate(touchx,touchy,swapaction,action,(long)ob,0);
          else
-            Link_To_Touchplate(touchx,touchy,action,swapaction,(int)ob,0);
+            Link_To_Touchplate(touchx,touchy,action,swapaction,(long)ob,0);
          if (ob->obclass == gasgrateobj)
             {
             ob->temp1 = touchx;
@@ -3645,7 +3645,7 @@ void SetupInanimateActors (void)
    {
    int   i,j,linked;
 	word   *map,tile;
-	void (*action)(int),(*swapaction)(int);
+	void (*action)(long),(*swapaction)(long);
 
 
    map = mapplanes[1];
@@ -4051,7 +4051,7 @@ void SetupLights(void)
 							 if (!(tswitch->flags & FL_ON))
 								{sprites[i][j]->shapenum --;
 								 if (touchindices[touchx][touchy])
-									 {Link_To_Touchplate(touchx,touchy,ActivateLight,DeactivateLight,(int)(sprites[i][j]),0);
+									 {Link_To_Touchplate(touchx,touchy,ActivateLight,DeactivateLight,(long)(sprites[i][j]),0);
 									  sprites[i][j]->linked_to = touchindices[touchx][touchy]-1;
 									 }
 								 else
@@ -4059,7 +4059,7 @@ void SetupLights(void)
 								}
 							 else
 								{if (touchindices[touchx][touchy])
-									 {Link_To_Touchplate(touchx,touchy,DeactivateLight,ActivateLight,(int)(sprites[i][j]),0);
+									 {Link_To_Touchplate(touchx,touchy,DeactivateLight,ActivateLight,(long)(sprites[i][j]),0);
 									  sprites[i][j]->linked_to = touchindices[touchx][touchy]-1;
 									 }
 								 else
@@ -4069,7 +4069,7 @@ void SetupLights(void)
 							}
 					  else
 						 {if (touchindices[touchx][touchy])
-							 {Link_To_Touchplate(touchx,touchy,DeactivateLight,ActivateLight,(int)(sprites[i][j]),0);
+							 {Link_To_Touchplate(touchx,touchy,DeactivateLight,ActivateLight,(long)(sprites[i][j]),0);
 							  sprites[i][j]->linked_to = touchindices[touchx][touchy]-1;
 							 }
 						  else

@@ -76,8 +76,8 @@ typedef struct
    // Variable for which version of the game can be played
    version_type Product;
 
-   long    TimeCount;
-   long    frame;
+   int     TimeCount;
+   int     frame;
    int     secrettotal,treasuretotal,killtotal;
    int     secretcount,treasurecount,killcount;
    int     supertotal,healthtotal,missiletotal;
@@ -88,7 +88,7 @@ typedef struct
    int     difficulty;
    int     violence;
 	int     mapon;
-	long    score;
+	int     score;
 	int     episode;
 	int     battlemode;
 	int     battleoption;

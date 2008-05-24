@@ -100,7 +100,7 @@ const int dirangle16[16] = {0,FINEANGLES/16,2*FINEANGLES/16,3*FINEANGLES/16,
 //
 
 short   tantable[FINEANGLES];
-long    sintable[FINEANGLES+FINEANGLEQUAD+1],
+int     sintable[FINEANGLES+FINEANGLEQUAD+1],
 		  *costable = sintable+(FINEANGLES/4);
 
 //
@@ -200,7 +200,7 @@ void BuildTables (void)
 {
   byte * table;
   byte * ptr;
-  long  length;
+  int   length;
   int   i;
 
 //
@@ -234,7 +234,7 @@ void BuildTables (void)
 //
 // get sin/cos table
 //
-   memcpy(&sintable[0],ptr,length*sizeof(long));
+   memcpy(&sintable[0],ptr,length*sizeof(int));
    SwapIntelLongArray(&sintable[0], length);
    ptr+=(length)*sizeof(int);
 

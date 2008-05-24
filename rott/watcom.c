@@ -24,8 +24,8 @@ fixed FixedMulShift(fixed a, fixed b, fixed shift)
 
 fixed FixedDiv2(fixed a, fixed b)
 {
-	__int64 x = (signed long)a;
-	__int64 y = (signed long)b;
+	__int64 x = (signed int)a;
+	__int64 y = (signed int)b;
 	__int64 z = x * 65536 / y;
 	
 	return (z) & 0xffffffff;

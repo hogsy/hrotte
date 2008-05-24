@@ -968,7 +968,7 @@ void VL_FadeIn (int start, int end, byte *palette, int steps)
 
 void SwitchPalette (byte * newpal, int steps)
 {
-   int temp;
+   byte *temp;
 
    VL_FadeOut(0,255,0,0,0,steps>>1);
 
