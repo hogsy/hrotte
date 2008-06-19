@@ -24,6 +24,31 @@ John Hall
 Dan Olson
 
 
+-------------------------
+Notes for the 1.1 Release
+-------------------------
+
+Thanks to the effort of the contributors listed below (and probably many more),
+lots of bug fixes, portability improvements and new features have found their
+way into the 1.1 release. Many changes have been ported over from the WinRott
+port (not WinRottGL but plain WinRott) with the high resolution software
+rendering support being the main feature of all these changes. Portability
+fixes include support for 64-bit and big-endian systems.
+
+Birger N. Andreasen (author of the WinRott port
+  <http://home14.inet.tele.dk/Bna-Info/>, initial work by Jonathan Bailey)
+Hans de Goede (porting of the WinRott high resolution renderer,
+  lots of bug and portability fixes for the Fedora package)
+Alexander Thomas aka Dr. Lex (author of the OS X port
+  <http://www.dr-lex.be/software/rott.html>, thanks Filippo Giunchedi for
+  creating the appropriate patch for the Debian package)
+Michael Karcher (lots of bug and portability fixes for the Debian package)
+Fabian Greffrath (some minor improvements)
+
+Getting network play working is considered the release goal for the 2.0
+version.
+
+
 -------------
 General Hints
 -------------
