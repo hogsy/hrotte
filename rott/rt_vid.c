@@ -1099,37 +1099,22 @@ void VL_ColorBorder (int color)
 
 void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
 {
-   byte *screen = (byte *)bufferofs;
-   byte *orig;
-	int  count;
-	byte b,
-        rept;
+   int  count;
+   byte b, rept;
    byte *source = (byte *)&lbminfo->data;
    byte *buf;
    int  ht = lbminfo->height;
-
-   int  x = 0;
-   int  y;
-   byte *origbuf;
    byte pal[768];
-
-
-   orig = screen;
-
-   if (iGLOBAL_SCREENWIDTH <= 320){
-		buf = (byte *) SafeMalloc (64000);
-   }else{
-		buf = (byte *) SafeMalloc (iGLOBAL_SCREENWIDTH*iGLOBAL_SCREENHEIGHT);
-   }
-   origbuf = buf;
-
-   VL_ClearBuffer (displayofs, 0);
-
+   
+   EnableScreenStretch();
+   
    memcpy(&pal[0],lbminfo->palette,768);
 
    VL_NormalizePalette (&pal[0]);
 
    VW_MarkUpdateBlock (0, 0, 320, 200);
+
+   buf = (byte *)bufferofs;
 
    while (ht--)
    {
@@ -1163,36 +1148,7 @@ void VL_DecompressLBM (lbm_t *lbminfo, boolean flip)
 		 buf += (iGLOBAL_SCREENWIDTH-320); //eg 800 - 320)
 	  }
    }
-	   //SetTextMode (  ); //12345678
 
-   {
-      int cnt;
-
-      cnt = 0;
-      screen = orig; 
-      buf = origbuf;
-      VGAMAPMASK (writemask);
-
-	  //bna section start
-	  if (iGLOBAL_SCREENWIDTH <= 320){
-		  for (y = 0; y < (lbminfo->height*lbminfo->width); y++)
-
-		  {
-			 *screen++ = *(buf+y);
-		  }
-	  }else{
-		  for (y = 0; y < (lbminfo->height); y++){
-			  for (x = 0; x < iGLOBAL_SCREENWIDTH; x++){
-				 *screen++ = *(buf++);
-			  }
-		  }
-	  }
-	  // bna section end
-
-   }
-
-   SafeFree(origbuf);
-   EnableScreenStretch();//bna++ shut on streech mode
    if (flip==true)
       VW_UpdateScreen ();
 
