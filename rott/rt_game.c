@@ -3426,7 +3426,7 @@ void LevelCompleted
    tmpPic = ( pic_t * )W_CacheLumpName( "mmbk", PU_CACHE, Cvt_pic_t, 1 );
    VWB_DrawPic( 0, 0, tmpPic );
    VW_UpdateScreen();
-   DisableScreenStretch();
+//   DisableScreenStretch();
 
    IN_StartAck();
    EndBonusVoice = 0;
@@ -3759,7 +3759,7 @@ EndBonusSkip = true;
     
 
 	//bna section 
-    EnableScreenStretch();//bna++
+//    EnableScreenStretch();//bna++
     VW_UpdateScreen();//bna++
 //    DisableScreenStretch();//bna++
 	//bna section end
