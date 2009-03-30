@@ -116,7 +116,7 @@ rott: 	\
 
 clean:
 	$(MAKE) -C audiolib clean
-	rm -rf rott *.o
+	rm -rf rott rott.exe *.o
 
 distclean: clean
 	$(MAKE) -C audiolib distclean
