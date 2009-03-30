@@ -47,7 +47,7 @@ endif
 
 
 CC = gcc
-CFLAGS += -g -W -Wall -Wno-unused -Wno-pointer-sign
+CFLAGS += -g -W -Wall -Wno-unused
 ALL_CFLAGS = $(SDL_CFLAGS) -DUSE_SDL=1 -DPLATFORM_UNIX=1 $(CFLAGS) $(EXTRACFLAGS)
 LDFLAGS += -Wl,-E
 LDLIBS = $(LDFLAGS) $(SDL_LDFLAGS) -lSDL -lSDL_mixer $(EXTRALDFLAGS)
