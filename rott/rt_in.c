@@ -1083,6 +1083,8 @@ sdl_mouse_grabbed = 1;
     scancodes[SDLK_LSHIFT]          = sc_RShift; /* sc_LShift */
     
     scancodes[SDLK_BACKSLASH]       = 0x2B;
+    /* Accept the German eszett as a backslash key */
+    scancodes[SDLK_WORLD_63]        = 0x2B;
     scancodes[SDLK_z]               = sc_Z;
     scancodes[SDLK_x]               = sc_X;
     scancodes[SDLK_c]               = sc_C;
