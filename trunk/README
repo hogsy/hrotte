@@ -45,8 +45,22 @@ Alexander Thomas aka Dr. Lex (author of the OS X port
 Michael Karcher (lots of bug and portability fixes for the Debian package)
 Fabian Greffrath (some minor improvements)
 
-Getting network play working is considered the release goal for the 2.0
-version.
+
+---------------------------
+Notes for the 1.1.1 Release
+---------------------------
+
+Version 1.1.1 is merely a bugfix release that contains all the patches that
+have accumulated in Fedora and Debian during the previous year.
+
+Enabling the use of UNICODE (instead of keyboard scancodes) for the cheat codes
+and names in the highscore table is considered the release goal for the next
+point release. Getting network play working is considered the release goal for
+the 2.0 version. Work on both of these projects has not yet begun, though...
+
+In this context: Please send bug reports, questions, suggestions and comments
+to the Fedora or Debian maintainers of the respective rott packages in these
+distributions. Patches are always welcome. ;-)
 
 
 -------------
