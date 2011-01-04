@@ -616,11 +616,11 @@ void CheckCommandLineParameters( void )
       printf ("   NOECHO     - Turn off sound reverb\n");
       printf ("   DEMOEXIT   - Exit program when demo is terminated\n");
       printf ("   WARP       - Warp to specific ROTT level\n");
-      printf ("                next paramater is level to start on\n");
+      printf ("                next parameter is level to start on\n");
       printf ("   TIMELIMIT  - Play ROTT in time limit mode\n");
-      printf ("                next paramater is time in seconds\n");
+      printf ("                next parameter is time in seconds\n");
       printf ("   MAXTIMELIMIT - Maximimum time to count down from\n");
-      printf ("                next paramater is time in seconds\n");
+      printf ("                next parameter is time in seconds\n");
       printf ("   DOPEFISH   - ?\n");
       printf (" \n");
       printf ("CONTROLS\n");
