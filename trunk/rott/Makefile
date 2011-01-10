@@ -21,7 +21,7 @@ all: rott
 audiolib/audiolib.a:
 	$(MAKE) -C audiolib CC="$(CC)" CFLAGS="$(ALL_CFLAGS)" LDLIBS="$(LDLIBS)"
 
-rott: 	\
+OBJS = \
 	cin_actr.o \
 	cin_efct.o \
 	cin_evnt.o \
@@ -71,8 +71,10 @@ rott: 	\
 	z_zone.o \
 	byteordr.o \
 	dukemusc.o \
-	audiolib/audiolib.a \
 	winrott.o
+
+$(OBJS): develop.h
+rott: $(OBJS) audiolib/audiolib.a
 	$(CC) $^ $(LDLIBS) -o $@
 
 clean:
