@@ -1,7 +1,10 @@
 BINARY ?= rott
 
+CC ?= gcc
+
 CFLAGS += $(shell sdl-config --cflags)
 CFLAGS += -g
+CFLAGS += -O2
 CFLAGS += -Wall
 CFLAGS += -Wno-unused
 CFLAGS += $(EXTRACFLAGS)
@@ -11,7 +14,6 @@ CPPFLAGS += -DUSE_EXECINFO=1
 CPPFLAGS += -DPLATFORM_UNIX=1
 CPPFLAGS += $(EXTRACPPFLAGS)
 
-LDFLAGS += -Wl,-E
 LDFLAGS += $(EXTRALDFLAGS)
 
 LDLIBS += $(shell sdl-config --libs)
@@ -80,8 +82,8 @@ $(BINARY): $(OBJS) $(AUDIOLIB)
 $(OBJS): develop.h
 
 $(AUDIOLIB):
-	$(MAKE) -C audiolib CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" LDLIBS="$(LDLIBS)"
+	$(MAKE) -C audiolib
 
-clean distclean:
-	$(MAKE) -C audiolib clean
+clean:
+	$(MAKE) -C audiolib $@
 	rm -f $(OBJS) $(BINARY) $(BINARY).exe

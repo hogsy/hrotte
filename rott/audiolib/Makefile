@@ -1,12 +1,16 @@
 AUDIOLIB ?= audiolib.a
 
+AR ?= ar
+CC ?= gcc
+RANLIB ?= ranlib
+
 CFLAGS += $(shell sdl-config --cflags)
+CFLAGS += -g
+CFLAGS += -O2
+CFLAGS += -Wall
 
 LDLIBS += $(shell sdl-config --libs)
 LDLIBS += -lSDL_mixer
-
-AR ?= ar
-RANLIB ?= ranlib
 
 OBJS :=
 OBJS += fx_man.o
@@ -25,5 +29,5 @@ $(AUDIOLIB): $(OBJS)
 	$(AR) rc $@ $^
 	$(RANLIB) $@
 
-clean distclean:
+clean:
 	rm -f $(AUDIOLIB) $(OBJS)
