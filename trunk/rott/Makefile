@@ -2,11 +2,9 @@ BINARY ?= rott
 
 CC ?= gcc
 
+CFLAGS ?= -g -O2
+CFLAGS += -Wall -Wno-unused
 CFLAGS += $(shell sdl-config --cflags)
-CFLAGS += -g
-CFLAGS += -O2
-CFLAGS += -Wall
-CFLAGS += -Wno-unused
 CFLAGS += $(EXTRACFLAGS)
 
 CPPFLAGS += -DUSE_SDL=1
@@ -77,7 +75,7 @@ AUDIOLIB := audiolib/audiolib.a
 all: $(BINARY)
 
 $(BINARY): $(OBJS) $(AUDIOLIB)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(OBJS): develop.h
 
