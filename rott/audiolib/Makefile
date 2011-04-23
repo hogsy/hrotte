@@ -4,13 +4,9 @@ AR ?= ar
 CC ?= gcc
 RANLIB ?= ranlib
 
-CFLAGS += $(shell sdl-config --cflags)
-CFLAGS += -g
-CFLAGS += -O2
+CFLAGS ?= -g -O2
 CFLAGS += -Wall
-
-LDLIBS += $(shell sdl-config --libs)
-LDLIBS += -lSDL_mixer
+CFLAGS += $(shell sdl-config --cflags)
 
 OBJS :=
 OBJS += fx_man.o
