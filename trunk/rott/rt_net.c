@@ -3079,8 +3079,8 @@ void GetDemoFilename (int demonumber, char * filename)
 {
    strcpy(filename,DATADIR "DEMO0_0.DMO\0");
 
-   filename[3 + sizeof(DATADIR)] = (char)('0' + (byte)demonumber);
-   filename[5 + sizeof(DATADIR)] = (char)('0' + (byte)gamestate.violence);
+   filename[4 + strlen(DATADIR)] = (char)('0' + (byte)demonumber);
+   filename[6 + strlen(DATADIR)] = (char)('0' + (byte)gamestate.violence);
    FixFilePath(filename);
 }
 //****************************************************************************
