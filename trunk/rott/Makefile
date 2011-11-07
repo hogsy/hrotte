@@ -83,4 +83,4 @@ $(AUDIOLIB):
 
 clean:
 	$(MAKE) -C audiolib $@
-	rm -f $(OBJS) $(BINARY) $(BINARY).exe
+	$(RM) $(OBJS) $(BINARY) $(BINARY).exe

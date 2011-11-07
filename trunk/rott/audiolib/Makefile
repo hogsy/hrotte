@@ -4,6 +4,7 @@ AR ?= ar
 CC ?= gcc
 RANLIB ?= ranlib
 
+ARFLAGS ?= rcT
 CFLAGS ?= -g -O2
 CFLAGS += -Wall
 CFLAGS += $(shell sdl-config --cflags)
@@ -21,9 +22,9 @@ OBJS += user.o
 OBJS += usrhooks.o
 
 $(AUDIOLIB): $(OBJS)
-	rm -f $@
-	$(AR) rc $@ $^
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $^
 	$(RANLIB) $@
 
 clean:
-	rm -f $(AUDIOLIB) $(OBJS)
+	$(RM) $(AUDIOLIB) $(OBJS)
