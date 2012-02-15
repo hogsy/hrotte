@@ -876,13 +876,13 @@ void SetupWads( void )
 					if (access (tempstr, 0) != 0) { //try open again
 						//stil no useful filename
 						strcat (tempstr," not found, skipping RTL file ");
-						printf(tempstr);
+						printf("%s", tempstr);
 						goto NoRTL;
 					}
 			   }
 			   if((f = fopen( tempstr, "r" )) == NULL ){ //try opnong file
 					strcat (tempstr," not could not be opened, skipping RTL file ");
-					printf(tempstr);
+					printf("%s", tempstr);
 					goto NoRTL;
 			   }else{
 					fread(buf,3,3,f);//is the 3 first letters RTL (RTC)
@@ -891,7 +891,7 @@ void SetupWads( void )
 						GameLevels.avail++;
 						strcpy (buf,"Adding ");
 						strcat (buf,tempstr);
-						printf(buf);
+						printf("%s", buf);
 					}
 					fclose(f);
 			   }
@@ -912,13 +912,13 @@ NoRTL:;
 					if (access (tempstr, 0) != 0) { //try open again
 						//stil no useful filename
 						strcat (tempstr," not found, skipping RTC file ");
-						printf(tempstr);
+						printf("%s", tempstr);
 						goto NoRTL;
 					}
 			   }
 			   if((f = fopen( tempstr, "r" )) == NULL ){ //try opening file
 					strcat (tempstr," not could not be opened, skipping RTC file ");
-					printf(tempstr);
+					printf("%s", tempstr);
 					goto NoRTL;
 			   }else{
 					fread(buf,3,3,f);//is the 3 first letters RTL (RTC)
@@ -927,7 +927,7 @@ NoRTL:;
 						BattleLevels.avail++;
 						strcpy (buf,"Adding ");
 						strcat (buf,tempstr);
-						printf(buf);
+						printf("%s", buf);
 					}
 					fclose(f);
 			   }
@@ -1500,7 +1500,7 @@ void GameLoop (void)
 //                     break;
                   }
                CurrentFont=smallfont;
-               US_MeasureStr (&width, &height, str);
+               US_MeasureStr (&width, &height, "%s", str);
                US_ClippedPrint ((320-width)>>1, 180, str);
                VW_UpdateScreen();
                MenuFadeIn();
