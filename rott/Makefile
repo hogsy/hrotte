@@ -1,4 +1,14 @@
+# Make sure only one of the following are on at one time
+SHAREWARE   ?= 1
+SUPERROTT   ?= 0
+SITELICENSE ?= 0
+
+CPPFLAGS += -DSHAREWARE=$(SHAREWARE)
+CPPFLAGS += -DSUPERROTT=$(SUPERROTT)
+CPPFLAGS += -DSITELICENSE=$(SITELICENSE)
+
 BINARY ?= rott
+
 
 CC ?= gcc
 
