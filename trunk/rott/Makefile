@@ -1,4 +1,7 @@
-# Make sure only one of the following are on at one time
+# Determine which version to build
+# Make sure only one of the following is set to 1 at once
+# Triple 0 will build the commercial/registered version
+
 SHAREWARE   ?= 1
 SUPERROTT   ?= 0
 SITELICENSE ?= 0
@@ -7,8 +10,9 @@ CPPFLAGS += -DSHAREWARE=$(SHAREWARE)
 CPPFLAGS += -DSUPERROTT=$(SUPERROTT)
 CPPFLAGS += -DSITELICENSE=$(SITELICENSE)
 
-BINARY ?= rott
+ROTT ?= rott
 
+# Regular build flags and rules
 
 CC ?= gcc
 
@@ -81,9 +85,9 @@ OBJS += winrott.o
 
 AUDIOLIB := audiolib/audiolib.a
 
-all: $(BINARY)
+all: $(ROTT)
 
-$(BINARY): $(OBJS) $(AUDIOLIB)
+$(ROTT): $(OBJS) $(AUDIOLIB)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(OBJS): develop.h
@@ -91,6 +95,8 @@ $(OBJS): develop.h
 $(AUDIOLIB):
 	$(MAKE) -C audiolib
 
-clean:
+tidy: 
+	$(RM) $(OBJS) $(ROTT) $(ROTT).exe
+
+clean: tidy
 	$(MAKE) -C audiolib $@
-	$(RM) $(OBJS) $(BINARY) $(BINARY).exe
