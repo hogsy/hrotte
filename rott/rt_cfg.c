@@ -2030,6 +2030,7 @@ void WriteConfig (void)
    memset(passwordtemp,0,sizeof(passwordtemp));
    ConvertPasswordStringToString ( &passwordtemp[0] );
    SafeWriteString(file,&passwordtemp[0]);
+   SafeWriteString(file,"\n");
 
    close (file);
 #endif
