@@ -2,8 +2,6 @@ FLVRS=huntbgin darkwar rottcd rottsite
 ROTTS=$(addprefix rott-,$(FLVRS))
 SRCDIR=rott
 
-export AR CC RANLIB ARFLAGS CFLAGS CPPFLAGS LDFLAGS LDLIBS
-
 all: $(ROTTS)
 
 # Shareware Version
