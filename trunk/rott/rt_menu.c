@@ -5359,9 +5359,9 @@ void DrawExtOptionsMenu (void)
 
    FlipMenuBuf();
 }
-extern long inverse_mouse;
+extern int inverse_mouse;
 extern boolean usemouselook;
-extern int iG_aimCross;
+extern boolean iG_aimCross;
 extern boolean usejump;
 extern boolean sdl_fullscreen;
 
