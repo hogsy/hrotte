@@ -1636,7 +1636,7 @@ void SetSpriteLightLevel (int x, int y, visobj_t * sprite, int dir, int fullbrig
 
    if (fog)
       {
-      i=(sprite->viewheight>>normalshade)+minshade;
+      i=((sprite->viewheight*200/iGLOBAL_SCREENHEIGHT)>>normalshade)+minshade;
       if (i>maxshade) i=maxshade;
       sprite->colormap=colormap+(i<<8);
       }
@@ -1697,7 +1697,7 @@ void SetColorLightLevel (int x, int y, visobj_t * sprite, int dir, int color, in
 
    if (fog)
       {
-      i=(height>>normalshade)+minshade;
+      i=((height*200/iGLOBAL_SCREENHEIGHT)>>normalshade)+minshade;
       if (i>maxshade) i=maxshade;
       sprite->colormap=map+(i<<8);
       }
@@ -1792,7 +1792,7 @@ void SetWallLightLevel (wallcast_t * post)
       }
    if (fog)
       {
-      i =(post->wallheight>>normalshade)+minshade-lv+la;
+      i =((post->wallheight*200/iGLOBAL_SCREENHEIGHT)>>normalshade)+minshade-lv+la;
       if (i>maxshade+la) i=maxshade+la;
       shadingtable=colormap+(i<<8);
       }

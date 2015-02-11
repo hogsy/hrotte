@@ -527,7 +527,7 @@ void SetFCLightLevel (int height)
       }
    if (fog)
       {
-      i=(height>>normalshade)+minshade;
+      i=((height*200/iGLOBAL_SCREENHEIGHT)>>normalshade)+minshade;
       if (i>maxshade) i=maxshade;
       shadingtable=colormap+(i<<8);
       }
