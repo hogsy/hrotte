@@ -115,7 +115,7 @@ static cachetype * cachelist;
 static word cacheindex;
 static boolean CachingStarted=false;
 static char * ROTTMAPS = STANDARDGAMELEVELS;
-static char * BATTMAPS = STANDARDBATTLELEVELS;
+char * BATTMAPS;
 
 static char NormalWeaponTiles[ 10 ] =
    {
