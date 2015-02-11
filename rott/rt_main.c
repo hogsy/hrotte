@@ -179,6 +179,7 @@ extern void RecordDemoQuery ( void );
 int main (int argc, char *argv[])
 {
     char *macwd;
+    extern char *BATTMAPS;
 #ifndef DOS
 	_argc = argc;
 	_argv = argv;
@@ -214,13 +215,33 @@ int main (int argc, char *argv[])
    gamestate.Version = ROTTVERSION;
 
 #if ( SHAREWARE == 1 )
+   BATTMAPS = strdup(STANDARDBATTLELEVELS);
+   FixFilePath(BATTMAPS);
    gamestate.Product = ROTT_SHAREWARE;
-#elif ( SUPERROTT == 1 )
-   gamestate.Product = ROTT_SUPERCD;
-#elif ( SITELICENSE == 1 )
-   gamestate.Product = ROTT_SITELICENSE;
 #else
-   gamestate.Product = ROTT_REGISTERED;
+   BATTMAPS = strdup(SITELICENSEBATTLELEVELS);
+   FixFilePath(BATTMAPS);
+   if (!access(BATTMAPS, R_OK))
+   {
+       gamestate.Product = ROTT_SITELICENSE;
+   }
+   else
+   {
+       free(BATTMAPS);
+       BATTMAPS = strdup(SUPERROTTBATTLELEVELS);
+       FixFilePath(BATTMAPS);
+       if (!access(BATTMAPS, R_OK))
+       {
+           gamestate.Product = ROTT_SUPERCD;
+       }
+       else
+       {
+           free(BATTMAPS);
+           BATTMAPS = strdup(STANDARDBATTLELEVELS);
+           FixFilePath(BATTMAPS);
+           gamestate.Product = ROTT_REGISTERED;
+       }
+   }
 #endif
 
    DrawRottTitle ();
