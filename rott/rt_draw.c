@@ -6009,6 +6009,7 @@ void DrawMaskedRotRow(int count, byte * dest, byte * src)
 
 void DrawSkyPost (byte * buf, byte * src, int height)
 {
+#if 0
 // bna fix for missing sky by high res eg 800x600
 // when sky is >400 (max skyheight) then reverse mouintain to missing spot
 // there should be 200 line of mouintain (400+200) = 600 height lines
@@ -6033,13 +6034,17 @@ void DrawSkyPost (byte * buf, byte * src, int height)
 		}
 	// bna section end
 	}
-	else {
+	else
+#endif
+	{
+	int i = 0;
+	const byte *orig_src = src;
 	// org code
 		while (height--) {
 			*buf = shadingtable[*src];
 			
 			buf += linewidth;
-			src++;
+			src = orig_src + (++i*200/iGLOBAL_SCREENHEIGHT);
 		}
 	//	
 	}
