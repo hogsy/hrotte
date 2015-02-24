@@ -55,6 +55,7 @@ no|yes)
     suffix=
     ;;
 *)
+    # Add leading dash
     suffix=-${suffix}
     ;;
 esac
@@ -68,6 +69,9 @@ AC_ARG_ENABLE([datadir],
                               [set data file directory])],
               [datadir="$enableval"],
               [datadir=no])
+
+# Remove duplicate and trailing slashes
+datadir=`echo ${datadir} | tr -s '/' | sed 's|/*$||'`
 
 case "$datadir" in
 no|yes)
