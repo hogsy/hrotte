@@ -4114,7 +4114,7 @@ void DrawBackground ( byte * bkgnd )
 //   int plane;
    int size;
 
-   size=linewidth*400;
+   size=linewidth*200;
 
 #ifdef DOS
    for (plane=0;plane<4;plane++)
@@ -4138,7 +4138,7 @@ void PrepareBackground ( byte * bkgnd )
 //   int plane;
    int size;
 
-   size=linewidth*400;
+   size=linewidth*200;
 
 #ifdef DOS
    for (plane=0;plane<4;plane++)
