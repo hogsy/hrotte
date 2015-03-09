@@ -842,7 +842,7 @@ void SetupWads( void )
 {
    char  *newargs[99];
    int i, arg, argnum = 0;
-   char tempstr[129];
+   char *tempstr = NULL;
    char *PStrings[] = {"AIM", "FULLSCREEN", "WINDOW", "RESOLUTION", NULL };
 
    // These must be checked here so that they can override the cfg file
@@ -888,8 +888,9 @@ void SetupWads( void )
    arg = CheckParm ("filertl");
    if (arg!=0)
    {
-	   FILE *f;char buf[32];
+	   FILE *f;char *buf = malloc(32);
 	   if (_argv[arg+1] != 0) { //are there a filename included
+		   tempstr = realloc(tempstr, 129 + strlen(_argv[arg+1]));
 		   strcpy (tempstr,_argv[arg+1]);//copy it to tempstr
 		   if (strlen (tempstr) < MAX_PATH) {
 			   if (access (tempstr, 0) != 0) { //try open
@@ -908,8 +909,9 @@ void SetupWads( void )
 			   }else{
 					fread(buf,3,3,f);//is the 3 first letters RTL (RTC)
 				    if (((strstr(buf,"RTL") != 0)||strstr(buf,"RTC") != 0)) {
-						strcpy (GameLevels.file,tempstr);
+						GameLevels.file = strdup(tempstr);
 						GameLevels.avail++;
+						buf = realloc(buf, 32 + strlen(tempstr));
 						strcpy (buf,"Adding ");
 						strcat (buf,tempstr);
 						printf("%s", buf);
@@ -918,14 +920,16 @@ void SetupWads( void )
 			   }
 		   }
 	   }else{printf("Missing RTL filename");}
+	   free(buf);
    }
 NoRTL:;
    // Check for rtc files
    arg = CheckParm ("filertc");
    if (arg!=0)
    {
-	   FILE *f;char buf[32];
+	   FILE *f;char *buf = malloc(32);
 	   if (_argv[arg+1] != 0) { //are there a filename included
+		   tempstr = realloc(tempstr, 129 + strlen(_argv[arg+1]));
 		   strcpy (tempstr,_argv[arg+1]);//copy it to tempstr
 		   if (strlen (tempstr) < MAX_PATH) {
 			   if (access (tempstr, 0) != 0) { //try open
@@ -944,8 +948,9 @@ NoRTL:;
 			   }else{
 					fread(buf,3,3,f);//is the 3 first letters RTL (RTC)
 				    if (((strstr(buf,"RTL") != 0)||strstr(buf,"RTC") != 0)) {
-						strcpy (BattleLevels.file,tempstr);
+						BattleLevels.file = strdup(tempstr);
 						BattleLevels.avail++;
+						buf = realloc(buf, 32 + strlen(tempstr));
 						strcpy (buf,"Adding ");
 						strcat (buf,tempstr);
 						printf("%s", buf);
@@ -954,6 +959,7 @@ NoRTL:;
 			   }
 		   }
 	   }else{printf("Missing RTC filename");}
+	   free(buf);
    }
 NoRTC:;
 
@@ -1002,17 +1008,21 @@ NoRTC:;
       {
       char  *src;
 
+      tempstr = realloc(tempstr, strlen(RemoteSounds.path) + strlen(RemoteSounds.file) + 2);
       strcpy (tempstr,RemoteSounds.path);
       src = RemoteSounds.path + strlen(RemoteSounds.path) - 1;
       if (*src != '\\')
          strcat (tempstr,"\\\0");
       strcat (tempstr,RemoteSounds.file);
-      newargs [argnum++] = tempstr;
+      newargs [argnum++] = strdup(tempstr);
       }
    else
       {
       newargs [argnum++] = DATADIR "REMOTE1.RTS";
       }
+
+   if (tempstr)
+      free(tempstr);
 
    newargs [argnum++] = NULL;
 
