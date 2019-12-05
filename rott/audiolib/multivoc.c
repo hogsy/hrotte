@@ -418,9 +418,9 @@ void MV_ServiceVoc
    {
    VoiceNode *voice;
    VoiceNode *next;
-   char      *buffer;
 
 #ifdef PLAT_DOS
+  char *buffer;
    if ( MV_DMAChannel >= 0 )
       {
       // Get the currently playing buffer

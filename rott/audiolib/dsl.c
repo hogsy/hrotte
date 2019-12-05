@@ -4,8 +4,8 @@
 #include "dsl.h"
 #include "util.h"
 
-#include "SDL.h"
-#include "SDL_mixer.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 extern volatile int MV_MixPage;
 
@@ -133,7 +133,6 @@ int   DSL_BeginBufferedPlayback( char *BufferStart,
       int MixMode, void ( *CallBackFunc )( void ) )
 {
 	Uint16 format;
-	Uint8 *tmp;
 	int channels;
 	int chunksize;
 		

@@ -41,6 +41,12 @@ add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
 add_definitions(-DGIT_COMMIT_COUNT="${GIT_COMMIT_COUNT}")
 add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
 
+if(UNIX)
+    add_definitions(-DPLATFORM_UNIX=1)
+elseif(WIN32)
+    add_definitions(-DPLATFORM_WIN32=1)
+endif()
+
 add_subdirectory(rott/audiolib)
 
 project(hrotte)
@@ -97,4 +103,4 @@ add_executable(hrotte
         rott/z_zone.c
         )
 
-target_link_libraries(hrotte audiolib SDL2)
+target_link_libraries(hrotte audiolib SDL2 SDL2_mixer)

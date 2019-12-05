@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static void StretchMemPicture ();
 // GLOBAL VARIABLES
 
-boolean StretchScreen=0;//bná++
+boolean StretchScreen=0;//bnï¿½++
 extern boolean iG_aimCross;
 extern boolean sdl_fullscreen;
 extern int iG_X_center;
@@ -399,7 +399,7 @@ void XFlipPage ( void )
 
 #else
 
-#include "SDL.h"
+#include <SDL2/SDL.h>
 
 #ifndef STUB_FUNCTION
 
