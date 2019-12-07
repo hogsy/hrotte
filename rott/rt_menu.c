@@ -27,22 +27,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdarg.h>
-#include <fcntl.h>
 #include <string.h>
 #include <ctype.h>
 
-#if PLATFORM_DOS
-																														#include <conio.h>
-#include <dos.h>
-#include <io.h>
-#elif PLATFORM_UNIX
-#include <unistd.h>
-#include "SDL.h"
+#if PLATFORM_UNIX
+#	include <unistd.h>
 #endif
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <SDL2/SDL.h>
 
 #include "rt_def.h"
 #include "_rt_menu.h"
@@ -59,7 +51,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_playr.h"
 #include "rt_rand.h"
 #include "rt_game.h"
-#include "rt_floor.h"
 #include "rt_draw.h"
 #include "rt_view.h"
 #include "rt_str.h"
@@ -72,7 +63,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "modexlib.h"
 #include "rt_msg.h"
 #include "rt_net.h"
-#include "rt_spbal.h"
 #include "rt_scale.h"
 
 #include "rt_battl.h"
@@ -330,8 +320,8 @@ static int cursorwidth;
 static int cursorheight;
 static int yinc;
 
-static char * FontNames[] = {"itnyfont", "ifnt", "sifont", "lifont"};
-static int FontSize[] = {6, 7, 9, 14};
+static char * FontNames[] = { "itnyfont", "ifnt", "sifont", "lifont" };
+static int FontSize[] = { 6, 7, 9, 14 };
 static char * SmallCursor = "smallc01";
 static char * LargeCursor = "cursor01";
 static char * CursorLump = "cursor01";
@@ -381,38 +371,38 @@ CP_MenuNames MainMenuNames[] =
 		"QUIT"
 	};
 
-CP_iteminfo MainItems = {MENU_X, MENU_Y + 1, 9, STARTITEM, 32, MainMenuNames, mn_largefont};
+CP_iteminfo MainItems = { MENU_X, MENU_Y + 1, 9, STARTITEM, 32, MainMenuNames, mn_largefont };
 CP_itemtype MainMenu[] =
 	{
-		{CP_CursorLocation, "mm_opt1\0", 'N', ( menuptr ) CP_NewGame},
-		{CP_Active, "battle\0", 'C', ( menuptr ) CP_BattleModes},
-		{CP_Active, "mm_opt2\0", 'R', ( menuptr ) CP_LoadGame},
-		{CP_Inactive, "mm_opt3\0", 'S', ( menuptr ) CP_SaveGame},
-		{CP_Active, "mm_opt5\0", 'O', ( menuptr ) CP_ControlMenu},
-		{CP_Active, "ordrinfo\0", 'O', ( menuptr ) CP_OrderInfo},
-		{CP_Active, "mm_opt7\0", 'V', ( menuptr ) CP_ViewScores},
-		{CP_Active, "mm_opt8\0", 'B', ( menuptr ) NULL},
-		{CP_Active, "mm_opt9\0", 'Q', ( menuptr ) CP_Quit}
+		{ CP_CursorLocation, "mm_opt1\0", 'N', ( menuptr ) CP_NewGame },
+		{ CP_Active, "battle\0", 'C', ( menuptr ) CP_BattleModes },
+		{ CP_Active, "mm_opt2\0", 'R', ( menuptr ) CP_LoadGame },
+		{ CP_Inactive, "mm_opt3\0", 'S', ( menuptr ) CP_SaveGame },
+		{ CP_Active, "mm_opt5\0", 'O', ( menuptr ) CP_ControlMenu },
+		{ CP_Active, "ordrinfo\0", 'O', ( menuptr ) CP_OrderInfo },
+		{ CP_Active, "mm_opt7\0", 'V', ( menuptr ) CP_ViewScores },
+		{ CP_Active, "mm_opt8\0", 'B', ( menuptr ) NULL },
+		{ CP_Active, "mm_opt9\0", 'Q', ( menuptr ) CP_Quit }
 	};
 
-CP_iteminfo LSItems = {LSM_X, LSM_Y, NUMSAVEGAMES, 0, 10, NULL, mn_largefont};
+CP_iteminfo LSItems = { LSM_X, LSM_Y, NUMSAVEGAMES, 0, 10, NULL, mn_largefont };
 CP_itemtype LSMenu[] =
 	{
-		{CP_Active, "", 'a', NULL},
-		{CP_Active, "", 'b', NULL},
-		{CP_Active, "", 'c', NULL},
-		{CP_Active, "", 'd', NULL},
-		{CP_Active, "", 'e', NULL},
-		{CP_Active, "", 'f', NULL},
-		{CP_Active, "", 'g', NULL},
-		{CP_Active, "", 'h', NULL},
-		{CP_Active, "", 'i', NULL},
-		{CP_Active, "", 'j', NULL},
-		{CP_Active, "", 'k', NULL},
-		{CP_Active, "", 'l', NULL},
-		{CP_Active, "", 'm', NULL},
-		{CP_Active, "", 'n', NULL},
-		{CP_Active, "", 'o', NULL}
+		{ CP_Active, "", 'a', NULL },
+		{ CP_Active, "", 'b', NULL },
+		{ CP_Active, "", 'c', NULL },
+		{ CP_Active, "", 'd', NULL },
+		{ CP_Active, "", 'e', NULL },
+		{ CP_Active, "", 'f', NULL },
+		{ CP_Active, "", 'g', NULL },
+		{ CP_Active, "", 'h', NULL },
+		{ CP_Active, "", 'i', NULL },
+		{ CP_Active, "", 'j', NULL },
+		{ CP_Active, "", 'k', NULL },
+		{ CP_Active, "", 'l', NULL },
+		{ CP_Active, "", 'm', NULL },
+		{ CP_Active, "", 'n', NULL },
+		{ CP_Active, "", 'o', NULL }
 	};
 
 CP_MenuNames CtlMenuNames[] =
@@ -428,75 +418,75 @@ CP_MenuNames CtlMenuNames[] =
 		"CUSTOMIZE CONTROLS"
 	};
 
-CP_iteminfo CtlItems = {CTL_X, MENU_Y, 9, -1, 36, CtlMenuNames, mn_largefont};
+CP_iteminfo CtlItems = { CTL_X, MENU_Y, 9, -1, 36, CtlMenuNames, mn_largefont };
 CP_itemtype CtlMenu[] =
 	{
-		{CP_Inactive, "ctl_mic\0", 'M', NULL},
-		{CP_Inactive, "ctl_jen\0", 'J', NULL},
-		{CP_Inactive, "ctl_jp2\0", 'U', NULL},
-		{CP_Inactive, "ctl_gpd\0", 'G', NULL},
-		{CP_Inactive, "spball\0", 'S', NULL},
-		{CP_Inactive, "cyberman\0", 'C', NULL},
-		{CP_Inactive, "ctl_thr\0", 'A', ( menuptr ) DoThreshold},
-		{CP_Inactive, "ctl_mse\0", 'M', ( menuptr ) MouseSensitivity},
-		{CP_Active, "ctl_cus\0", 'C', ( menuptr ) CP_Custom}
+		{ CP_Inactive, "ctl_mic\0", 'M', NULL },
+		{ CP_Inactive, "ctl_jen\0", 'J', NULL },
+		{ CP_Inactive, "ctl_jp2\0", 'U', NULL },
+		{ CP_Inactive, "ctl_gpd\0", 'G', NULL },
+		{ CP_Inactive, "spball\0", 'S', NULL },
+		{ CP_Inactive, "cyberman\0", 'C', NULL },
+		{ CP_Inactive, "ctl_thr\0", 'A', ( menuptr ) DoThreshold },
+		{ CP_Inactive, "ctl_mse\0", 'M', ( menuptr ) MouseSensitivity },
+		{ CP_Active, "ctl_cus\0", 'C', ( menuptr ) CP_Custom }
 	};
 
-CP_iteminfo CusItems = {32, CST_Y + 13 * 2, 9, -1, 0, NULL, mn_largefont};
+CP_iteminfo CusItems = { 32, CST_Y + 13 * 2, 9, -1, 0, NULL, mn_largefont };
 CP_itemtype CusMenu[] =
 	{
-		{CP_Active, "ctl_mic\0", 'a', NULL},
-		{CP_Inactive, "ctl_mic\0", 'a', NULL},
-		{CP_Inactive, "ctl_mic\0", 'a', NULL},
-		{CP_Active, "ctl_mic\0", 'a', NULL},
-		{CP_Inactive, "ctl_mic\0", 'a', NULL},
-		{CP_Inactive, "ctl_mic\0", 'a', NULL},
-		{CP_Active, "ctl_mic\0", 'a', NULL},
-		{CP_Inactive, "ctl_mic\0", 'a', NULL},
-		{CP_Active, "ctl_mic\0", 'a', NULL}
+		{ CP_Active, "ctl_mic\0", 'a', NULL },
+		{ CP_Inactive, "ctl_mic\0", 'a', NULL },
+		{ CP_Inactive, "ctl_mic\0", 'a', NULL },
+		{ CP_Active, "ctl_mic\0", 'a', NULL },
+		{ CP_Inactive, "ctl_mic\0", 'a', NULL },
+		{ CP_Inactive, "ctl_mic\0", 'a', NULL },
+		{ CP_Active, "ctl_mic\0", 'a', NULL },
+		{ CP_Inactive, "ctl_mic\0", 'a', NULL },
+		{ CP_Active, "ctl_mic\0", 'a', NULL }
 	};
 
-CP_iteminfo TufItems = {TUF_X, TUF_Y, 7, 0, 80, NULL, mn_largefont};
+CP_iteminfo TufItems = { TUF_X, TUF_Y, 7, 0, 80, NULL, mn_largefont };
 CP_itemtype TufMenu[4][7] =
 	{
 		{
-			{2, "new11\0", 'a', NULL},
-			{3, "new11\0", 'a', NULL},
-			{1, "new12\0", 'a', NULL},
-			{3, "new12\0", 'a', NULL},
-			{1, "new13\0", 'a', NULL},
-			{3, "new13\0", 'a', NULL},
-			{1, "new14\0", 'a', NULL},
+			{ 2, "new11\0", 'a', NULL },
+			{ 3, "new11\0", 'a', NULL },
+			{ 1, "new12\0", 'a', NULL },
+			{ 3, "new12\0", 'a', NULL },
+			{ 1, "new13\0", 'a', NULL },
+			{ 3, "new13\0", 'a', NULL },
+			{ 1, "new14\0", 'a', NULL },
 		},
 
 		{
-			{2, "new21\0", 'a', NULL},
-			{3, "new21\0", 'a', NULL},
-			{1, "new22\0", 'a', NULL},
-			{3, "new22\0", 'a', NULL},
-			{1, "new23\0", 'a', NULL},
-			{3, "new23\0", 'a', NULL},
-			{1, "new24\0", 'a', NULL},
+			{ 2, "new21\0", 'a', NULL },
+			{ 3, "new21\0", 'a', NULL },
+			{ 1, "new22\0", 'a', NULL },
+			{ 3, "new22\0", 'a', NULL },
+			{ 1, "new23\0", 'a', NULL },
+			{ 3, "new23\0", 'a', NULL },
+			{ 1, "new24\0", 'a', NULL },
 		},
 
 		{
-			{2, "new31\0", 'a', NULL},
-			{3, "new31\0", 'a', NULL},
-			{1, "new32\0", 'a', NULL},
-			{3, "new32\0", 'a', NULL},
-			{1, "new33\0", 'a', NULL},
-			{3, "new33\0", 'a', NULL},
-			{1, "new34\0", 'a', NULL},
+			{ 2, "new31\0", 'a', NULL },
+			{ 3, "new31\0", 'a', NULL },
+			{ 1, "new32\0", 'a', NULL },
+			{ 3, "new32\0", 'a', NULL },
+			{ 1, "new33\0", 'a', NULL },
+			{ 3, "new33\0", 'a', NULL },
+			{ 1, "new34\0", 'a', NULL },
 		},
 
 		{
-			{2, "stk_1\0", 'a', NULL},
-			{3, "stk_1\0", 'a', NULL},
-			{1, "stk_2\0", 'a', NULL},
-			{3, "stk_2\0", 'a', NULL},
-			{1, "stk_3\0", 'a', NULL},
-			{3, "stk_3\0", 'a', NULL},
-			{1, "stk_4\0", 'a', NULL},
+			{ 2, "stk_1\0", 'a', NULL },
+			{ 3, "stk_1\0", 'a', NULL },
+			{ 1, "stk_2\0", 'a', NULL },
+			{ 3, "stk_2\0", 'a', NULL },
+			{ 1, "stk_3\0", 'a', NULL },
+			{ 3, "stk_3\0", 'a', NULL },
+			{ 1, "stk_4\0", 'a', NULL },
 		}
 	};
 
@@ -507,13 +497,13 @@ CP_MenuNames CustomMenuNames[] =
 		"CUSTOMIZE JOYSTICK"
 	};
 
-CP_iteminfo CustomItems = {32, 64, 3, 0, 24, CustomMenuNames, mn_largefont};
+CP_iteminfo CustomItems = { 32, 64, 3, 0, 24, CustomMenuNames, mn_largefont };
 
 CP_itemtype CustomMenu[] =
 	{
-		{2, "custom1\0", 'C', ( menuptr ) CP_Keyboard},
-		{1, "custom2\0", 'C', ( menuptr ) CP_Mouse},
-		{1, "custom3\0", 'C', ( menuptr ) CP_Joystick}
+		{ 2, "custom1\0", 'C', ( menuptr ) CP_Keyboard },
+		{ 1, "custom2\0", 'C', ( menuptr ) CP_Mouse },
+		{ 1, "custom3\0", 'C', ( menuptr ) CP_Joystick }
 	};
 
 #define KEYNAMEINDEX 21
@@ -545,31 +535,31 @@ CP_MenuNames NormalKeyNames[] =
 
 #define NORMALKEY_X  74
 #define NORMALKEY_Y  16
-CP_iteminfo NormalKeyItems = {NORMALKEY_X, 17, 21, 0, 16, NormalKeyNames, mn_tinyfont};
+CP_iteminfo NormalKeyItems = { NORMALKEY_X, 17, 21, 0, 16, NormalKeyNames, mn_tinyfont };
 
 CP_itemtype NormalKeyMenu[] =
 	{
-		{2, "\0", 'L', ( menuptr ) DefineKey},
-		{1, "\0", 'R', ( menuptr ) DefineKey},
-		{1, "\0", 'F', ( menuptr ) DefineKey},
-		{1, "\0", 'B', ( menuptr ) DefineKey},
-		{1, "\0", 'R', ( menuptr ) DefineKey},
-		{1, "\0", 'O', ( menuptr ) DefineKey},
-		{1, "\0", 'F', ( menuptr ) DefineKey},
-		{1, "\0", 'S', ( menuptr ) DefineKey},
-		{1, "\0", 'S', ( menuptr ) DefineKey},
-		{1, "\0", 'S', ( menuptr ) DefineKey},
-		{1, "\0", 'L', ( menuptr ) DefineKey},
-		{1, "\0", 'L', ( menuptr ) DefineKey},
-		{1, "\0", 'A', ( menuptr ) DefineKey},
-		{1, "\0", 'A', ( menuptr ) DefineKey},
-		{1, "\0", 'T', ( menuptr ) DefineKey},
-		{1, "\0", 'D', ( menuptr ) DefineKey},
-		{1, "\0", 'V', ( menuptr ) DefineKey},
-		{1, "\0", 'A', ( menuptr ) DefineKey},
-		{1, "\0", 'A', ( menuptr ) DefineKey},
-		{1, "\0", 'S', ( menuptr ) DefineKey},
-		{1, "\0", 'D', ( menuptr ) DefineKey}
+		{ 2, "\0", 'L', ( menuptr ) DefineKey },
+		{ 1, "\0", 'R', ( menuptr ) DefineKey },
+		{ 1, "\0", 'F', ( menuptr ) DefineKey },
+		{ 1, "\0", 'B', ( menuptr ) DefineKey },
+		{ 1, "\0", 'R', ( menuptr ) DefineKey },
+		{ 1, "\0", 'O', ( menuptr ) DefineKey },
+		{ 1, "\0", 'F', ( menuptr ) DefineKey },
+		{ 1, "\0", 'S', ( menuptr ) DefineKey },
+		{ 1, "\0", 'S', ( menuptr ) DefineKey },
+		{ 1, "\0", 'S', ( menuptr ) DefineKey },
+		{ 1, "\0", 'L', ( menuptr ) DefineKey },
+		{ 1, "\0", 'L', ( menuptr ) DefineKey },
+		{ 1, "\0", 'A', ( menuptr ) DefineKey },
+		{ 1, "\0", 'A', ( menuptr ) DefineKey },
+		{ 1, "\0", 'T', ( menuptr ) DefineKey },
+		{ 1, "\0", 'D', ( menuptr ) DefineKey },
+		{ 1, "\0", 'V', ( menuptr ) DefineKey },
+		{ 1, "\0", 'A', ( menuptr ) DefineKey },
+		{ 1, "\0", 'A', ( menuptr ) DefineKey },
+		{ 1, "\0", 'S', ( menuptr ) DefineKey },
+		{ 1, "\0", 'D', ( menuptr ) DefineKey }
 	};
 
 #define NUMCONTROLNAMES 21
@@ -607,31 +597,31 @@ int controlorder[NUMCONTROLNAMES] = {
 };
 
 #define CONTROLSELECT_X  106
-CP_iteminfo ControlSelectItems = {CONTROLSELECT_X, 17, NUMCONTROLNAMES, 0, 16, ControlNames, mn_tinyfont};
+CP_iteminfo ControlSelectItems = { CONTROLSELECT_X, 17, NUMCONTROLNAMES, 0, 16, ControlNames, mn_tinyfont };
 
 CP_itemtype ControlSelectMenu[] =
 	{
-		{2, "\0", 'N', NULL},
-		{1, "\0", 'L', NULL},
-		{1, "\0", 'R', NULL},
-		{1, "\0", 'F', NULL},
-		{1, "\0", 'B', NULL},
-		{1, "\0", 'R', NULL},
-		{1, "\0", 'O', NULL},
-		{1, "\0", 'F', NULL},
-		{1, "\0", 'S', NULL},
-		{1, "\0", 'S', NULL},
-		{1, "\0", 'S', NULL},
-		{1, "\0", 'L', NULL},
-		{1, "\0", 'L', NULL},
-		{1, "\0", 'A', NULL},
-		{1, "\0", 'A', NULL},
-		{1, "\0", 'A', NULL},
-		{1, "\0", 'T', NULL},
-		{1, "\0", 'D', NULL},
-		{1, "\0", 'V', NULL},
-		{1, "\0", 'A', NULL},
-		{1, "\0", 'M', NULL}
+		{ 2, "\0", 'N', NULL },
+		{ 1, "\0", 'L', NULL },
+		{ 1, "\0", 'R', NULL },
+		{ 1, "\0", 'F', NULL },
+		{ 1, "\0", 'B', NULL },
+		{ 1, "\0", 'R', NULL },
+		{ 1, "\0", 'O', NULL },
+		{ 1, "\0", 'F', NULL },
+		{ 1, "\0", 'S', NULL },
+		{ 1, "\0", 'S', NULL },
+		{ 1, "\0", 'S', NULL },
+		{ 1, "\0", 'L', NULL },
+		{ 1, "\0", 'L', NULL },
+		{ 1, "\0", 'A', NULL },
+		{ 1, "\0", 'A', NULL },
+		{ 1, "\0", 'A', NULL },
+		{ 1, "\0", 'T', NULL },
+		{ 1, "\0", 'D', NULL },
+		{ 1, "\0", 'V', NULL },
+		{ 1, "\0", 'A', NULL },
+		{ 1, "\0", 'M', NULL }
 	};
 
 #define MOUSEBTNINDEX 17
@@ -646,16 +636,16 @@ CP_MenuNames MouseBtnNames[] =
 		"DOUBLE-CLICK B2  \x9             "
 	};
 
-CP_iteminfo MouseBtnItems = {19, 52, 6, 0, 11, MouseBtnNames, mn_8x8font};
+CP_iteminfo MouseBtnItems = { 19, 52, 6, 0, 11, MouseBtnNames, mn_8x8font };
 
 CP_itemtype MouseBtnMenu[] =
 	{
-		{2, "\0", 'B', ( menuptr ) DefineMouseBtn},
-		{1, "\0", 'B', ( menuptr ) DefineMouseBtn},
-		{1, "\0", 'B', ( menuptr ) DefineMouseBtn},
-		{1, "\0", 'D', ( menuptr ) DefineMouseBtn},
-		{1, "\0", 'D', ( menuptr ) DefineMouseBtn},
-		{1, "\0", 'D', ( menuptr ) DefineMouseBtn}
+		{ 2, "\0", 'B', ( menuptr ) DefineMouseBtn },
+		{ 1, "\0", 'B', ( menuptr ) DefineMouseBtn },
+		{ 1, "\0", 'B', ( menuptr ) DefineMouseBtn },
+		{ 1, "\0", 'D', ( menuptr ) DefineMouseBtn },
+		{ 1, "\0", 'D', ( menuptr ) DefineMouseBtn },
+		{ 1, "\0", 'D', ( menuptr ) DefineMouseBtn }
 	};
 
 #define JOYBTNINDEX 17
@@ -672,18 +662,18 @@ CP_MenuNames JoyBtnNames[] =
 		"DOUBLE-CLICK B3  \x9             "
 	};
 
-CP_iteminfo JoyBtnItems = {19, 48, 8, 0, 11, JoyBtnNames, mn_8x8font};
+CP_iteminfo JoyBtnItems = { 19, 48, 8, 0, 11, JoyBtnNames, mn_8x8font };
 
 CP_itemtype JoyBtnMenu[] =
 	{
-		{2, "\0", 'B', ( menuptr ) DefineJoyBtn},
-		{1, "\0", 'B', ( menuptr ) DefineJoyBtn},
-		{1, "\0", 'B', ( menuptr ) DefineJoyBtn},
-		{1, "\0", 'B', ( menuptr ) DefineJoyBtn},
-		{1, "\0", 'D', ( menuptr ) DefineJoyBtn},
-		{1, "\0", 'D', ( menuptr ) DefineJoyBtn},
-		{1, "\0", 'D', ( menuptr ) DefineJoyBtn},
-		{1, "\0", 'D', ( menuptr ) DefineJoyBtn}
+		{ 2, "\0", 'B', ( menuptr ) DefineJoyBtn },
+		{ 1, "\0", 'B', ( menuptr ) DefineJoyBtn },
+		{ 1, "\0", 'B', ( menuptr ) DefineJoyBtn },
+		{ 1, "\0", 'B', ( menuptr ) DefineJoyBtn },
+		{ 1, "\0", 'D', ( menuptr ) DefineJoyBtn },
+		{ 1, "\0", 'D', ( menuptr ) DefineJoyBtn },
+		{ 1, "\0", 'D', ( menuptr ) DefineJoyBtn },
+		{ 1, "\0", 'D', ( menuptr ) DefineJoyBtn }
 	};
 
 CP_MenuNames PlayerMenuNames[] =
@@ -695,15 +685,15 @@ CP_MenuNames PlayerMenuNames[] =
 		"IAN PAUL FREELEY"
 	};
 
-CP_iteminfo PlayerItems = {TUF_X, 48, 5, 0, 80, PlayerMenuNames, mn_largefont};
+CP_iteminfo PlayerItems = { TUF_X, 48, 5, 0, 80, PlayerMenuNames, mn_largefont };
 
 CP_itemtype PlayerMenu[] =
 	{
-		{2, "name1\0", 'T', NULL},
-		{1, "name2\0", 'T', NULL},
-		{1, "name3\0", 'D', NULL},
-		{1, "name4\0", 'L', NULL},
-		{1, "name5\0", 'I', NULL},
+		{ 2, "name1\0", 'T', NULL },
+		{ 1, "name2\0", 'T', NULL },
+		{ 1, "name3\0", 'D', NULL },
+		{ 1, "name4\0", 'L', NULL },
+		{ 1, "name5\0", 'I', NULL },
 	};
 
 CP_MenuNames ControlMMenuNames[] =
@@ -715,16 +705,16 @@ CP_MenuNames ControlMMenuNames[] =
 		"SOUND FX VOLUME"
 
 	};
-CP_iteminfo ControlMItems = {32, 48 - 8, 5, 0, 32, ControlMMenuNames, mn_largefont};//bna added
+CP_iteminfo ControlMItems = { 32, 48 - 8, 5, 0, 32, ControlMMenuNames, mn_largefont };//bna added
 //CP_iteminfo ControlMItems = {32, 48, 4, 0, 32, ControlMMenuNames, mn_largefont };
 
 CP_itemtype ControlMMenu[] =
 	{
-		{2, "cntl\0", 'C', ( menuptr ) CP_Control},
-		{1, "uopt\0", 'U', ( menuptr ) CP_OptionsMenu},
-		{1, "euopt\0", 'E', ( menuptr ) CP_ExtOptionsMenu},//bna added
-		{1, "muvolumn\0", 'M', ( menuptr ) MusicVolume},
-		{1, "fxvolumn\0", 'S', ( menuptr ) FXVolume}
+		{ 2, "cntl\0", 'C', ( menuptr ) CP_Control },
+		{ 1, "uopt\0", 'U', ( menuptr ) CP_OptionsMenu },
+		{ 1, "euopt\0", 'E', ( menuptr ) CP_ExtOptionsMenu },//bna added
+		{ 1, "muvolumn\0", 'M', ( menuptr ) MusicVolume },
+		{ 1, "fxvolumn\0", 'S', ( menuptr ) FXVolume }
 
 	};
 
@@ -749,32 +739,32 @@ CP_MenuNames ExtOptionsNames[] =
 		"JUMPING",
 		"FULLSCREEN"
 	};
-CP_iteminfo ExtOptionsItems = {20, MENU_Y, 5, 0, 43, ExtOptionsNames, mn_largefont};
+CP_iteminfo ExtOptionsItems = { 20, MENU_Y, 5, 0, 43, ExtOptionsNames, mn_largefont };
 
 CP_itemtype ExtOptionsMenu[] =
 	{
-		{1, "", 'M', NULL},
-		{1, "", 'I', NULL},
-		{1, "", 'C', NULL},
-		{1, "", 'J', NULL},
-		{1, "", 'F', NULL}
+		{ 1, "", 'M', NULL },
+		{ 1, "", 'I', NULL },
+		{ 1, "", 'C', NULL },
+		{ 1, "", 'J', NULL },
+		{ 1, "", 'F', NULL }
 	};
 
 //bna added end
 
-CP_iteminfo OptionsItems = {20, MENU_Y, 9, 0, 43, OptionsNames, mn_largefont};
+CP_iteminfo OptionsItems = { 20, MENU_Y, 9, 0, 43, OptionsNames, mn_largefont };
 
 CP_itemtype OptionsMenu[] =
 	{
-		{2, "autoadj\0", 'A', NULL},
-		{1, "lightdim\0", 'L', NULL},
-		{1, "bobbin\0", 'B', NULL},
-		{1, "fandc\0", 'F', NULL},
-		{1, "double\0", 'D', ( menuptr ) CP_DoubleClickSpeed},
-		{1, "menuspd\0", 'M', ( menuptr ) MenuFlipSpeed},
-		{1, "detail\0", 'D', ( menuptr ) CP_DetailMenu},
-		{1, "vlevel\0", 'V', ( menuptr ) CP_ViolenceMenu},
-		{1, "\0", 'S', ( menuptr ) CP_ScreenSize}
+		{ 2, "autoadj\0", 'A', NULL },
+		{ 1, "lightdim\0", 'L', NULL },
+		{ 1, "bobbin\0", 'B', NULL },
+		{ 1, "fandc\0", 'F', NULL },
+		{ 1, "double\0", 'D', ( menuptr ) CP_DoubleClickSpeed },
+		{ 1, "menuspd\0", 'M', ( menuptr ) MenuFlipSpeed },
+		{ 1, "detail\0", 'D', ( menuptr ) CP_DetailMenu },
+		{ 1, "vlevel\0", 'V', ( menuptr ) CP_ViolenceMenu },
+		{ 1, "\0", 'S', ( menuptr ) CP_ScreenSize }
 	};
 
 CP_MenuNames DetailMenuNames[] =
@@ -784,13 +774,13 @@ CP_MenuNames DetailMenuNames[] =
 		"HIGH DETAIL"
 	};
 
-CP_iteminfo DetailItems = {32, 64, 3, 0, 43, DetailMenuNames, mn_largefont};
+CP_iteminfo DetailItems = { 32, 64, 3, 0, 43, DetailMenuNames, mn_largefont };
 
 CP_itemtype DetailMenu[] =
 	{
-		{2, "lowdtl\0", 'L', NULL},
-		{1, "meddtl\0", 'M', NULL},
-		{1, "hidtl\0", 'H', NULL}
+		{ 2, "lowdtl\0", 'L', NULL },
+		{ 1, "meddtl\0", 'M', NULL },
+		{ 1, "hidtl\0", 'H', NULL }
 	};
 
 CP_MenuNames BattleMenuNames[] =
@@ -800,13 +790,13 @@ CP_MenuNames BattleMenuNames[] =
 		"COMM-BAT OPTIONS"
 	};
 
-CP_iteminfo BattleItems = {32, 19, 3, 0, 24, BattleMenuNames, mn_largefont};
+CP_iteminfo BattleItems = { 32, 19, 3, 0, 24, BattleMenuNames, mn_largefont };
 
 CP_itemtype BattleMenu[] =
 	{
-		{2, "bplay\0", 'P', ( menuptr ) BattleNoTeams},
-		{1, "playteam\0", 'P', ( menuptr ) BattleTeams},
-		{1, "comopt\0", 'C', ( menuptr ) CP_BattleOptions}
+		{ 2, "bplay\0", 'P', ( menuptr ) BattleNoTeams },
+		{ 1, "playteam\0", 'P', ( menuptr ) BattleTeams },
+		{ 1, "comopt\0", 'C', ( menuptr ) CP_BattleOptions }
 	};
 
 CP_MenuNames ViolenceMenuNames[] =
@@ -817,14 +807,14 @@ CP_MenuNames ViolenceMenuNames[] =
 		"EXCESSIVE"
 	};
 
-CP_iteminfo ViolenceItems = {32, 64, 4, 0, 45, ViolenceMenuNames, mn_largefont};
+CP_iteminfo ViolenceItems = { 32, 64, 4, 0, 45, ViolenceMenuNames, mn_largefont };
 
 CP_itemtype ViolenceMenu[] =
 	{
-		{2, "vnone\0", 'N', NULL},
-		{1, "vsome\0", 'S', NULL},
-		{1, "valot\0", 'A', NULL},
-		{1, "vexcess\0", 'E', NULL}
+		{ 2, "vnone\0", 'N', NULL },
+		{ 1, "vsome\0", 'S', NULL },
+		{ 1, "valot\0", 'A', NULL },
+		{ 1, "vexcess\0", 'E', NULL }
 	};
 
 CP_MenuNames VMenuNames[] =
@@ -833,12 +823,12 @@ CP_MenuNames VMenuNames[] =
 		"" // "ENTER PASSWORD" // "CHANGE PASSWORD"
 	};
 
-CP_iteminfo VItems = {32, MP_Y, 2, 0, 24, VMenuNames, mn_largefont};
+CP_iteminfo VItems = { 32, MP_Y, 2, 0, 24, VMenuNames, mn_largefont };
 
 CP_itemtype VMenu[] =
 	{
-		{2, "msetv\0", 'S', ( menuptr ) CP_ViolenceLevel},
-		{1, "mepass\0", 'E', ( menuptr ) CP_PWMenu}
+		{ 2, "msetv\0", 'S', ( menuptr ) CP_ViolenceLevel },
+		{ 1, "mepass\0", 'E', ( menuptr ) CP_PWMenu }
 	};
 
 CP_MenuNames ModeMenuNames[] =
@@ -854,19 +844,19 @@ CP_MenuNames ModeMenuNames[] =
 		"CAPTURE THE TRIAD"
 	};
 
-CP_iteminfo ModeItems = {MENU_X, MENU_Y + 1, 9, 0, 24, ModeMenuNames, mn_largefont};
+CP_iteminfo ModeItems = { MENU_X, MENU_Y + 1, 9, 0, 24, ModeMenuNames, mn_largefont };
 
 CP_itemtype ModeMenu[] =
 	{
-		{CP_CursorLocation, "normal\0", 'N', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "scorem\0", 'S', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "collect\0", 'C', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "scaven\0", 'S', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "hunter\0", 'H', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "tag\0", 'T', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "eluder\0", 'E', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "deluder\0", 'D', ( menuptr ) CP_BattleMenu},
-		{CP_Active, "captriad\0", 'C', ( menuptr ) CP_BattleMenu}
+		{ CP_CursorLocation, "normal\0", 'N', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "scorem\0", 'S', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "collect\0", 'C', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "scaven\0", 'S', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "hunter\0", 'H', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "tag\0", 'T', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "eluder\0", 'E', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "deluder\0", 'D', ( menuptr ) CP_BattleMenu },
+		{ CP_Active, "captriad\0", 'C', ( menuptr ) CP_BattleMenu }
 	};
 
 CP_MenuNames BOptNames[] =
@@ -882,19 +872,19 @@ CP_MenuNames BOptNames[] =
 		"TIME LIMIT"
 	};
 
-CP_iteminfo BOptItems = {MENU_X, MENU_Y + 1, 9, 0, 24, BOptNames, mn_largefont};
+CP_iteminfo BOptItems = { MENU_X, MENU_Y + 1, 9, 0, 24, BOptNames, mn_largefont };
 
 CP_itemtype BOptMenu[] =
 	{
-		{2, "gravity\0", 'G', ( menuptr ) CP_GravityOptions},
-		{1, "speed\0", 'S', ( menuptr ) CP_SpeedOptions},
-		{1, "ammoper\0", 'A', ( menuptr ) CP_AmmoPerWeaponOptions},
-		{1, "hitp\0", 'H', ( menuptr ) CP_HitPointsOptions},
-		{1, "radical\0", 'R', ( menuptr ) CP_SpawnControlOptions},
-		{1, "lightl\0", 'L', ( menuptr ) CP_LightLevelOptions},
-		{1, "pntgoal\0", 'P', ( menuptr ) CP_PointGoalOptions},
-		{1, "danger\0", 'D', ( menuptr ) CP_DangerOptions},
-		{1, "timel\0", 'T', ( menuptr ) CP_TimeLimitOptions}
+		{ 2, "gravity\0", 'G', ( menuptr ) CP_GravityOptions },
+		{ 1, "speed\0", 'S', ( menuptr ) CP_SpeedOptions },
+		{ 1, "ammoper\0", 'A', ( menuptr ) CP_AmmoPerWeaponOptions },
+		{ 1, "hitp\0", 'H', ( menuptr ) CP_HitPointsOptions },
+		{ 1, "radical\0", 'R', ( menuptr ) CP_SpawnControlOptions },
+		{ 1, "lightl\0", 'L', ( menuptr ) CP_LightLevelOptions },
+		{ 1, "pntgoal\0", 'P', ( menuptr ) CP_PointGoalOptions },
+		{ 1, "danger\0", 'D', ( menuptr ) CP_DangerOptions },
+		{ 1, "timel\0", 'T', ( menuptr ) CP_TimeLimitOptions }
 	};
 
 CP_MenuNames GravityMenuNames[] =
@@ -904,13 +894,13 @@ CP_MenuNames GravityMenuNames[] =
 		"HIGH"
 	};
 
-CP_iteminfo GravityItems = {32, 26, 3, 0, 45, GravityMenuNames, mn_largefont};
+CP_iteminfo GravityItems = { 32, 26, 3, 0, 45, GravityMenuNames, mn_largefont };
 
 CP_itemtype GravityMenu[] =
 	{
-		{2, "b_low\0", 'L', NULL},
-		{1, "b_normal\0", 'N', NULL},
-		{1, "b_high\0", 'H', NULL}
+		{ 2, "b_low\0", 'L', NULL },
+		{ 1, "b_normal\0", 'N', NULL },
+		{ 1, "b_high\0", 'H', NULL }
 	};
 
 CP_MenuNames SpeedMenuNames[] =
@@ -919,12 +909,12 @@ CP_MenuNames SpeedMenuNames[] =
 		"FAST"
 	};
 
-CP_iteminfo SpeedItems = {32, MP_Y, 2, 0, 45, SpeedMenuNames, mn_largefont};
+CP_iteminfo SpeedItems = { 32, MP_Y, 2, 0, 45, SpeedMenuNames, mn_largefont };
 
 CP_itemtype SpeedMenu[] =
 	{
-		{2, "b_normal\0", 'N', NULL},
-		{1, "b_fast\0", 'F', NULL}
+		{ 2, "b_normal\0", 'N', NULL },
+		{ 1, "b_fast\0", 'F', NULL }
 	};
 
 CP_MenuNames AmmoPerWeaponMenuNames[] =
@@ -934,13 +924,13 @@ CP_MenuNames AmmoPerWeaponMenuNames[] =
 		"GUNFINITY"
 	};
 
-CP_iteminfo AmmoPerWeaponItems = {32, 26, 3, 0, 45, AmmoPerWeaponMenuNames, mn_largefont};
+CP_iteminfo AmmoPerWeaponItems = { 32, 26, 3, 0, 45, AmmoPerWeaponMenuNames, mn_largefont };
 
 CP_itemtype AmmoPerWeaponMenu[] =
 	{
-		{2, "b_one\0", 'O', NULL},
-		{1, "b_normal\0", 'N', NULL},
-		{1, "b_gunf\0", 'G', NULL}
+		{ 2, "b_one\0", 'O', NULL },
+		{ 1, "b_normal\0", 'N', NULL },
+		{ 1, "b_gunf\0", 'G', NULL }
 	};
 
 CP_MenuNames HitPointMenuNames[] =
@@ -954,17 +944,17 @@ CP_MenuNames HitPointMenuNames[] =
 		"4000"
 	};
 
-CP_iteminfo HitPointItems = {32, 32, 7, 0, 45, HitPointMenuNames, mn_largefont};
+CP_iteminfo HitPointItems = { 32, 32, 7, 0, 45, HitPointMenuNames, mn_largefont };
 
 CP_itemtype HitPointMenu[] =
 	{
-		{2, "b_one\0", 'O', NULL},
-		{1, "b_25\0", 'a', NULL},
-		{1, "b_char\0", 'C', NULL},
-		{1, "b_100\0", 'a', NULL},
-		{1, "b_250\0", 'a', NULL},
-		{1, "b_500\0", 'a', NULL},
-		{1, "b_4000\0", 'a', NULL}
+		{ 2, "b_one\0", 'O', NULL },
+		{ 1, "b_25\0", 'a', NULL },
+		{ 1, "b_char\0", 'C', NULL },
+		{ 1, "b_100\0", 'a', NULL },
+		{ 1, "b_250\0", 'a', NULL },
+		{ 1, "b_500\0", 'a', NULL },
+		{ 1, "b_4000\0", 'a', NULL }
 	};
 
 CP_MenuNames SpawnMenuNames[] =
@@ -979,18 +969,18 @@ CP_MenuNames SpawnMenuNames[] =
 		"FRIENDLY FIRE"
 	};
 
-CP_iteminfo SpawnItems = {20, 24, 8, 0, 35, SpawnMenuNames, mn_largefont};
+CP_iteminfo SpawnItems = { 20, 24, 8, 0, 35, SpawnMenuNames, mn_largefont };
 
 CP_itemtype SpawnMenu[] =
 	{
-		{2, "b_danger\0", 'S', NULL},
-		{1, "b_health\0", 'S', NULL},
-		{1, "b_weap\0", 'S', NULL},
-		{1, "b_mines\0", 'S', NULL},
-		{1, "b_rpawn\0", 'R', NULL},
-		{1, "b_persis\0", 'W', NULL},
-		{1, "b_rndwpn\0", 'R', NULL},
-		{1, "b_friend\0", 'F', NULL}
+		{ 2, "b_danger\0", 'S', NULL },
+		{ 1, "b_health\0", 'S', NULL },
+		{ 1, "b_weap\0", 'S', NULL },
+		{ 1, "b_mines\0", 'S', NULL },
+		{ 1, "b_rpawn\0", 'R', NULL },
+		{ 1, "b_persis\0", 'W', NULL },
+		{ 1, "b_rndwpn\0", 'R', NULL },
+		{ 1, "b_friend\0", 'F', NULL }
 	};
 
 CP_MenuNames LightLevelMenuNames[] =
@@ -1003,16 +993,16 @@ CP_MenuNames LightLevelMenuNames[] =
 		"LIGHTNING"
 	};
 
-CP_iteminfo LightLevelItems = {32, 40, 6, 0, 45, LightLevelMenuNames, mn_largefont};
+CP_iteminfo LightLevelItems = { 32, 40, 6, 0, 45, LightLevelMenuNames, mn_largefont };
 
 CP_itemtype LightLevelMenu[] =
 	{
-		{2, "b_dark\0", 'D', NULL},
-		{1, "b_normal\0", 'N', NULL},
-		{1, "b_bright\0", 'B', NULL},
-		{1, "b_fog\0", 'F', NULL},
-		{1, "b_period\0", 'P', NULL},
-		{1, "b_light\0", 'L', NULL}
+		{ 2, "b_dark\0", 'D', NULL },
+		{ 1, "b_normal\0", 'N', NULL },
+		{ 1, "b_bright\0", 'B', NULL },
+		{ 1, "b_fog\0", 'F', NULL },
+		{ 1, "b_period\0", 'P', NULL },
+		{ 1, "b_light\0", 'L', NULL }
 	};
 
 CP_MenuNames PointGoalMenuNames[] =
@@ -1028,19 +1018,19 @@ CP_MenuNames PointGoalMenuNames[] =
 		"INFINITE"
 	};
 
-CP_iteminfo PointGoalItems = {32, 16, 9, 0, 45, PointGoalMenuNames, mn_largefont};
+CP_iteminfo PointGoalItems = { 32, 16, 9, 0, 45, PointGoalMenuNames, mn_largefont };
 
 CP_itemtype PointGoalMenu[] =
 	{
-		{2, "b_1\0", 'a', NULL},
-		{1, "b_5\0", 'a', NULL},
-		{1, "b_11\0", 'a', NULL},
-		{1, "b_21\0", 'a', NULL},
-		{1, "b_50\0", 'a', NULL},
-		{1, "b_100\0", 'a', NULL},
-		{1, "b_random\0", 'R', NULL},
-		{1, "b_randb\0", 'R', NULL},
-		{1, "b_inf\0", 'I', NULL}
+		{ 2, "b_1\0", 'a', NULL },
+		{ 1, "b_5\0", 'a', NULL },
+		{ 1, "b_11\0", 'a', NULL },
+		{ 1, "b_21\0", 'a', NULL },
+		{ 1, "b_50\0", 'a', NULL },
+		{ 1, "b_100\0", 'a', NULL },
+		{ 1, "b_random\0", 'R', NULL },
+		{ 1, "b_randb\0", 'R', NULL },
+		{ 1, "b_inf\0", 'I', NULL }
 	};
 
 CP_MenuNames DangerMenuNames[] =
@@ -1050,13 +1040,13 @@ CP_MenuNames DangerMenuNames[] =
 		"KILL"
 	};
 
-CP_iteminfo DangerItems = {32, 56, 3, 0, 45, DangerMenuNames, mn_largefont};
+CP_iteminfo DangerItems = { 32, 56, 3, 0, 45, DangerMenuNames, mn_largefont };
 
 CP_itemtype DangerMenu[] =
 	{
-		{2, "b_low\0", 'L', NULL},
-		{1, "b_normal\0", 'N', NULL},
-		{1, "b_kill\0", 'K', NULL}
+		{ 2, "b_low\0", 'L', NULL },
+		{ 1, "b_normal\0", 'N', NULL },
+		{ 1, "b_kill\0", 'K', NULL }
 	};
 
 CP_MenuNames TimeLimitMenuNames[] =
@@ -1071,18 +1061,18 @@ CP_MenuNames TimeLimitMenuNames[] =
 		"NONE"
 	};
 
-CP_iteminfo TimeLimitItems = {32, 24, 8, 0, 45, TimeLimitMenuNames, mn_largefont};
+CP_iteminfo TimeLimitItems = { 32, 24, 8, 0, 45, TimeLimitMenuNames, mn_largefont };
 
 CP_itemtype TimeLimitMenu[] =
 	{
-		{2, "b_1\0", 'a', NULL},
-		{1, "b_2\0", 'a', NULL},
-		{1, "b_5\0", 'a', NULL},
-		{1, "b_10\0", 'a', NULL},
-		{1, "b_21\0", 'a', NULL},
-		{1, "b_30\0", 'a', NULL},
-		{1, "b_99\0", 'a', NULL},
-		{1, "vnone\0", 'N', NULL}
+		{ 2, "b_1\0", 'a', NULL },
+		{ 1, "b_2\0", 'a', NULL },
+		{ 1, "b_5\0", 'a', NULL },
+		{ 1, "b_10\0", 'a', NULL },
+		{ 1, "b_21\0", 'a', NULL },
+		{ 1, "b_30\0", 'a', NULL },
+		{ 1, "b_99\0", 'a', NULL },
+		{ 1, "vnone\0", 'N', NULL }
 	};
 
 CP_MenuNames MultiPageCustomNames[MAXCUSTOM + 2] =
@@ -1091,23 +1081,23 @@ CP_MenuNames MultiPageCustomNames[MAXCUSTOM + 2] =
 		"PREVIOUS PAGE"
 	};
 
-CP_iteminfo MultiPageCustomItems = {18, 17, 0, 0, 12, MultiPageCustomNames, mn_smallfont};
+CP_iteminfo MultiPageCustomItems = { 18, 17, 0, 0, 12, MultiPageCustomNames, mn_smallfont };
 CP_itemtype MultiPageCustomMenu[] =
 	{
-		{1, "", 'N', NULL},
-		{1, "", 'P', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
-		{1, "", 'a', NULL},
+		{ 1, "", 'N', NULL },
+		{ 1, "", 'P', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
+		{ 1, "", 'a', NULL },
 	};
 
 #define COLORX 113
@@ -1116,7 +1106,7 @@ CP_itemtype MultiPageCustomMenu[] =
 #define COLORH 96
 
 // Custom menu stuff
-static int CUSTOM_y[7] = {31, 0, 63, 0, 94, 0, 126};
+static int CUSTOM_y[7] = { 31, 0, 63, 0, 94, 0, 126 };
 
 //
 // Save globals
@@ -1211,7 +1201,7 @@ void MN_GetCursorLocation
 			break;
 		}
 
-		if ((items[i].active == CP_Active) && (position == -1)) {
+		if (( items[i].active == CP_Active ) && ( position == -1 )) {
 			position = i;
 		}
 	}
@@ -1249,7 +1239,7 @@ int MN_GetActive
 		}
 	}
 
-	return (returnval);
+	return ( returnval );
 }
 
 
@@ -1385,7 +1375,7 @@ int getASCII( void ) {
 	_enable ();
 #endif
 
-	return (returnvalue);
+	return ( returnvalue );
 }
 
 
@@ -1435,7 +1425,7 @@ void ScanForSavedGames() {
 			MainMenu[loadgame].active = CP_Active;
 	} else
 		MainMenu[loadgame].active = CP_Inactive;
-#if ((!PLATFORM_DOS) && (!PLATFORM_WIN32))
+#if (( !PLATFORM_DOS ) && ( !PLATFORM_WIN32 ))
 	chdir( pathsave );
 	free( pathsave );
 #endif
@@ -1488,14 +1478,14 @@ void SetUpControlPanel( void ) {
 	if ( iGLOBAL_SCREENWIDTH == 320 ) {
 		for ( i = 0; i < Xres; i += 2 ) {
 			b = ( byte * ) bufferofs + i;
-			for ( j = 0; j < 100; j++, s++, b += (iGLOBAL_SCREENWIDTH << 1))
+			for ( j = 0; j < 100; j++, s++, b += ( iGLOBAL_SCREENWIDTH << 1 ))
 				*s = *b;
 		}
 	}
 	if ( iGLOBAL_SCREENWIDTH >= 640 ) {
 		for ( i = 0; i < Xres; i += 4 ) {
 			b = ( byte * ) bufferofs + i;//schrink screen to 1/2 size
-			for ( j = 0; j < (Yres / 4); j++, s++, b += (iGLOBAL_SCREENWIDTH << 1) * 2 )
+			for ( j = 0; j < ( Yres / 4 ); j++, s++, b += ( iGLOBAL_SCREENWIDTH << 1 ) * 2 )
 				*s = *b;
 		}
 	}/*
@@ -1599,7 +1589,7 @@ void FreeSavedScreenPtr( void ) {
 void CleanUpControlPanel( void ) {
 	int joyx, joyy;
 
-	if ((playstate == ex_resetgame) || (loadedgame == true))
+	if (( playstate == ex_resetgame ) || ( loadedgame == true ))
 		ShutdownClientControls();
 
 	// Free up saved screen image
@@ -1631,7 +1621,7 @@ boolean CP_CheckQuick
 	if ( demoplayback == true ) {
 		switch ( scancode ) {
 		case sc_Escape:inmenu = true;
-			return (true);
+			return ( true );
 			break;
 		}
 	} else {
@@ -1644,12 +1634,12 @@ boolean CP_CheckQuick
 		case sc_F8:
 		case sc_F9:
 		case sc_F10:inmenu = true;
-			return (true);
+			return ( true );
 			break;
 		}
 	}
 
-	return (false);
+	return ( false );
 }
 
 //******************************************************************************
@@ -1665,7 +1655,7 @@ void ControlPanel
 	) {
 	if ( scancode == sc_Escape ) {
 		CP_MainMenu();
-		if ((playstate == ex_stillplaying) && (loadedgame == false)) {
+		if (( playstate == ex_stillplaying ) && ( loadedgame == false )) {
 			fizzlein = true;
 		}
 		return;
@@ -1783,7 +1773,7 @@ menuitems CP_MainMenu
 	CleanUpControlPanel();
 	ShutdownMenuBuf();
 
-	return (which);
+	return ( which );
 }
 
 
@@ -1843,8 +1833,8 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 
 	handlewhich = item_i->curpos;
 	x = item_i->x;
-	if ((MenuNum == 4) || (MenuNum == 6) ||
-		(item_i->fontsize == mn_smallfont)) {
+	if (( MenuNum == 4 ) || ( MenuNum == 6 ) ||
+		( item_i->fontsize == mn_smallfont )) {
 		basey = item_i->y;
 
 		CursorLump = SmallCursor;
@@ -1893,11 +1883,11 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 		ReadAnyControl( &ci );
 		RefreshMenuBuf( 0 );
 		// Change Cursor Shape
-		if ((GetTicCount() > (timer + count)) && (MenuNum != 5)) {
+		if (( GetTicCount() > ( timer + count )) && ( MenuNum != 5 )) {
 			timer = GetTicCount();
 
 			CursorNum++;
-			if ( CursorNum > (MAXCURSORNUM - 1))
+			if ( CursorNum > ( MAXCURSORNUM - 1 ))
 				CursorNum = 0;
 
 			EraseMenuBufRegion( x, y, cursorwidth, cursorheight );
@@ -1913,8 +1903,8 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 
 			key = toupper( key );
 
-			for ( i = (handlewhich + 1); i < item_i->amount; i++ )
-				if ((items + i)->active && (items + i)->letter == key ) {
+			for ( i = ( handlewhich + 1 ); i < item_i->amount; i++ )
+				if (( items + i )->active && ( items + i )->letter == key ) {
 					HideCursor( item_i, items, x, y, handlewhich );
 					MN_PlayMenuSnd( SD_MOVECURSORSND );
 					handlewhich = i;
@@ -1931,7 +1921,7 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 			// Initial char - pass 2
 			if ( !ok ) {
 				for ( i = 0; i < handlewhich; i++ )
-					if ((items + i)->active && (items + i)->letter == key ) {
+					if (( items + i )->active && ( items + i )->letter == key ) {
 						HideCursor( item_i, items, x, y, handlewhich );
 						MN_PlayMenuSnd( SD_MOVECURSORSND );
 						handlewhich = i;
@@ -1953,14 +1943,14 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 			case dir_North:HideCursor( item_i, items, x, y, handlewhich );
 
 				CursorNum++;
-				if ( CursorNum > (MAXCURSORNUM - 1))
+				if ( CursorNum > ( MAXCURSORNUM - 1 ))
 					CursorNum = 0;
 
 
 				// Do a half step if possible
-				if ((handlewhich) &&
-					(((items + handlewhich - 1)->active == CP_CursorLocation) ||
-						((items + handlewhich - 1)->active == CP_Active))) {
+				if (( handlewhich ) &&
+					((( items + handlewhich - 1 )->active == CP_CursorLocation ) ||
+						(( items + handlewhich - 1 )->active == CP_Active ))) {
 					y -= 6;
 					DrawHalfStep( x, y );
 					playsnd = false;
@@ -1968,7 +1958,7 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 					RefreshMenuBuf( 0 );
 
 					CursorNum++;
-					if ( CursorNum > (MAXCURSORNUM - 1))
+					if ( CursorNum > ( MAXCURSORNUM - 1 ))
 						CursorNum = 0;
 				} else {
 					playsnd = true;
@@ -1980,8 +1970,8 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 						handlewhich = item_i->amount - 1;
 					else
 						handlewhich--;
-				} while (((items + handlewhich)->active == CP_Inactive)
-					|| ((items + handlewhich)->active == CP_Active3));
+				} while ((( items + handlewhich )->active == CP_Inactive )
+					|| (( items + handlewhich )->active == CP_Active3 ));
 
 				if ( playsnd )
 					MN_PlayMenuSnd( SD_MOVECURSORSND );
@@ -1996,13 +1986,13 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 			case dir_South:HideCursor( item_i, items, x, y, handlewhich );
 
 				CursorNum++;
-				if ( CursorNum > (MAXCURSORNUM - 1))
+				if ( CursorNum > ( MAXCURSORNUM - 1 ))
 					CursorNum = 0;
 
 				// Do a half step if possible
-				if ((handlewhich != item_i->amount - 1) &&
-					(((items + handlewhich + 1)->active == CP_CursorLocation) ||
-						((items + handlewhich + 1)->active == CP_Active))) {
+				if (( handlewhich != item_i->amount - 1 ) &&
+					((( items + handlewhich + 1 )->active == CP_CursorLocation ) ||
+						(( items + handlewhich + 1 )->active == CP_Active ))) {
 					y += 6;
 					DrawHalfStep( x, y );
 					playsnd = false;
@@ -2010,7 +2000,7 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 					RefreshMenuBuf( 0 );
 
 					CursorNum++;
-					if ( CursorNum > (MAXCURSORNUM - 1))
+					if ( CursorNum > ( MAXCURSORNUM - 1 ))
 						CursorNum = 0;
 				} else {
 					playsnd = true;
@@ -2022,8 +2012,8 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 						handlewhich = 0;
 					else
 						handlewhich++;
-				} while (((items + handlewhich)->active == CP_Inactive)
-					|| ((items + handlewhich)->active == CP_Active3));
+				} while ((( items + handlewhich )->active == CP_Inactive )
+					|| (( items + handlewhich )->active == CP_Active3 ));
 
 				if ( playsnd )
 					MN_PlayMenuSnd( SD_MOVECURSORSND );
@@ -2050,10 +2040,10 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 			exit = 2;
 		}
 
-		if ((Keyboard[sc_Home]) && (numactive > 1)) {
+		if (( Keyboard[sc_Home] ) && ( numactive > 1 )) {
 			newpos = 0;
-			while ((items[newpos].active == CP_Inactive) ||
-				(items[newpos].active == CP_Active3)) {
+			while (( items[newpos].active == CP_Inactive ) ||
+				( items[newpos].active == CP_Active3 )) {
 				newpos++;
 			}
 
@@ -2061,7 +2051,7 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 				HideCursor( item_i, items, x, y, handlewhich );
 
 				CursorNum++;
-				if ( CursorNum > (MAXCURSORNUM - 1)) {
+				if ( CursorNum > ( MAXCURSORNUM - 1 )) {
 					CursorNum = 0;
 				}
 
@@ -2079,10 +2069,10 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 
 				RefreshMenuBuf( 0 );
 			}
-		} else if ((Keyboard[sc_End]) && (numactive > 1)) {
+		} else if (( Keyboard[sc_End] ) && ( numactive > 1 )) {
 			newpos = item_i->amount - 1;
-			while ((items[newpos].active == CP_Inactive) ||
-				(items[newpos].active == CP_Active3)) {
+			while (( items[newpos].active == CP_Inactive ) ||
+				( items[newpos].active == CP_Active3 )) {
 				newpos--;
 			}
 
@@ -2090,7 +2080,7 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 				HideCursor( item_i, items, x, y, handlewhich );
 
 				CursorNum++;
-				if ( CursorNum > (MAXCURSORNUM - 1)) {
+				if ( CursorNum > ( MAXCURSORNUM - 1 )) {
 					CursorNum = 0;
 				}
 
@@ -2112,14 +2102,14 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 
 		// Page Up/Down
 		if ( MenuNum == 11 ) {
-			if ((Keyboard[sc_PgUp]) &&
-				((items + 1)->active != CP_Inactive)) {
+			if (( Keyboard[sc_PgUp] ) &&
+				(( items + 1 )->active != CP_Inactive )) {
 				item_i->curpos = handlewhich;
 				handlewhich = PAGEUP;
 				exit = 3;
 				MN_PlayMenuSnd( SD_SELECTSND );
-			} else if ((Keyboard[sc_PgDn]) &&
-				((items + 0)->active != CP_Inactive)) {
+			} else if (( Keyboard[sc_PgDn] ) &&
+				(( items + 0 )->active != CP_Inactive )) {
 				item_i->curpos = handlewhich;
 				handlewhich = PAGEDOWN;
 				exit = 3;
@@ -2128,7 +2118,7 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 		}
 
 		// Delete save games
-		if ((MenuNum == 4) || (MenuNum == 6)) {
+		if (( MenuNum == 4 ) || ( MenuNum == 6 )) {
 			if ( Keyboard[sc_Delete] && SaveGamesAvail[handlewhich] ) {
 				if ( CP_DisplayMsg( "Delete saved game?\nAre you sure?", 12 ) == true ) {
 					char loadname[45] = "rottgam0.rot";
@@ -2196,17 +2186,17 @@ int HandleMenu( CP_iteminfo * item_i, CP_itemtype * items, void (* routine)( int
 
 	switch ( exit ) {
 	case 1:
-		if ((items + handlewhich)->routine != NULL)
-			(items + handlewhich)->routine( 0 );
-		return (handlewhich);
+		if (( items + handlewhich )->routine != NULL)
+			( items + handlewhich )->routine( 0 );
+		return ( handlewhich );
 
 	case 2:MN_PlayMenuSnd( SD_ESCPRESSEDSND );
-		return (-1);
+		return ( -1 );
 
-	case 3:return (handlewhich);
+	case 3:return ( handlewhich );
 	}
 
-	return (0);
+	return ( 0 );
 }
 
 //******************************************************************************
@@ -2232,9 +2222,9 @@ void HideCursor
 		EraseMenuBufRegion( x, y, cursorwidth, cursorheight );
 	}
 
-	if ( MenuNum && (MenuNum != 4) && (MenuNum != 6)) {
+	if ( MenuNum && ( MenuNum != 4 ) && ( MenuNum != 6 )) {
 		posx = item_i->x + item_i->indent;
-		posy = item_i->y + (which * yinc);
+		posy = item_i->y + ( which * yinc );
 
 		color = -1;
 		switch ( items[which].active ) {
@@ -2268,13 +2258,13 @@ void HideCursor
 		}
 	}
 
-	if ((items[which].active != CP_Inactive) &&
-		(items[which].active != CP_SemiActive)) {
+	if (( items[which].active != CP_Inactive ) &&
+		( items[which].active != CP_SemiActive )) {
 		items[which].active = CP_Active;
 	}
 
 	delay = DELAYAMT - tics;
-	while ((time + delay) > GetTicCount()) {
+	while (( time + delay ) > GetTicCount()) {
 		RefreshMenuBuf( 0 );
 	}
 }
@@ -2307,11 +2297,11 @@ int GetNumActive( CP_iteminfo * item_i, CP_itemtype * items ) {
 	int num = 0;
 
 	for ( cnt = 0; cnt < item_i->amount; cnt++ ) {
-		if ((items + cnt)->active != CP_Inactive )
+		if (( items + cnt )->active != CP_Inactive )
 			num++;
 	}
 
-	return (num);
+	return ( num );
 }
 
 //******************************************************************************
@@ -2347,7 +2337,7 @@ void ShowCursor
 	}
 
 	if ( items[which].active != CP_SemiActive ) {
-		if ( MenuNum && (MenuNum != 4) && (MenuNum != 6)) {
+		if ( MenuNum && ( MenuNum != 4 ) && ( MenuNum != 6 )) {
 			posx = item_i->x + item_i->indent;
 			posy = item_i->y + which * yinc;
 
@@ -2369,7 +2359,7 @@ void ShowCursor
 	}
 
 	delay = DELAYAMT - tics;
-	while ((time + delay) > GetTicCount()) {
+	while (( time + delay ) > GetTicCount()) {
 		RefreshMenuBuf( 0 );
 	}
 }
@@ -2506,8 +2496,8 @@ void CP_Quit( int which ) {
 	int num = 100;
 	static int oldnum;
 
-	while ((num >= 7) || (oldnum == num))
-		num = (RandomNumber ( "CP_QUIT", 0 ) & 7);
+	while (( num >= 7 ) || ( oldnum == num ))
+		num = ( RandomNumber ( "CP_QUIT", 0 ) & 7 );
 
 	oldnum = num;
 
@@ -2525,7 +2515,7 @@ void CP_Quit( int which ) {
 	if ( which != -1 ) {
 		ClearMenuBuf();
 		DrawMainMenu();
-		DrawMenuBufItem( MainItems.x, ((MainItems.curpos * 14) + (MainItems.y - 2)),
+		DrawMenuBufItem( MainItems.x, (( MainItems.curpos * 14 ) + ( MainItems.y - 2 )),
 						 W_GetNumForName( LargeCursor ) + CursorFrame[CursorNum] );
 		RefreshMenuBuf( 0 );
 	}
@@ -2620,7 +2610,7 @@ boolean CP_DisplayMsg
 	}
 
 	CurrentFont = tinyfont;
-	W_H = (W_H * CurrentFont->height) + 3;
+	W_H = ( W_H * CurrentFont->height ) + 3;
 
 	WindowX = Q_X + W_X;
 	WindowY = L_Y + 2;
@@ -2653,11 +2643,11 @@ boolean CP_DisplayMsg
 
 			ReadAnyControl( &ci );
 
-			if ((ci.dir == dir_West) && (!YESON)) {
+			if (( ci.dir == dir_West ) && ( !YESON )) {
 				MN_PlayMenuSnd( SD_MOVECURSORSND );
 				YESON = 1;
 				redraw = true;
-			} else if ((ci.dir == dir_East) && (YESON)) {
+			} else if (( ci.dir == dir_East ) && ( YESON )) {
 				MN_PlayMenuSnd( SD_MOVECURSORSND );
 				YESON = 0;
 				redraw = true;
@@ -2712,8 +2702,8 @@ boolean CP_DisplayMsg
 				}
 			}
 
-			if ((Keyboard[sc_Space] || Keyboard[sc_Enter] ||
-				ci.button0) && YESON ) {
+			if (( Keyboard[sc_Space] || Keyboard[sc_Enter] ||
+				ci.button0 ) && YESON ) {
 				done = true;
 				retval = true;
 				MN_PlayMenuSnd( SD_SELECTSND );
@@ -2723,8 +2713,8 @@ boolean CP_DisplayMsg
 				retval = false;
 				CP_Acknowledge = CP_ESC;
 				MN_PlayMenuSnd( SD_ESCPRESSEDSND );
-			} else if ((Keyboard[sc_Space] || Keyboard[sc_Enter] ||
-				ci.button0) && !YESON ) {
+			} else if (( Keyboard[sc_Space] || Keyboard[sc_Enter] ||
+				ci.button0 ) && !YESON ) {
 				done = true;
 				retval = false;
 				CP_Acknowledge = CP_NO;
@@ -2737,8 +2727,8 @@ boolean CP_DisplayMsg
 			}
 		}
 
-		while ((Keyboard[sc_Enter] || Keyboard[sc_Space] ||
-			Keyboard[sc_Escape]) && !blowout ) {
+		while (( Keyboard[sc_Enter] || Keyboard[sc_Space] ||
+			Keyboard[sc_Escape] ) && !blowout ) {
 			IN_UpdateKeyboard();
 			RefreshMenuBuf( 0 );
 		}
@@ -2756,7 +2746,7 @@ boolean CP_DisplayMsg
 		LastScan = 0;
 	}
 	IN_ClearKeysDown();
-	return (retval);
+	return ( retval );
 }
 
 
@@ -2801,7 +2791,7 @@ void CP_NewGame
 	) {
 	int which;
 
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 	ToughMenuNum = 0;
 #else
 	int temp;
@@ -2809,7 +2799,7 @@ void CP_NewGame
 	temp = ToughMenuNum;
 
 	while ( ToughMenuNum == temp ) {
-		temp = ((RandomNumber( "TOUGH MENU", 0 )) & 3);
+		temp = (( RandomNumber( "TOUGH MENU", 0 )) & 3 );
 		if ( temp == 3 ) {
 			temp = 1;
 		}
@@ -2979,7 +2969,7 @@ void DrawStoredGame( byte * pic, int episode, int area ) {
 	DrawMenuBufPropString( 103, 128, "A" );
 
 	if ( episode > 1 )
-		level = (area + 1) - ((episode - 1) << 3);
+		level = ( area + 1 ) - (( episode - 1 ) << 3 );
 	else
 		level = area + 1;
 
@@ -3002,7 +2992,7 @@ int DoLoad( int which ) {
 	gamestorage_t game;
 	int exit = 0;
 
-	if ((which >= 0) && SaveGamesAvail[which] ) {
+	if (( which >= 0 ) && SaveGamesAvail[which] ) {
 		loadedgame = true;
 
 		if ( loadsavesound )
@@ -3037,7 +3027,7 @@ int DoLoad( int which ) {
 		}
 	}
 
-	return (exit);
+	return ( exit );
 }
 
 
@@ -3068,7 +3058,7 @@ int CP_LoadGame( int quick, int dieload ) {
 				RefreshMenuBuf( 0 );
 				DoLoad( which );
 
-				return (1);
+				return ( 1 );
 			} else {
 				DrawLoadSaveScreen( 0 );
 				if ( CP_DisplayMsg( "Quick load saved game?\nAre you sure?", 12 ) == true ) {
@@ -3077,9 +3067,9 @@ int CP_LoadGame( int quick, int dieload ) {
 					RefreshMenuBuf( 0 );
 					DoLoad( which );
 
-					return (1);
+					return ( 1 );
 				} else {
-					return (0);
+					return ( 0 );
 				}
 			}
 		}
@@ -3089,7 +3079,7 @@ int CP_LoadGame( int quick, int dieload ) {
 	do {
 		which = HandleMenu( &LSItems, &LSMenu[0], CP_DrawSelectedGame );
 
-		if ((exit = DoLoad( which )))
+		if (( exit = DoLoad( which )))
 			break;
 
 	} while ( which >= 0 );
@@ -3144,7 +3134,7 @@ void QuickSaveGame( void ) {
          *s=*b;
 #else
 		b = ( byte * ) bufferofs + i;
-		for ( j = 0; j < 100; j++, s++, b += (iGLOBAL_SCREENWIDTH << 1))
+		for ( j = 0; j < 100; j++, s++, b += ( iGLOBAL_SCREENWIDTH << 1 ))
 			*s = *b;
 #endif
 	}
@@ -3282,7 +3272,7 @@ int CP_SaveGame( void ) {
 
 	handlewhich = OUTOFRANGE;
 
-	return (exit);
+	return ( exit );
 }
 
 
@@ -3348,7 +3338,7 @@ void CP_Control( void ) {
 			break;
 
 		case PADENABLE:joypadenabled ^= 1;
-			if ((joypadenabled) && (!joystickenabled)) {
+			if (( joypadenabled ) && ( !joystickenabled )) {
 				joystickenabled = 1;
 				if ( !CalibrateJoystick()) {
 					joystickenabled = 0;
@@ -3455,7 +3445,7 @@ void DefineKey
 	timer = GetTicCount();
 
 	x = NORMALKEY_X + 97;
-	y = NORMALKEY_Y + (handlewhich * FontSize[NormalKeyItems.fontsize]);
+	y = NORMALKEY_Y + ( handlewhich * FontSize[NormalKeyItems.fontsize] );
 
 	strcpy( &NormalKeyNames[handlewhich][KEYNAMEINDEX],
 			"     " );
@@ -3477,7 +3467,7 @@ void DefineKey
 		//
 		// FLASH CURSOR
 		//
-		if ((GetTicCount() - timer) > 10 ) {
+		if (( GetTicCount() - timer ) > 10 ) {
 			int color;
 
 			if ( tick ) {
@@ -3791,15 +3781,15 @@ void Message( char * string ) {
 		} else
 			w += CurrentFont->width[string[i] - 31];
 
-	if ((w + 10) > mw )
+	if (( w + 10 ) > mw )
 		mw = w + 10;
 
-	PrintY = 78 - (h / 2);
-	PrintX = WindowX = 143 - (mw / 2);
+	PrintY = 78 - ( h / 2 );
+	PrintX = WindowX = 143 - ( mw / 2 );
 	WindowW = mw;
 
-	EraseMenuBufRegion( WindowX - 5, PrintY - 5, (mw + 14) & 0xFFFC, h + 10 );
-	DrawSTMenuBuf( WindowX - 5, PrintY - 5, (mw + 14) & 0xFFFC, h + 10, true );
+	EraseMenuBufRegion( WindowX - 5, PrintY - 5, ( mw + 14 ) & 0xFFFC, h + 10 );
+	DrawSTMenuBuf( WindowX - 5, PrintY - 5, ( mw + 14 ) & 0xFFFC, h + 10, true );
 
 	MenuBufCPrint( string );
 	RefreshMenuBuf( 0 );
@@ -3832,7 +3822,7 @@ void DrawNewGame( void ) {
 //
 //******************************************************************************
 
-int newgameY[7] = {19, 0, 42, 0, 74, 0, 93};
+int newgameY[7] = { 19, 0, 42, 0, 74, 0, 93 };
 char * DifficultyStrings[4] =
 	{
 		"Easy", "Medium", "Hard", "Crezzy Man"
@@ -3860,7 +3850,7 @@ void DrawNewGameDiff
 
 	EraseMenuBufRegion( 25, 18, 52, 125 );
 	DrawMenuBufPic( 25, newgameY[w], W_GetNumForName( "NEWG1" ) +
-		(ToughMenuNum * 4) + x );
+		( ToughMenuNum * 4 ) + x );
 	EraseMenuBufRegion( 25, 149, 64, 8 );
 //   DrawMenuBufPic (25, 149, W_GetNumForName( "O_EASY" ) + x );
 
@@ -3883,7 +3873,7 @@ void DrawLoadSaveScreen( int loadsave ) {
 	newfont1 = ( font_t * ) shape;
 	CurrentFont = newfont1;
 
-	if ( numdone || (!ingame) || (!inmenu))
+	if ( numdone || ( !ingame ) || ( !inmenu ))
 		SetAlternateMenuBuf();
 
 	ClearMenuBuf();
@@ -3895,10 +3885,10 @@ void DrawLoadSaveScreen( int loadsave ) {
 
 	for ( i = 0; i < NUMSAVEGAMES; i++ )
 		PrintLSEntry( i );
-	DrawMenuBufItem( LSItems.x, ((LSItems.curpos * 9) + (LSItems.y)),
+	DrawMenuBufItem( LSItems.x, (( LSItems.curpos * 9 ) + ( LSItems.y )),
 					 W_GetNumForName( SmallCursor ) + CursorFrame[CursorNum] );
 	DisplayInfo( 7 );
-	if ((!numdone) && ingame && inmenu )
+	if (( !numdone ) && ingame && inmenu )
 		RefreshMenuBuf( 0 );
 	else
 		FlipMenuBuf();
@@ -3931,7 +3921,7 @@ void DrawLoadSaveScreenAlt( int loadsave ) {
 
 	for ( i = 0; i < NUMSAVEGAMES; i++ )
 		PrintLSEntry( i );
-	DrawMenuBufItem( LSItems.x, ((LSItems.curpos * 9) + (LSItems.y)),
+	DrawMenuBufItem( LSItems.x, (( LSItems.curpos * 9 ) + ( LSItems.y )),
 					 W_GetNumForName( SmallCursor ) + CursorFrame[CursorNum] );
 	DisplayInfo( 7 );
 	RefreshMenuBuf( 0 );
@@ -3953,7 +3943,7 @@ void PrintLSEntry( int w ) {
 	DrawSTMenuBuf( LSM_X + LSItems.indent, LSM_Y + 1 + w * 9, 80, 7, false );
 
 	PrintX = LSM_X + LSItems.indent + 2;
-	PrintY = LSM_Y + (w * 9) + 2;
+	PrintY = LSM_Y + ( w * 9 ) + 2;
 
 	CurrentFont = tinyfont;
 
@@ -3982,13 +3972,13 @@ int CalibrateJoystick
 
 	if ( joypadenabled ) {
 		// Gravis GamePad : Check all buttons
-		checkbits = (1 << 0) + (1 << 1) + (1 << 2) + (1 << 3);
+		checkbits = ( 1 << 0 ) + ( 1 << 1 ) + ( 1 << 2 ) + ( 1 << 3 );
 	} else if ( joystickport ) {
 		// Joystick port 2 : check only buttons 2 and 3
-		checkbits = (1 << 2) + (1 << 3);
+		checkbits = ( 1 << 2 ) + ( 1 << 3 );
 	} else {
 		// Joystick port 1 : check only buttons 0 and 1
-		checkbits = (1 << 0) + (1 << 1);
+		checkbits = ( 1 << 0 ) + ( 1 << 1 );
 	}
 
 	status = 0;
@@ -4016,9 +4006,9 @@ int CalibrateJoystick
 			IN_UpdateKeyboard();
 
 			if ( Keyboard[sc_Escape] ) {
-				return (0);
+				return ( 0 );
 			}
-		} while ( !(jb & checkbits));
+		} while ( !( jb & checkbits ));
 
 		IN_GetJoyAbs( joystickport, &xmin, &ymin );
 		MN_PlayMenuSnd( SD_SELECTSND );
@@ -4027,7 +4017,7 @@ int CalibrateJoystick
 			IN_UpdateKeyboard();
 
 			if ( Keyboard[sc_Escape] ) {
-				return (0);
+				return ( 0 );
 			}
 		}
 
@@ -4050,9 +4040,9 @@ int CalibrateJoystick
 			IN_UpdateKeyboard();
 
 			if ( Keyboard[sc_Escape] ) {
-				return (0);
+				return ( 0 );
 			}
-		} while ( !(jb & checkbits));
+		} while ( !( jb & checkbits ));
 
 		IN_GetJoyAbs( joystickport, &xmax, &ymax );
 		MN_PlayMenuSnd( SD_SELECTSND );
@@ -4061,14 +4051,14 @@ int CalibrateJoystick
 			IN_UpdateKeyboard();
 
 			if ( Keyboard[sc_Escape] ) {
-				return (0);
+				return ( 0 );
 			}
 		}
 
 		//
 		// ASSIGN ACTUAL VALUES HERE
 		//
-		if ((xmin < xmax) && (ymin < ymax)) {
+		if (( xmin < xmax ) && ( ymin < ymax )) {
 			IN_SetupJoy( joystickport, xmin, xmax, ymin, ymax );
 			joyxmin = xmin;
 			joyxmax = xmax;
@@ -4085,7 +4075,7 @@ int CalibrateJoystick
 		}
 	}
 
-	return (status);
+	return ( status );
 }
 
 
@@ -4126,7 +4116,7 @@ void DoThreshold
 void DrawCtlScreen( void ) {
 	MenuNum = 3;
 
-	if ( numdone || (!ingame) || (!inmenu))
+	if ( numdone || ( !ingame ) || ( !inmenu ))
 		SetAlternateMenuBuf();
 
 	ClearMenuBuf();
@@ -4136,10 +4126,10 @@ void DrawCtlScreen( void ) {
 
 	DisplayInfo( 0 );
 	DrawMenu( &CtlItems, &CtlMenu[0] );
-	DrawMenuBufItem( CtlItems.x, ((CtlItems.curpos * 14) + (CtlItems.y - 2)),
+	DrawMenuBufItem( CtlItems.x, (( CtlItems.curpos * 14 ) + ( CtlItems.y - 2 )),
 					 W_GetNumForName( LargeCursor ) + CursorFrame[CursorNum] );
 
-	if ( ingame && inmenu && (!numdone))
+	if ( ingame && inmenu && ( !numdone ))
 		RefreshMenuBuf( 0 );
 	else
 		FlipMenuBuf();
@@ -4254,7 +4244,7 @@ void DrawCtlButtons( void ) {
 		DrawMenuBufItem( x, y, button_off );
 	}
 
-	if ((CtlItems.curpos < 0) || (!CtlMenu[CtlItems.curpos].active))
+	if (( CtlItems.curpos < 0 ) || ( !CtlMenu[CtlItems.curpos].active ))
 		for ( i = 0; i < CtlItems.amount; i++ )
 			if ( CtlMenu[i].active ) {
 				CtlItems.curpos = i;
@@ -4312,99 +4302,22 @@ void ReadAnyControl( ControlInfo * ci ) {
 		int mousey,
 			mousex;
 
-#if USE_SDL
-																																INL_GetMouseDelta(&mousex, &mousey);
-      if (mousex >= SENSITIVE)
-      {
-         ci->dir = dir_East;
-         mouseactive = 1;
-      }
-      else if (mousex <= -SENSITIVE)
-      {
-         ci->dir = dir_West;
-         mouseactive = 1;
-      }
+		INL_GetMouseDelta( &mousex, &mousey );
+		if ( mousex >= SENSITIVE ) {
+			ci->dir = dir_East;
+			mouseactive = 1;
+		} else if ( mousex <= -SENSITIVE ) {
+			ci->dir = dir_West;
+			mouseactive = 1;
+		}
 
-      if (mousey >= SENSITIVE)
-      {
-         ci->dir = dir_South;
-         mouseactive = 1;
-      }
-      else if (mousey <= -SENSITIVE)
-      {
-         ci->dir = dir_North;
-         mouseactive = 1;
-      }
-
-#elif PLATFORM_DOS
-																																// READ MOUSE MOTION COUNTERS
-      // RETURN DIRECTION
-      // HOME MOUSE
-      // CHECK MOUSE BUTTONS
-
-      inregs.w.ax = PMOUSE;
-      int386 (MouseInt, &inregs, &outregs);
-
-      mousex = outregs.w.cx;
-      mousey = outregs.w.dx;
-
-
-      if (mousey < (CENTER-SENSITIVE))
-      {
-         ci->dir = dir_North;
-
-         inregs.w.cx = CENTER;
-         inregs.w.dx = CENTER;
-
-         inregs.w.ax = SMOUSE;
-         int386 (MouseInt, &inregs, &outregs);
-
-         mouseactive = 1;
-
-      }
-      else
-      if (mousey > (CENTER+SENSITIVE))
-      {
-         ci->dir = dir_South;
-
-         inregs.w.cx = CENTER;
-         inregs.w.dx = CENTER;
-
-         inregs.w.ax = SMOUSE;
-         int386 (MouseInt, &inregs, &outregs);
-
-         mouseactive = 1;
-      }
-
-      if (mousex < (CENTER-SENSITIVE))
-      {
-         ci->dir = dir_West;
-
-			inregs.w.cx = CENTER;
-         inregs.w.dx = CENTER;
-
-         inregs.w.ax = SMOUSE;
-         int386 (MouseInt, &inregs, &outregs);
-
-
-         mouseactive = 1;
-      }
-      else
-      if (mousex > (CENTER+SENSITIVE))
-      {
-         ci->dir = dir_East;
-
-         inregs.w.cx = CENTER;
-         inregs.w.dx = CENTER;
-
-         inregs.w.ax = SMOUSE;
-         int386 (MouseInt, &inregs, &outregs);
-
-         mouseactive = 1;
-      }
-#else
-#error please define your platform.  /* or maybe just nuke the DOS section? */
-#endif
+		if ( mousey >= SENSITIVE ) {
+			ci->dir = dir_South;
+			mouseactive = 1;
+		} else if ( mousey <= -SENSITIVE ) {
+			ci->dir = dir_North;
+			mouseactive = 1;
+		}
 
 		buttons = IN_GetMouseButtons();
 		if ( buttons ) {
@@ -4486,9 +4399,9 @@ byte * IN_GetScanName( ScanCode scan ) {
 
 	for ( s = ExtScanCodes, p = ExtScanNames; *s; p++, s++ )
 		if ( *s == scan )
-			return (*p);
+			return ( *p );
 
-	return (ScanNames[scan]);
+	return ( ScanNames[scan] );
 }
 
 
@@ -4506,7 +4419,7 @@ void DisplayInfo( int which ) {
 	num = W_GetNumForName( "info1" ) + which;
 	p = ( patch_t * ) W_CacheLumpNum( num, PU_CACHE, Cvt_patch_t, 1 );
 
-	x = (288 - p->width) >> 1;
+	x = ( 288 - p->width ) >> 1;
 
 	DrawMenuBufItem( x, 149, num );
 }
@@ -4544,7 +4457,7 @@ void DoMainMenu( void ) {
 	SetAlternateMenuBuf();
 	ClearMenuBuf();
 	DrawMainMenu();
-	DrawMenuBufItem( MainItems.x, ((MainItems.curpos * 14) + (MainItems.y - 2)),
+	DrawMenuBufItem( MainItems.x, (( MainItems.curpos * 14 ) + ( MainItems.y - 2 )),
 					 W_GetNumForName( LargeCursor ) + CursorFrame[CursorNum] );
 	FlipMenuBuf();
 }
@@ -4563,7 +4476,7 @@ void DrawCustomMenu( void ) {
 	SetMenuTitle( "Customize Menu" );
 	MN_GetCursorLocation( &CustomItems, &CustomMenu[0] );
 	DrawMenu( &CustomItems, &CustomMenu[0] );
-	DrawMenuBufItem( CustomItems.x, ((CustomItems.curpos * 14) + (CustomItems.y - 2)),
+	DrawMenuBufItem( CustomItems.x, (( CustomItems.curpos * 14 ) + ( CustomItems.y - 2 )),
 					 W_GetNumForName( LargeCursor ) + CursorFrame[CursorNum] );
 	DisplayInfo( 0 );
 	FlipMenuBuf();
@@ -4673,14 +4586,14 @@ void DrawPlayerMenu( void ) {
 
 	MN_MakeActive( &PlayerItems, &PlayerMenu[0], DefaultPlayerCharacter );
 
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 																															PlayerMenu[ 1 ].active = CP_SemiActive; // Thi Barrett
    PlayerMenu[ 2 ].active = CP_SemiActive; // Doug Wendt
    PlayerMenu[ 3 ].active = CP_SemiActive; // Lorelei Ni
    PlayerMenu[ 4 ].active = CP_SemiActive; // Ian Paul Freeley
 #endif
 
-	if ( numdone || (!ingame) || (!inmenu))
+	if ( numdone || ( !ingame ) || ( !inmenu ))
 		SetAlternateMenuBuf();
 	ClearMenuBuf();
 	SetMenuTitle( "Choose Player" );
@@ -4690,12 +4603,12 @@ void DrawPlayerMenu( void ) {
 
 	DisplayInfo( 0 );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
-	if ( ingame && inmenu && (!numdone))
+	if ( ingame && inmenu && ( !numdone ))
 		RefreshMenuBuf( 0 );
 	else
 		FlipMenuBuf();
@@ -4707,7 +4620,7 @@ void DrawPlayerMenu( void ) {
 //
 //******************************************************************************
 
-int newplayerY[5] = {28, 42, 56, 70, 84};
+int newplayerY[5] = { 28, 42, 56, 70, 84 };
 
 void DrawNewPlayerDiff( int w ) {
 	EraseMenuBufRegion( 25, 18, 52, 125 );
@@ -4760,7 +4673,7 @@ void GetEpisode( int level ) {
 void DrawControlMenu( void ) {
 	MenuNum = 1;
 
-	if ( numdone || (!ingame) || (!inmenu))
+	if ( numdone || ( !ingame ) || ( !inmenu ))
 		SetAlternateMenuBuf();
 
 	ClearMenuBuf();
@@ -4770,7 +4683,7 @@ void DrawControlMenu( void ) {
 	DrawMenu( &ControlMItems, &ControlMMenu[0] );
 	DisplayInfo( 0 );
 
-	if ( ingame && inmenu && (!numdone))
+	if ( ingame && inmenu && ( !numdone ))
 		RefreshMenuBuf( 0 );
 	else
 		FlipMenuBuf();
@@ -4871,10 +4784,12 @@ void CP_ExtOptionsMenu( void ) {
 			DrawExtOptionsButtons();
 			break;
 		case 4:
+#if 0 // todo
 			if ( SDL_WM_ToggleFullScreen( SDL_GetVideoSurface())) {
 				sdl_fullscreen ^= 1;
 				DrawExtOptionsButtons();
 			}
+#endif
 			break;
 		}
 
@@ -5025,10 +4940,10 @@ void CP_DoubleClickSpeed
 	) {
 	int temp;
 
-	temp = 50 - (DoubleClickSpeed - 5);
+	temp = 50 - ( DoubleClickSpeed - 5 );
 	SliderMenu( &temp, 50, 5, 31, 81, 225, 3, "block1", NULL,
 				"Double-Click Speed", "Slow", "Fast" );
-	DoubleClickSpeed = 50 - (temp - 5);
+	DoubleClickSpeed = 50 - ( temp - 5 );
 
 	handlewhich = 100;
 	DrawOptionsMenu();
@@ -5046,12 +4961,12 @@ void MenuFlipSpeed
 	) {
 	int temp;
 
-	temp = 50 - (Menuflipspeed - 5);
+	temp = 50 - ( Menuflipspeed - 5 );
 
 	SliderMenu( &temp, 50, 5, 31, 81, 225, 3, "block1", NULL,
 				"Menu Flip Speed", "Slow", "Fast" );
 
-	Menuflipspeed = 50 - (temp - 5);
+	Menuflipspeed = 50 - ( temp - 5 );
 
 	DrawOptionsMenu();
 	handlewhich = 10;
@@ -5122,7 +5037,7 @@ void CP_DetailMenu( void ) {
 void DrawBattleMenu( void ) {
 	MenuNum = 1;
 
-	if ( numdone || (!ingame) || (!inmenu))
+	if ( numdone || ( !ingame ) || ( !inmenu ))
 		SetAlternateMenuBuf();
 
 	ClearMenuBuf();
@@ -5137,7 +5052,7 @@ void DrawBattleMenu( void ) {
 	BATTLE_SetOptions( &BATTLE_Options[gamestate.battlemode] );
 	ShowBattleOptions( true, MENU_X, MENU_Y + 49 );
 
-	if ( ingame && inmenu && (!numdone))
+	if ( ingame && inmenu && ( !numdone ))
 		RefreshMenuBuf( 0 );
 	else
 		FlipMenuBuf();
@@ -5260,8 +5175,8 @@ void CP_BattleMenu( void ) {
 
 	// Tag can't be played in team mode
 	// Also, can't play teams if only 1 person is playing
-	if ((gamestate.battlemode == battle_Tag) ||
-		(numplayers < 2)) {
+	if (( gamestate.battlemode == battle_Tag ) ||
+		( numplayers < 2 )) {
 		BattleMenu[1].active = CP_Inactive;
 		if ( BattleItems.curpos == 1 ) {
 			BattleItems.curpos = 0;
@@ -5298,9 +5213,9 @@ void CP_BattleMenu( void ) {
 
 extern boolean dopefish;
 void MN_PlayMenuSnd( int which ) {
-	if ( INFXSETUP || (SD_Started == false))
+	if ( INFXSETUP || ( SD_Started == false ))
 		return;
-#if (SHAREWARE == 0)
+#if ( SHAREWARE == 0 )
 	if ( dopefish == true ) {
 		switch ( which ) {
 		case SD_ESCPRESSEDSND:which = SD_SOUNDESCSND;
@@ -5369,13 +5284,13 @@ boolean SliderMenu
 	shape = ( patch_t * ) W_CacheLumpNum( block, PU_CACHE, Cvt_patch_t, 1 );
 	blkx = erasex - shape->leftoffset;
 	eraseh = shape->height;
-	scale = (erasew + shape->leftoffset - shape->width) << 16;
+	scale = ( erasew + shape->leftoffset - shape->width ) << 16;
 	range = upperbound - lowerbound;
 
 	DrawSTMenuBuf( erasex - 1, erasey - 1, erasew + 1, eraseh + 1, false );
 
-	DrawMenuBufItem( blkx + ((((*number - lowerbound) *
-		scale) / range) >> 16), erasey, block );
+	DrawMenuBufItem( blkx + (((( *number - lowerbound ) *
+		scale ) / range ) >> 16 ), erasey, block );
 
 	DisplayInfo( 1 );
 	FlipMenuBuf();
@@ -5389,7 +5304,7 @@ boolean SliderMenu
 		RefreshMenuBuf( 0 );
 
 		ReadAnyControl( &ci );
-		if (((GetTicCount() - timer) > 5) || (ci.dir != lastdir)) {
+		if ((( GetTicCount() - timer ) > 5 ) || ( ci.dir != lastdir )) {
 			timer = GetTicCount();
 
 			switch ( ci.dir ) {
@@ -5429,8 +5344,8 @@ boolean SliderMenu
 
 			EraseMenuBufRegion( erasex, erasey, erasew, eraseh );
 
-			DrawMenuBufItem( blkx + ((((*number - lowerbound) *
-				scale) / range) >> 16), erasey, block );
+			DrawMenuBufItem( blkx + (((( *number - lowerbound ) *
+				scale ) / range ) >> 16 ), erasey, block );
 
 			if ( routine ) {
 				routine( *number );
@@ -5455,7 +5370,7 @@ boolean SliderMenu
 	}
 
 	WaitKeyUp();
-	return (returnval);
+	return ( returnval );
 }
 
 
@@ -5490,7 +5405,7 @@ void CP_F1Help( void ) {
 	}
 
 	LastScan = 0;
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 																															{
    DrawOrderInfo( 2 );
    while (LastScan == 0)
@@ -5867,7 +5782,7 @@ void DrawOptionDescription( char ** options, int w ) {
 	string = options[w];
 
 	VW_MeasurePropString( string, &width, &height );
-	DrawMenuBufPropString((288 - width) / 2, 4, string );
+	DrawMenuBufPropString(( 288 - width ) / 2, 4, string );
 
 	CurrentFont = temp;
 }
@@ -5988,7 +5903,7 @@ void DrawBattleModes
 	MN_GetActive( &ModeItems, &ModeMenu[0], gamestate.battlemode -
 		battle_Normal, OptionNums );
 
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 																															TURN_OFF_BATTLE_MODE( battle_ScoreMore );
       TURN_OFF_BATTLE_MODE( battle_Scavenger );
       TURN_OFF_BATTLE_MODE( battle_Tag );
@@ -6037,7 +5952,7 @@ void DrawBattleModeName( int which ) {
 	char * string;
 	font_t * temp;
 
-	if ((which < battle_Normal) || (which > battle_CaptureTheTriad)) {
+	if (( which < battle_Normal ) || ( which > battle_CaptureTheTriad )) {
 		return;
 	}
 
@@ -6047,7 +5962,7 @@ void DrawBattleModeName( int which ) {
 	CurrentFont = tinyfont;
 
 	VW_MeasurePropString( string, &width, &height );
-	DrawMenuBufPropString((288 - width) / 2, 4, string );
+	DrawMenuBufPropString(( 288 - width ) / 2, 4, string );
 //   DrawMenuBufPropString ( 270-width, 4, string );
 
 	CurrentFont = temp;
@@ -6085,7 +6000,7 @@ void DrawBattleModeDescription( int w ) {
 		}
 	}
 
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 																															switch( w + 1 )
          {
          case battle_ScoreMore :
@@ -6100,7 +6015,7 @@ void DrawBattleModeDescription( int w ) {
 #endif
 
 	VW_MeasurePropString( string, &width, &height );
-	DrawMenuBufPropString((288 - width) / 2, 4, string );
+	DrawMenuBufPropString(( 288 - width ) / 2, 4, string );
 
 	CurrentFont = temp;
 }
@@ -6127,7 +6042,7 @@ void CP_BattleModes( void ) {
 		}
 	}
 
-	if ((numplayers == 1) && (Warning == 0)) {
+	if (( numplayers == 1 ) && ( Warning == 0 )) {
 		Warning = 1;
 		CP_OnePlayerWarningMessage();
 	}
@@ -6248,7 +6163,7 @@ void DrawColorMenu( void ) {
 
 	text = colorname[locplayerstate->uniformcolor];
 	VW_MeasurePropString( text, &width, &height );
-	DrawMenuBufPropString((320 - width) / 2 - 16, MENU_Y + 5, text );
+	DrawMenuBufPropString(( 320 - width ) / 2 - 16, MENU_Y + 5, text );
 	DisplayInfo( 8 );
 	EraseMenuBufRegion( COLORX, COLORY, COLORW, COLORH );
 	DrawTMenuBufBox( COLORX, COLORY, COLORW, COLORH );
@@ -6256,8 +6171,8 @@ void DrawColorMenu( void ) {
 							W_GetNumForName( playerwadname[locplayerstate->player] ),
 							locplayerstate->uniformcolor );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -6278,7 +6193,7 @@ int CP_ColorSelection( void ) {
 
 	DrawColorMenu();
 	status = ColorMenu();
-	return (status);
+	return ( status );
 }
 
 int ColorMenu
@@ -6304,7 +6219,7 @@ int ColorMenu
 	done = false;
 	while ( !done ) {
 		ReadAnyControl( &ci );
-		if ((ci.dir == dir_East) && ((GetTicCount() - timer) > 5)) {
+		if (( ci.dir == dir_East ) && (( GetTicCount() - timer ) > 5 )) {
 			update = true;
 			timer = GetTicCount();
 
@@ -6316,7 +6231,7 @@ int ColorMenu
 			MN_PlayMenuSnd( SD_MOVECURSORSND );
 		}
 
-		if ((ci.dir == dir_West) && ((GetTicCount() - timer) > 5)) {
+		if (( ci.dir == dir_West ) && (( GetTicCount() - timer ) > 5 )) {
 			update = true;
 			timer = GetTicCount();
 
@@ -6336,7 +6251,7 @@ int ColorMenu
 			EraseMenuBufRegion( 0, MENU_Y + 5, 200, 10 );
 			EraseMenuBufRegion( COLORX, COLORY, COLORW, COLORH );
 			VW_MeasurePropString( text, &width, &height );
-			DrawMenuBufPropString((320 - width) / 2 - 16, MENU_Y + 5, text );
+			DrawMenuBufPropString(( 320 - width ) / 2 - 16, MENU_Y + 5, text );
 			DrawTMenuBufBox( COLORX, COLORY, COLORW, COLORH );
 			DrawColoredMenuBufItem( COLORX - 36, COLORY - 33,
 									baseshape, locplayerstate->uniformcolor );
@@ -6358,7 +6273,7 @@ int ColorMenu
 	}
 
 	IN_ClearKeysDown();
-	return (status);
+	return ( status );
 }
 
 //****************************************************************************
@@ -6379,10 +6294,10 @@ int CP_PlayerSelection
 		which = HandleMenu( &PlayerItems, &PlayerMenu[0], DrawNewPlayerDiff );
 		if ( which < 0 ) {
 			handlewhich = 1;
-			return (0);
+			return ( 0 );
 		}
 
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 																																if ( PlayerMenu[ which ].active == CP_SemiActive )
             {
             CP_ErrorMsg( "Choose Player",
@@ -6395,7 +6310,7 @@ int CP_PlayerSelection
 #endif
 	} while ( PlayerMenu[which].active == CP_SemiActive );
 
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 																															DefaultPlayerCharacter = 0;
    locplayerstate->player = 0;
 #else
@@ -6403,7 +6318,7 @@ int CP_PlayerSelection
 	locplayerstate->player = which;
 #endif
 
-	return (1);
+	return ( 1 );
 }
 
 //****************************************************************************
@@ -6553,8 +6468,8 @@ void DrawGravityMenu( void ) {
 	ClearMenuBuf();
 	SetMenuTitle( "Gravity" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -6624,8 +6539,8 @@ void DrawSpeedMenu( void ) {
 	ClearMenuBuf();
 	SetMenuTitle( "Speed" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -6681,8 +6596,8 @@ void DrawAmmoPerWeaponMenu
 	ClearMenuBuf();
 	SetMenuTitle( "Ammo Per Weapon" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -6771,8 +6686,8 @@ void DrawHitPointsMenu
 	ClearMenuBuf();
 	SetMenuTitle( "Player Hitpoints" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -6834,7 +6749,7 @@ void DrawSpawnControlMenu
 
 	MN_MakeActive( &SpawnItems, &SpawnMenu[0], SpawnItems.curpos );
 
-#if (SHAREWARE == 1)
+#if ( SHAREWARE == 1 )
 																															BATTLE_Options[ gamestate.battlemode ].SpawnMines = false;
    SpawnMenu[ 3 ].active = CP_Inactive; // Mines
 #endif
@@ -6886,8 +6801,8 @@ void DrawSpawnControlMenu
 		}
 	}
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -7064,8 +6979,8 @@ void DrawLightLevelMenu( void ) {
 	ClearMenuBuf();
 	SetMenuTitle( "Light Levels" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -7125,8 +7040,8 @@ void DrawPointGoalMenu
 	ClearMenuBuf();
 	SetMenuTitle( "Point Goal" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 
@@ -7186,8 +7101,8 @@ void DrawDangerMenu( void ) {
 	ClearMenuBuf();
 	SetMenuTitle( "Danger Damage" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 	MN_DrawButtons( &DangerItems, &DangerMenu[0],
@@ -7242,8 +7157,8 @@ void DrawTimeLimitMenu( void ) {
 	ClearMenuBuf();
 	SetMenuTitle( "Time Limit" );
 
-	if ((gamestate.battlemode != battle_StandAloneGame) &&
-		(consoleplayer == 0)) {
+	if (( gamestate.battlemode != battle_StandAloneGame ) &&
+		( consoleplayer == 0 )) {
 		DrawBattleModeName( gamestate.battlemode );
 	}
 	MN_DrawButtons( &TimeLimitItems, &TimeLimitMenu[0],
@@ -7324,7 +7239,7 @@ void ShowBattleOption
 	int x;
 	int y;
 
-	y = PosY + (Line * 7);
+	y = PosY + ( Line * 7 );
 	x = PosX + column * 120;
 
 	PrintBattleOption( inmenu, x, y, text1 );
@@ -7359,7 +7274,7 @@ void ShowBattleOptions
 	} else {
 		temp = 320;
 	}
-	PrintBattleOption( inmenu, (temp - width) / 2, PosY, text );
+	PrintBattleOption( inmenu, ( temp - width ) / 2, PosY, text );
 
 	PosY++;
 
@@ -7367,28 +7282,28 @@ void ShowBattleOptions
 	options = &BatOps;
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 1, "Friendly Fire",
-					  (options->FriendlyFire) ? "On" : "Off" );
+					  ( options->FriendlyFire ) ? "On" : "Off" );
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 2, "Weapon Persist",
-					  (options->WeaponPersistence) ? "On" : "Off" );
+					  ( options->WeaponPersistence ) ? "On" : "Off" );
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 3, "Random Weapons",
-					  (options->RandomWeapons) ? "On" : "Off" );
+					  ( options->RandomWeapons ) ? "On" : "Off" );
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 4, "Respawn Items",
-					  (options->RespawnItems) ? "On" : "Off" );
+					  ( options->RespawnItems ) ? "On" : "Off" );
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 5, "Spawn Health",
-					  (options->SpawnHealth) ? "On" : "Off" );
+					  ( options->SpawnHealth ) ? "On" : "Off" );
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 6, "Spawn Weapons",
-					  (options->SpawnWeapons) ? "On" : "Off" );
+					  ( options->SpawnWeapons ) ? "On" : "Off" );
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 7, "Spawn Mines",
-					  (options->SpawnMines) ? "On" : "Off" );
+					  ( options->SpawnMines ) ? "On" : "Off" );
 
 	ShowBattleOption( inmenu, PosX, PosY, 0, 8, "Spawn Dangers",
-					  (options->SpawnDangers) ? "On" : "Off" );
+					  ( options->SpawnDangers ) ? "On" : "Off" );
 
 	switch ( options->DangerDamage ) {
 	case bo_danger_low :string = "Low";
@@ -7419,8 +7334,8 @@ void ShowBattleOptions
 	}
 	ShowBattleOption( inmenu, PosX, PosY, 1, 2, "Time Limit", string );
 
-	if ((gamestate.battlemode == battle_Collector) ||
-		(gamestate.battlemode == battle_Scavenger)) {
+	if (( gamestate.battlemode == battle_Collector ) ||
+		( gamestate.battlemode == battle_Scavenger )) {
 		string = "?";
 	} else {
 		switch ( options->Kills ) {
@@ -7532,7 +7447,7 @@ void SetMenuHeader
 
 	CurrentFont = tinyfont;
 	VW_MeasurePropString( header, &width, &height );
-	DrawMenuBufPropString((288 - width) / 2, 4, header );
+	DrawMenuBufPropString(( 288 - width ) / 2, 4, header );
 
 	RefreshMenuBuf( 0 );
 }
@@ -7629,12 +7544,12 @@ int HandleMultiPageCustomMenu
 				letter = *names[page + i - 2];
 
 				// Force it to upper case
-				if ((letter >= 'a') && (letter <= 'z')) {
+				if (( letter >= 'a' ) && ( letter <= 'z' )) {
 					letter = letter - 'a' + 'A';
 				}
 
 				// Only use letters
-				if ((letter < 'A') || (letter > 'Z')) {
+				if (( letter < 'A' ) || ( letter > 'Z' )) {
 					letter = 'a';
 				}
 				MultiPageCustomMenu[i].letter = letter;
@@ -7686,7 +7601,7 @@ int HandleMultiPageCustomMenu
 		}
 	} while ( which >= 0 );
 
-	return (selection);
+	return ( selection );
 }
 
 
@@ -7714,7 +7629,7 @@ int CP_LevelSelectionMenu
 	(
 		void
 	) {
-	static char levelcursorpos[2] = {0};
+	static char levelcursorpos[2] = { 0 };
 
 	char * LevelNames[100];
 	int whichlevels;
@@ -7749,7 +7664,7 @@ int CP_LevelSelectionMenu
 		levelcursorpos[whichlevels] = level;
 	}
 
-	return (level);
+	return ( level );
 }
 
 //****************************************************************************
@@ -7781,11 +7696,11 @@ void DrawEnterCodeNameMenu
 	MenuBufCPrint( "Enter CodeName\n" );
 	MenuBufCPrint( "maximum 8 letters\n" );
 
-	DrawSTMenuBuf((288 - 92) / 2 - 2, 80 - 2, 92 + 4, 10 + 4, false );
+	DrawSTMenuBuf(( 288 - 92 ) / 2 - 2, 80 - 2, 92 + 4, 10 + 4, false );
 
-	DrawMenuBufPropString((288 - 92) / 2, 80, CodeName );
+	DrawMenuBufPropString(( 288 - 92 ) / 2, 80, CodeName );
 
-	WindowX = 144 - (9 * 4);
+	WindowX = 144 - ( 9 * 4 );
 	PrintX = WindowX;
 
 	FlipMenuBuf();
@@ -7808,7 +7723,7 @@ int CP_EnterCodeNameMenu
 	memset( input, 0, sizeof( input ));
 	strcpy( input, CodeName );
 
-	if ( US_LineInput((288 - 92) / 2, 80, input, input, true, 8, 92, 0 )) {
+	if ( US_LineInput(( 288 - 92 ) / 2, 80, input, input, true, 8, 92, 0 )) {
 		strcpy( &locplayerstate->codename[0], input );
 		strcpy( CodeName, input );
 		WaitKeyUp();
@@ -8582,14 +8497,14 @@ char * GetNextWord
 		char * source,
 		int length
 	) {
-	while ((*source != 0) && (isspace( *source )) && (length > 0)) {
+	while (( *source != 0 ) && (isspace( *source )) && ( length > 0 )) {
 		*dest = *source;
 		length--;
 		dest++;
 		source++;
 	}
 
-	while ((*source != 0) && (!isspace( *source )) && (length > 0)) {
+	while (( *source != 0 ) && ( !isspace( *source )) && ( length > 0 )) {
 		*dest = *source;
 		length--;
 		dest++;
@@ -8597,7 +8512,7 @@ char * GetNextWord
 	}
 
 	*dest = 0;
-	return (source);
+	return ( source );
 }
 
 //******************************************************************************
@@ -8642,7 +8557,7 @@ void CP_ErrorMsg
 		error = GetNextWord( wordtext, error, 79 );
 
 		pos = 0;
-		while ((wordtext[pos] != 0) && (isspace( wordtext[pos] ))) {
+		while (( wordtext[pos] != 0 ) && (isspace( wordtext[pos] ))) {
 			pos++;
 		}
 
@@ -8671,11 +8586,11 @@ void CP_ErrorMsg
 
 	VWL_MeasureIntensityString( text[0], &w, &h, IFont );
 
-	y = (WindowH - (line + 1) * h) / 2;
+	y = ( WindowH - ( line + 1 ) * h ) / 2;
 
 	for ( pos = 0; pos <= line; pos++ ) {
 		VWL_MeasureIntensityString( text[pos], &w, &h, IFont );
-		DrawMenuBufIString((288 - w) / 2, y, text[pos], ACTIVECOLOR );
+		DrawMenuBufIString(( 288 - w ) / 2, y, text[pos], ACTIVECOLOR );
 		y += h;
 	}
 

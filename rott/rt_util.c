@@ -20,15 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "rt_def.h"
 
-#ifdef DOS
 #include <malloc.h>
-#include <dos.h>
-#include <conio.h>
-#include <io.h>
-#include <direct.h>
-#elif USE_SDL
-#include "SDL.h"
-#endif
+#include <SDL2/SDL.h>
 
 #include <stdarg.h>
 #include <fcntl.h>
@@ -415,9 +408,7 @@ void Error( char * error, ... ) {
 
 #endif
 
-#if USE_SDL
 	SDL_Quit();
-#endif
 
 	exit( 1 );
 }
@@ -1123,13 +1114,7 @@ void SwapIntelShortArray( short * s, int num ) {
 */
 
 void GetaPalette( byte * palette ) {
-#ifdef DOS
-	int	i;
-
-	OUTP (PEL_READ_ADR,0);
-	for (i=0 ; i<768 ; i++)
-		palette[i] = inp (PEL_DATA)<<2;
-#else
+#if 0    // todo
 	int i;
 	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
 
@@ -1137,7 +1122,6 @@ void GetaPalette( byte * palette ) {
 		palette[0] = pal->colors[i].r;
 		palette[1] = pal->colors[i].g;
 		palette[2] = pal->colors[i].b;
-
 		palette += 3;
 	}
 #endif
@@ -1154,13 +1138,7 @@ void GetaPalette( byte * palette ) {
 */
 
 void SetaPalette( byte * pal ) {
-#ifdef DOS
-	int	i;
-
-	OUTP (PEL_WRITE_ADR,0);
-	for (i=0 ; i<768 ; i++)
-		OUTP (PEL_DATA, pal[i]>>2);
-#else
+#if 0 // todo
 	SDL_Color cmap[256];
 	int i;
 
@@ -1175,13 +1153,7 @@ void SetaPalette( byte * pal ) {
 }
 
 void GetPalette( char * palette ) {
-#ifdef DOS
-	int i;
-
-	OUTP(0x03c7,0);
-	for (i=0;i<256*3;i++)
-	   *(palette+(unsigned char)i)=inp(0x3c9)<<2;
-#else
+#if 0 // todo
 	int i;
 	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
 
@@ -1258,17 +1230,7 @@ int US_CheckParm( char * parm, char ** strings ) {
 */
 
 void VL_FillPalette( int red, int green, int blue ) {
-#ifdef DOS
-	int   i;
-
-	OUTP (PEL_WRITE_ADR,0);
-	for (i=0;i<256;i++)
-	{
-	   OUTP (PEL_DATA,red);
-	   OUTP (PEL_DATA,green);
-	   OUTP (PEL_DATA,blue);
-	}
-#else
+#if 0 // todo
 	SDL_Color cmap[256];
 	int i;
 
@@ -1353,16 +1315,7 @@ void VL_NormalizePalette( byte * palette ) {
 */
 
 void VL_SetPalette( byte * palette ) {
-#ifdef DOS
-	int   i;
-
-	OUTP (PEL_WRITE_ADR, 0);
-
-	for (i = 0; i < 768; i++)
-	   {
-	   OUTP (PEL_DATA, gammatable[(gammaindex<<6)+(*palette++)]);
-	   }
-#else
+#if 0 // todo
 	SDL_Color cmap[256];
 	int i;
 
@@ -1391,14 +1344,7 @@ void VL_SetPalette( byte * palette ) {
 */
 
 void VL_GetPalette( byte * palette ) {
-#ifdef DOS
-	int   i;
-
-	OUTP (PEL_READ_ADR, 0);
-
-	for (i = 0; i < 768; i++)
-	   *palette++ = inp (PEL_DATA);
-#else
+#if 0 // todo
 	int i;
 	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
 

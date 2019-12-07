@@ -383,17 +383,7 @@ int main( int argc, char * argv[] ) {
 //   SetBorderColor(155);
 	SetViewSize( 8 );
 
-#ifdef DOS
-																															if ( SOUNDSETUP )
-      {
-      SwitchPalette( origpal, 35 );
-      CP_SoundSetup();
-      }
-#endif
-
 	playstate = ex_titles;
-
-//   I_SetKeyboardLEDs( caps_lock, 0 );
 
 	gamestate.battlemode = battle_StandAloneGame;
 

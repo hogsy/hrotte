@@ -66,6 +66,7 @@ add_executable(hrotte
         rott/modexlib.c
         rott/rt_actor.c
         rott/rt_battl.c
+        rott/rt_build.c
         rott/rt_cfg.c
         rott/rt_com.c
         rott/rt_crc.c
