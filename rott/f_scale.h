@@ -27,8 +27,8 @@ extern int cin_iscale;
 extern int cin_texturemid;
 extern byte * cin_source;
 
-void R_DrawFilmColumn (byte * buf);
-void DrawFilmPost (byte * buf, byte * src, int height);
+void R_DrawFilmColumn( byte * buf );
+void DrawFilmPost( byte * buf, byte * src, int height );
 
 #if (defined __WATCOMC__)
 #pragma aux R_DrawFilmColumn parm [EDI] modify exact [eax ebx ecx edx esi edi]

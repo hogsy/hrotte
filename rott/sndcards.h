@@ -34,27 +34,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ASS_VERSION_STRING "1.04"
 
-typedef enum
-   {
+typedef enum {
 //   ASS_NoSound,
-   SoundBlaster,
+		SoundBlaster,
 #ifdef DOS
-   ProAudioSpectrum,
-   SoundMan16,
-   Adlib,
-   GenMidi,
-   SoundCanvas,
-   Awe32,
-   WaveBlaster,
+	ProAudioSpectrum,
+	SoundMan16,
+	Adlib,
+	GenMidi,
+	SoundCanvas,
+	Awe32,
+	WaveBlaster,
 #endif
-   SoundScape,
-   UltraSound,
+	SoundScape,
+	UltraSound,
 #ifdef DOS
-   SoundSource,
-   TandySoundSource,
-   PC,
+	SoundSource,
+	TandySoundSource,
+	PC,
 #endif
-   NumSoundCards
-   } soundcardnames;
+	NumSoundCards
+} soundcardnames;
 
 #endif

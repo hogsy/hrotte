@@ -71,33 +71,33 @@ volatile int fasttics;
 
 volatile boolean PausePressed = false;
 volatile boolean PanicPressed = false;
-int KeyboardStarted=false;
+int KeyboardStarted = false;
 
 const int ASCIINames[] =          // Unshifted ASCII for scan codes
-{
+	{
 //       0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
-		  0  ,27 ,'1','2','3','4','5','6','7','8','9','0','-','=',8  ,9  ,        // 0
-		  'q','w','e','r','t','y','u','i','o','p','[',']',13 ,0  ,'a','s',        // 1
-		  'd','f','g','h','j','k','l',';',39 ,'`',0  ,92 ,'z','x','c','v',        // 2
-		  'b','n','m',',','.','/',0  ,'*',0  ,' ',0  ,0  ,0  ,0  ,0  ,0  ,        // 3
-		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,'7','8','9','-','4','5','6','+','1',        // 4
-		  '2','3','0',127,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 5
-		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 6
-		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0           // 7
-};
+		0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, 9,        // 0
+		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 13, 0, 'a', 's',        // 1
+		'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', 39, '`', 0, 92, 'z', 'x', 'c', 'v',        // 2
+		'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,        // 3
+		0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',        // 4
+		'2', '3', '0', 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,        // 5
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,        // 6
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0           // 7
+	};
 
 const int ShiftNames[] =              // Shifted ASCII for scan codes
-{
+	{
 //       0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
-		  0  ,27 ,'!','@','#','$','%','^','&','*','(',')','_','+',8  ,9  ,        // 0
-		  'Q','W','E','R','T','Y','U','I','O','P','{','}',13 ,0  ,'A','S',        // 1
-		  'D','F','G','H','J','K','L',':',34 ,'~',0  ,'|','Z','X','C','V',        // 2
-		  'B','N','M','<','>','?',0  ,'*',0  ,' ',0  ,0  ,0  ,0  ,0  ,0  ,        // 3
-		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,'7','8','9','-','4','5','6','+','1',        // 4
-		  '2','3','0',127,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 5
-		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,        // 6
-		  0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0           // 7
-};
+		0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 8, 9,        // 0
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', 13, 0, 'A', 'S',        // 1
+		'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', 34, '~', 0, '|', 'Z', 'X', 'C', 'V',        // 2
+		'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,        // 3
+		0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',        // 4
+		'2', '3', '0', 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,        // 5
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,        // 6
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0           // 7
+	};
 
 #ifdef DOS
 
@@ -169,55 +169,55 @@ void ISR_SetTime(int settime)
    ticcount=settime;
 #if 0
 #if (DEVELOPMENT == 1)
-      {
-      insettime=1;
-      savetime=time;
-      t1=0;
-      t2=0;
-      t3=0;
-      t=0;
+	  {
+	  insettime=1;
+	  savetime=time;
+	  t1=0;
+	  t2=0;
+	  t3=0;
+	  t=0;
 
-      for (i=0;i<settime;i++)
-         {
-         t++;
-         if (t==VBLCOUNTER)
-            {
-            t=0;
-            t1++;
-            if (t1==2)
-               {
-               t1=0;
-               t2++;
-               if (t2==2)
-                  {
-                  t2=0;
-                  t3++;
-                  if (t3==2)
-                     t3=0;
-                  }
-               }
-            }
-         }
-      time=t+(time-savetime);
-      if (time>=VBLCOUNTER)
-         {
-         time-=VBLCOUNTER;
-         t1++;
-         if (t1==2)
-            {
-            t1=0;
-            t2++;
-            if (t2==2)
-               {
-               t2=0;
-               t3++;
-               if (t3==2)
-                  t3=0;
-               }
-            }
-         }
-      insettime=0;
-      }
+	  for (i=0;i<settime;i++)
+		 {
+		 t++;
+		 if (t==VBLCOUNTER)
+			{
+			t=0;
+			t1++;
+			if (t1==2)
+			   {
+			   t1=0;
+			   t2++;
+			   if (t2==2)
+				  {
+				  t2=0;
+				  t3++;
+				  if (t3==2)
+					 t3=0;
+				  }
+			   }
+			}
+		 }
+	  time=t+(time-savetime);
+	  if (time>=VBLCOUNTER)
+		 {
+		 time-=VBLCOUNTER;
+		 t1++;
+		 if (t1==2)
+			{
+			t1=0;
+			t2++;
+			if (t2==2)
+			   {
+			   t2=0;
+			   t3++;
+			   if (t3==2)
+				  t3=0;
+			   }
+			}
+		 }
+	  insettime=0;
+	  }
 #endif
 #endif
 }
@@ -229,30 +229,30 @@ static void ISR_Timer (task *Task)
 
 #if 0
 #if (DEVELOPMENT == 1)
-      {
-      if (Task==timertask)
-         {
-         time++;
-         if ((time==VBLCOUNTER) && (insettime==0))
-            {
-            time=0;
-            VL_SetColor(0,(t1<<5)+20,(t2<<5)+20,(t3<<5)+20);
-            t1++;
-            if (t1==2)
-               {
-               t1=0;
-               t2++;
-               if (t2==2)
-                  {
-                  t2=0;
-                  t3++;
-                  if (t3==2)
-                     t3=0;
-                  }
-               }
-            }
-         }
-      }
+	  {
+	  if (Task==timertask)
+		 {
+		 time++;
+		 if ((time==VBLCOUNTER) && (insettime==0))
+			{
+			time=0;
+			VL_SetColor(0,(t1<<5)+20,(t2<<5)+20,(t3<<5)+20);
+			t1++;
+			if (t1==2)
+			   {
+			   t1=0;
+			   t2++;
+			   if (t2==2)
+				  {
+				  t2=0;
+				  t3++;
+				  if (t3==2)
+					 t3=0;
+				  }
+			   }
+			}
+		 }
+	  }
 #endif
 #endif
 }
@@ -295,10 +295,10 @@ void I_Delay ( int delay )
    IN_ClearKeysDown();
    time=ticcount;
    while (ticcount<time+delay)
-      {
-      if (LastScan)
-         break;
-      }
+	  {
+	  if (LastScan)
+		 break;
+	  }
 }
 
 /*
@@ -317,7 +317,7 @@ void I_StartupTimer (void)
    struct dostime_t cmostime;
 
    if (TimerStarted==true)
-      return;
+	  return;
    TimerStarted=true;
 
    I_GetCMOSTime ( &cmostime );
@@ -336,7 +336,7 @@ void I_StartupTimer (void)
    memcpy(&starttime,&cmostime,sizeof(starttime));
    ticcount=0;
    if (!quiet)
-      printf("I_StartupTimer: Timer Started\n");
+	  printf("I_StartupTimer: Timer Started\n");
 #endif
 }
 
@@ -352,7 +352,7 @@ void I_ShutdownTimer (void)
 #endif
 
    if (TimerStarted==false)
-      return;
+	  return;
    TimerStarted=false;
 
 //      OUTP(0x43,0x36);                            // Change timer 0
@@ -368,9 +368,9 @@ void I_ShutdownTimer (void)
    SoftError("Time difference in minutes (DOS-CMOS) %ld\n",dostime.minute-cmostime.minute);
    SoftError("Time difference in hour (DOS-CMOS) %ld\n",dostime.hour-cmostime.hour);
    totaltime=( ((cmostime.hour-starttime.hour)*3600) +
-               ((cmostime.minute-starttime.minute)*60) +
-                (cmostime.second-starttime.second)
-             );
+			   ((cmostime.minute-starttime.minute)*60) +
+				(cmostime.second-starttime.second)
+			 );
    SoftError("Total seconds = %ld Total Tics = %ld Game Tics = %ld\n",totaltime,totaltime*VBLCOUNTER,ticcount);
 #endif
 
@@ -382,34 +382,34 @@ void I_ShutdownTimer (void)
 //   TS_Halt();
 /*
    if (oldtimerisr)
-      {
-      OUTP(0x43,0x36);                            // Change timer 0
-      OUTP(0x40,0);
-      OUTP(0x40,0);
-      _dos_setvect (TIMERINT, oldtimerisr);
-      // Set Date and Time from CMOS
+	  {
+	  OUTP(0x43,0x36);                            // Change timer 0
+	  OUTP(0x40,0);
+	  OUTP(0x40,0);
+	  _dos_setvect (TIMERINT, oldtimerisr);
+	  // Set Date and Time from CMOS
 
-      OUTP(0x70,0);
-      time.second=inp(0x71);
-      OUTP(0x70,2);
-      time.minute=inp(0x71);
-      OUTP(0x70,4);
-      time.hour=inp(0x71);
-      time.second=(time.second&0x0f)+((time.second>>4)*10);
-      time.minute=(time.minute&0x0f)+((time.minute>>4)*10);
-      time.hour=(time.hour&0x0f)+((time.hour>>4)*10);
-      _dos_settime(&time);
+	  OUTP(0x70,0);
+	  time.second=inp(0x71);
+	  OUTP(0x70,2);
+	  time.minute=inp(0x71);
+	  OUTP(0x70,4);
+	  time.hour=inp(0x71);
+	  time.second=(time.second&0x0f)+((time.second>>4)*10);
+	  time.minute=(time.minute&0x0f)+((time.minute>>4)*10);
+	  time.hour=(time.hour&0x0f)+((time.hour>>4)*10);
+	  _dos_settime(&time);
 
-      OUTP(0x70,7);
-      date.day=inp(0x71);
-      OUTP(0x70,8);
-      date.month=inp(0x71);
-      OUTP(0x70,9);
-      date.year=inp(0x71);
-      date.day=(date.day&0x0f)+((date.day>>4)*10);
-      date.month=(date.month&0x0f)+((date.month>>4)*10);
-      date.year=(date.year&0x0f)+((date.year>>4)*10);
-      _dos_setdate(&date);
+	  OUTP(0x70,7);
+	  date.day=inp(0x71);
+	  OUTP(0x70,8);
+	  date.month=inp(0x71);
+	  OUTP(0x70,9);
+	  date.year=inp(0x71);
+	  date.day=(date.day&0x0f)+((date.day>>4)*10);
+	  date.month=(date.month&0x0f)+((date.month>>4)*10);
+	  date.year=(date.year&0x0f)+((date.year>>4)*10);
+	  _dos_setdate(&date);
 //      }
 */
 #endif
@@ -487,12 +487,12 @@ void I_SendKeyboardData
 
    count = 0xffff;
    while( count-- )
-      {
-      if ( !( inp( kb_status_port ) & input_buffer_full ) )
-         {
-         break;
-         }
-      }
+	  {
+	  if ( !( inp( kb_status_port ) & input_buffer_full ) )
+		 {
+		 break;
+		 }
+	  }
 
    outp( porta, val );
 
@@ -500,21 +500,21 @@ void I_SendKeyboardData
 
    retry = 3;
    while( retry-- )
-      {
-      count = 0x1a00;
-      while( count-- )
-         {
-         if ( KBFlags & kb_fe )
-            {
-            break;
-            }
+	  {
+	  count = 0x1a00;
+	  while( count-- )
+		 {
+		 if ( KBFlags & kb_fe )
+			{
+			break;
+			}
 
-         if ( KBFlags & kb_fa )
-            {
-            return;
-            }
-         }
-      }
+		 if ( KBFlags & kb_fa )
+			{
+			return;
+			}
+		 }
+	  }
 
    KBFlags |= kb_error;
    }
@@ -541,49 +541,49 @@ void I_SetKeyboardLEDs
    KBFlags |= kb_pr_led;
 
    switch( which )
-      {
-      case scroll_lock :
-         mask = scroll_led_on;
-         break;
+	  {
+	  case scroll_lock :
+		 mask = scroll_led_on;
+		 break;
 
-      case num_lock :
-         mask = num_led_on;
-         break;
+	  case num_lock :
+		 mask = num_led_on;
+		 break;
 
-      case caps_lock :
-         mask = caps_led_on;
-         break;
+	  case caps_lock :
+		 mask = caps_led_on;
+		 break;
 
-      default :
-         mask = 0;
-         break;
-      }
+	  default :
+		 mask = 0;
+		 break;
+	  }
 
    if ( val )
-      {
-      LEDs |= mask;
-      }
+	  {
+	  LEDs |= mask;
+	  }
    else
-      {
-      LEDs &= ~mask;
-      }
+	  {
+	  LEDs &= ~mask;
+	  }
 
    count = 0;
    do
-      {
-      if ( count > 3 )
-         {
-         break;
-         }
+	  {
+	  if ( count > 3 )
+		 {
+		 break;
+		 }
 
-      I_SendKeyboardData( led_cmd );
-      _disable();
-      I_SendKeyboardData( LEDs );
-      _disable();
-      I_SendKeyboardData( kb_enable );
-      _disable();
-      count++;
-      }
+	  I_SendKeyboardData( led_cmd );
+	  _disable();
+	  I_SendKeyboardData( LEDs );
+	  _disable();
+	  I_SendKeyboardData( kb_enable );
+	  _disable();
+	  count++;
+	  }
    while( KBFlags & kb_error );
 
    _enable();
@@ -614,92 +614,92 @@ void __interrupt I_KeyboardISR (void)
 	OUTP ( 0x61, temp );
 
    if ( KBFlags & kb_pr_led )
-      {
-      if ( k == kb_resend )
-         {
-         // Handle resend
-         KBFlags |= kb_fe;
-         }
-      else if (k == kb_ack)
-         {
-         // Handle ack
-         KBFlags |= kb_fa;
-         }
-      }
+	  {
+	  if ( k == kb_resend )
+		 {
+		 // Handle resend
+		 KBFlags |= kb_fe;
+		 }
+	  else if (k == kb_ack)
+		 {
+		 // Handle ack
+		 KBFlags |= kb_fa;
+		 }
+	  }
    else if ( pausecount )
-      {
-      pausecount--;
-      }
+	  {
+	  pausecount--;
+	  }
    else if ( k == 0xe1 )         // Handle Pause key
-      {
-      PausePressed = true;
-      pausecount = 5;
-      }
+	  {
+	  PausePressed = true;
+	  pausecount = 5;
+	  }
    else if ( k == 0x46 )         // Handle Panic key (Scroll Lock)
-      {
-      PanicPressed = true;
-      }
+	  {
+	  PanicPressed = true;
+	  }
    else
-      {
-      if ( k == 0xE0 )
-         {
-         ExtendedKeyFlag = true;
-         }
-      else
-         {
-         keyon = k & 0x80;
-         strippedkey = k & 0x7f;
+	  {
+	  if ( k == 0xE0 )
+		 {
+		 ExtendedKeyFlag = true;
+		 }
+	  else
+		 {
+		 keyon = k & 0x80;
+		 strippedkey = k & 0x7f;
 
-         if ( ExtendedKeyFlag )
-            {
-            if ( ( strippedkey == sc_LShift ) ||
-               ( strippedkey == sc_RShift ) )
-               {
-               k = sc_None;
-               }
+		 if ( ExtendedKeyFlag )
+			{
+			if ( ( strippedkey == sc_LShift ) ||
+			   ( strippedkey == sc_RShift ) )
+			   {
+			   k = sc_None;
+			   }
 /*
-            else
-               {
-               if ( strippedkey == sc_Alt )
-                  {
-                  k = sc_RightAlt | keyon;
-                  }
-               if ( strippedkey == sc_Control )
-                  {
-                  k = sc_RightCtrl | keyon;
-                  }
-               }
+			else
+			   {
+			   if ( strippedkey == sc_Alt )
+				  {
+				  k = sc_RightAlt | keyon;
+				  }
+			   if ( strippedkey == sc_Control )
+				  {
+				  k = sc_RightCtrl | keyon;
+				  }
+			   }
 */
-            }
+			}
 
-         if ( k != sc_None )
-            {
-            if ( strippedkey == sc_LShift )
-               {
-               k = sc_RShift | keyon;
-               }
+		 if ( k != sc_None )
+			{
+			if ( strippedkey == sc_LShift )
+			   {
+			   k = sc_RShift | keyon;
+			   }
 
-            if ( !keyon )
-               {
-               LastScan = k;
-               }
+			if ( !keyon )
+			   {
+			   LastScan = k;
+			   }
 
-            if (k & 0x80)        // Up event
-               {
-               Keystate[k&0x7f]=0;
-               }
-            else                 // Down event
-               {
-               Keystate[k]=1;
-               }
+			if (k & 0x80)        // Up event
+			   {
+			   Keystate[k&0x7f]=0;
+			   }
+			else                 // Down event
+			   {
+			   Keystate[k]=1;
+			   }
 
-            KeyboardQueue[ Keytail ] = k;
-            Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
-            }
+			KeyboardQueue[ Keytail ] = k;
+			Keytail = ( Keytail + 1 )&( KEYQMAX - 1 );
+			}
 
-         ExtendedKeyFlag = false;
-         }
-      }
+		 ExtendedKeyFlag = false;
+		 }
+	  }
 
    // acknowledge the interrupt
    OUTP ( 0x20, 0x20 );
@@ -717,7 +717,7 @@ void __interrupt I_KeyboardISR (void)
 void I_StartupKeyboard (void)
 {
    if (KeyboardStarted==true)
-      return;
+	  return;
    KeyboardStarted=true;
 
    LEDs = 0;
@@ -732,13 +732,13 @@ void I_StartupKeyboard (void)
    Keyhead = Keytail = 0;
    memset(Keystate,0,sizeof(Keystate));
    if (!quiet)
-      printf("I_StartupKeyboard: Keyboard Started\n");
+	  printf("I_StartupKeyboard: Keyboard Started\n");
 }
 
 void I_ShutdownKeyboard (void)
 {
    if (KeyboardStarted==false)
-      return;
+	  return;
    KeyboardStarted=false;
 
    // Clear LEDS
@@ -754,8 +754,7 @@ void I_ShutdownKeyboard (void)
 static int ticoffset;    /* offset for SDL_GetTicks() */
 static int ticbase;      /* game-supplied base */
 
-int GetTicCount (void)
-{
+int GetTicCount( void ) {
 	return ((SDL_GetTicks() - ticoffset) * VBLCOUNTER) / 1000 + ticbase;
 }
 
@@ -766,23 +765,20 @@ int GetTicCount (void)
 =
 ================
 */
-void ISR_SetTime(int settime)
-{
+void ISR_SetTime( int settime ) {
 	ticoffset = SDL_GetTicks();
 	ticbase = settime;
 }
 
 /* developer-only */
 
-int GetFastTics (void)
-{
+int GetFastTics( void ) {
 	/* STUB_FUNCTION; */
-	
+
 	return 0;
 }
 
-void SetFastTics (int settime)
-{
+void SetFastTics( int settime ) {
 	/* STUB_FUNCTION; */
 }
 
@@ -794,17 +790,15 @@ void SetFastTics (int settime)
 ================
 */
 
-void I_Delay ( int delay )
-{
-   int time;
+void I_Delay( int delay ) {
+	int time;
 
-   delay=(VBLCOUNTER*delay)/10;
-   IN_ClearKeysDown();
-   time=GetTicCount();
-   while (!LastScan && !IN_GetMouseButtons() && GetTicCount()<time+delay)
-      {
-      	IN_UpdateKeyboard();
-      }
+	delay = (VBLCOUNTER * delay) / 10;
+	IN_ClearKeysDown();
+	time = GetTicCount();
+	while ( !LastScan && !IN_GetMouseButtons() && GetTicCount() < time + delay ) {
+		IN_UpdateKeyboard();
+	}
 }
 
 /*
@@ -815,12 +809,10 @@ void I_Delay ( int delay )
 ===============
 */
 
-void I_StartupTimer (void)
-{
+void I_StartupTimer( void ) {
 }
 
-void I_ShutdownTimer (void)
-{
+void I_ShutdownTimer( void ) {
 }
 
 /*
@@ -831,12 +823,9 @@ void I_ShutdownTimer (void)
 ===============
 */
 
-void I_StartupKeyboard (void)
-{
+void I_StartupKeyboard( void ) {
 }
 
-
-void I_ShutdownKeyboard (void)
-{
+void I_ShutdownKeyboard( void ) {
 }
 #endif

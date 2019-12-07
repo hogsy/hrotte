@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __INTERRUPT_H
 
 unsigned long DisableInterrupts( void );
-void          RestoreInterrupts( unsigned long flags );
+void RestoreInterrupts( unsigned long flags );
 
 #ifdef PLAT_DOS
 #pragma aux DisableInterrupts = \

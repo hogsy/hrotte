@@ -52,7 +52,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MESSAGEBOXCOLOR    166
 
-
 #define DISKERROR          0x4000         // bit 15 (of deverr)
 #define IGNOREAVAILABLE    0x1000         // bit 13   (bit 14 isn't used)
 #define RETRYAVAILABLE     0x800          // bit 12
@@ -71,49 +70,51 @@ boolean DivisionError = false;
 
 
 static char ErrorCodes[13][25] =
-{
-   "Write-protected disk\0",
-   "Unknown unit\0",
-   "Drive not ready\0",
-   "Unknown command\0",
-   "CRC error in data\0",
-   "Bad drive struct length\0",
-   "Seek error\0",
-   "Unknown media type\0",
-   "Sector not found\0",
-   "Printer out of paper\0",
-   "Write fault\0",
-   "Read fault\0",
-   "General failure\0"
-};
+	{
+		"Write-protected disk\0",
+		"Unknown unit\0",
+		"Drive not ready\0",
+		"Unknown command\0",
+		"CRC error in data\0",
+		"Bad drive struct length\0",
+		"Seek error\0",
+		"Unknown media type\0",
+		"Sector not found\0",
+		"Printer out of paper\0",
+		"Write fault\0",
+		"Read fault\0",
+		"General failure\0"
+	};
 
 static char Drives[7][3] =
-{
-   "A\0",
-   "B\0",
-   "C\0",
-   "D\0",
-   "E\0",
-   "F\0",
-   "G\0"
-};
+	{
+		"A\0",
+		"B\0",
+		"C\0",
+		"D\0",
+		"E\0",
+		"F\0",
+		"G\0"
+	};
 
 static char Locations[4][11] =
-{
-   "MS-DOS\0",
-   "FAT\0",
-   "Directory\0",
-   "Data area\0"
-};
+	{
+		"MS-DOS\0",
+		"FAT\0",
+		"Directory\0",
+		"Data area\0"
+	};
 
 static char ReadWrite[2][6] =
-{
-   "Read\0",
-   "Write\0"
-};
+	{
+		"Read\0",
+		"Write\0"
+	};
 
-static boolean ErrorHandlerStarted=false;
-void (__interrupt __far *olddivisr) () = NULL;
+static boolean ErrorHandlerStarted = false;
+void (__interrupt
+__far * olddivisr
+) () = NULL;
 
 //******************************************************************************
 //
@@ -121,50 +122,46 @@ void (__interrupt __far *olddivisr) () = NULL;
 //
 //******************************************************************************
 
-void UL_UserMessage (int x, int y, char *str, ...) __attribute__((format(printf,3,4)))
-{
-   va_list strptr;
-   char buf[128];
-   int width, height;
+void UL_UserMessage( int x, int y, char * str, ... ) __attribute__((format(printf, 3, 4))) {
+	va_list strptr;
+	char buf[128];
+	int width, height;
 
-   memset (&buf[0], 0, sizeof (buf));
-   va_start (strptr, str);
-   vsprintf (&buf[0], str, strptr);
-   va_end (strptr);
+	memset( &buf[0], 0, sizeof( buf ));
+	va_start ( strptr, str );
+	vsprintf( &buf[0], str, strptr );
+	va_end ( strptr );
 
-	if ( *(byte *)0x449 == 0x13)
-      {
-      CurrentFont = tinyfont;
+	if ( *( byte * ) 0x449 == 0x13 ) {
+		CurrentFont = tinyfont;
 
-      WindowW=160;
-      WindowH=100;
-      WindowX=80;
-      WindowY=50;
+		WindowW = 160;
+		WindowH = 100;
+		WindowX = 80;
+		WindowY = 50;
 
-      US_MeasureStr (&width, &height, &buf[0]);
+		US_MeasureStr( &width, &height, &buf[0] );
 
-      width  += (CurrentFont->width[1] << 1);
-      height += (CurrentFont->height << 1);
+		width += (CurrentFont->width[1] << 1);
+		height += (CurrentFont->height << 1);
 
-      VL_Bar (x, y, WindowW-2, WindowH, MESSAGEBOXCOLOR);
+		VL_Bar( x, y, WindowW - 2, WindowH, MESSAGEBOXCOLOR );
 
-      PrintX = x+CurrentFont->width[1];
-      PrintY = y+CurrentFont->height;
+		PrintX = x + CurrentFont->width[1];
+		PrintY = y + CurrentFont->height;
 
-      US_CPrint (&buf[0]);
+		US_CPrint( &buf[0] );
 
-      displayofs=bufferofs;
+		displayofs = bufferofs;
 
-      OUTP(CRTC_INDEX, CRTC_STARTHIGH);
-      OUTP(CRTC_DATA,((displayofs&0x0000ffff)>>8));
+		OUTP( CRTC_INDEX, CRTC_STARTHIGH );
+		OUTP( CRTC_DATA, ((displayofs & 0x0000ffff) >> 8));
 
-
-      bufferofs += screensize;
-      if (bufferofs > page3start)
-         bufferofs = page1start;
-      }
-   else
-      printf("%s\n",&buf[0]);
+		bufferofs += screensize;
+		if ( bufferofs > page3start )
+			bufferofs = page1start;
+	} else
+		printf( "%s\n", &buf[0] );
 }
 
 //****************************************************************************
@@ -173,62 +170,45 @@ void UL_UserMessage (int x, int y, char *str, ...) __attribute__((format(printf,
 //
 //****************************************************************************
 
-int UL_GeneralError (int code)
-{
-   boolean done = false;
-   int retval = 0;
+int UL_GeneralError( int code ) {
+	boolean done = false;
+	int retval = 0;
 
-   UL_UserMessage (80, 50, "Device Error!\n%s.\n \n(A)bort  (R)etry\n",
-                   ErrorCodes[code]);
+	UL_UserMessage( 80, 50, "Device Error!\n%s.\n \n(A)bort  (R)etry\n",
+					ErrorCodes[code] );
 
-   if (KeyboardStarted==true)
-      {
-      while (!done)
-      {
-         if (Keyboard[sc_A])
-         {
-            retval = 1;
-            done = true;
+	if ( KeyboardStarted == true ) {
+		while ( !done ) {
+			if ( Keyboard[sc_A] ) {
+				retval = 1;
+				done = true;
 
-            while (Keyboard[sc_A])
-               ;
-         }
-         else
-            if (Keyboard[sc_R])
-            {
-               retval = 0;
-               done = true;
+				while ( Keyboard[sc_A] );
+			} else if ( Keyboard[sc_R] ) {
+				retval = 0;
+				done = true;
 
-               while (Keyboard[sc_R])
-                  ;
-            }
-      }
-      }
-   else
-      {
-      while (!done)
-      {
-         if (kbhit())
-         {
-            char ch;
+				while ( Keyboard[sc_R] );
+			}
+		}
+	} else {
+		while ( !done ) {
+			if ( kbhit()) {
+				char ch;
 
-            ch=toupper(getch());
-            if (ch=='A')
-               {
-               retval = 1;
-               done = true;
-               }
-            else if (ch=='R')
-               {
-               retval = 0;
-               done = true;
-               }
-         }
-      }
-      }
+				ch = toupper( getch());
+				if ( ch == 'A' ) {
+					retval = 1;
+					done = true;
+				} else if ( ch == 'R' ) {
+					retval = 0;
+					done = true;
+				}
+			}
+		}
+	}
 
-
-   return (retval);
+	return (retval);
 }
 
 
@@ -238,63 +218,47 @@ int UL_GeneralError (int code)
 //
 //****************************************************************************
 
-int UL_DriveError (int code, int location, int rwerror, int whichdrive)
-{
-   boolean done = false;
-   int retval   = 0;
+int UL_DriveError( int code, int location, int rwerror, int whichdrive ) {
+	boolean done = false;
+	int retval = 0;
 
-   UL_UserMessage (80, 50,
-                  "Drive Error!\n%s.\nOn drive %s.\nLocation: %s.\n%s error.\n(A)bort  (R)etry\n",
-                    ErrorCodes[code], Drives[whichdrive],
-                    Locations[location], ReadWrite[rwerror]);
+	UL_UserMessage( 80, 50,
+					"Drive Error!\n%s.\nOn drive %s.\nLocation: %s.\n%s error.\n(A)bort  (R)etry\n",
+					ErrorCodes[code], Drives[whichdrive],
+					Locations[location], ReadWrite[rwerror] );
 
-   if (KeyboardStarted==true)
-      {
-      while (!done)
-      {
-         if (Keyboard[sc_A])
-         {
-            retval = 1;
-            done = true;
+	if ( KeyboardStarted == true ) {
+		while ( !done ) {
+			if ( Keyboard[sc_A] ) {
+				retval = 1;
+				done = true;
 
-            while (Keyboard[sc_A])
-               ;
-         }
-         else
-            if (Keyboard[sc_R])
-            {
-               retval = 0;
-               done = true;
+				while ( Keyboard[sc_A] );
+			} else if ( Keyboard[sc_R] ) {
+				retval = 0;
+				done = true;
 
-               while (Keyboard[sc_R])
-                  ;
-            }
-      }
-      }
-   else
-      {
-      while (!done)
-      {
-         if (kbhit())
-         {
-            char ch;
+				while ( Keyboard[sc_R] );
+			}
+		}
+	} else {
+		while ( !done ) {
+			if ( kbhit()) {
+				char ch;
 
-            ch=toupper(getch());
-            if (ch=='A')
-               {
-               retval = 1;
-               done = true;
-               }
-            else if (ch=='R')
-               {
-               retval = 0;
-               done = true;
-               }
-         }
-      }
-      }
+				ch = toupper( getch());
+				if ( ch == 'A' ) {
+					retval = 1;
+					done = true;
+				} else if ( ch == 'R' ) {
+					retval = 0;
+					done = true;
+				}
+			}
+		}
+	}
 
-   return (retval);
+	return (retval);
 }
 
 
@@ -304,36 +268,36 @@ int UL_DriveError (int code, int location, int rwerror, int whichdrive)
 //
 //****************************************************************************
 
-int __far UL_harderr (unsigned deverr, unsigned errcode, unsigned far *devhdr)
-{
-   int DiskError      = 0;    // Indicates if it was a disk error
-   int IgnoreAvail    = 0;    // if "ignore" response is available
-   int RetryAvail     = 0;    // if "retry" response is available
-   int FailAvail      = 0;    // if "fail" response is available
-   byte ErrorLocation = 0;    // Location of error
-   byte RWerror       = 0;    // Read/Write error (0 == read, 1 == write)
-   byte whichDrive    = 0;    // Drive the error is on (0 == A, 1 == B, ...)
-   int action;
+int __far
+UL_harderr( unsigned deverr, unsigned errcode, unsigned far * devhdr ) {
+	int DiskError = 0;    // Indicates if it was a disk error
+	int IgnoreAvail = 0;    // if "ignore" response is available
+	int RetryAvail = 0;    // if "retry" response is available
+	int FailAvail = 0;    // if "fail" response is available
+	byte ErrorLocation = 0;    // Location of error
+	byte RWerror = 0;    // Read/Write error (0 == read, 1 == write)
+	byte whichDrive = 0;    // Drive the error is on (0 == A, 1 == B, ...)
+	int action;
 
-   unsigned temp;
-   temp = *devhdr;
+	unsigned temp;
+	temp = *devhdr;
 
-  // Check errors
-   DiskError     = (deverr & DISKERROR);
-   IgnoreAvail   = (deverr & IGNOREAVAILABLE);
-   RetryAvail    = (deverr & RETRYAVAILABLE);
-   FailAvail     = (deverr & FAILAVAILABLE);
-   ErrorLocation = ((deverr & LOCATION) >> 8);
-   RWerror       = (deverr & READWRITEERROR);
+	// Check errors
+	DiskError = (deverr & DISKERROR);
+	IgnoreAvail = (deverr & IGNOREAVAILABLE);
+	RetryAvail = (deverr & RETRYAVAILABLE);
+	FailAvail = (deverr & FAILAVAILABLE);
+	ErrorLocation = ((deverr & LOCATION) >> 8);
+	RWerror = (deverr & READWRITEERROR);
 
-   if (DiskError == 0)
-      action = UL_GeneralError (errcode);
-   else
-      action = UL_DriveError (errcode, ErrorLocation, RWerror, whichDrive);
+	if ( DiskError == 0 )
+		action = UL_GeneralError( errcode );
+	else
+		action = UL_DriveError( errcode, ErrorLocation, RWerror, whichDrive );
 
-   if (action)
-      Error ("USER BREAK : ROTT aborted.\n");
-   return (_HARDERR_RETRY);
+	if ( action )
+		Error( "USER BREAK : ROTT aborted.\n" );
+	return (_HARDERR_RETRY);
 }
 
 
@@ -345,13 +309,13 @@ int __far UL_harderr (unsigned deverr, unsigned errcode, unsigned far *devhdr)
 
 extern byte * colormap;
 
-void __interrupt __far UL_DivisionISR ( void )
-{
+void __interrupt
+__far UL_DivisionISR( void ) {
 // acknowledge the interrupt
 
-   SetBorderColor (*(colormap+(((100-10)>>2)<<8)+160));
-   DivisionError = true;
-   OUTP (0x20, 0x20);
+	SetBorderColor( *(colormap + (((100 - 10) >> 2) << 8) + 160));
+	DivisionError = true;
+	OUTP ( 0x20, 0x20 );
 }
 
 
@@ -361,13 +325,12 @@ void __interrupt __far UL_DivisionISR ( void )
 //
 //****************************************************************************
 
-void UL_ErrorStartup ( void )
-{
-   if (ErrorHandlerStarted==true)
-      return;
-   ErrorHandlerStarted=true;
-   _harderr (UL_harderr);     // Install hard error handler
-   UL_StartupDivisionByZero();
+void UL_ErrorStartup( void ) {
+	if ( ErrorHandlerStarted == true )
+		return;
+	ErrorHandlerStarted = true;
+	_harderr( UL_harderr );     // Install hard error handler
+	UL_StartupDivisionByZero();
 }
 
 //****************************************************************************
@@ -376,14 +339,12 @@ void UL_ErrorStartup ( void )
 //
 //****************************************************************************
 
-void UL_ErrorShutdown ( void )
-{
-   if (ErrorHandlerStarted==false)
-      return;
-   ErrorHandlerStarted=false;
-   UL_ShutdownDivisionByZero();
+void UL_ErrorShutdown( void ) {
+	if ( ErrorHandlerStarted == false )
+		return;
+	ErrorHandlerStarted = false;
+	UL_ShutdownDivisionByZero();
 }
-
 
 /*
 ===============
@@ -393,10 +354,9 @@ void UL_ErrorShutdown ( void )
 ===============
 */
 
-void UL_StartupDivisionByZero ( void )
-{
-	olddivisr = _dos_getvect(DIVISIONINT);
-	_dos_setvect (DIVISIONINT, UL_DivisionISR);
+void UL_StartupDivisionByZero( void ) {
+	olddivisr = _dos_getvect( DIVISIONINT );
+	_dos_setvect( DIVISIONINT, UL_DivisionISR );
 }
 
 /*
@@ -407,8 +367,7 @@ void UL_StartupDivisionByZero ( void )
 ===============
 */
 
-void UL_ShutdownDivisionByZero ( void )
-{
-	_dos_setvect (DIVISIONINT, olddivisr);
+void UL_ShutdownDivisionByZero( void ) {
+	_dos_setvect( DIVISIONINT, olddivisr );
 }
 

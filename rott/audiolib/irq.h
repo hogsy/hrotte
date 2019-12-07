@@ -31,24 +31,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __IRQ_H
 #define __IRQ_H
 
-enum IRQ_ERRORS
-   {
-   IRQ_Warning = -2,
-   IRQ_Error = -1,
-   IRQ_Ok = 0,
-   };
+enum IRQ_ERRORS {
+	IRQ_Warning = -2,
+	IRQ_Error = -1,
+	IRQ_Ok = 0,
+};
 
 #define VALID_IRQ( irq )  ( ( ( irq ) >= 0 ) && ( ( irq ) <= 15 ) )
 
 int IRQ_SetVector
-   (
-   int vector,
-   void ( __interrupt *function )( void )
-   );
+	(
+		int vector,
+		void ( __interrupt
+*function )( void )
+);
 int IRQ_RestoreVector
-   (
-   int vector
-   );
-
+	(
+		int vector
+	);
 
 #endif

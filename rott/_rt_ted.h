@@ -32,35 +32,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define NORMAL_SIGNATURE  ( "RTL" )
 #define RTL_HEADER_OFFSET 8
 
-typedef struct
-{
-	int  lump;
-	int  cachelevel;
-	int  type; // To make precaching possible on big endian machines
+typedef struct {
+	int lump;
+	int cachelevel;
+	int type; // To make precaching possible on big endian machines
 } cachetype;
 
 //========================================
 
-typedef struct
-{
-        short   RLEWtag;
-        int             headeroffsets[100];
-        byte            tileinfo[1];
+typedef struct {
+	short RLEWtag;
+	int headeroffsets[100];
+	byte tileinfo[1];
 } mapfiletype;
 
-
-typedef struct
-{
-        int   planestart[3];
-        word  planelength[3];
-        word  width,height;
-        char            name[16];
+typedef struct {
+	int planestart[3];
+	word planelength[3];
+	word width, height;
+	char name[16];
 } maptype;
 
-#define ActorIsPushWall(xx,yy)   ((actorat[xx][yy])&&(((objtype *)actorat[xx][yy])->which==PWALL) )
-#define ActorIsWall(xx,yy)   ((actorat[xx][yy])&&(((objtype *)actorat[xx][yy])->which==WALL) )
-#define ActorIsSpring(xx,yy)   ((actorat[xx][yy])&&(((objtype *)actorat[xx][yy])->obclass==springobj) )
-#define StaticUndefined(xx,yy)   ((sprites[xx][yy])&&(((statobj_t *)sprites[xx][yy])->z<-64) )
+#define ActorIsPushWall( xx, yy )   ((actorat[xx][yy])&&(((objtype *)actorat[xx][yy])->which==PWALL) )
+#define ActorIsWall( xx, yy )   ((actorat[xx][yy])&&(((objtype *)actorat[xx][yy])->which==WALL) )
+#define ActorIsSpring( xx, yy )   ((actorat[xx][yy])&&(((objtype *)actorat[xx][yy])->obclass==springobj) )
+#define StaticUndefined( xx, yy )   ((sprites[xx][yy])&&(((statobj_t *)sprites[xx][yy])->z<-64) )
 
 #define  PRECACHEASTRINGX 141
 #define  PRECACHEASTRINGY 8
@@ -83,8 +79,5 @@ typedef struct
 #define  MAXLEDS 57
 
 #define  MAXSILLYSTRINGS 32
-
-
-
 
 #endif

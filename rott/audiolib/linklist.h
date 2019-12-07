@@ -23,28 +23,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern "C" {
 #endif
 
+#define NewNode( type )  ((type*)SafeMalloc(sizeof(type)))
 
-#define NewNode(type)  ((type*)SafeMalloc(sizeof(type)))
-
-
-#define LL_CreateNewLinkedList(rootnode,type,next,prev) 			\
-   { 																				\
-   (rootnode) = NewNode(type);                            		\
-   (rootnode)->prev = (rootnode);                         		\
-   (rootnode)->next = (rootnode);                         		\
+#define LL_CreateNewLinkedList( rootnode, type, next, prev )            \
+   {                                                                                \
+   (rootnode) = NewNode(type);                                    \
+   (rootnode)->prev = (rootnode);                                \
+   (rootnode)->next = (rootnode);                                \
    }
 
-
-
-#define LL_AddNode(rootnode, newnode, next, prev) 			\
-   {                                              			\
-   (newnode)->next = (rootnode);                  			\
-   (newnode)->prev = (rootnode)->prev;                	\
-   (rootnode)->prev->next = (newnode);                	\
-   (rootnode)->prev = (newnode);                      	\
+#define LL_AddNode( rootnode, newnode, next, prev )            \
+   {                                                        \
+   (newnode)->next = (rootnode);                            \
+   (newnode)->prev = (rootnode)->prev;                    \
+   (rootnode)->prev->next = (newnode);                    \
+   (rootnode)->prev = (newnode);                        \
    }
 
-#define LL_TransferList(oldroot,newroot,next,prev)  \
+#define LL_TransferList( oldroot, newroot, next, prev )  \
    {                                                \
    if ((oldroot)->prev != (oldroot))                    \
       {                                             \
@@ -57,7 +53,7 @@ extern "C" {
       }                                             \
    }
 
-#define LL_ReverseList(root,type,next,prev)              \
+#define LL_ReverseList( root, type, next, prev )              \
    {                                                     \
    type *newend,*trav,*tprev;                            \
                                                          \
@@ -69,8 +65,7 @@ extern "C" {
       }                                                  \
    }
 
-
-#define LL_RemoveNode(node,next,prev) \
+#define LL_RemoveNode( node, next, prev ) \
    {                                  \
    (node)->prev->next = (node)->next;     \
    (node)->next->prev = (node)->prev;     \
@@ -78,8 +73,7 @@ extern "C" {
    (node)->prev = (node);                 \
    }
 
-
-#define LL_SortedInsertion(rootnode,insertnode,next,prev,type,sortparm) \
+#define LL_SortedInsertion( rootnode, insertnode, next, prev, type, sortparm ) \
    {                                                                    \
    type *hoya;                                                          \
                                                                         \
@@ -91,26 +85,25 @@ extern "C" {
    LL_AddNode(hoya,(insertnode),next,prev);                               \
    }
 
-#define LL_MoveNode(node,newroot,next,prev) \
+#define LL_MoveNode( node, newroot, next, prev ) \
    {                                        \
    LL_RemoveNode((node),next,prev);           \
    LL_AddNode((newroot),(node),next,prev);      \
    }
 
-#define LL_ListEmpty(list,next,prev) \
+#define LL_ListEmpty( list, next, prev ) \
    (                                 \
    ((list)->next == (list)) &&       \
    ((list)->prev == (list))          \
    )
 
-#define LL_Free(list)   SafeFree(list)
-#define LL_Reset(list,next,prev)    (list)->next = (list)->prev = (list)
+#define LL_Free( list )   SafeFree(list)
+#define LL_Reset( list, next, prev )    (list)->next = (list)->prev = (list)
 #define LL_New      LL_CreateNewLinkedList
 #define LL_Remove   LL_RemoveNode
 #define LL_Add      LL_AddNode
 #define LL_Empty    LL_ListEmpty
 #define LL_Move     LL_MoveNode
-
 
 #ifdef __cplusplus
 };

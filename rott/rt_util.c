@@ -59,32 +59,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //MED
 #include "memcheck.h"
 
-int    egacolor[16];
-byte   *  origpal;
-FILE   *  errout;
-FILE   *  debugout;
-FILE   *  mapdebugout;
+int egacolor[16];
+byte * origpal;
+FILE * errout;
+FILE * debugout;
+FILE * mapdebugout;
 
-static boolean SoftErrorStarted=false;
-static boolean DebugStarted=false;
-static boolean MapDebugStarted=false;
+static boolean SoftErrorStarted = false;
+static boolean DebugStarted = false;
+static boolean MapDebugStarted = false;
 
-static unsigned char egargb[48]={ 0x00,0x00,0x00,
-									 0x00,0x00,0xab,
-                            0x00,0xab,0x00,
-                            0x00,0xab,0xab,
-                            0xab,0x00,0x00,
-                            0xab,0x00,0xab,
-                            0xab,0x57,0x00,
-                            0xab,0xab,0xab,
-                            0x57,0x57,0x57,
-                            0x57,0x57,0xff,
-                            0x57,0xff,0x57,
-                            0x57,0xff,0xff,
-                            0xff,0x57,0x57,
-                            0xff,0x57,0xff,
-                            0xff,0xff,0x57,
-									 0xff,0xff,0xff};
+static unsigned char egargb[48] = {0x00, 0x00, 0x00,
+								   0x00, 0x00, 0xab,
+								   0x00, 0xab, 0x00,
+								   0x00, 0xab, 0xab,
+								   0xab, 0x00, 0x00,
+								   0xab, 0x00, 0xab,
+								   0xab, 0x57, 0x00,
+								   0xab, 0xab, 0xab,
+								   0x57, 0x57, 0x57,
+								   0x57, 0x57, 0xff,
+								   0x57, 0xff, 0x57,
+								   0x57, 0xff, 0xff,
+								   0xff, 0x57, 0x57,
+								   0xff, 0x57, 0xff,
+								   0xff, 0xff, 0x57,
+								   0xff, 0xff, 0xff};
 
 extern const byte * ROTT_ERR;
 
@@ -92,7 +92,7 @@ extern const byte * ROTT_ERR;
 int TotalStaticMemory=0;
 #endif
 
-#define SWAP(a,b) \
+#define SWAP( a, b ) \
    {              \
    a=(a)^(b);     \
    b=(a)^(b);     \
@@ -105,19 +105,17 @@ int TotalStaticMemory=0;
 //
 //******************************************************************************
 
-int FindDistance(int ix, int iy)
-{
-  int   t;
+int FindDistance( int ix, int iy ) {
+	int t;
 
-  ix= abs(ix);        /* absolute values */
-  iy= abs(iy);
+	ix = abs( ix );        /* absolute values */
+	iy = abs( iy );
 
-  if (ix<iy)
-     SWAP(ix,iy);
+	if ( ix < iy ) SWAP( ix, iy );
 
-  t = iy + (iy>>1);
+	t = iy + (iy >> 1);
 
-  return (ix - (ix>>5) - (ix>>7)  + (t>>2) + (t>>6));
+	return (ix - (ix >> 5) - (ix >> 7) + (t >> 2) + (t >> 6));
 }
 
 
@@ -127,24 +125,21 @@ int FindDistance(int ix, int iy)
 //
 //******************************************************************************
 
-int Find_3D_Distance(int ix, int iy, int iz)
-   {
-   int   t;
+int Find_3D_Distance( int ix, int iy, int iz ) {
+	int t;
 
-   ix= abs(ix);           /* absolute values */
-   iy= abs(iy);
-   iz= abs(iz);
+	ix = abs( ix );           /* absolute values */
+	iy = abs( iy );
+	iz = abs( iz );
 
-   if (ix<iy)
-     SWAP(ix,iy);
+	if ( ix < iy ) SWAP( ix, iy );
 
-   if (ix<iz)
-     SWAP(ix,iz);
+	if ( ix < iz ) SWAP( ix, iz );
 
-   t = iy + iz;
+	t = iy + iz;
 
-   return (ix - (ix>>4) + (t>>2) + (t>>3));
-   }
+	return (ix - (ix >> 4) + (t >> 2) + (t >> 3));
+}
 
 //******************************************************************************
 //
@@ -152,87 +147,76 @@ int Find_3D_Distance(int ix, int iy, int iz)
 //
 //******************************************************************************
 
-int atan2_appx(int dx, int dy)
-{int absdx, absdy;
- fixed angle;
- fixed ratio;
+int atan2_appx( int dx, int dy ) {
+	int absdx, absdy;
+	fixed angle;
+	fixed ratio;
 
-
- if (!(dx||dy))
-  return 0;
- absdx = abs(dx);
- absdy = abs(dy);
- if (absdx >= absdy)
-  ratio = FixedDiv2(absdy,absdx);
- else
-  ratio = FixedDiv2(absdx,absdy);
-
- if (dx >= 0)
-  {if (dy >= 0)
-	 {if (absdx >= absdy)
-		angle = ratio;	    // 1st octant
-	  else
-		angle = (2<<16) - ratio; // 2nd octant
-	 }
+	if ( !(dx || dy))
+		return 0;
+	absdx = abs( dx );
+	absdy = abs( dy );
+	if ( absdx >= absdy )
+		ratio = FixedDiv2( absdy, absdx );
 	else
-	 {if (absdx >= absdy)
-		angle = (8<<16) - ratio; // 8th octant
-	  else
-		angle = (6<<16) + ratio; // 7th octant
-	 }
-  }
- else
-  {if (dy >= 0)
-	 {if (absdx >= absdy)
-		angle = (4<<16) - ratio; // 4th octant
-	  else
-		angle = (2<<16) + ratio; // 3rd octant
-	 }
-	else
-	 {if (absdx >= absdy)
-		angle = (4<<16) + ratio; // 5th octant
-	  else
-		angle = (6<<16) - ratio; // 6th octant
-	 }
-  }
+		ratio = FixedDiv2( absdx, absdy );
 
- return (((int)FixedMul(angle,ANGLESDIV8))&(FINEANGLES-1));
+	if ( dx >= 0 ) {
+		if ( dy >= 0 ) {
+			if ( absdx >= absdy )
+				angle = ratio;        // 1st octant
+			else
+				angle = (2 << 16) - ratio; // 2nd octant
+		} else {
+			if ( absdx >= absdy )
+				angle = (8 << 16) - ratio; // 8th octant
+			else
+				angle = (6 << 16) + ratio; // 7th octant
+		}
+	} else {
+		if ( dy >= 0 ) {
+			if ( absdx >= absdy )
+				angle = (4 << 16) - ratio; // 4th octant
+			else
+				angle = (2 << 16) + ratio; // 3rd octant
+		} else {
+			if ( absdx >= absdy )
+				angle = (4 << 16) + ratio; // 5th octant
+			else
+				angle = (6 << 16) - ratio; // 6th octant
+		}
+	}
+
+	return ((( int ) FixedMul( angle, ANGLESDIV8)) & (FINEANGLES - 1));
 }
-
-
 
 //******************************************************************************
 //
 // StringsNotEqual
 //
 //******************************************************************************
-boolean StringsNotEqual (char * s1, char * s2, int length)
-{
-   int i;
+boolean StringsNotEqual( char * s1, char * s2, int length ) {
+	int i;
 
-   for (i=0;i<length;i++)
-      if (s1[i]!=s2[i])
-         return true;
-   return false;
+	for ( i = 0; i < length; i++ )
+		if ( s1[i] != s2[i] )
+			return true;
+	return false;
 }
 
+void markgetch( void ) {
+	int done;
+	int i;
 
-
-void markgetch( void )
-{
-   int done;
-   int i;
-
-   done=0;
-   while (done==0)
-      {
-      IN_UpdateKeyboard ();
-      for (i=0;i<127;i++)
-         if (Keyboard[i]==1)
-            done=i;
-      }
-   while (Keyboard[done])
-      IN_UpdateKeyboard ();
+	done = 0;
+	while ( done == 0 ) {
+		IN_UpdateKeyboard();
+		for ( i = 0; i < 127; i++ )
+			if ( Keyboard[i] == 1 )
+				done = i;
+	}
+	while ( Keyboard[done] )
+		IN_UpdateKeyboard();
 }
 
 /*
@@ -243,42 +227,38 @@ void markgetch( void )
 ====================
 */
 
-void FindEGAColors ( void )
-{
-   int i;
+void FindEGAColors( void ) {
+	int i;
 
-	for (i=0;i<16;i++)
-		egacolor[i]=BestColor((int)egargb[i*3],(int)egargb[i*3+1],(int)egargb[i*3+2],origpal);
+	for ( i = 0; i < 16; i++ )
+		egacolor[i] = BestColor(( int ) egargb[i * 3], ( int ) egargb[i * 3 + 1], ( int ) egargb[i * 3 + 2], origpal );
 }
 
 //===========================================================================
 
 
-byte BestColor (int r, int g, int b, byte *palette)
-{
-	int	i;
-	long	dr, dg, db;
-	long	bestdistortion, distortion;
-	int	bestcolor;
-	byte	*pal;
+byte BestColor( int r, int g, int b, byte * palette ) {
+	int i;
+	long dr, dg, db;
+	long bestdistortion, distortion;
+	int bestcolor;
+	byte * pal;
 
 //
 // let any color go to 0 as a last resort
 //
-   bestdistortion = ( (long)WeightR*r*r + (long)WeightG*g*g + (long)WeightB*b*b )*2;
+	bestdistortion = (( long ) WeightR * r * r + ( long ) WeightG * g * g + ( long ) WeightB * b * b) * 2;
 	bestcolor = 0;
 
 	pal = &palette[0];
-	for (i=0 ; i<= 255 ; i++,pal+=3)
-	{
-		dr = r - (int)pal[0];
-		dg = g - (int)pal[1];
-		db = b - (int)pal[2];
-      distortion = WeightR*dr*dr + WeightG*dg*dg + WeightB*db*db;
-		if (distortion < bestdistortion)
-		{
-			if (!distortion)
-				return i;		// perfect match
+	for ( i = 0; i <= 255; i++, pal += 3 ) {
+		dr = r - ( int ) pal[0];
+		dg = g - ( int ) pal[1];
+		db = b - ( int ) pal[2];
+		distortion = WeightR * dr * dr + WeightG * dg * dg + WeightB * db * db;
+		if ( distortion < bestdistortion ) {
+			if ( !distortion )
+				return i;        // perfect match
 
 			bestdistortion = distortion;
 			bestcolor = i;
@@ -288,14 +268,12 @@ byte BestColor (int r, int g, int b, byte *palette)
 	return bestcolor;
 }
 
-void ClearGraphicsScreen( void )
-{
-VL_ClearVideo(0);
+void ClearGraphicsScreen( void ) {
+	VL_ClearVideo( 0 );
 }
 
-void ClearBuffer( char * buf, int size )
-{
-        memset(buf,0,size);
+void ClearBuffer( char * buf, int size ) {
+	memset( buf, 0, size );
 }
 
 /*
@@ -316,63 +294,60 @@ void ClearBuffer( char * buf, int size )
 =================
 */
 
-void Error (char *error, ...)
-{
-   char msgbuf[300];
-	va_list	argptr;
-   char i;
-   int size;
-   char * sptr;
-   char buf[30];
-   int handle;
-   int x,y;
-   int level;
-   static int inerror = 0;
-   char filename[ 128 ];
+void Error( char * error, ... ) {
+	char msgbuf[300];
+	va_list argptr;
+	char i;
+	int size;
+	char * sptr;
+	char buf[30];
+	int handle;
+	int x, y;
+	int level;
+	static int inerror = 0;
+	char filename[128];
 
+	inerror++;
+	if ( inerror > 1 )
+		abort();
 
-   inerror++;
-   if (inerror > 1)
-      abort();
-
-
-	SetTextMode ();
+	SetTextMode();
 #ifdef DOS
-   memcpy ((byte *)0xB8000, &ROTT_ERR, 160*7);
+	memcpy ((byte *)0xB8000, &ROTT_ERR, 160*7);
 #elif defined (ANSIESC)
-   DisplayTextSplash (&ROTT_ERR, 7);
+	DisplayTextSplash (&ROTT_ERR, 7);
 #endif
-   memset (msgbuf, 0, 300);
+	memset( msgbuf, 0, 300 );
 
 #ifdef DOS
-   px = ERRORVERSIONCOL-1;
-   py = ERRORVERSIONROW;
+	px = ERRORVERSIONCOL-1;
+	py = ERRORVERSIONROW;
 #if (SHAREWARE == 1)
-   UL_printf ("S");
+	UL_printf ("S");
 #else
-   UL_printf ("R");
+	UL_printf ("R");
 #endif
 
-   px = ERRORVERSIONCOL;
-   py = ERRORVERSIONROW;
+	px = ERRORVERSIONCOL;
+	py = ERRORVERSIONROW;
 #if (BETA == 1)
-   UL_printf ("á");
+	UL_printf ("ï¿½");
 #else
-   UL_printf (itoa(ROTTMAJORVERSION,&buf[0],10));
+	UL_printf (itoa(ROTTMAJORVERSION,&buf[0],10));
 #endif
 
-   // Skip the dot
-   px++;
+	// Skip the dot
+	px++;
 
-   UL_printf (itoa(ROTTMINORVERSION,&buf[0],10));
+	UL_printf (itoa(ROTTMINORVERSION,&buf[0],10));
 #endif
 
-	va_start (argptr, error);
-   vsprintf (&msgbuf[0], error, argptr);
-	va_end (argptr);
+	va_start ( argptr, error );
+	vsprintf( &msgbuf[0], error, argptr );
+	va_end ( argptr );
 
-   scriptbuffer = &msgbuf[0];
-	size = strlen (msgbuf);
+	scriptbuffer = &msgbuf[0];
+	size = strlen( msgbuf );
 
 	sptr = script_p = scriptbuffer;
 	scriptend_p = script_p + size;
@@ -380,74 +355,71 @@ void Error (char *error, ...)
 	endofscript = false;
 	tokenready = false;
 
-   px = ERRORCOL;
-   py = ERRORROW;
+	px = ERRORCOL;
+	py = ERRORROW;
 
-   GetToken (true);
-   while (!endofscript)
-   {
-      if ((script_p - sptr) >= 60)
-      {
-         px = ERRORCOL;
-         py++;
-         sptr = script_p;
-      }
+	GetToken( true );
+	while ( !endofscript ) {
+		if ((script_p - sptr) >= 60 ) {
+			px = ERRORCOL;
+			py++;
+			sptr = script_p;
+		}
 
-      UL_printf (token);
-      px++;                //SPACE
-      GetToken (true);
-   }
+		UL_printf( token );
+		px++;                //SPACE
+		GetToken( true );
+	}
 
 #ifdef ANSIESC
-   for (i = 0; i < 8; i++)
-      printf ("\n");
+	for (i = 0; i < 8; i++)
+	   printf ("\n");
 #endif
 
-   if (player!=NULL)
-      {
-      printf ("Player X     = %lx\n", (long int)player->x);
-      printf ("Player Y     = %lx\n", (long int)player->y);
-      printf ("Player Angle = %lx\n\n", (long int)player->angle);
-      }
-   printf ("Episode      = %ld\n", (long int)gamestate.episode);
+	if ( player != NULL) {
+		printf( "Player X     = %lx\n", ( long int ) player->x );
+		printf( "Player Y     = %lx\n", ( long int ) player->y );
+		printf( "Player Angle = %lx\n\n", ( long int ) player->angle );
+	}
+	printf( "Episode      = %ld\n", ( long int ) gamestate.episode );
 
-   if (gamestate.episode > 1)
-      level = (gamestate.mapon+1) - ((gamestate.episode-1) << 3);
-   else
-      level = gamestate.mapon+1;
+	if ( gamestate.episode > 1 )
+		level = (gamestate.mapon + 1) - ((gamestate.episode - 1) << 3);
+	else
+		level = gamestate.mapon + 1;
 
-   printf ("Area         = %ld\n", (long int)level);
+	printf( "Area         = %ld\n", ( long int ) level );
 
-   ShutDown();	// DDOI - moved this so that it doesn't try to access player
-   		// which is freed by this function.
+	ShutDown();    // DDOI - moved this so that it doesn't try to access player
+	// which is freed by this function.
 
 #ifdef DOS
-   GetPathFromEnvironment( filename, ApogeePath, ERRORFILE );
-   handle=SafeOpenAppend ( filename );
-   for (y=0;y<16;y++)
-      {
-      for (x=0;x<160;x+=2)
-         SafeWrite(handle,(byte *)0xB8000+(y*160)+x,1);
-      i=10;
-      SafeWrite(handle,&i,1);
-      i=13;
-      SafeWrite(handle,&i,1);
-      }
+	GetPathFromEnvironment( filename, ApogeePath, ERRORFILE );
+	handle=SafeOpenAppend ( filename );
+	for (y=0;y<16;y++)
+	   {
+	   for (x=0;x<160;x+=2)
+		  SafeWrite(handle,(byte *)0xB8000+(y*160)+x,1);
+	   i=10;
+	   SafeWrite(handle,&i,1);
+	   i=13;
+	   SafeWrite(handle,&i,1);
+	   }
 
-   close(handle);
+	close(handle);
 
-   if ( SOUNDSETUP )
-      {
-      getch();
-      }
+	if ( SOUNDSETUP )
+	   {
+	   getch();
+	   }
 
 #endif
 
-   #if USE_SDL
-   SDL_Quit();
-   #endif
+#if USE_SDL
+	SDL_Quit();
+#endif
 
-   exit (1);
+	exit( 1 );
 }
 
 //#if (SOFTERROR==1)
@@ -459,15 +431,14 @@ void Error (char *error, ...)
 =
 =================
 */
-void SoftwareError (char *error, ...)
-{
-	va_list	argptr;
+void SoftwareError( char * error, ... ) {
+	va_list argptr;
 
-	if (SoftErrorStarted==false)
-      return;
-	va_start (argptr, error);
-   vfprintf (errout, error, argptr);
-	va_end (argptr);
+	if ( SoftErrorStarted == false )
+		return;
+	va_start ( argptr, error );
+	vfprintf( errout, error, argptr );
+	va_end ( argptr );
 }
 
 //#endif
@@ -482,15 +453,14 @@ void SoftwareError (char *error, ...)
 =
 =================
 */
-void DebugError (char *error, ...)
-{
-	va_list	argptr;
+void DebugError( char * error, ... ) {
+	va_list argptr;
 
-   if (DebugStarted==false)
-      return;
-	va_start (argptr, error);
-   vfprintf (debugout, error, argptr);
-	va_end (argptr);
+	if ( DebugStarted == false )
+		return;
+	va_start ( argptr, error );
+	vfprintf( debugout, error, argptr );
+	va_end ( argptr );
 }
 
 //#endif
@@ -502,10 +472,9 @@ void DebugError (char *error, ...)
 =
 =================
 */
-void OpenSoftError ( void )
-{
-  errout = fopen(SOFTERRORFILE,"wt+");
-  SoftErrorStarted=true;
+void OpenSoftError( void ) {
+	errout = fopen(SOFTERRORFILE, "wt+" );
+	SoftErrorStarted = true;
 }
 
 /*
@@ -515,15 +484,14 @@ void OpenSoftError ( void )
 =
 =================
 */
-void MapDebug (char *error, ...)
-{
-	va_list	argptr;
+void MapDebug( char * error, ... ) {
+	va_list argptr;
 
-   if (MapDebugStarted==false)
-      return;
-	va_start (argptr, error);
-   vfprintf (mapdebugout, error, argptr);
-	va_end (argptr);
+	if ( MapDebugStarted == false )
+		return;
+	va_start ( argptr, error );
+	vfprintf( mapdebugout, error, argptr );
+	va_end ( argptr );
 }
 
 /*
@@ -533,17 +501,15 @@ void MapDebug (char *error, ...)
 =
 =================
 */
-void OpenMapDebug ( void )
-{
-  char filename[ 128 ];
+void OpenMapDebug( void ) {
+	char filename[128];
 
-  if (MapDebugStarted==true)
-     return;
-  GetPathFromEnvironment( filename, ApogeePath, MAPDEBUGFILE );
-  mapdebugout = fopen(filename,"wt+");
-  MapDebugStarted=true;
+	if ( MapDebugStarted == true )
+		return;
+	GetPathFromEnvironment( filename, ApogeePath, MAPDEBUGFILE);
+	mapdebugout = fopen( filename, "wt+" );
+	MapDebugStarted = true;
 }
-
 
 /*
 =================
@@ -552,18 +518,17 @@ void OpenMapDebug ( void )
 =
 =================
 */
-void StartupSoftError ( void )
-{
+void StartupSoftError( void ) {
 #if (DEBUG == 1)
-  if (DebugStarted==false)
-     {
-     debugout = fopen(DEBUGFILE,"wt+");
-     DebugStarted=true;
-     }
+	if (DebugStarted==false)
+	   {
+	   debugout = fopen(DEBUGFILE,"wt+");
+	   DebugStarted=true;
+	   }
 #endif
 #if (SOFTERROR == 1)
-  if (SoftErrorStarted==false)
-     OpenSoftError();
+	if (SoftErrorStarted==false)
+	   OpenSoftError();
 #endif
 }
 
@@ -574,25 +539,20 @@ void StartupSoftError ( void )
 =
 =================
 */
-void ShutdownSoftError ( void )
-{
-  if (DebugStarted==true)
-     {
-     fclose(debugout);
-     DebugStarted=false;
-     }
-  if (SoftErrorStarted==true)
-     {
-     fclose(errout);
-     SoftErrorStarted=false;
-     }
-  if (MapDebugStarted==true)
-     {
-     fclose(mapdebugout);
-     MapDebugStarted=false;
-     }
+void ShutdownSoftError( void ) {
+	if ( DebugStarted == true ) {
+		fclose( debugout );
+		DebugStarted = false;
+	}
+	if ( SoftErrorStarted == true ) {
+		fclose( errout );
+		SoftErrorStarted = false;
+	}
+	if ( MapDebugStarted == true ) {
+		fclose( mapdebugout );
+		MapDebugStarted = false;
+	}
 }
-
 
 /*
 =================
@@ -606,153 +566,134 @@ void ShutdownSoftError ( void )
 =================
 */
 
-int CheckParm (char *check)
-{
-	int		i;
-	char	*parm;
+int CheckParm( char * check ) {
+	int i;
+	char * parm;
 
-	for (i = 1;i<_argc;i++)
-	{
+	for ( i = 1; i < _argc; i++ ) {
 		parm = _argv[i];
-		if ( !isalpha(*parm) )	// skip - / \ etc.. in front of parm
-         {
-         parm++;
-         if (!*parm)
-				continue;		// parm was only one char
-         }
+		if ( !isalpha( *parm ))    // skip - / \ etc.. in front of parm
+		{
+			parm++;
+			if ( !*parm )
+				continue;        // parm was only one char
+		}
 
-		if ( !_fstricmp(check,parm) )
+		if ( !_fstricmp( check, parm ))
 			return i;
 	}
 
 	return 0;
 }
 
+int SafeOpenAppend( char * _filename ) {
+	int handle;
+	char filename[MAX_PATH];
+	strncpy( filename, _filename, sizeof( filename ));
+	filename[sizeof( filename ) - 1] = '\0';
+	FixFilePath( filename );
 
+	handle = open( filename, O_RDWR | O_BINARY | O_CREAT | O_APPEND, S_IREAD | S_IWRITE );
 
-int SafeOpenAppend (char *_filename)
-{
-	int	handle;
-    char filename[MAX_PATH];
-    strncpy(filename, _filename, sizeof (filename));
-    filename[sizeof (filename) - 1] = '\0';
-    FixFilePath(filename);
-
-	handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_APPEND
-	, S_IREAD | S_IWRITE);
-
-	if (handle == -1)
-		Error ("Error opening for append %s: %s",filename,strerror(errno));
+	if ( handle == -1 )
+		Error( "Error opening for append %s: %s", filename, strerror(errno));
 
 	return handle;
 }
 
-int SafeOpenWrite (char *_filename)
-{
-	int	handle;
-    char filename[MAX_PATH];
-    strncpy(filename, _filename, sizeof (filename));
-    filename[sizeof (filename) - 1] = '\0';
-    FixFilePath(filename);
+int SafeOpenWrite( char * _filename ) {
+	int handle;
+	char filename[MAX_PATH];
+	strncpy( filename, _filename, sizeof( filename ));
+	filename[sizeof( filename ) - 1] = '\0';
+	FixFilePath( filename );
 
-	handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_TRUNC
-	, S_IREAD | S_IWRITE);
+	handle = open( filename, O_RDWR | O_BINARY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE );
 
-	if (handle == -1)
-		Error ("Error opening %s: %s",filename,strerror(errno));
+	if ( handle == -1 )
+		Error( "Error opening %s: %s", filename, strerror(errno));
 
 	return handle;
 }
 
-int SafeOpenRead (char *_filename)
-{
-	int	handle;
-    char filename[MAX_PATH];
-    strncpy(filename, _filename, sizeof (filename));
-    filename[sizeof (filename) - 1] = '\0';
-    FixFilePath(filename);
+int SafeOpenRead( char * _filename ) {
+	int handle;
+	char filename[MAX_PATH];
+	strncpy( filename, _filename, sizeof( filename ));
+	filename[sizeof( filename ) - 1] = '\0';
+	FixFilePath( filename );
 
-	handle = open(filename,O_RDONLY | O_BINARY);
+	handle = open( filename, O_RDONLY | O_BINARY );
 
-	if (handle == -1)
-		Error ("Error opening %s: %s",filename,strerror(errno));
+	if ( handle == -1 )
+		Error( "Error opening %s: %s", filename, strerror(errno));
 
 	return handle;
 }
 
+void SafeRead( int handle, void * buffer, long count ) {
+	unsigned iocount;
 
-void SafeRead (int handle, void *buffer, long count)
-{
-	unsigned	iocount;
-
-	while (count)
-	{
+	while ( count ) {
 		iocount = count > 0x8000 ? 0x8000 : count;
-		if (read (handle,buffer,iocount) != (int)iocount)
-			Error ("File read failure reading %ld bytes",count);
-		buffer = (void *)( (byte *)buffer + iocount );
+		if ( read( handle, buffer, iocount ) != ( int ) iocount )
+			Error( "File read failure reading %ld bytes", count );
+		buffer = ( void * ) (( byte * ) buffer + iocount);
 		count -= iocount;
 	}
 }
 
+void SafeWrite( int handle, void * buffer, long count ) {
+	unsigned iocount;
 
-void SafeWrite (int handle, void *buffer, long count)
-{
-	unsigned	iocount;
-
-	while (count)
-	{
+	while ( count ) {
 		iocount = count > 0x8000 ? 0x8000 : count;
-		if (write (handle,buffer,iocount) != (int)iocount)
-			Error ("File write failure writing %ld bytes",count);
-		buffer = (void *)( (byte *)buffer + iocount );
+		if ( write( handle, buffer, iocount ) != ( int ) iocount )
+			Error( "File write failure writing %ld bytes", count );
+		buffer = ( void * ) (( byte * ) buffer + iocount);
 		count -= iocount;
 	}
 }
 
-void SafeWriteString (int handle, char * buffer)
-{
-	unsigned	iocount;
+void SafeWriteString( int handle, char * buffer ) {
+	unsigned iocount;
 
-   iocount=strlen(buffer);
-	if (write (handle,buffer,iocount) != (int)iocount)
-			Error ("File write string failure writing %s\n",buffer);
+	iocount = strlen( buffer );
+	if ( write( handle, buffer, iocount ) != ( int ) iocount )
+		Error( "File write string failure writing %s\n", buffer );
 }
 
-void *SafeMalloc (long size)
-{
-	void *ptr;
+void * SafeMalloc( long size ) {
+	void * ptr;
 
-   if (zonememorystarted==false)
-      Error("Called SafeMalloc without starting zone memory\n");
-	ptr = Z_Malloc (size,PU_STATIC,NULL);
+	if ( zonememorystarted == false )
+		Error( "Called SafeMalloc without starting zone memory\n" );
+	ptr = Z_Malloc( size, PU_STATIC, NULL);
 
-	if (!ptr)
-      Error ("SafeMalloc failure for %lu bytes",size);
+	if ( !ptr )
+		Error( "SafeMalloc failure for %lu bytes", size );
 
 	return ptr;
 }
 
-void *SafeLevelMalloc (long size)
-{
-	void *ptr;
+void * SafeLevelMalloc( long size ) {
+	void * ptr;
 
-   if (zonememorystarted==false)
-      Error("Called SafeLevelMalloc without starting zone memory\n");
-   ptr = Z_LevelMalloc (size,PU_STATIC,NULL);
+	if ( zonememorystarted == false )
+		Error( "Called SafeLevelMalloc without starting zone memory\n" );
+	ptr = Z_LevelMalloc( size, PU_STATIC, NULL);
 
-	if (!ptr)
-      Error ("SafeLevelMalloc failure for %lu bytes",size);
+	if ( !ptr )
+		Error( "SafeLevelMalloc failure for %lu bytes", size );
 
 	return ptr;
 }
 
-void SafeFree (void * ptr)
-{
-   if ( ptr == NULL )
-      Error ("SafeFree : Tried to free a freed pointer\n");
+void SafeFree( void * ptr ) {
+	if ( ptr == NULL)
+		Error( "SafeFree : Tried to free a freed pointer\n" );
 
-	Z_Free (ptr);
+	Z_Free( ptr );
 }
 
 /*
@@ -763,19 +704,17 @@ void SafeFree (void * ptr)
 ==============
 */
 
-long	LoadFile (char *filename, void **bufferptr)
-{
-	int		handle;
-	long	length;
+long LoadFile( char * filename, void ** bufferptr ) {
+	int handle;
+	long length;
 
-	handle = SafeOpenRead (filename);
-	length = filelength (handle);
-	*bufferptr = SafeMalloc (length);
-	SafeRead (handle,*bufferptr, length);
-	close (handle);
+	handle = SafeOpenRead( filename );
+	length = filelength( handle );
+	*bufferptr = SafeMalloc( length );
+	SafeRead( handle, *bufferptr, length );
+	close( handle );
 	return length;
 }
-
 
 /*
 ==============
@@ -785,226 +724,198 @@ long	LoadFile (char *filename, void **bufferptr)
 ==============
 */
 
-void	SaveFile (char *filename, void *buffer, long count)
-{
-	int		handle;
+void SaveFile( char * filename, void * buffer, long count ) {
+	int handle;
 
-	handle = SafeOpenWrite (filename);
-	SafeWrite (handle, buffer, count);
-	close (handle);
+	handle = SafeOpenWrite( filename );
+	SafeWrite( handle, buffer, count );
+	close( handle );
 }
 
-
-void FixFilePath(char *filename)
-{
+void FixFilePath( char * filename ) {
 #if PLATFORM_UNIX
-    char *ptr;
-    char *lastsep = filename;
+	char * ptr;
+	char * lastsep = filename;
 
-    if ((!filename) || (*filename == '\0'))
-        return;
+	if ((!filename) || (*filename == '\0'))
+		return;
 
-    if (access(filename, F_OK) == 0)  /* File exists; we're good to go. */
-        return;
+	if ( access( filename, F_OK ) == 0 )  /* File exists; we're good to go. */
+		return;
 
-    for (ptr = filename; 1; ptr++)
-    {
-        if (*ptr == '\\')
-            *ptr = PATH_SEP_CHAR;
+	for ( ptr = filename; 1; ptr++ ) {
+		if ( *ptr == '\\' )
+			*ptr = PATH_SEP_CHAR;
 
-        if ((*ptr == PATH_SEP_CHAR) || (*ptr == '\0'))
-        {
-            char pch = *ptr;
-            struct dirent *dent = NULL;
-            DIR *dir;
+		if ((*ptr == PATH_SEP_CHAR) || (*ptr == '\0')) {
+			char pch = *ptr;
+			struct dirent * dent = NULL;
+			DIR * dir;
 
-            if ((pch == PATH_SEP_CHAR) && (*(ptr + 1) == '\0'))
-                return; /* eos is pathsep; we're done. */
+			if ((pch == PATH_SEP_CHAR) && (*(ptr + 1) == '\0'))
+				return; /* eos is pathsep; we're done. */
 
-            if (lastsep == ptr)
-                continue;  /* absolute path; skip to next one. */
+			if ( lastsep == ptr )
+				continue;  /* absolute path; skip to next one. */
 
-            *ptr = '\0';
-            if (lastsep == filename) {
-                dir = opendir((*lastsep == PATH_SEP_CHAR) ? ROOTDIR : CURDIR);
-                
-                if (*lastsep == PATH_SEP_CHAR) {
-                    lastsep++;
-                }
-            } 
-            else
-            {
-                *lastsep = '\0';
-                dir = opendir(filename);
-                *lastsep = PATH_SEP_CHAR;
-                lastsep++;
-            }
+			*ptr = '\0';
+			if ( lastsep == filename ) {
+				dir = opendir((*lastsep == PATH_SEP_CHAR) ? ROOTDIR : CURDIR );
 
-            if (dir == NULL)
-            {
-                *ptr = PATH_SEP_CHAR;
-                return;  /* maybe dir doesn't exist? give up. */
-            }
+				if ( *lastsep == PATH_SEP_CHAR ) {
+					lastsep++;
+				}
+			} else {
+				*lastsep = '\0';
+				dir = opendir( filename );
+				*lastsep = PATH_SEP_CHAR;
+				lastsep++;
+			}
 
-            while ((dent = readdir(dir)) != NULL)
-            {
-                if (strcasecmp(dent->d_name, lastsep) == 0)
-                {
-                    /* found match; replace it. */
-                    strcpy(lastsep, dent->d_name);
-                    break;
-                }
-            }
+			if ( dir == NULL) {
+				*ptr = PATH_SEP_CHAR;
+				return;  /* maybe dir doesn't exist? give up. */
+			}
 
-            closedir(dir);
-            *ptr = pch;
-            lastsep = ptr;
+			while ((dent = readdir( dir )) != NULL) {
+				if ( strcasecmp( dent->d_name, lastsep ) == 0 ) {
+					/* found match; replace it. */
+					strcpy( lastsep, dent->d_name );
+					break;
+				}
+			}
 
-            if (dent == NULL)
-                return;  /* no match. oh well. */
+			closedir( dir );
+			*ptr = pch;
+			lastsep = ptr;
 
-            if (pch == '\0')  /* eos? */
-                return;
-        }
-    }
+			if ( dent == NULL)
+				return;  /* no match. oh well. */
+
+			if ( pch == '\0' )  /* eos? */
+				return;
+		}
+	}
 #endif
 }
 
-
 #if PLATFORM_DOS
- /* no-op. */
+/* no-op. */
 
 #elif PLATFORM_WIN32
 int _dos_findfirst(char *filename, int x, struct find_t *f)
 {
-    long rc = _findfirst(filename, &f->data);
-    f->handle = rc;
-    if (rc != -1)
-    {
-        strncpy(f->name, f->data.name, sizeof (f->name) - 1);
-        f->name[sizeof (f->name) - 1] = '\0';
-        return(0);
-    }
-    return(1);
+	long rc = _findfirst(filename, &f->data);
+	f->handle = rc;
+	if (rc != -1)
+	{
+		strncpy(f->name, f->data.name, sizeof (f->name) - 1);
+		f->name[sizeof (f->name) - 1] = '\0';
+		return(0);
+	}
+	return(1);
 }
 
 int _dos_findnext(struct find_t *f)
 {
-    int rc = 0;
-    if (f->handle == -1)
-        return(1);   /* invalid handle. */
+	int rc = 0;
+	if (f->handle == -1)
+		return(1);   /* invalid handle. */
 
-    rc = _findnext(f->handle, &f->data);
-    if (rc == -1)
-    {
-        _findclose(f->handle);
-        f->handle = -1;
-        return(1);
-    }
+	rc = _findnext(f->handle, &f->data);
+	if (rc == -1)
+	{
+		_findclose(f->handle);
+		f->handle = -1;
+		return(1);
+	}
 
-    strncpy(f->name, f->data.name, sizeof (f->name) - 1);
-    f->name[sizeof (f->name) - 1] = '\0';
-    return(0);
+	strncpy(f->name, f->data.name, sizeof (f->name) - 1);
+	f->name[sizeof (f->name) - 1] = '\0';
+	return(0);
 }
 
-#elif PLATFORM_UNIX 
-int _dos_findfirst(char *filename, int x, struct find_t *f)
-{
-    char *ptr;
+#elif PLATFORM_UNIX
+int _dos_findfirst( char * filename, int x, struct find_t * f ) {
+	char * ptr;
 
-    if (strlen(filename) >= sizeof (f->pattern))
-        return(1);
+	if ( strlen( filename ) >= sizeof( f->pattern ))
+		return (1);
 
-    strcpy(f->pattern, filename);
-    FixFilePath(f->pattern);
-    ptr = strrchr(f->pattern, PATH_SEP_CHAR);
+	strcpy( f->pattern, filename );
+	FixFilePath( f->pattern );
+	ptr = strrchr( f->pattern, PATH_SEP_CHAR );
 
-    if (ptr == NULL)
-    {
-        ptr = filename;
-        f->dir = opendir(CURDIR);
-    }
-    else
-    {
-        *ptr = '\0';
-        f->dir = opendir(f->pattern);
-        memmove(f->pattern, ptr + 1, strlen(ptr + 1) + 1);
-    }
+	if ( ptr == NULL) {
+		ptr = filename;
+		f->dir = opendir( CURDIR );
+	} else {
+		*ptr = '\0';
+		f->dir = opendir( f->pattern );
+		memmove( f->pattern, ptr + 1, strlen( ptr + 1 ) + 1 );
+	}
 
-    return(_dos_findnext(f));
+	return (_dos_findnext( f ));
 }
 
+static int check_pattern_nocase( const char * x, const char * y ) {
+	if ((x == NULL) || (y == NULL))
+		return (0);  /* not a match. */
 
-static int check_pattern_nocase(const char *x, const char *y)
-{
-    if ((x == NULL) || (y == NULL))
-        return(0);  /* not a match. */
+	while ((*x) && (*y)) {
+		if ( *x == '*' )
+			Error( "Unexpected wildcard!" );  /* FIXME? */
 
-    while ((*x) && (*y))
-    {
-        if (*x == '*')
-            Error("Unexpected wildcard!");  /* FIXME? */
+		else if ( *x == '?' ) {
+			if ( *y == '\0' )
+				return (0);  /* anything but EOS is okay. */
+		} else {
+			if ( toupper(( int ) *x ) != toupper(( int ) *y ))
+				return (0);  /* not a match. */
+		}
 
-        else if (*x == '?')
-        {
-            if (*y == '\0')
-                return(0);  /* anything but EOS is okay. */
-        }
+		x++;
+		y++;
+	}
 
-        else
-        {
-            if (toupper((int) *x) != toupper((int) *y))
-                return(0);  /* not a match. */
-        }
-
-        x++;
-        y++;
-    }
-
-    return(*x == *y);  /* it's a match (both should be EOS). */
+	return (*x == *y);  /* it's a match (both should be EOS). */
 }
 
-int _dos_findnext(struct find_t *f)
-{
-    struct dirent *dent;
+int _dos_findnext( struct find_t * f ) {
+	struct dirent * dent;
 
-    if (f->dir == NULL)
-        return(1);  /* no such dir or we're just done searching. */
+	if ( f->dir == NULL)
+		return (1);  /* no such dir or we're just done searching. */
 
-    while ((dent = readdir(f->dir)) != NULL)
-    {
-        if (check_pattern_nocase(f->pattern, dent->d_name))
-        {
-            if (strlen(dent->d_name) < sizeof (f->name))
-            {
-                strcpy(f->name, dent->d_name);
-                return(0);  /* match. */
-            }
-        }
-    }
+	while ((dent = readdir( f->dir )) != NULL) {
+		if ( check_pattern_nocase( f->pattern, dent->d_name )) {
+			if ( strlen( dent->d_name ) < sizeof( f->name )) {
+				strcpy( f->name, dent->d_name );
+				return (0);  /* match. */
+			}
+		}
+	}
 
-    closedir(f->dir);
-    f->dir = NULL;
-    return(1);  /* no match in whole directory. */
+	closedir( f->dir );
+	f->dir = NULL;
+	return (1);  /* no match in whole directory. */
 }
 #else
 #error please define for your platform.
 #endif
 
-
 #if !PLATFORM_DOS
-void _dos_getdate(struct dosdate_t *date)
-{
+void _dos_getdate( struct dosdate_t * date ) {
 	time_t curtime = time(NULL);
-	struct tm *tm;
-	
-	if (date == NULL) {
+	struct tm * tm;
+
+	if ( date == NULL) {
 		return;
 	}
-	
-	memset(date, 0, sizeof(struct dosdate_t));
-	
-	if ((tm = localtime(&curtime)) != NULL) {
+
+	memset( date, 0, sizeof( struct dosdate_t ));
+
+	if ((tm = localtime( &curtime )) != NULL) {
 		date->day = tm->tm_mday;
 		date->month = tm->tm_mon + 1;
 		date->year = tm->tm_year + 1900;
@@ -1013,92 +924,79 @@ void _dos_getdate(struct dosdate_t *date)
 }
 #endif
 
-
-void GetPathFromEnvironment( char *fullname, const char *envname, const char *filename )
-   {
+void GetPathFromEnvironment( char * fullname, const char * envname, const char * filename ) {
 
 #ifdef DOS
-   char *path;
-   path = getenv( envname );
+	char *path;
+	path = getenv( envname );
 #else
-   const char *path;
-   path = envname;
+	const char * path;
+	path = envname;
 #endif
 
-   if ( path != NULL )
-      {
-      strcpy( fullname, path );
-      if ( fullname[ strlen( fullname ) - 1 ] != PATH_SEP_CHAR )
-         {
-         strcat( fullname, PATH_SEP_STR );
-         }
-      strcat( fullname, filename );
-      }
-   else
-      {
-      strcpy( fullname, filename );
-      }
+	if ( path != NULL) {
+		strcpy( fullname, path );
+		if ( fullname[strlen( fullname ) - 1] != PATH_SEP_CHAR ) {
+			strcat( fullname, PATH_SEP_STR );
+		}
+		strcat( fullname, filename );
+	} else {
+		strcpy( fullname, filename );
+	}
 
-      FixFilePath(fullname);
-   }
+	FixFilePath( fullname );
+}
 
-void DefaultExtension (char *path, char *extension)
-{
-	char	*src;
+void DefaultExtension( char * path, char * extension ) {
+	char * src;
 //
 // if path doesn't have a .EXT, append extension
 // (extension should include the .)
 //
-	src = path + strlen(path) - 1;
+	src = path + strlen( path ) - 1;
 
-	while (*src != PATH_SEP_CHAR && src != path)
-	{
-		if (*src == '.')
-			return;			// it has an extension
+	while ( *src != PATH_SEP_CHAR && src != path ) {
+		if ( *src == '.' )
+			return;            // it has an extension
 		src--;
 	}
 
-	strcat (path, extension);
+	strcat( path, extension );
 }
 
-void DefaultPath (char *path, char *basepath)
-{
-	char	temp[128];
+void DefaultPath( char * path, char * basepath ) {
+	char temp[128];
 
-	if (path[0] == PATH_SEP_CHAR)
-		return;							// absolute path location
-	strcpy (temp,path);
-	strcpy (path,basepath);
-	strcat (path,temp);
+	if ( path[0] == PATH_SEP_CHAR )
+		return;                            // absolute path location
+	strcpy( temp, path );
+	strcpy( path, basepath );
+	strcat( path, temp );
 }
 
+void ExtractFileBase( char * path, char * dest ) {
+	char * src;
+	int length;
 
-void ExtractFileBase (char *path, char *dest)
-{
-	char	*src;
-	int		length;
-
-	src = path + strlen(path) - 1;
+	src = path + strlen( path ) - 1;
 
 //
 // back up until a \ or the start
 //
-	while (src != path && *(src-1) != PATH_SEP_CHAR)
+	while ( src != path && *(src - 1) != PATH_SEP_CHAR )
 		src--;
 
 //
 // copy up to eight characters
 //
-	memset (dest,0,8);
+	memset( dest, 0, 8 );
 	length = 0;
-	while (*src && *src != '.')
-	{
-		if (++length == 9)
-			Error ("Filename base of %s >8 chars",path);
-		*dest++ = toupper(*src++);
+	while ( *src && *src != '.' ) {
+		if ( ++length == 9 )
+			Error( "Filename base of %s >8 chars", path );
+		*dest++ = toupper( *src++ );
 	}
 }
-
 
 /*
 ==============
@@ -1108,41 +1006,36 @@ void ExtractFileBase (char *path, char *dest)
 ==============
 */
 
-long ParseHex (char *hex)
-{
-	char	*str;
-	long	num;
+long ParseHex( char * hex ) {
+	char * str;
+	long num;
 
 	num = 0;
 	str = hex;
 
-	while (*str)
-	{
+	while ( *str ) {
 		num <<= 4;
-		if (*str >= '0' && *str <= '9')
-			num += *str-'0';
-		else if (*str >= 'a' && *str <= 'f')
-			num += 10 + *str-'a';
-		else if (*str >= 'A' && *str <= 'F')
-			num += 10 + *str-'A';
+		if ( *str >= '0' && *str <= '9' )
+			num += *str - '0';
+		else if ( *str >= 'a' && *str <= 'f' )
+			num += 10 + *str - 'a';
+		else if ( *str >= 'A' && *str <= 'F' )
+			num += 10 + *str - 'A';
 		else
-			Error ("Bad hex number: %s",hex);
+			Error( "Bad hex number: %s", hex );
 		str++;
 	}
 
 	return num;
 }
 
-
-long ParseNum (char *str)
-{
-	if (str[0] == '$')
-		return ParseHex (str+1);
-	if (str[0] == '0' && str[1] == 'x')
-		return ParseHex (str+2);
-	return atol (str);
+long ParseNum( char * str ) {
+	if ( str[0] == '$' )
+		return ParseHex( str + 1 );
+	if ( str[0] == '0' && str[1] == 'x' )
+		return ParseHex( str + 2 );
+	return atol( str );
 }
-
 
 #if (BYTE_ORDER == LITTLE_ENDIAN)
 #define KeepShort IntelShort
@@ -1156,69 +1049,59 @@ long ParseNum (char *str)
 #define SwapLong IntelLong
 #endif
 
-short	SwapShort (short l)
-{
-	byte	b1,b2;
+short    SwapShort( short l ) {
+	byte b1, b2;
 
-	b1 = l&255;
-	b2 = (l>>8)&255;
+	b1 = l & 255;
+	b2 = (l >> 8) & 255;
 
-	return (b1<<8) + b2;
+	return (b1 << 8) + b2;
 }
 
-short	KeepShort (short l)
-{
+short    KeepShort( short l ) {
 	return l;
 }
 
+int    SwapLong( int l ) {
+	byte b1, b2, b3, b4;
 
-int	SwapLong (int l)
-{
-	byte	b1,b2,b3,b4;
+	b1 = l & 255;
+	b2 = (l >> 8) & 255;
+	b3 = (l >> 16) & 255;
+	b4 = (l >> 24) & 255;
 
-	b1 = l&255;
-	b2 = (l>>8)&255;
-	b3 = (l>>16)&255;
-	b4 = (l>>24)&255;
-
-	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
+	return (( int ) b1 << 24) + (( int ) b2 << 16) + (( int ) b3 << 8) + b4;
 }
 
-int	KeepLong (int l)
-{
+int    KeepLong( int l ) {
 	return l;
 }
-
 
 #undef KeepShort
 #undef KeepLong
 #undef SwapShort
 #undef SwapLong
 
-void SwapIntelLong(int *l)
-{
-    *l = IntelLong(*l);
+void SwapIntelLong( int * l ) {
+	*l = IntelLong( *l );
 }
 
-void SwapIntelShort(short *s)
-{
-    *s = IntelShort(*s);
+void SwapIntelShort( short * s ) {
+	*s = IntelShort( *s );
 }
 
-void SwapIntelLongArray(int *l, int num)
-{
-    while (num--) {
-        SwapIntelLong(l);
-        l++;
-    }
+void SwapIntelLongArray( int * l, int num ) {
+	while ( num-- ) {
+		SwapIntelLong( l );
+		l++;
+	}
 }
 
-void SwapIntelShortArray(short *s, int num)
-{
-    while (num--) {
-        SwapIntelShort(s);
-        s++;
-    }
+void SwapIntelShortArray( short * s, int num ) {
+	while ( num-- ) {
+		SwapIntelShort( s );
+		s++;
+	}
 }
 
 /*
@@ -1239,8 +1122,7 @@ void SwapIntelShortArray(short *s, int num)
 ==============
 */
 
-void GetaPalette (byte *palette)
-{
+void GetaPalette( byte * palette ) {
 #ifdef DOS
 	int	i;
 
@@ -1249,13 +1131,13 @@ void GetaPalette (byte *palette)
 		palette[i] = inp (PEL_DATA)<<2;
 #else
 	int i;
-	SDL_Palette *pal = SDL_GetVideoSurface()->format->palette;
-	
-	for (i = 0; i < 256; i++) {
+	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
+
+	for ( i = 0; i < 256; i++ ) {
 		palette[0] = pal->colors[i].r;
 		palette[1] = pal->colors[i].g;
 		palette[2] = pal->colors[i].b;
-		
+
 		palette += 3;
 	}
 #endif
@@ -1271,8 +1153,7 @@ void GetaPalette (byte *palette)
 ==============
 */
 
-void SetaPalette (byte *pal)
-{
+void SetaPalette( byte * pal ) {
 #ifdef DOS
 	int	i;
 
@@ -1280,45 +1161,42 @@ void SetaPalette (byte *pal)
 	for (i=0 ; i<768 ; i++)
 		OUTP (PEL_DATA, pal[i]>>2);
 #else
-   SDL_Color cmap[256];
-   int i;
+	SDL_Color cmap[256];
+	int i;
 
-   for (i = 0; i < 256; i++)
-   {
-	   cmap[i].r = pal[i*3+0];
-	   cmap[i].g = pal[i*3+1];
-	   cmap[i].b = pal[i*3+2];
-   }
+	for ( i = 0; i < 256; i++ ) {
+		cmap[i].r = pal[i * 3 + 0];
+		cmap[i].g = pal[i * 3 + 1];
+		cmap[i].b = pal[i * 3 + 2];
+	}
 
-   SDL_SetColors (SDL_GetVideoSurface (), cmap, 0, 256);
+	SDL_SetColors( SDL_GetVideoSurface(), cmap, 0, 256 );
 #endif
 }
 
-void GetPalette(char * palette)
-{
+void GetPalette( char * palette ) {
 #ifdef DOS
-  int i;
+	int i;
 
-  OUTP(0x03c7,0);
-  for (i=0;i<256*3;i++)
-     *(palette+(unsigned char)i)=inp(0x3c9)<<2;
+	OUTP(0x03c7,0);
+	for (i=0;i<256*3;i++)
+	   *(palette+(unsigned char)i)=inp(0x3c9)<<2;
 #else
 	int i;
-	SDL_Palette *pal = SDL_GetVideoSurface()->format->palette;
-	
-	for (i = 0; i < 256; i++) {
+	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
+
+	for ( i = 0; i < 256; i++ ) {
 		palette[0] = pal->colors[i].r;
 		palette[1] = pal->colors[i].g;
 		palette[2] = pal->colors[i].b;
-		
+
 		palette += 3;
 	}
 #endif
 }
 
-void SetPalette ( char * pal )
-{
-   VL_SetPalette (pal);
+void SetPalette( char * pal ) {
+	VL_SetPalette( pal );
 }
 
 
@@ -1331,36 +1209,33 @@ void SetPalette ( char * pal )
 //
 //******************************************************************************
 
-int US_CheckParm (char *parm, char **strings)
-{
-   char  cp,cs,
-         *p,*s;
-   int      i;
-   int      length;
+int US_CheckParm( char * parm, char ** strings ) {
+	char cp, cs,
+		* p, * s;
+	int i;
+	int length;
 
-   length=strlen(parm);
-   while ( (!isalpha(*parm)) && (length>0)) // Skip non-alphas
-      {
-      length--;
-      parm++;
-      }
+	length = strlen( parm );
+	while ((!isalpha( *parm )) && (length > 0)) // Skip non-alphas
+	{
+		length--;
+		parm++;
+	}
 
-   for (i = 0;*strings && **strings;i++)
-   {
-      for (s = *strings++,p = parm,cs = cp = 0;cs == cp;)
-      {
-         cs = *s++;
-         if (!cs)
-            return(i);
-         cp = *p++;
+	for ( i = 0; *strings && **strings; i++ ) {
+		for ( s = *strings++, p = parm, cs = cp = 0; cs == cp; ) {
+			cs = *s++;
+			if ( !cs )
+				return (i);
+			cp = *p++;
 
-         if (isupper(cs))
-            cs = tolower(cs);
-         if (isupper(cp))
-            cp = tolower(cp);
-      }
-   }
-   return(-1);
+			if ( isupper( cs ))
+				cs = tolower( cs );
+			if ( isupper( cp ))
+				cp = tolower( cp );
+		}
+	}
+	return (-1);
 }
 
 /*
@@ -1382,30 +1257,28 @@ int US_CheckParm (char *parm, char **strings)
 =================
 */
 
-void VL_FillPalette (int red, int green, int blue)
-{
+void VL_FillPalette( int red, int green, int blue ) {
 #ifdef DOS
-   int   i;
+	int   i;
 
-   OUTP (PEL_WRITE_ADR,0);
-   for (i=0;i<256;i++)
-   {
-      OUTP (PEL_DATA,red);
-      OUTP (PEL_DATA,green);
-      OUTP (PEL_DATA,blue);
-   }
+	OUTP (PEL_WRITE_ADR,0);
+	for (i=0;i<256;i++)
+	{
+	   OUTP (PEL_DATA,red);
+	   OUTP (PEL_DATA,green);
+	   OUTP (PEL_DATA,blue);
+	}
 #else
-   SDL_Color cmap[256];
-   int i;
+	SDL_Color cmap[256];
+	int i;
 
-   for (i = 0; i < 256; i++)
-   {
-           cmap[i].r = red << 2;
-           cmap[i].g = green << 2;
-           cmap[i].b = blue << 2;
-   }
+	for ( i = 0; i < 256; i++ ) {
+		cmap[i].r = red << 2;
+		cmap[i].g = green << 2;
+		cmap[i].b = blue << 2;
+	}
 
-   SDL_SetColors (SDL_GetVideoSurface (), cmap, 0, 256);
+	SDL_SetColors( SDL_GetVideoSurface(), cmap, 0, 256 );
 #endif
 }
 
@@ -1419,13 +1292,12 @@ void VL_FillPalette (int red, int green, int blue)
 =================
 */
 
-void VL_SetColor  (int color, int red, int green, int blue)
-{
+void VL_SetColor( int color, int red, int green, int blue ) {
 #ifdef DOS
-   OUTP (PEL_WRITE_ADR,color);
-   OUTP (PEL_DATA,red);
-   OUTP (PEL_DATA,green);
-   OUTP (PEL_DATA,blue);
+	OUTP (PEL_WRITE_ADR,color);
+	OUTP (PEL_DATA,red);
+	OUTP (PEL_DATA,green);
+	OUTP (PEL_DATA,blue);
 #else
 	STUB_FUNCTION;
 #endif
@@ -1441,13 +1313,12 @@ void VL_SetColor  (int color, int red, int green, int blue)
 =================
 */
 
-void VL_GetColor  (int color, int *red, int *green, int *blue)
-{
+void VL_GetColor( int color, int * red, int * green, int * blue ) {
 #ifdef DOS
-   OUTP (PEL_READ_ADR,color);
-   *red   = inp (PEL_DATA);
-   *green = inp (PEL_DATA);
-   *blue  = inp (PEL_DATA);
+	OUTP (PEL_READ_ADR,color);
+	*red   = inp (PEL_DATA);
+	*green = inp (PEL_DATA);
+	*blue  = inp (PEL_DATA);
 #else
 	STUB_FUNCTION;
 #endif
@@ -1463,14 +1334,12 @@ void VL_GetColor  (int color, int *red, int *green, int *blue)
 =================
 */
 
-void VL_NormalizePalette (byte *palette)
-{
-   int   i;
+void VL_NormalizePalette( byte * palette ) {
+	int i;
 
-   for (i = 0; i < 768; i++)
-      *(palette+i)=(*(palette+i))>>2;
+	for ( i = 0; i < 768; i++ )
+		*(palette + i) = (*(palette + i)) >> 2;
 }
-
 
 /*
 =================
@@ -1483,29 +1352,27 @@ void VL_NormalizePalette (byte *palette)
 =================
 */
 
-void VL_SetPalette (byte *palette)
-{
+void VL_SetPalette( byte * palette ) {
 #ifdef DOS
-   int   i;
+	int   i;
 
-   OUTP (PEL_WRITE_ADR, 0);
+	OUTP (PEL_WRITE_ADR, 0);
 
-   for (i = 0; i < 768; i++)
-      {
-      OUTP (PEL_DATA, gammatable[(gammaindex<<6)+(*palette++)]);
-      }
+	for (i = 0; i < 768; i++)
+	   {
+	   OUTP (PEL_DATA, gammatable[(gammaindex<<6)+(*palette++)]);
+	   }
 #else
-   SDL_Color cmap[256];
-   int i;
+	SDL_Color cmap[256];
+	int i;
 
-   for (i = 0; i < 256; i++)
-   {
-	   cmap[i].r = gammatable[(gammaindex<<6)+(*palette++)] << 2;
-	   cmap[i].g = gammatable[(gammaindex<<6)+(*palette++)] << 2;
-	   cmap[i].b = gammatable[(gammaindex<<6)+(*palette++)] << 2;
-   }
+	for ( i = 0; i < 256; i++ ) {
+		cmap[i].r = gammatable[(gammaindex << 6) + (*palette++)] << 2;
+		cmap[i].g = gammatable[(gammaindex << 6) + (*palette++)] << 2;
+		cmap[i].b = gammatable[(gammaindex << 6) + (*palette++)] << 2;
+	}
 
-   SDL_SetColors (SDL_GetVideoSurface (), cmap, 0, 256);
+	SDL_SetColors( SDL_GetVideoSurface(), cmap, 0, 256 );
 #endif
 }
 
@@ -1523,29 +1390,27 @@ void VL_SetPalette (byte *palette)
 =================
 */
 
-void VL_GetPalette (byte *palette)
-{
+void VL_GetPalette( byte * palette ) {
 #ifdef DOS
-   int   i;
+	int   i;
 
-   OUTP (PEL_READ_ADR, 0);
+	OUTP (PEL_READ_ADR, 0);
 
-   for (i = 0; i < 768; i++)
-      *palette++ = inp (PEL_DATA);
+	for (i = 0; i < 768; i++)
+	   *palette++ = inp (PEL_DATA);
 #else
 	int i;
-	SDL_Palette *pal = SDL_GetVideoSurface()->format->palette;
-	
-	for (i = 0; i < 256; i++) {
+	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
+
+	for ( i = 0; i < 256; i++ ) {
 		palette[0] = pal->colors[i].r >> 2;
 		palette[1] = pal->colors[i].g >> 2;
 		palette[2] = pal->colors[i].b >> 2;
-		
+
 		palette += 3;
 	}
 #endif
 }
-
 
 /*
 =================
@@ -1555,47 +1420,45 @@ void VL_GetPalette (byte *palette)
 =================
 */
 
-void UL_DisplayMemoryError ( int memneeded )
-{
+void UL_DisplayMemoryError( int memneeded ) {
 #ifdef DOS
-   char buf[4000];
-   int i;
+	char buf[4000];
+	int i;
 
-   ShutDown ();
-   TextMode ();
+	ShutDown ();
+	TextMode ();
 
-   for (i = 0; i < 19; i++)
-      printf ("\n");
+	for (i = 0; i < 19; i++)
+	   printf ("\n");
 
-   memcpy (buf, &ROTT_ERR, 4000);
-   memcpy ((byte *)0xB8000, &buf[160*7], 4000-(160*7));
+	memcpy (buf, &ROTT_ERR, 4000);
+	memcpy ((byte *)0xB8000, &buf[160*7], 4000-(160*7));
 
-   px = ERRORVERSIONCOL;
-   py = ERRORVERSIONROW;
+	px = ERRORVERSIONCOL;
+	py = ERRORVERSIONROW;
 #if (BETA == 1)
-   UL_printf ("á");
+	UL_printf ("ï¿½");
 #else
-   UL_printf (itoa(ROTTMAJORVERSION,&buf[0],10));
+	UL_printf (itoa(ROTTMAJORVERSION,&buf[0],10));
 #endif
-   px++;
+	px++;
 
-   UL_printf (itoa(ROTTMINORVERSION,&buf[0],10));
+	UL_printf (itoa(ROTTMINORVERSION,&buf[0],10));
 
-   px = LOWMEMORYCOL;
-   py = LOWMEMORYROW;
-   UL_printf ("You need ");
-   UL_printf (itoa(memneeded,&buf[0],10));
-   UL_printf (" bytes more memory");
-   if ( SOUNDSETUP )
-      {
-      getch();
-      }
+	px = LOWMEMORYCOL;
+	py = LOWMEMORYROW;
+	UL_printf ("You need ");
+	UL_printf (itoa(memneeded,&buf[0],10));
+	UL_printf (" bytes more memory");
+	if ( SOUNDSETUP )
+	   {
+	   getch();
+	   }
 #else
 	STUB_FUNCTION;
 #endif
-   exit (0);
+	exit( 0 );
 }
-
 
 /*
 =================
@@ -1605,30 +1468,29 @@ void UL_DisplayMemoryError ( int memneeded )
 =================
 */
 
-void UL_printf (byte *str)
-{
+void UL_printf( byte * str ) {
 #ifdef DOS
-   byte *s;
-   byte *screen;
+	byte *s;
+	byte *screen;
 
-   s = str;
-   screen = (byte *)(0xB8000 + (py*160) + (px<<1));
+	s = str;
+	screen = (byte *)(0xB8000 + (py*160) + (px<<1));
 
-   while (*s)
-   {
-      *screen = *s;
-      s++;
-      screen += 2;
-      px++;
+	while (*s)
+	{
+	   *screen = *s;
+	   s++;
+	   screen += 2;
+	   px++;
 
-      if ((*s < 32) && (*s > 0))
-         s++;
-   }
+	   if ((*s < 32) && (*s > 0))
+		  s++;
+	}
 #else
 #ifdef ANSIESC
-   printf ("\x1b[%d;%dH%s",py,px,str);
+	printf ("\x1b[%d;%dH%s",py,px,str);
 #else
-   printf ("%s ",str);	// Hackish but works - DDOI
+	printf( "%s ", str );    // Hackish but works - DDOI
 #endif
 #endif
 }
@@ -1641,34 +1503,33 @@ void UL_printf (byte *str)
 =================
 */
 
-void UL_ColorBox (int x, int y, int w, int h, int color)
-{
+void UL_ColorBox( int x, int y, int w, int h, int color ) {
 #ifdef DOS
-   byte *screen;
-   int i,j;
+	byte *screen;
+	int i,j;
 
 
-   for (j=0;j<h;j++)
-      {
-      screen = (byte *)(0xB8000 + ((y+j)*160) + (x<<1) + 1);
-      for (i=0;i<w;i++)
-         {
-         *screen = (byte)color;
-         screen+=2;
-         }
-      }
+	for (j=0;j<h;j++)
+	   {
+	   screen = (byte *)(0xB8000 + ((y+j)*160) + (x<<1) + 1);
+	   for (i=0;i<w;i++)
+		  {
+		  *screen = (byte)color;
+		  screen+=2;
+		  }
+	   }
 #elif defined (ANSIESC)
-   int i,j;
+	int i,j;
 
 
-   for (j=0;j<h;j++)
-      {
-      for (i=0;i<w;i++)
-         {
-         printf ("\x1b[%d;%dH",y+j,x+i);
-         put_dos2ansi(color);
-         }
-      }
+	for (j=0;j<h;j++)
+	   {
+	   for (i=0;i<w;i++)
+		  {
+		  printf ("\x1b[%d;%dH",y+j,x+i);
+		  put_dos2ansi(color);
+		  }
+	   }
 #endif
 }
 
@@ -1678,19 +1539,18 @@ void UL_ColorBox (int x, int y, int w, int h, int color)
 //
 //******************************************************************************
 
-int SideOfLine(int x1, int y1, int x2, int y2, int x3, int y3)
-{
-   int a1,b1,c1;
+int SideOfLine( int x1, int y1, int x2, int y2, int x3, int y3 ) {
+	int a1, b1, c1;
 
-   /* Compute a1, b1, c1, where line joining points 1 and 2
-    * is "a1 x  +  b1 y  +  c1  =  0".
-    */
+	/* Compute a1, b1, c1, where line joining points 1 and 2
+	 * is "a1 x  +  b1 y  +  c1  =  0".
+	 */
 
-   a1 = y2 - y1;
-   b1 = x1 - x2;
-   c1 = FixedMulShift(x2,y1,16) - FixedMulShift(x1,y2,16);
+	a1 = y2 - y1;
+	b1 = x1 - x2;
+	c1 = FixedMulShift( x2, y1, 16 ) - FixedMulShift( x1, y2, 16 );
 
-   return SGN(FixedMulShift(a1,x3,16) + FixedMulShift(b1,y3,16) + c1);
+	return SGN( FixedMulShift( a1, x3, 16 ) + FixedMulShift( b1, y3, 16 ) + c1 );
 }
 
 
@@ -1701,53 +1561,56 @@ int SideOfLine(int x1, int y1, int x2, int y2, int x3, int y3)
 //
 //******************************************************************************
 
-typedef int (*PFI)();           /* pointer to a function returning int  */
-typedef void (*PFV)();           /* pointer to a function returning int  */
+typedef int (* PFI)();           /* pointer to a function returning int  */
+typedef void (* PFV)();           /* pointer to a function returning int  */
 static PFI Comp;                        /* pointer to comparison routine                */
 static PFV Switch;                        /* pointer to comparison routine                */
 static int Width;                       /* width of an object in bytes                  */
-static char *Base;                      /* pointer to element [-1] of array             */
+static char * Base;                      /* pointer to element [-1] of array             */
 
 
-static void newsift_down(L,U) int L,U;
-{  int c;
+static void newsift_down( L, U )int L, U;
+{
+	int c;
 
-   while(1)
-      {c=L+L;
-      if(c>U) break;
-      if( (c+Width <= U) && ((*Comp)(Base+c+Width,Base+c)>0) ) c+= Width;
-      if ((*Comp)(Base+L,Base+c)>=0) break;
-      (*Switch)(Base+L, Base+c);
-      L=c;
-      }
+	while ( 1 ) {
+		c = L + L;
+		if ( c > U )
+			break;
+		if ((c + Width <= U) && ((*Comp)( Base + c + Width, Base + c ) > 0))
+			c += Width;
+		if ((*Comp)( Base + L, Base + c ) >= 0 )
+			break;
+		(*Switch)( Base + L, Base + c );
+		L = c;
+	}
 }
 
-void hsort(char * base, int nel, int width, int (*compare)(), void (*switcher)())
-{
-static int i,n,stop;
-        /*      Perform a heap sort on an array starting at base.  The array is
-                nel elements large and width is the size of a single element in
-                bytes.  Compare is a pointer to a comparison routine which will
-                be passed pointers to two elements of the array.  It should
-                return a negative number if the left-most argument is less than
-                the rightmost, 0 if the two arguments are equal, a positive
-                number if the left argument is greater than the right.  (That
-                is, it acts like a "subtract" operator.) If compare is 0 then
-                the default comparison routine, argvcmp (which sorts an
-                argv-like array of pointers to strings), is used.                                       */
+void hsort( char * base, int nel, int width, int (* compare)(), void (* switcher)()) {
+	static int i, n, stop;
+	/*      Perform a heap sort on an array starting at base.  The array is
+			nel elements large and width is the size of a single element in
+			bytes.  Compare is a pointer to a comparison routine which will
+			be passed pointers to two elements of the array.  It should
+			return a negative number if the left-most argument is less than
+			the rightmost, 0 if the two arguments are equal, a positive
+			number if the left argument is greater than the right.  (That
+			is, it acts like a "subtract" operator.) If compare is 0 then
+			the default comparison routine, argvcmp (which sorts an
+			argv-like array of pointers to strings), is used.                                       */
 
-   Width=width;
-   Comp= compare;
-   Switch= switcher;
-   n=nel*Width;
-   Base=base-Width;
-   for (i=(n/Width/2)*Width; i>=Width; i-=Width) newsift_down(i,n);
-   stop=Width+Width;
-   for (i=n; i>=stop; )
-      {
-      (*Switch)(base, Base+i);
-      newsift_down(Width,i-=Width);
-      }
+	Width = width;
+	Comp = compare;
+	Switch = switcher;
+	n = nel * Width;
+	Base = base - Width;
+	for ( i = (n / Width / 2) * Width; i >= Width; i -= Width )
+		newsift_down( i, n );
+	stop = Width + Width;
+	for ( i = n; i >= stop; ) {
+		(*Switch)( base, Base + i );
+		newsift_down( Width, i -= Width );
+	}
 
 }
 
@@ -1768,32 +1631,30 @@ static int i,n,stop;
 //
 //******************************************************************************
 
-char * UL_GetPath (char * path, char *dir)
-{
-   boolean done      = 0;
-   char *dr          = dir;
-   int cnt           = 0;
+char * UL_GetPath( char * path, char * dir ) {
+	boolean done = 0;
+	char * dr = dir;
+	int cnt = 0;
 
-   if (*path == SLASHES)
-      path++;
+	if ( *path == SLASHES)
+		path++;
 
-   while (!done)
-   {
-      *dr = *path;
+	while ( !done ) {
+		*dr = *path;
 
-      cnt++;                  // make sure the number of characters in the dir
-      if (cnt > MAXCHARS)     // name doesn't exceed acceptable limits.
-         Error ("ERROR : Directory name can only be %d characters long.\n", MAXCHARS);
+		cnt++;                  // make sure the number of characters in the dir
+		if ( cnt > MAXCHARS )     // name doesn't exceed acceptable limits.
+			Error( "ERROR : Directory name can only be %d characters long.\n", MAXCHARS );
 
-      path++;
-      dr++;
+		path++;
+		dr++;
 
-      if ((*path == SLASHES) || (*path == 0))
-         done = true;
-   }
+		if ((*path == SLASHES) || (*path == 0))
+			done = true;
+	}
 
-   *dr = 0;
-   return (path);
+	*dr = 0;
+	return (path);
 }
 
 
@@ -1813,52 +1674,51 @@ char * UL_GetPath (char * path, char *dir)
 //
 //******************************************************************************
 
-boolean UL_ChangeDirectory (char *path)
-{
+boolean UL_ChangeDirectory( char * path ) {
 #ifdef DOS
-   char *p;
-   char dir[9];
-   char *d;
+	char *p;
+	char dir[9];
+	char *d;
 
-   d = &dir[0];
-   p = path;
-   memset (dir, 0, 9);
+	d = &dir[0];
+	p = path;
+	memset (dir, 0, 9);
 
-   // Check for a drive at the beginning of the path
-   if (*(p+1) == ':')
-   {
-      *d++ = *p++;      // drive letter
-      *d++ = *p++;      // colon
+	// Check for a drive at the beginning of the path
+	if (*(p+1) == ':')
+	{
+	   *d++ = *p++;      // drive letter
+	   *d++ = *p++;      // colon
 
-      if (UL_ChangeDrive (dir) == false)
-         return (false);
-   }
+	   if (UL_ChangeDrive (dir) == false)
+		  return (false);
+	}
 
-   if (*p == SLASHES)
-   {
-      chdir ("\\");
-      p++;
-   }
+	if (*p == SLASHES)
+	{
+	   chdir ("\\");
+	   p++;
+	}
 
-   d = &dir[0];
-   while (*p)
-   {
-      p = UL_GetPath (p, d);
+	d = &dir[0];
+	while (*p)
+	{
+	   p = UL_GetPath (p, d);
 
-      if (chdir (d) == -1)
-         return (false);
-   }
+	   if (chdir (d) == -1)
+		  return (false);
+	}
 
-   return (true);
+	return (true);
 #else
-	if (!path || !*path) {
+	if ( !path || !*path ) {
 		return true;
 	}
-	
-	if (chdir (path) == -1) {
-	         return (false);
+
+	if ( chdir( path ) == -1 ) {
+		return (false);
 	}
-	
+
 	return true;
 #endif
 }
@@ -1881,29 +1741,27 @@ boolean UL_ChangeDirectory (char *path)
 //
 //******************************************************************************
 
-boolean UL_ChangeDrive (char *drive)
-{
+boolean UL_ChangeDrive( char * drive ) {
 #ifdef DOS
-   unsigned d, total, tempd;
+	unsigned d, total, tempd;
 
-   d = toupper (*drive);
+	d = toupper (*drive);
 
-   d = d - 'A' + 1;
+	d = d - 'A' + 1;
 
-   _dos_setdrive (d, &total);
-   _dos_getdrive (&tempd);
+	_dos_setdrive (d, &total);
+	_dos_getdrive (&tempd);
 
-   if (d != tempd)
-      return (false);
+	if (d != tempd)
+	   return (false);
 
-   return (true);
+	return (true);
 #else
 	STUB_FUNCTION;
-	
+
 	return false;
 #endif
 }
-
 
 /*
 =============
@@ -1912,12 +1770,11 @@ boolean UL_ChangeDrive (char *drive)
 =
 =============
 */
-void AbortCheck (char * abortstring)
-{
-   // User abort check
+void AbortCheck( char * abortstring ) {
+	// User abort check
 
-   IN_UpdateKeyboard ();
+	IN_UpdateKeyboard();
 
-   if (Keyboard[sc_Escape])
-      Error("%s\n",abortstring);
+	if ( Keyboard[sc_Escape] )
+		Error( "%s\n", abortstring );
 }

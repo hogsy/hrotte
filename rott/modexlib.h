@@ -108,56 +108,55 @@ int iGLOBAL_SCREENHEIGHT;//bna val 600
 #define PEL_DATA                0x3c9
 #endif
 
-extern  boolean StretchScreen;//bná++
+extern boolean StretchScreen;//bnï¿½++
 
 //extern  int      ylookup[MAXSCREENHEIGHT];      // Table of row offsets
-extern  int      ylookup[600];      // just set to max res
-extern  int      linewidth;
-extern  byte    *page1start;
-extern  byte    *page2start;
-extern  byte    *page3start;
-extern  int      screensize;
-extern  byte    *bufferofs;
-extern  byte    *displayofs;
-extern  boolean  graphicsmode;
+extern int ylookup[600];      // just set to max res
+extern int linewidth;
+extern byte * page1start;
+extern byte * page2start;
+extern byte * page3start;
+extern int screensize;
+extern byte * bufferofs;
+extern byte * displayofs;
+extern boolean graphicsmode;
 
-
-void  GraphicsMode ( void );
-void  SetTextMode ( void );
-void  VL_SetVGAPlaneMode ( void );
-void  VL_ClearBuffer (byte *buf, byte color);
-void  VL_ClearVideo (byte color);
-void  VL_DePlaneVGA (void);
-void  VL_CopyDisplayToHidden ( void );
-void  VL_CopyBufferToAll ( byte *buffer );
-void  VL_CopyPlanarPage ( byte * src, byte * dest );
-void  VL_CopyPlanarPageToMemory ( byte * src, byte * dest );
-void  XFlipPage ( void );
-void  WaitVBL( void );
-void  TurnOffTextCursor ( void );
+void GraphicsMode( void );
+void SetTextMode( void );
+void VL_SetVGAPlaneMode( void );
+void VL_ClearBuffer( byte * buf, byte color );
+void VL_ClearVideo( byte color );
+void VL_DePlaneVGA( void );
+void VL_CopyDisplayToHidden( void );
+void VL_CopyBufferToAll( byte * buffer );
+void VL_CopyPlanarPage( byte * src, byte * dest );
+void VL_CopyPlanarPageToMemory( byte * src, byte * dest );
+void XFlipPage( void );
+void WaitVBL( void );
+void TurnOffTextCursor( void );
 
 #ifdef __WATCOMC__
 #pragma aux VGAWRITEMAP =      \
-        "mov    eax,01H"       \
-        "mov    edx,03c5h"     \
-        "shl    eax,cl"        \
-        "out    dx,al"         \
-        parm    [ecx]          \
-        modify exact [eax edx]
+		"mov    eax,01H"       \
+		"mov    edx,03c5h"     \
+		"shl    eax,cl"        \
+		"out    dx,al"         \
+		parm    [ecx]          \
+		modify exact [eax edx]
 
 #pragma aux VGAMAPMASK =       \
-        "mov    edx,03c5h"     \
-        "out    dx,al"         \
-        parm    [eax]          \
-        modify exact [edx]
+		"mov    edx,03c5h"     \
+		"out    dx,al"         \
+		parm    [eax]          \
+		modify exact [edx]
 
 #pragma aux VGAREADMAP =      \
-        "shl    eax,08H"      \
-        "mov    edx,03ceh"    \
-        "add    eax,04H"      \
-        "out    dx,ax"        \
-        parm    [eax]         \
-        modify exact [eax edx]
+		"shl    eax,08H"      \
+		"mov    edx,03ceh"    \
+		"add    eax,04H"      \
+		"out    dx,ax"        \
+		parm    [eax]         \
+		modify exact [eax edx]
 #endif
 
 #ifdef DOS
@@ -165,9 +164,9 @@ void  VGAMAPMASK (int x);
 void  VGAREADMAP (int x);
 void  VGAWRITEMAP(int x);
 #else
-#define VGAMAPMASK(a)
-#define VGAREADMAP(a)
-#define VGAWRITEMAP(a)
+#define VGAMAPMASK( a )
+#define VGAREADMAP( a )
+#define VGAWRITEMAP( a )
 #endif
 
 #endif

@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _rt_com_private
 #define _rt_com_private
 
-
 #define SYNCPACKETSIZE 32
 
 #define SYNC_PHASE0 6
@@ -34,20 +33,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SYNCTIME    15
 
-typedef struct
-{
-   byte type;
-   int  phase;
-   int  clocktime;
-   int  delta;
-   byte data[SYNCPACKETSIZE];
+typedef struct {
+	byte type;
+	int phase;
+	int clocktime;
+	int delta;
+	byte data[SYNCPACKETSIZE];
 } syncpackettype;
 
-typedef struct
-{
-   int  sendtime;
-   int  deltatime;
-   syncpackettype pkt;
+typedef struct {
+	int sendtime;
+	int deltatime;
+	syncpackettype pkt;
 } synctype;
 
 #endif

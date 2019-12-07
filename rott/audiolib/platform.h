@@ -32,31 +32,29 @@
 
 #endif
 
-static __inline unsigned short _swap16(unsigned short D)
-{
+static __inline unsigned short _swap16( unsigned short D ) {
 #if PLATFORM_MACOSX
-    register unsigned short returnValue;
-    __asm__ volatile("lhbrx %0,0,%1"
-        : "=r" (returnValue)
-        : "r" (&D)
-    );
-    return returnValue;
+	register unsigned short returnValue;
+	__asm__ volatile("lhbrx %0,0,%1"
+		: "=r" (returnValue)
+		: "r" (&D)
+	);
+	return returnValue;
 #else
-    return((D<<8)|(D>>8));
+	return ((D << 8) | (D >> 8));
 #endif
 }
 
-static __inline unsigned int _swap32(unsigned int D)
-{
+static __inline unsigned int _swap32( unsigned int D ) {
 #if PLATFORM_MACOSX
-    register unsigned int returnValue;
-    __asm__ volatile("lwbrx %0,0,%1"
-        : "=r" (returnValue)
-        : "r" (&D)
-    );
-    return returnValue;
+	register unsigned int returnValue;
+	__asm__ volatile("lwbrx %0,0,%1"
+		: "=r" (returnValue)
+		: "r" (&D)
+	);
+	return returnValue;
 #else
-    return((D<<24)|((D<<8)&0x00FF0000)|((D>>8)&0x0000FF00)|(D>>24));
+	return ((D << 24) | ((D << 8) & 0x00FF0000) | ((D >> 8) & 0x0000FF00) | (D >> 24));
 #endif
 }
 
@@ -66,8 +64,8 @@ static __inline unsigned int _swap32(unsigned int D)
 #define BUILDSWAP_INTEL32(x) _swap32(x)
 #else
 #define PLATFORM_LITTLEENDIAN 1
-#define BUILDSWAP_INTEL16(x) (x)
-#define BUILDSWAP_INTEL32(x) (x)
+#define BUILDSWAP_INTEL16( x ) (x)
+#define BUILDSWAP_INTEL32( x ) (x)
 #endif
 
 #endif  /* !defined _INCLUDE_PLATFORM_H_ */

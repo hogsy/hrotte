@@ -26,18 +26,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef BYTEORDER_H
 #define BYTEORDER_H
 
-typedef void (*converter_t)(void *, int);
+typedef void (* converter_t)( void *, int );
 
-#define DECLARE_CONVERTER(type) void Cvt_##type(void *lmp, int num);
+#define DECLARE_CONVERTER( type ) void Cvt_##type(void *lmp, int num);
 
-DECLARE_CONVERTER(pic_t);
-DECLARE_CONVERTER(lpic_t);
-DECLARE_CONVERTER(font_t);
-DECLARE_CONVERTER(lbm_t);
-DECLARE_CONVERTER(patch_t);
-DECLARE_CONVERTER(transpatch_t);
-DECLARE_CONVERTER(cfont_t);
-void CvtNull(void *lmp, int num);
-converter_t CvtForType(int type);
+DECLARE_CONVERTER( pic_t );
+DECLARE_CONVERTER( lpic_t );
+DECLARE_CONVERTER( font_t );
+DECLARE_CONVERTER( lbm_t );
+DECLARE_CONVERTER( patch_t );
+DECLARE_CONVERTER( transpatch_t );
+DECLARE_CONVERTER( cfont_t );
+void CvtNull( void * lmp, int num );
+converter_t CvtForType( int type );
 
 #endif

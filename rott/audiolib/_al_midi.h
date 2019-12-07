@@ -68,104 +68,98 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MIDI_DATAENTRY_LSB         38
 #define MIDI_PITCHBEND_RPN         0
 
-enum cromatic_scale
-   {
-   C       = 0x157,
-   C_SHARP = 0x16B,
-   D_FLAT  = 0x16B,
-   D       = 0x181,
-   D_SHARP = 0x198,
-   E_FLAT  = 0x198,
-   E       = 0x1B0,
-   F_FLAT  = 0x1B0,
-   E_SHARP = 0x1CA,
-   F       = 0x1CA,
-   F_SHARP = 0x1E5,
-   G_FLAT  = 0x1E5,
-   G       = 0x202,
-   G_SHARP = 0x220,
-   A_FLAT  = 0x220,
-   A       = 0x241,
-   A_SHARP = 0x263,
-   B_FLAT  = 0x263,
-   B       = 0x287,
-   C_FLAT  = 0x287,
-   B_SHARP = 0x2AE,
-   };
+enum cromatic_scale {
+	C = 0x157,
+	C_SHARP = 0x16B,
+	D_FLAT = 0x16B,
+	D = 0x181,
+	D_SHARP = 0x198,
+	E_FLAT = 0x198,
+	E = 0x1B0,
+	F_FLAT = 0x1B0,
+	E_SHARP = 0x1CA,
+	F = 0x1CA,
+	F_SHARP = 0x1E5,
+	G_FLAT = 0x1E5,
+	G = 0x202,
+	G_SHARP = 0x220,
+	A_FLAT = 0x220,
+	A = 0x241,
+	A_SHARP = 0x263,
+	B_FLAT = 0x263,
+	B = 0x287,
+	C_FLAT = 0x287,
+	B_SHARP = 0x2AE,
+};
 
 /* Definition of octave information to be ORed onto F-Number */
 
-enum octaves
-   {
-   OCTAVE_0 = 0x0000,
-   OCTAVE_1 = 0x0400,
-   OCTAVE_2 = 0x0800,
-   OCTAVE_3 = 0x0C00,
-   OCTAVE_4 = 0x1000,
-   OCTAVE_5 = 0x1400,
-   OCTAVE_6 = 0x1800,
-   OCTAVE_7 = 0x1C00
-   };
+enum octaves {
+	OCTAVE_0 = 0x0000,
+	OCTAVE_1 = 0x0400,
+	OCTAVE_2 = 0x0800,
+	OCTAVE_3 = 0x0C00,
+	OCTAVE_4 = 0x1000,
+	OCTAVE_5 = 0x1400,
+	OCTAVE_6 = 0x1800,
+	OCTAVE_7 = 0x1C00
+};
 
-typedef struct VOICE
-   {
-   struct VOICE *next;
-   struct VOICE *prev;
+typedef struct VOICE {
+	struct VOICE * next;
+	struct VOICE * prev;
 
-   unsigned num;
-   unsigned key;
-   unsigned velocity;
-   unsigned channel;
-   unsigned pitchleft;
-   unsigned pitchright;
-   int      timbre;
-   int      port;
-   unsigned status;
-   } VOICE;
+	unsigned num;
+	unsigned key;
+	unsigned velocity;
+	unsigned channel;
+	unsigned pitchleft;
+	unsigned pitchright;
+	int timbre;
+	int port;
+	unsigned status;
+} VOICE;
 
-typedef struct
-   {
-   VOICE *start;
-   VOICE *end;
-   } VOICELIST;
+typedef struct {
+	VOICE * start;
+	VOICE * end;
+} VOICELIST;
 
-typedef struct
-   {
-   VOICELIST Voices;
-   int       Timbre;
-   int       Pitchbend;
-   int       KeyOffset;
-   unsigned  KeyDetune;
-   unsigned  Volume;
-   unsigned  EffectiveVolume;
-   int       Pan;
-   int       Detune;
-   unsigned  RPN;
-   short     PitchBendRange;
-   short     PitchBendSemiTones;
-   short     PitchBendHundreds;
-   } CHANNEL;
+typedef struct {
+	VOICELIST Voices;
+	int Timbre;
+	int Pitchbend;
+	int KeyOffset;
+	unsigned KeyDetune;
+	unsigned Volume;
+	unsigned EffectiveVolume;
+	int Pan;
+	int Detune;
+	unsigned RPN;
+	short PitchBendRange;
+	short PitchBendSemiTones;
+	short PitchBendHundreds;
+} CHANNEL;
 
-typedef struct
-   {
-   unsigned char SAVEK[ 2 ];
-   unsigned char Level[ 2 ];
-   unsigned char Env1[ 2 ];
-   unsigned char Env2[ 2 ];
-   unsigned char Wave[ 2 ];
-   unsigned char Feedback;
-   signed   char Transpose;
-   signed   char Velocity;
-   } TIMBRE;
+typedef struct {
+	unsigned char SAVEK[2];
+	unsigned char Level[2];
+	unsigned char Env1[2];
+	unsigned char Env2[2];
+	unsigned char Wave[2];
+	unsigned char Feedback;
+	signed char Transpose;
+	signed char Velocity;
+} TIMBRE;
 
-extern TIMBRE ADLIB_TimbreBank[ 256 ];
+extern TIMBRE ADLIB_TimbreBank[256];
 
 static void AL_ResetVoices( void );
 static void AL_CalcPitchInfo( void );
 static void AL_SetVoiceTimbre( int voice );
 static void AL_SetVoiceVolume( int voice );
-static int  AL_AllocVoice( void );
-static int  AL_GetVoice( int channel, int key );
+static int AL_AllocVoice( void );
+static int AL_GetVoice( int channel, int key );
 static void AL_SetVoicePitch( int voice );
 static void AL_SetChannelVolume( int channel, int volume );
 static void AL_SetChannelPan( int channel, int pan );

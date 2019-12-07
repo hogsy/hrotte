@@ -42,8 +42,8 @@ typedef long fixed;
 
 #define DEFAULT_CONFIG_FILENAME  "sbconfig.dat"
 
-#define NUM_ELEMENTS(x) (sizeof(x)/sizeof(x[0]))
-#define SIGN(x) ((x<0)?-1:1)
+#define NUM_ELEMENTS( x ) (sizeof(x)/sizeof(x[0]))
+#define SIGN( x ) ((x<0)?-1:1)
 
 /* ----------------------------------------------------------------------- */
 
@@ -56,11 +56,11 @@ fixed FIXED_MUL(fixed a, fixed b)
 
    asm {
 
-      mov  eax,a
-      mov  edx,b
-      imul edx
-      shrd eax,edx,16
-      mov  ret_code,eax
+	  mov  eax,a
+	  mov  edx,b
+	  imul edx
+	  shrd eax,edx,16
+	  mov  ret_code,eax
    }
 
    return ret_code;
@@ -97,66 +97,61 @@ fixed FIXED_MUL(fixed a, fixed b);
 
 #endif /* definition of inline FIXED_MUL */
 
-
 static
-fixed StrToFx1616(char *string, char **ret_string)
-{
-	long  whole;
-	long  fract;
+fixed StrToFx1616( char * string, char ** ret_string ) {
+	long whole;
+	long fract;
 	fixed result;
-	int   sign;
+	int sign;
 
 	/* Skip whitespace */
-	while((*string==' ')||(*string=='\t')||(*string=='\n')) string++;
+	while ((*string == ' ') || (*string == '\t') || (*string == '\n'))
+		string++;
 
 	/* Accept numbers in the form: [+-]?[0-9]+(.[0-9]*)
 	*/
 
-	sign=1;
-	if(*string=='-')
-		{
-			string++;
-			sign=-1;
-		}
-	else if(*string=='+')
-		{
-			string++;
-			sign=1;
-		}
+	sign = 1;
+	if ( *string == '-' ) {
+		string++;
+		sign = -1;
+	} else if ( *string == '+' ) {
+		string++;
+		sign = 1;
+	}
 
 	/* Read in the whole part */
-	whole=0;
-	while((*string>='0')&&(*string<='9'))
-		whole=whole*10+(*string++)-'0';
+	whole = 0;
+	while ((*string >= '0') && (*string <= '9'))
+		whole = whole * 10 + (*string++) - '0';
 
 	/* Read the optional fraction part */
-	fract=0;
-	if(*string=='.')
-		{
-			long place=1;
-			string++;
-			while((*string>='0')&&(*string<='9'))
-				{
-					fract=fract*10+(*string++)-'0';
-					place*=10;
-				}
-			/* Convert to fixed point */
-			fract=(fract<<16)/place;
+	fract = 0;
+	if ( *string == '.' ) {
+		long place = 1;
+		string++;
+		while ((*string >= '0') && (*string <= '9')) {
+			fract = fract * 10 + (*string++) - '0';
+			place *= 10;
 		}
+		/* Convert to fixed point */
+		fract = (fract << 16) / place;
+	}
 
-	if(ret_string) *ret_string=string;
+	if ( ret_string )
+		*ret_string = string;
 
-	if(sign==1)
-		result= (whole<<16) + fract;
+	if ( sign == 1 )
+		result = (whole << 16) + fract;
 	else
-		result=-(whole<<16) + fract;
+		result = -(whole << 16) + fract;
 
 	return result;
 }
 
 /* ----------------------------------------------------------------------- */
 
-static char *SbButtonNames[]={
+static char * SbButtonNames[] = {
 	"BUTTON_A",
 	"BUTTON_B",
 	"BUTTON_C",
@@ -164,10 +159,10 @@ static char *SbButtonNames[]={
 	"BUTTON_E",
 	"BUTTON_F"};
 
-static int         cfgFileVersion=0;
-static char        cfgButtons[NUM_ELEMENTS(SbButtonNames)][MAX_STRING_LENGTH];
-static WarpRecord *pCfgWarps;
-static int         nCfgWarps=0;
+static int cfgFileVersion = 0;
+static char cfgButtons[NUM_ELEMENTS( SbButtonNames )][MAX_STRING_LENGTH];
+static WarpRecord * pCfgWarps;
+static int nCfgWarps = 0;
 
 /*-------------------------------------------------------------------------*/
 
@@ -175,224 +170,211 @@ static int         nCfgWarps=0;
  * and return a pointer to the character AFTER the '}'
  * or NULL if error
  */
-static char *GetWarpLevels(char *string, WarpRange *pw)
-{
+static char * GetWarpLevels( char * string, WarpRange * pw ) {
 	short value;
-   fixed fxvalue;
+	fixed fxvalue;
 
-	if((*string++)!='{')
-  		return NULL;
-
-	if(!*string)
-  		return NULL;
-
-	/* Expecting the first number - low */
-	value=(short)strtol(string, &string, 0);
-	if(pw) pw->low=value;
-
-	/* Skip any whitespace */
-	while(isspace(*string)) string++;
-
-	if(*string++!=',')
-  		return NULL;
-
-	/* Expecting the second number - high */
-	value=(short)strtol(string, &string, 0);
-	if(pw) pw->high=value;
-
-	/* Skip any whitespace */
-	while(isspace(*string)) string++;
-
-	if(*string++!=',')
-  		return NULL;
-
-	/* Expecting the third number - multiplier */
-	fxvalue=StrToFx1616(string, &string);
-	if(pw) pw->mult=fxvalue;
-
-	/* Skip any whitespace */
-	while(isspace(*string)) string++;
-
-	if(*string!='}')
+	if ((*string++) != '{' )
 		return NULL;
 
-	return string+1;
+	if ( !*string )
+		return NULL;
+
+	/* Expecting the first number - low */
+	value = ( short ) strtol( string, &string, 0 );
+	if ( pw )
+		pw->low = value;
+
+	/* Skip any whitespace */
+	while ( isspace( *string ))
+		string++;
+
+	if ( *string++ != ',' )
+		return NULL;
+
+	/* Expecting the second number - high */
+	value = ( short ) strtol( string, &string, 0 );
+	if ( pw )
+		pw->high = value;
+
+	/* Skip any whitespace */
+	while ( isspace( *string ))
+		string++;
+
+	if ( *string++ != ',' )
+		return NULL;
+
+	/* Expecting the third number - multiplier */
+	fxvalue = StrToFx1616( string, &string );
+	if ( pw )
+		pw->mult = fxvalue;
+
+	/* Skip any whitespace */
+	while ( isspace( *string ))
+		string++;
+
+	if ( *string != '}' )
+		return NULL;
+
+	return string + 1;
 }
 
-
-
-static int GetWarp(char *string, WarpRecord *pRecord)
-{
-	int        nWarp;
-	WarpRange *pWarp;
+static int GetWarp( char * string, WarpRecord * pRecord ) {
+	int nWarp;
+	WarpRange * pWarp;
 
 	/* Only update the field if we successfully read the entire line */
-	nWarp=0;
-	pWarp=NULL;
+	nWarp = 0;
+	pWarp = NULL;
 
 	/* Skip whitespace */
-	while(isspace(*string)) string++;
+	while ( isspace( *string ))
+		string++;
 
-	if(*string++!='{') return 0;
+	if ( *string++ != '{' )
+		return 0;
 
-	while(string && *string)
-		{
-			switch(*string)
-				{
-				case ' ':
-				case '\t':
-				case '\n':
-					string++;
-					break;
+	while ( string && *string ) {
+		switch ( *string ) {
+		case ' ':
+		case '\t':
+		case '\n': string++;
+			break;
 
-				case ',':
-					string++;
-					break;
+		case ',': string++;
+			break;
 
-				case '{':
-					if(nWarp++==0)
-						pWarp=malloc(sizeof(WarpRange));
-					else
-						pWarp=realloc(pWarp, nWarp*sizeof(WarpRange));
+		case '{':
+			if ( nWarp++ == 0 )
+				pWarp = malloc( sizeof( WarpRange ));
+			else
+				pWarp = realloc( pWarp, nWarp * sizeof( WarpRange ));
 
-					string=GetWarpLevels(string, pWarp+nWarp-1);
-					break;
+			string = GetWarpLevels( string, pWarp + nWarp - 1 );
+			break;
 
-				case '}':
-					pRecord->nWarp=nWarp;
-					pRecord->pWarp=pWarp;
-					return 1;
-				}
+		case '}': pRecord->nWarp = nWarp;
+			pRecord->pWarp = pWarp;
+			return 1;
 		}
+	}
 
 	/* Early EOL (didn't get closing '}') */
-	if(nWarp) free(pWarp);
+	if ( nWarp )
+		free( pWarp );
 	return 0;
 }
-	
 
 /*-------------------------------------------------------------------------*/
 
-int SbConfigParse(char *_filename)
-{
-	int             i;
-	FILE           *file;
-	char           *pc;
-	char            buffer[128];
-    char filename[MAX_PATH];
+int SbConfigParse( char * _filename ) {
+	int i;
+	FILE * file;
+	char * pc;
+	char buffer[128];
+	char filename[MAX_PATH];
 
-   if(!_filename) _filename=DEFAULT_CONFIG_FILENAME;
+	if ( !_filename )
+		_filename = DEFAULT_CONFIG_FILENAME;
 
-    strncpy(filename, _filename, sizeof (filename));
-    filename[sizeof (filename) - 1] = '\0';
-    FixFilePath(filename);
+	strncpy( filename, _filename, sizeof( filename ));
+	filename[sizeof( filename ) - 1] = '\0';
+	FixFilePath( filename );
 
-	if(!(file=fopen(filename, "r")))
-      {
-			printf("Config file: %s, not found\n", filename);
-			return 0;
-      }
+	if ( !(file = fopen( filename, "r" ))) {
+		printf( "Config file: %s, not found\n", filename );
+		return 0;
+	}
 
-	while(fgets(buffer, sizeof(buffer), file))
-		{
-			int lineParsed=0;
+	while ( fgets( buffer, sizeof( buffer ), file )) {
+		int lineParsed = 0;
 
-			/* each line in config file starts with either a ;, VERSION or an
-	      ** element of GameButtonNames or WarpNames
-			*/
-	      pc=strtok(buffer, " \t\n,");
+		/* each line in config file starts with either a ;, VERSION or an
+	  ** element of GameButtonNames or WarpNames
+		*/
+		pc = strtok( buffer, " \t\n," );
 
-	      if(*pc==';')									/* commented out line? */
-				continue;
+		if ( *pc == ';' )                                    /* commented out line? */
+			continue;
 
-			/* VERSION?  The version will be used in the future to allow fx1616
-			**           values in the config file
-			*/
-			if(!stricmp(pc,"VERSION"))
-				{
-					pc=strtok(NULL, " \t\n,");
-					cfgFileVersion=atoi(pc);
+		/* VERSION?  The version will be used in the future to allow fx1616
+		**           values in the config file
+		*/
+		if ( !stricmp( pc, "VERSION" )) {
+			pc = strtok(NULL, " \t\n," );
+			cfgFileVersion = atoi( pc );
+		}
+
+		/* Check if first token is an element of SbButtonNames */
+		for ( i = 0; i < NUM_ELEMENTS( SbButtonNames ); i++ )
+			if ( !stricmp( pc, SbButtonNames[i] )) {
+				lineParsed = 1;
+
+				/* Save the next token in the appropriate slot */
+				pc = strtok(NULL, " \t\n," );
+
+				strncpy( cfgButtons[i], pc, MAX_STRING_LENGTH - 1 );
+				cfgButtons[i][MAX_STRING_LENGTH - 1] = 0;
+			}
+
+		/* If the first token is not from GameButtonNames,
+		** it must be a WarpName
+		*/
+		if ( !lineParsed ) {
+			char * name;
+
+			name = pc;
+			pc = pc + strlen( pc ) + 1;            /* Skip this token */
+			while ( isspace( *pc ))
+				pc++;    /* Skip any whitespace */
+
+			if ( *pc == '{' ) {
+				WarpRecord warpRec;
+
+				strcpy( warpRec.name, name );
+				warpRec.pWarp = NULL;
+				warpRec.nWarp = 0;
+
+				if ( GetWarp( pc, &warpRec )) {
+					if ( nCfgWarps++ == 0 )
+						pCfgWarps = ( WarpRecord * ) malloc( sizeof( WarpRecord ));
+					else
+						pCfgWarps = ( WarpRecord * ) realloc( pCfgWarps, nCfgWarps * sizeof( WarpRecord ));
+					pCfgWarps[nCfgWarps - 1] = warpRec;
 				}
+			}
+		}
+	} /* end of while getting lines from config file */
 
-			/* Check if first token is an element of SbButtonNames */
-			for(i=0; i<NUM_ELEMENTS(SbButtonNames); i++)
-				if(!stricmp(pc, SbButtonNames[i]))
-					{
-						lineParsed=1;
-
-						/* Save the next token in the appropriate slot */
-						pc=strtok(NULL," \t\n,");
-
-						strncpy(cfgButtons[i], pc, MAX_STRING_LENGTH-1);
-						cfgButtons[i][MAX_STRING_LENGTH-1]=0;
-					}
-
-			/* If the first token is not from GameButtonNames,
-			** it must be a WarpName
-			*/
-			if(!lineParsed)
-				{
-					char *name;
-
-					name=pc;
-					pc=pc+strlen(pc)+1;			/* Skip this token */
-					while(isspace(*pc)) pc++;	/* Skip any whitespace */
-
-					if(*pc=='{')
-						{
-							WarpRecord warpRec;
-
-							strcpy(warpRec.name, name);
-							warpRec.pWarp=NULL;
-							warpRec.nWarp=0;
-
-							if(GetWarp(pc, &warpRec))
-								{
-									if(nCfgWarps++==0)
-										pCfgWarps=(WarpRecord *)malloc(sizeof(WarpRecord));
-									else
-										pCfgWarps=(WarpRecord *)realloc(pCfgWarps, nCfgWarps*sizeof(WarpRecord));
-									pCfgWarps[nCfgWarps-1]=warpRec;
-								}
-						}
-				}
-		} /* end of while getting lines from config file */
-
-	fclose(file);
-   return 1;
+	fclose( file );
+	return 1;
 }
 
 /*-------------------------------------------------------------------------*/
 
-char *SbConfigGetButton(char *btnName)
-{
+char * SbConfigGetButton( char * btnName ) {
 	int i;
-	for(i=0; i<NUM_ELEMENTS(SbButtonNames); i++)
-		{
-			if(!stricmp(btnName, SbButtonNames[i]))
-				if(cfgButtons[i][0])
-					return cfgButtons[i];
-				else
-					return NULL;	/* Empty slot */
+	for ( i = 0; i < NUM_ELEMENTS( SbButtonNames ); i++ ) {
+		if ( !stricmp( btnName, SbButtonNames[i] ))
+			if ( cfgButtons[i][0] )
+				return cfgButtons[i];
+			else
+				return NULL;    /* Empty slot */
 
-			if(!stricmp(btnName, cfgButtons[i]))
-				return SbButtonNames[i];
-		}
+		if ( !stricmp( btnName, cfgButtons[i] ))
+			return SbButtonNames[i];
+	}
 
 	/* Unknown button name */
 	return NULL;
 }
 
-
-
-int SbConfigGetButtonNumber(char *btnName)
-{
+int SbConfigGetButtonNumber( char * btnName ) {
 	int i;
-	for(i=0; i<NUM_ELEMENTS(SbButtonNames); i++)
-		{
-			if(!stricmp(btnName, cfgButtons[i]))
-				return i;
-		}
+	for ( i = 0; i < NUM_ELEMENTS( SbButtonNames ); i++ ) {
+		if ( !stricmp( btnName, cfgButtons[i] ))
+			return i;
+	}
 
 	/* Unknown button name */
 	return -1;
@@ -400,11 +382,10 @@ int SbConfigGetButtonNumber(char *btnName)
 
 /*-------------------------------------------------------------------------*/
 
-WarpRecord *SbConfigGetWarpRange(char *rngName)
-{
+WarpRecord * SbConfigGetWarpRange( char * rngName ) {
 	int i;
-	for(i=0; i<nCfgWarps; i++)
-		if(!stricmp(rngName, pCfgWarps[i].name))
+	for ( i = 0; i < nCfgWarps; i++ )
+		if ( !stricmp( rngName, pCfgWarps[i].name ))
 			return &pCfgWarps[i];
 
 	return NULL;
@@ -412,86 +393,79 @@ WarpRecord *SbConfigGetWarpRange(char *rngName)
 
 /*-------------------------------------------------------------------------*/
 
-fixed SbFxConfigWarp(WarpRecord *warp, short value)
-{
-	int  i;
+fixed SbFxConfigWarp( WarpRecord * warp, short value ) {
+	int i;
 	short absValue;
 	fixed accum;
-	int   sign;
+	int sign;
 
-	if(!warp) return INT_TO_FIXED(value);
-	
-	absValue=value;
-	sign=1;
-	if(absValue<0)
-		{
-			absValue= (short)-absValue;
-			sign=-1;
-		}
+	if ( !warp )
+		return INT_TO_FIXED( value );
 
-	accum=INT_TO_FIXED(0);
+	absValue = value;
+	sign = 1;
+	if ( absValue < 0 ) {
+		absValue = ( short ) -absValue;
+		sign = -1;
+	}
 
-	for(i=0; i<warp->nWarp; i++)
-		{
-      if(absValue<=warp->pWarp[i].low)
-		      ;	/* Ignore it if below this range (if required, will have
+	accum = INT_TO_FIXED( 0 );
+
+	for ( i = 0; i < warp->nWarp; i++ ) {
+		if ( absValue <= warp->pWarp[i].low );    /* Ignore it if below this range (if required, will have
 					**	been caught by the previous warp)
 					*/
-			else if((absValue>warp->pWarp[i].low) && (absValue<=warp->pWarp[i].high))
-				{
-					fixed diff;
-					fixed partial;
-					diff=INT_TO_FIXED((long)absValue-(long)warp->pWarp[i].low);
-               partial=FIXED_MUL(diff, warp->pWarp[i].mult);
-					accum=FIXED_ADD(accum, partial);
-					break;	/* Exit the for loop */
-				}
-			else	/* Accumulate if greater than this range */
-				{
-					fixed partial;
-					partial=FIXED_MUL(INT_TO_FIXED((long)warp->pWarp[i].high-(long)warp->pWarp[i].low),
-										   warp->pWarp[i].mult);
-					accum=FIXED_ADD(accum, partial);
-				}
+		else if ((absValue > warp->pWarp[i].low) && (absValue <= warp->pWarp[i].high)) {
+			fixed diff;
+			fixed partial;
+			diff = INT_TO_FIXED(( long ) absValue - ( long ) warp->pWarp[i].low );
+			partial = FIXED_MUL( diff, warp->pWarp[i].mult );
+			accum = FIXED_ADD( accum, partial );
+			break;    /* Exit the for loop */
+		} else    /* Accumulate if greater than this range */
+		{
+			fixed partial;
+			partial = FIXED_MUL(INT_TO_FIXED(( long ) warp->pWarp[i].high - ( long ) warp->pWarp[i].low ),
+								warp->pWarp[i].mult );
+			accum = FIXED_ADD( accum, partial );
 		}
+	}
 
-	if(sign==1)
-		return  accum;
+	if ( sign == 1 )
+		return accum;
 	else
 		return -accum;
 
-#if 0	/* Old technique */
-		if((absValue>=warp->pWarp[i].low) && (absValue<=warp->pWarp[i].high))
-			if(warp->pWarp[i].shift>=0)
-				value=accum+((absValue-warp->pWarp[i].low)<<warp->pWarp[i].shift);
-			else
-				value=accum+((absValue-warp->pWarp[i].low)>>abs(warp->pWarp[i].shift));
+#if 0    /* Old technique */
+	if((absValue>=warp->pWarp[i].low) && (absValue<=warp->pWarp[i].high))
+		if(warp->pWarp[i].shift>=0)
+			value=accum+((absValue-warp->pWarp[i].low)<<warp->pWarp[i].shift);
 		else
-			if(warp->pWarp[i].shift>=0)
-				accum+=(warp->pWarp[i].high-warp->pWarp[i].low)<<warp->pWarp[i].shift;
-			else
-				accum+=(warp->pWarp[i].high-warp->pWarp[i].low)>>abs(warp->pWarp[i].shift);
+			value=accum+((absValue-warp->pWarp[i].low)>>abs(warp->pWarp[i].shift));
+	else
+		if(warp->pWarp[i].shift>=0)
+			accum+=(warp->pWarp[i].high-warp->pWarp[i].low)<<warp->pWarp[i].shift;
+		else
+			accum+=(warp->pWarp[i].high-warp->pWarp[i].low)>>abs(warp->pWarp[i].shift);
 
-	if(absValue>warp->pWarp[warp->nWarp-1].high)
-		value=accum;
+if(absValue>warp->pWarp[warp->nWarp-1].high)
+	value=accum;
 
-	return sign*value;
+return sign*value;
 #endif
 }
 
-
 /*-------------------------------------------------------------------------*/
 
-long SbConfigWarp(WarpRecord *warp, short value)
-{
-   /* An apparent bug in the msc70 compiler, trashes r
-      if it is on the stack.  Leave in unitialized global segment.
-   */
-   static fixed r;
+long SbConfigWarp( WarpRecord * warp, short value ) {
+	/* An apparent bug in the msc70 compiler, trashes r
+	   if it is on the stack.  Leave in unitialized global segment.
+	*/
+	static fixed r;
 
-   r = SbFxConfigWarp(warp,value);
+	r = SbFxConfigWarp( warp, value );
 
-   return r >> 16 ;
+	return r >> 16;
 }
 
 

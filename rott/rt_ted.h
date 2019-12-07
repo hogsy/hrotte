@@ -25,14 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "rottnet.h"
 
-
 #ifndef _rt_ted_public
 #define _rt_ted_public
 
 #define MAXCLOCKS 10
 #define MAXSPAWNLOCATIONS 50
 #define POWERUPTICS  ((VBLCOUNTER*60)+6)
-#define IsPlatform(x,y)  ( (MAPSPOT((x),(y),2)==1) || ((MAPSPOT((x),(y),2)>=4) && (MAPSPOT((x),(y),2)<=9)))
+#define IsPlatform( x, y )  ( (MAPSPOT((x),(y),2)==1) || ((MAPSPOT((x),(y),2)>=4) && (MAPSPOT((x),(y),2)<=9)))
 
 #define EXITTILE             (107)
 #define SECRETEXITTILE       (106)
@@ -44,41 +43,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define FL_W_INVERTED  0x10
 #define FL_S_FLIPPED   0x20
 
-
-
 #define MAXTEAMS 11
 
-typedef struct
-{
- int nummembers;
- int uniformcolor;
- int tilex,tiley;
- byte dir;
+typedef struct {
+	int nummembers;
+	int uniformcolor;
+	int tilex, tiley;
+	byte dir;
 
 } teamtype;
 
 extern teamtype TEAM[MAXPLAYERS];
 
-typedef struct
-{ thingtype   which;
-  byte        flags;
-  byte        hitpoints;
-  word        tile;
-  byte        tilex,tiley;
-
+typedef struct {
+	thingtype which;
+	byte flags;
+	byte hitpoints;
+	word tile;
+	byte tilex, tiley;
 
 } wall_t;
 
-typedef struct
-{
-  int  number;
-  char mapname[23];
+typedef struct {
+	int number;
+	char mapname[23];
 } mapinfo_t;
 
-typedef struct
-{
-  int  nummaps;
-  mapinfo_t maps[100];
+typedef struct {
+	int nummaps;
+	mapinfo_t maps[100];
 } mapfileinfo_t;
 
 #define MAXLEVELNAMELENGTH 23
@@ -88,46 +81,43 @@ typedef struct
 
 #define MAP_SPECIAL_TOGGLE_PUSHWALLS 0x0001
 
-typedef struct
-   {
-   unsigned used;
-   unsigned CRC;
-   unsigned RLEWtag;
-   unsigned MapSpecials;
-   unsigned planestart[ NUMPLANES ];
-   unsigned planelength[ NUMPLANES ];
-   char     Name[ ALLOCATEDLEVELNAMELENGTH ];
-   } RTLMAP;
+typedef struct {
+	unsigned used;
+	unsigned CRC;
+	unsigned RLEWtag;
+	unsigned MapSpecials;
+	unsigned planestart[NUMPLANES];
+	unsigned planelength[NUMPLANES];
+	char Name[ALLOCATEDLEVELNAMELENGTH];
+} RTLMAP;
 
+typedef struct {
+	int x, y, dir;
+} _2dvec;
 
-typedef struct
- {int x,y,dir;
- }_2dvec;
+extern _2dvec SPAWNLOC[MAXSPAWNLOCATIONS], FIRST, SECOND;
 
-extern _2dvec SPAWNLOC[MAXSPAWNLOCATIONS],FIRST,SECOND;
+typedef struct {
+	int time1;
+	int time2;
+	byte points_to_tilex;
+	byte points_to_tiley;
+	int linkindex;
+} str_clock;
 
-typedef struct
- {int time1;
-  int time2;
-  byte points_to_tilex;
-  byte points_to_tiley;
-  int linkindex;
- }str_clock;
+extern int numareatiles[NUMAREAS + 1];
+extern int shapestart, shapestop;
+extern int NUMSPAWNLOCATIONS;
+extern int mapwidth;
+extern int mapheight;
 
-
-extern int  numareatiles[NUMAREAS+1];
-extern int  shapestart,shapestop;
-extern int  NUMSPAWNLOCATIONS;
-extern int  mapwidth;
-extern int  mapheight;
-
-extern  wall_t walls[MAXWALLTILES];
+extern wall_t walls[MAXWALLTILES];
 extern str_clock Clocks[MAXCLOCKS];
-extern int LightsInArea[NUMAREAS+1];
+extern int LightsInArea[NUMAREAS + 1];
 extern int numclocks;
 extern word ELEVATORLOCATION;
 
-extern unsigned short int *mapplanes[3];
+extern unsigned short int * mapplanes[3];
 extern int gunsstart;
 extern int elevatorstart;
 extern int spritestop;
@@ -138,14 +128,14 @@ extern boolean insetupgame;
 extern char LevelName[80];
 extern boolean ISRTL;
 
-void PreCacheGroup(int,int,int); // added type
-void AssignTeams(void);
-void LoadTedMap( const char *extension, int mapnum );
-void SetupGameLevel(void);
-void ScanInfoPlane(void);
+void PreCacheGroup( int, int, int ); // added type
+void AssignTeams( void );
+void LoadTedMap( const char * extension, int mapnum );
+void SetupGameLevel( void );
+void ScanInfoPlane( void );
 void PreCacheLump( int lump, int level, int type ); // added type
-void SetupGameLevelAgain (void);
-void ScanInfoPlaneAgain (void);
+void SetupGameLevelAgain( void );
+void ScanInfoPlaneAgain( void );
 void PreCacheActor( int actor, int which );
 void PreCache( void );
 
@@ -156,29 +146,29 @@ void SetupPlayers( void );
 void SetupMaskedWalls( void );
 void SetupPushWalls( void );
 void SetupPushWallLinks( void );
-void SetupDoors (void);
-void SetupDoorLinks (void);
-void SetupClocks (void);
-void SetupLinkedActors (void);
-void SetupLights(void);
-void SetupWindows ( void );
+void SetupDoors( void );
+void SetupDoorLinks( void );
+void SetupClocks( void );
+void SetupLinkedActors( void );
+void SetupLights( void );
+void SetupWindows( void );
 
 int GetWallIndex( int texture );
-void PrintMapStats (void);
-void PrintTileStats (void);
+void PrintMapStats( void );
+void PrintTileStats( void );
 
-void GetMapInfo (mapfileinfo_t * mapinfo);
-void GetMapFileName ( char * filename );
-void SetBattleMapFileName ( char * filename );
-word GetMapCRC ( int num );
+void GetMapInfo( mapfileinfo_t * mapinfo );
+void GetMapFileName( char * filename );
+void SetBattleMapFileName( char * filename );
+word GetMapCRC( int num );
 
-int GetNextMap ( int tilex, int tiley );
+int GetNextMap( int tilex, int tiley );
 void Illuminate();
 
-int GetSongForLevel ( void );
-void CheckHolidays(void);
-boolean IsChristmas(void);
+int GetSongForLevel( void );
+void CheckHolidays( void );
+boolean IsChristmas( void );
 
-boolean DoPanicMapping (void);
+boolean DoPanicMapping( void );
 
 #endif

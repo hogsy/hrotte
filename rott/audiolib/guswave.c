@@ -48,34 +48,34 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ATR_INDEX               0x3c0
 #define STATUS_REGISTER_1       0x3da
 
-#define SetBorderColor(color) \
+#define SetBorderColor( color ) \
    { \
    inp  (STATUS_REGISTER_1); \
    outp (ATR_INDEX,0x31);    \
    outp (ATR_INDEX,color);   \
    }
 
-static const int GUSWAVE_PanTable[ 32 ] =
-   {
-      8,  9, 10, 11, 11, 12, 13, 14,
-     15, 14, 13, 12, 11, 10,  9,  8,
-      7,  6,  5,  4,  4,  3,  2,  1,
-      0,  1,  2,  3,  4,  5,  6,  7
-   };
+static const int GUSWAVE_PanTable[32] =
+	{
+		8, 9, 10, 11, 11, 12, 13, 14,
+		15, 14, 13, 12, 11, 10, 9, 8,
+		7, 6, 5, 4, 4, 3, 2, 1,
+		0, 1, 2, 3, 4, 5, 6, 7
+	};
 
 static voicelist VoiceList;
 static voicelist VoicePool;
 
-static voicestatus VoiceStatus[ MAX_VOICES ];
+static voicestatus VoiceStatus[MAX_VOICES];
 //static
-VoiceNode GUSWAVE_Voices[ VOICES ];
+VoiceNode GUSWAVE_Voices[VOICES];
 
-static int GUSWAVE_VoiceHandle  = GUSWAVE_MinVoiceHandle;
+static int GUSWAVE_VoiceHandle = GUSWAVE_MinVoiceHandle;
 static int GUSWAVE_MaxVoices = VOICES;
 //static
 int GUSWAVE_Installed = FALSE;
 
-static void ( *GUSWAVE_CallBackFunc )( unsigned long ) = NULL;
+static void ( * GUSWAVE_CallBackFunc )( unsigned long ) = NULL;
 
 // current volume for dig audio - from 0 to 4095
 static int GUSWAVE_Volume = MAX_VOLUME;
@@ -91,7 +91,6 @@ int GUSWAVE_ErrorCode = GUSWAVE_Ok;
 #define GUSWAVE_SetErrorCode( status ) \
    GUSWAVE_ErrorCode   = ( status );
 
-
 /*---------------------------------------------------------------------
    Function: GUSWAVE_ErrorString
 
@@ -99,66 +98,52 @@ int GUSWAVE_ErrorCode = GUSWAVE_Ok;
    number.  A -1 returns a pointer the current error.
 ---------------------------------------------------------------------*/
 
-char *GUSWAVE_ErrorString
-   (
-   int ErrorNumber
-   )
+char * GUSWAVE_ErrorString
+	(
+		int ErrorNumber
+	) {
+	char * ErrorString;
 
-   {
-   char *ErrorString;
+	switch ( ErrorNumber ) {
+	case GUSWAVE_Warning :
+	case GUSWAVE_Error :ErrorString = GUSWAVE_ErrorString( GUSWAVE_ErrorCode );
+		break;
 
-   switch( ErrorNumber )
-      {
-      case GUSWAVE_Warning :
-      case GUSWAVE_Error :
-         ErrorString = GUSWAVE_ErrorString( GUSWAVE_ErrorCode );
-         break;
+	case GUSWAVE_Ok :ErrorString = "GUSWAVE ok.";
+		break;
 
-      case GUSWAVE_Ok :
-         ErrorString = "GUSWAVE ok.";
-         break;
+	case GUSWAVE_GUSError :ErrorString = GUS_ErrorString( GUS_Error );
+		break;
 
-      case GUSWAVE_GUSError :
-         ErrorString = GUS_ErrorString( GUS_Error );
-         break;
+	case GUSWAVE_NotInstalled :ErrorString = "GUSWAVE not installed.";
+		break;
 
-      case GUSWAVE_NotInstalled :
-         ErrorString = "GUSWAVE not installed.";
-         break;
+	case GUSWAVE_NoVoices :ErrorString = "No free voices available to GUSWAVE.";
+		break;
 
-      case GUSWAVE_NoVoices :
-         ErrorString = "No free voices available to GUSWAVE.";
-         break;
+	case GUSWAVE_UltraNoMem :ErrorString = "Not enough Ultrasound memory available for GUSWAVE.";
+		break;
 
-      case GUSWAVE_UltraNoMem :
-         ErrorString = "Not enough Ultrasound memory available for GUSWAVE.";
-         break;
+	case GUSWAVE_UltraNoMemMIDI :
+		ErrorString = "Not enough Ultrasound memory available for GUSWAVE.  "
+					  "Try initializing Sound FX before Music.";
+		break;
 
-      case GUSWAVE_UltraNoMemMIDI :
-         ErrorString = "Not enough Ultrasound memory available for GUSWAVE.  "
-            "Try initializing Sound FX before Music.";
-         break;
+	case GUSWAVE_VoiceNotFound :ErrorString = "No voice with matching handle found.";
+		break;
 
-      case GUSWAVE_VoiceNotFound :
-         ErrorString = "No voice with matching handle found.";
-         break;
+	case GUSWAVE_InvalidVOCFile :ErrorString = "Invalid VOC file passed in to GUSWAVE.";
+		break;
 
-      case GUSWAVE_InvalidVOCFile :
-         ErrorString = "Invalid VOC file passed in to GUSWAVE.";
-         break;
+	case GUSWAVE_InvalidWAVFile :ErrorString = "Invalid WAV file passed in to GUSWAVE.";
+		break;
 
-      case GUSWAVE_InvalidWAVFile :
-         ErrorString = "Invalid WAV file passed in to GUSWAVE.";
-         break;
+	default :ErrorString = "Unknown GUSWAVE error code.";
+		break;
+	}
 
-      default :
-         ErrorString = "Unknown GUSWAVE error code.";
-         break;
-      }
-
-   return( ErrorString );
-   }
-
+	return (ErrorString);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_CallBack
@@ -166,146 +151,140 @@ char *GUSWAVE_ErrorString
    GF1 callback service routine.
 ---------------------------------------------------------------------*/
 
-char GUS_Silence8[ 1024 ] = //256 ] =
-   {
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+char GUS_Silence8[1024] = //256 ] =
+	{
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
 
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-   0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+		0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
 
-
-   };
+	};
 
 //unsigned short GUS_Silence16[ 128 ] =
-unsigned short GUS_Silence16[ 512 ] =
-   {
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+unsigned short GUS_Silence16[512] =
+	{
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
 
+static int LOADDS
+GUSWAVE_CallBack
+	(
+		int reason,
+		int voice,
+		unsigned char ** buf,
+		unsigned long * size
+	) {
+	VoiceNode * Voice;
+	playbackstatus status;
 
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-   };
+	// this function is called from an interrupt
+	// remember not to make any DOS or BIOS calls from here
+	// also don't call any C library functions unless you are sure that
+	// they are reentrant
+	// restore our DS register
 
-static int LOADDS GUSWAVE_CallBack
-   (
-   int reason,
-   int voice,
-   unsigned char **buf,
-   unsigned long *size
-   )
+	if ( VoiceStatus[voice].playing == FALSE) {
+		return (DIG_DONE);
+	}
 
-   {
-   VoiceNode *Voice;
-   playbackstatus status;
-
-   // this function is called from an interrupt
-   // remember not to make any DOS or BIOS calls from here
-   // also don't call any C library functions unless you are sure that
-   // they are reentrant
-   // restore our DS register
-
-   if ( VoiceStatus[ voice ].playing == FALSE )
-      {
-      return( DIG_DONE );
-      }
-
-   if ( reason == DIG_MORE_DATA )
-      {
+	if ( reason == DIG_MORE_DATA ) {
 //      SetBorderColor(16);
-      Voice = VoiceStatus[ voice ].Voice;
+		Voice = VoiceStatus[voice].Voice;
 
-      if ( ( Voice != NULL ) && ( Voice->Playing ) )
+		if ((Voice != NULL) && (Voice->Playing))
 /*
          {
          *buf = ( unsigned char * )GUS_Silence16;
@@ -315,43 +294,34 @@ static int LOADDS GUSWAVE_CallBack
          return( DIG_MORE_DATA );
          }
  */
-         {
-         status = Voice->GetSound( Voice );
-         if ( status != SoundDone )
-            {
-            if ( ( Voice->sound == NULL ) || ( status == NoMoreData ) )
-               {
-               if ( Voice->bits == 8 )
-                  {
-                  *buf = GUS_Silence8;
-                  }
-               else
-                  {
-                  *buf = ( unsigned char * )GUS_Silence16;
-                  }
-               *size = 256;
-               }
-            else
-               {
-               *buf  = Voice->sound;
-               *size = Voice->length;
-               }
-            return( DIG_MORE_DATA );
-            }
-         }
+		{
+			status = Voice->GetSound( Voice );
+			if ( status != SoundDone ) {
+				if ((Voice->sound == NULL) || (status == NoMoreData)) {
+					if ( Voice->bits == 8 ) {
+						*buf = GUS_Silence8;
+					} else {
+						*buf = ( unsigned char * ) GUS_Silence16;
+					}
+					*size = 256;
+				} else {
+					*buf = Voice->sound;
+					*size = Voice->length;
+				}
+				return (DIG_MORE_DATA);
+			}
+		}
 //      SetBorderColor(16);
-      return( DIG_DONE );
-      }
+		return (DIG_DONE);
+	}
 
-   if ( reason == DIG_DONE )
-      {
-      Voice = VoiceStatus[ voice ].Voice;
-      VoiceStatus[ voice ].playing = FALSE;
+	if ( reason == DIG_DONE ) {
+		Voice = VoiceStatus[voice].Voice;
+		VoiceStatus[voice].playing = FALSE;
 
-      if ( Voice != NULL )
-         {
-         Voice->Active   = FALSE;
-         Voice->Playing  = FALSE;
+		if ( Voice != NULL) {
+			Voice->Active = FALSE;
+			Voice->Playing = FALSE;
 
 // I'm commenting this out because a -1 could cause a crash if it
 // is sent to the GF1 code.  This shouldn't be necessary since
@@ -360,19 +330,17 @@ static int LOADDS GUSWAVE_CallBack
 // more pleasant than a crash!
 //         Voice->GF1voice = -1;
 
-         LL_Remove( VoiceNode, &VoiceList, Voice );
-         LL_AddToTail( VoiceNode, &VoicePool, Voice );
-         }
+			LL_Remove( VoiceNode, &VoiceList, Voice );
+			LL_AddToTail( VoiceNode, &VoicePool, Voice );
+		}
 
-      if ( GUSWAVE_CallBackFunc )
-         {
-         GUSWAVE_CallBackFunc( Voice->callbackval );
-         }
-      }
+		if ( GUSWAVE_CallBackFunc ) {
+			GUSWAVE_CallBackFunc( Voice->callbackval );
+		}
+	}
 
-   return( DIG_DONE );
-   }
-
+	return (DIG_DONE);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_DebugCallBack
@@ -380,91 +348,77 @@ static int LOADDS GUSWAVE_CallBack
    GF1 callback service routine with debugging info.
 ---------------------------------------------------------------------*/
 
-static int LOADDS GUSWAVE_DebugCallBack
-   (
-   int reason,
-   int voice,
-   unsigned char **buf,
-   unsigned long *size
-   )
+static int LOADDS
+GUSWAVE_DebugCallBack
+	(
+		int reason,
+		int voice,
+		unsigned char ** buf,
+		unsigned long * size
+	) {
+	VoiceNode * Voice;
 
-   {
-   VoiceNode *Voice;
+	// this function is called from an interrupt
+	// remember not to make any DOS or BIOS calls from here
+	// also don't call any C library functions unless you are sure that
+	// they are reentrant
+	// restore our DS register
 
-   // this function is called from an interrupt
-   // remember not to make any DOS or BIOS calls from here
-   // also don't call any C library functions unless you are sure that
-   // they are reentrant
-   // restore our DS register
-
-   if ( VoiceStatus[ voice ].playing == FALSE )
-      {
+	if ( VoiceStatus[voice].playing == FALSE) {
 //      DB_printf( "GUS Voice %d not playing.\n", voice );
-      DB_printf( "GUS Voice " );
-      DB_PrintNum( voice );
-      DB_printf( " not playing.\n" );
-      return( DIG_DONE );
-         }
+		DB_printf( "GUS Voice " );
+		DB_PrintNum( voice );
+		DB_printf( " not playing.\n" );
+		return (DIG_DONE);
+	}
 
-      if ( reason == DIG_MORE_DATA )
-         {
-         Voice = VoiceStatus[ voice ].Voice;
+	if ( reason == DIG_MORE_DATA ) {
+		Voice = VoiceStatus[voice].Voice;
 
 //         DB_printf( "Voice %d : More data -- ", Voice );
-         DB_printf( "Voice " );
-         DB_PrintNum( voice );
-         DB_printf( " : More data -- " );
-         if ( Voice != NULL )
-            {
-            if ( Voice->Playing )
-               {
-               GUSWAVE_GetNextVOCBlock( Voice );
-               if ( Voice->Playing )
-                  {
+		DB_printf( "Voice " );
+		DB_PrintNum( voice );
+		DB_printf( " : More data -- " );
+		if ( Voice != NULL) {
+			if ( Voice->Playing ) {
+				GUSWAVE_GetNextVOCBlock( Voice );
+				if ( Voice->Playing ) {
 //                  DB_printf( "More data -- size = %u blocklength = %u\n",
 //                     Voice->length, Voice->BlockLength );
-                  DB_printf( "More data -- size = " );
-                  DB_PrintNum( Voice->length );
-                  DB_printf( " blocklength = " );
-                  DB_PrintNum( Voice->BlockLength );
-                  DB_printf( "\n" );
-                  *buf  = Voice->sound;
-                  *size = Voice->length;
-                  return( DIG_MORE_DATA );
-                  }
-               else
-                  {
-                  DB_printf( "Voice done.\n" );
-                  }
-               }
-            else
-               {
-               DB_printf( "Voice not active.\n" );
-               }
-            }
-         else
-            {
-            DB_printf( " NULL Voice\n" );
-            }
+					DB_printf( "More data -- size = " );
+					DB_PrintNum( Voice->length );
+					DB_printf( " blocklength = " );
+					DB_PrintNum( Voice->BlockLength );
+					DB_printf( "\n" );
+					*buf = Voice->sound;
+					*size = Voice->length;
+					return (DIG_MORE_DATA);
+				} else {
+					DB_printf( "Voice done.\n" );
+				}
+			} else {
+				DB_printf( "Voice not active.\n" );
+			}
+		} else {
+			DB_printf( " NULL Voice\n" );
+		}
 
-         return( DIG_DONE );
-         }
+		return (DIG_DONE);
+	}
 
-      if ( reason == DIG_DONE )
-         {
-         VoiceStatus[ voice ].playing = FALSE;
-         Voice = VoiceStatus[ voice ].Voice;
+	if ( reason == DIG_DONE ) {
+		VoiceStatus[voice].playing = FALSE;
+		Voice = VoiceStatus[voice].Voice;
 //         DB_printf( "Voice %d : Done -- ", Voice );
-         DB_printf( "Voice " );
-         DB_PrintNum( voice );
-         DB_printf( " : Done -- " );
+		DB_printf( "Voice " );
+		DB_PrintNum( voice );
+		DB_printf( " : Done -- " );
 
-         if ( Voice != NULL )
-            {
-            DB_printf( "Ok\n" );
+		if ( Voice != NULL) {
+			DB_printf( "Ok\n" );
 
-            Voice->Active   = FALSE;
-            Voice->Playing  = FALSE;
+			Voice->Active = FALSE;
+			Voice->Playing = FALSE;
 
 // I'm commenting this out because a -1 could cause a crash if it
 // is sent to the GF1 code.  This shouldn't be necessary since
@@ -473,23 +427,19 @@ static int LOADDS GUSWAVE_DebugCallBack
 // more pleasant than a crash!
 //         Voice->GF1voice = -1;
 
-         LL_Remove( VoiceNode, &VoiceList, Voice );
-         LL_AddToTail( VoiceNode, &VoicePool, Voice );
-         }
-      else
-         {
-         DB_printf( "Null voice\n" );
-         }
+			LL_Remove( VoiceNode, &VoiceList, Voice );
+			LL_AddToTail( VoiceNode, &VoicePool, Voice );
+		} else {
+			DB_printf( "Null voice\n" );
+		}
 
-      if ( GUSWAVE_CallBackFunc )
-         {
-         GUSWAVE_CallBackFunc( Voice->callbackval );
-         }
-      }
+		if ( GUSWAVE_CallBackFunc ) {
+			GUSWAVE_CallBackFunc( Voice->callbackval );
+		}
+	}
 
-   return( DIG_DONE );
-   }
-
+	return (DIG_DONE);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_GetVoice
@@ -497,39 +447,33 @@ static int LOADDS GUSWAVE_DebugCallBack
    Locates the voice with the specified handle.
 ---------------------------------------------------------------------*/
 
-static VoiceNode *GUSWAVE_GetVoice
-   (
-   int handle
-   )
+static VoiceNode * GUSWAVE_GetVoice
+	(
+		int handle
+	) {
+	VoiceNode * voice;
+	unsigned flags;
 
-   {
-   VoiceNode *voice;
-   unsigned  flags;
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	voice = VoiceList.start;
 
-   voice = VoiceList.start;
+	while ( voice != NULL) {
+		if ( handle == voice->handle ) {
+			break;
+		}
 
-   while( voice != NULL )
-      {
-      if ( handle == voice->handle )
-         {
-         break;
-         }
+		voice = voice->next;
+	}
 
-      voice = voice->next;
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
+	if ( voice == NULL) {
+		GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
+	}
 
-   if ( voice == NULL )
-      {
-      GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
-      }
-
-   return( voice );
-   }
-
+	return (voice);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_VoicePlaying
@@ -539,22 +483,18 @@ static VoiceNode *GUSWAVE_GetVoice
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_VoicePlaying
-   (
-   int handle
-   )
+	(
+		int handle
+	) {
+	VoiceNode * voice;
 
-   {
-   VoiceNode   *voice;
+	voice = GUSWAVE_GetVoice( handle );
+	if ( voice != NULL) {
+		return (voice->Active);
+	}
 
-   voice = GUSWAVE_GetVoice( handle );
-   if ( voice != NULL )
-      {
-      return( voice->Active );
-      }
-
-   return( FALSE );
-   }
-
+	return (FALSE);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_VoicesPlaying
@@ -563,35 +503,29 @@ int GUSWAVE_VoicePlaying
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_VoicesPlaying
-   (
-   void
-   )
+	(
+		void
+	) {
+	int index;
+	int NumVoices = 0;
+	unsigned flags;
 
-   {
-   int         index;
-   int         NumVoices = 0;
-   unsigned    flags;
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	for ( index = 0; index < GUSWAVE_MaxVoices; index++ ) {
+		if ( GUSWAVE_Voices[index].Active ) {
+			NumVoices++;
+		}
+	}
 
-   for( index = 0; index < GUSWAVE_MaxVoices; index++ )
-      {
-      if ( GUSWAVE_Voices[ index ].Active )
-         {
-         NumVoices++;
-         }
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
+	if ( GUS_Debug ) {
+		DB_printf( "Number of voices = %d.\n", NumVoices );
+	}
 
-   if ( GUS_Debug )
-      {
-      DB_printf( "Number of voices = %d.\n", NumVoices );
-      }
-
-   return( NumVoices );
-   }
-
+	return (NumVoices);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_Kill
@@ -600,59 +534,47 @@ int GUSWAVE_VoicesPlaying
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_Kill
-   (
-   int handle
-   )
+	(
+		int handle
+	) {
+	VoiceNode * voice;
+	unsigned flags;
 
-   {
-   VoiceNode *voice;
-   unsigned  flags;
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	voice = GUSWAVE_GetVoice( handle );
 
-   voice = GUSWAVE_GetVoice( handle );
+	if ( voice == NULL) {
+		RestoreInterrupts( flags );
+		GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
 
-   if ( voice == NULL )
-      {
-      RestoreInterrupts( flags );
-      GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
+		if ( GUS_Debug ) {
+			DB_printf( "Could not find voice to kill.\n" );
+		}
 
-      if ( GUS_Debug )
-         {
-         DB_printf( "Could not find voice to kill.\n" );
-         }
+		return (GUSWAVE_Warning);
+	}
 
-      return( GUSWAVE_Warning );
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
-
-   if ( !GUS_Debug )
-      {
-      if ( voice->Active )
-         {
-         gf1_stop_digital( voice->GF1voice );
-         }
-      }
-   else
-      {
-      DB_printf( "Kill - GUS Voice %d ", voice->GF1voice );
-      if ( voice->Active )
-         {
-         DB_printf( "active\n" );
-         gf1_stop_digital( voice->GF1voice );
-         }
-      else
-         {
-         DB_printf( "inactive\n" );
-         }
-      }
+	if ( !GUS_Debug ) {
+		if ( voice->Active ) {
+			gf1_stop_digital( voice->GF1voice );
+		}
+	} else {
+		DB_printf( "Kill - GUS Voice %d ", voice->GF1voice );
+		if ( voice->Active ) {
+			DB_printf( "active\n" );
+			gf1_stop_digital( voice->GF1voice );
+		} else {
+			DB_printf( "inactive\n" );
+		}
+	}
 
 //   RestoreInterrupts( flags );
 
-   return( GUSWAVE_Ok );
-   }
-
+	return (GUSWAVE_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_KillAllVoices
@@ -661,62 +583,52 @@ int GUSWAVE_Kill
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_KillAllVoices
-   (
-   void
-   )
+	(
+		void
+	) {
+	int i;
+	unsigned flags;
 
-   {
-   int i;
-   unsigned  flags;
+	if ( !GUSWAVE_Installed ) {
+		return (GUSWAVE_Ok);
+	}
 
-   if ( !GUSWAVE_Installed )
-      {
-      return( GUSWAVE_Ok );
-      }
+	if ( GUS_Debug ) {
+		DB_printf( "Kill All Voices\n" );
+	}
 
-   if ( GUS_Debug )
-      {
-      DB_printf( "Kill All Voices\n" );
-      }
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
-
-   // Remove all the voices from the list
-   for( i = 0; i < GUSWAVE_MaxVoices; i++ )
-      {
-      if ( GUSWAVE_Voices[ i ].Active )
-         {
+	// Remove all the voices from the list
+	for ( i = 0; i < GUSWAVE_MaxVoices; i++ ) {
+		if ( GUSWAVE_Voices[i].Active ) {
 //         GUSWAVE_Kill( GUSWAVE_Voices[ i ].handle );
 
-         gf1_stop_digital( GUSWAVE_Voices[ i ].GF1voice );
-         }
-      }
+			gf1_stop_digital( GUSWAVE_Voices[i].GF1voice );
+		}
+	}
 
-   for( i = 0; i < MAX_VOICES; i++ )
-      {
-      VoiceStatus[ i ].playing = FALSE;
-      VoiceStatus[ i ].Voice   = NULL;
-      }
+	for ( i = 0; i < MAX_VOICES; i++ ) {
+		VoiceStatus[i].playing = FALSE;
+		VoiceStatus[i].Voice = NULL;
+	}
 
-   VoicePool.start = NULL;
-   VoicePool.end   = NULL;
-   VoiceList.start = NULL;
-   VoiceList.end   = NULL;
+	VoicePool.start = NULL;
+	VoicePool.end = NULL;
+	VoiceList.start = NULL;
+	VoiceList.end = NULL;
 
-   for( i = 0; i < GUSWAVE_MaxVoices; i++ )
-      {
-      GUSWAVE_Voices[ i ].Active = FALSE;
-      if ( GUSWAVE_Voices[ i ].mem != NULL )
-         {
-         LL_AddToTail( VoiceNode, &VoicePool, &GUSWAVE_Voices[ i ] );
-         }
-      }
+	for ( i = 0; i < GUSWAVE_MaxVoices; i++ ) {
+		GUSWAVE_Voices[i].Active = FALSE;
+		if ( GUSWAVE_Voices[i].mem != NULL) {
+			LL_AddToTail( VoiceNode, &VoicePool, &GUSWAVE_Voices[i] );
+		}
+	}
 
-   RestoreInterrupts( flags );
+	RestoreInterrupts( flags );
 
-   return( GUSWAVE_Ok );
-   }
-
+	return (GUSWAVE_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_SetPitch
@@ -725,39 +637,34 @@ int GUSWAVE_KillAllVoices
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_SetPitch
-   (
-   int handle,
-   int pitchoffset
-   )
+	(
+		int handle,
+		int pitchoffset
+	) {
+	VoiceNode * voice;
+	unsigned flags;
 
-   {
-   VoiceNode *voice;
-   unsigned  flags;
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	voice = GUSWAVE_GetVoice( handle );
 
-   voice = GUSWAVE_GetVoice( handle );
+	if ( voice == NULL) {
+		RestoreInterrupts( flags );
 
-   if ( voice == NULL )
-      {
-      RestoreInterrupts( flags );
+		GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
+		return (GUSWAVE_Warning);
+	}
 
-      GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
-      return( GUSWAVE_Warning );
-      }
+	if ( voice->Active ) {
+		voice->PitchScale = PITCH_GetScale( pitchoffset );
+		voice->RateScale = (voice->SamplingRate * voice->PitchScale) >> 16;
+		gf1_dig_set_freq( voice->GF1voice, voice->RateScale );
+	}
 
-   if ( voice->Active )
-      {
-      voice->PitchScale  = PITCH_GetScale( pitchoffset );
-      voice->RateScale   = ( voice->SamplingRate * voice->PitchScale ) >> 16;
-      gf1_dig_set_freq( voice->GF1voice, voice->RateScale );
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
-
-   return( GUSWAVE_Ok );
-   }
-
+	return (GUSWAVE_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_SetPan3D
@@ -766,54 +673,48 @@ int GUSWAVE_SetPitch
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_SetPan3D
-   (
-   int handle,
-   int angle,
-   int distance
-   )
+	(
+		int handle,
+		int angle,
+		int distance
+	) {
+	VoiceNode * voice;
+	int pan;
+	unsigned flags;
 
-   {
-   VoiceNode *voice;
-   int        pan;
-   unsigned  flags;
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	voice = GUSWAVE_GetVoice( handle );
 
-   voice = GUSWAVE_GetVoice( handle );
+	if ( voice == NULL) {
+		RestoreInterrupts( flags );
 
-   if ( voice == NULL )
-      {
-      RestoreInterrupts( flags );
+		GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
+		return (GUSWAVE_Warning);
+	}
 
-      GUSWAVE_SetErrorCode( GUSWAVE_VoiceNotFound );
-      return( GUSWAVE_Warning );
-      }
+	if ( voice->Active ) {
+		angle &= 31;
 
-   if ( voice->Active )
-      {
-      angle &= 31;
+		pan = GUSWAVE_PanTable[angle];
+		if ( GUSWAVE_SwapLeftRight ) {
+			pan = 15 - pan;
+		}
 
-      pan = GUSWAVE_PanTable[ angle ];
-      if ( GUSWAVE_SwapLeftRight )
-         {
-         pan = 15 - pan;
-         }
+		distance = max( 0, distance );
+		distance = min( 255, distance );
 
-      distance = max( 0, distance );
-      distance = min( 255, distance );
+		voice->Volume = 255 - distance;
+		voice->Pan = pan;
 
-      voice->Volume = 255 - distance;
-      voice->Pan    = pan;
+		gf1_dig_set_pan( voice->GF1voice, pan );
+		gf1_dig_set_vol( voice->GF1voice, GUSWAVE_Volume - distance * 4 );
+	}
 
-      gf1_dig_set_pan( voice->GF1voice, pan );
-      gf1_dig_set_vol( voice->GF1voice, GUSWAVE_Volume - distance * 4 );
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
-
-   return( GUSWAVE_Ok );
-   }
-
+	return (GUSWAVE_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_SetVolume
@@ -822,27 +723,22 @@ int GUSWAVE_SetPan3D
 ---------------------------------------------------------------------*/
 
 void GUSWAVE_SetVolume
-   (
-   int volume
-   )
+	(
+		int volume
+	) {
+	int i;
 
-   {
-   int i;
+	volume = max( 0, volume );
+	volume = min( 255, volume );
+	GUSWAVE_Volume = MAX_VOLUME - (255 - volume) * 4;
 
-   volume = max( 0, volume );
-   volume = min( 255, volume );
-   GUSWAVE_Volume = MAX_VOLUME - ( 255 - volume ) * 4;
-
-   for( i = 0; i < GUSWAVE_MaxVoices; i++ )
-      {
-      if ( GUSWAVE_Voices[ i ].Active )
-         {
-         gf1_dig_set_vol( GUSWAVE_Voices[ i ].GF1voice,
-            GUSWAVE_Volume - ( 255 - GUSWAVE_Voices[ i ].Volume ) * 4 );
-         }
-      }
-   }
-
+	for ( i = 0; i < GUSWAVE_MaxVoices; i++ ) {
+		if ( GUSWAVE_Voices[i].Active ) {
+			gf1_dig_set_vol( GUSWAVE_Voices[i].GF1voice,
+							 GUSWAVE_Volume - (255 - GUSWAVE_Voices[i].Volume) * 4 );
+		}
+	}
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_GetVolume
@@ -851,14 +747,11 @@ void GUSWAVE_SetVolume
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_GetVolume
-   (
-   void
-   )
-
-   {
-   return( 255 - ( ( MAX_VOLUME - GUSWAVE_Volume ) / 4 ) );
-   }
-
+	(
+		void
+	) {
+	return (255 - ((MAX_VOLUME - GUSWAVE_Volume) / 4));
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_AllocVoice
@@ -866,71 +759,59 @@ int GUSWAVE_GetVolume
    Retrieve an inactive or lower priority voice for output.
 ---------------------------------------------------------------------*/
 
-static VoiceNode *GUSWAVE_AllocVoice
-   (
-   int priority
-   )
+static VoiceNode * GUSWAVE_AllocVoice
+	(
+		int priority
+	) {
+	VoiceNode * voice;
+	VoiceNode * node;
+	unsigned flags;
 
-   {
-   VoiceNode   *voice;
-   VoiceNode   *node;
-   unsigned    flags;
+	// If we don't have any free voices, check if we have a higher
+	// priority than one that is playing.
+	if ( GUSWAVE_VoicesPlaying() >= GUSWAVE_MaxVoices ) {
+		flags = DisableInterrupts();
 
-   // If we don't have any free voices, check if we have a higher
-   // priority than one that is playing.
-   if ( GUSWAVE_VoicesPlaying() >= GUSWAVE_MaxVoices )
-      {
-      flags = DisableInterrupts();
+		node = VoiceList.start;
+		voice = node;
+		while ( node != NULL) {
+			if ( node->priority < voice->priority ) {
+				voice = node;
+			}
 
-      node = VoiceList.start;
-      voice = node;
-      while( node != NULL )
-         {
-         if ( node->priority < voice->priority )
-            {
-            voice = node;
-            }
+			node = node->next;
+		}
 
-         node = node->next;
-         }
+		RestoreInterrupts( flags );
 
-      RestoreInterrupts( flags );
+		if ( priority >= voice->priority ) {
+			GUSWAVE_Kill( voice->handle );
+		}
+	}
 
-      if ( priority >= voice->priority )
-         {
-         GUSWAVE_Kill( voice->handle );
-         }
-      }
+	// Check if any voices are in the voice pool
+	flags = DisableInterrupts();
 
-   // Check if any voices are in the voice pool
-   flags = DisableInterrupts();
+	voice = VoicePool.start;
+	if ( voice != NULL) {
+		LL_Remove( VoiceNode, &VoicePool, voice );
+	}
 
-   voice = VoicePool.start;
-   if ( voice != NULL )
-      {
-      LL_Remove( VoiceNode, &VoicePool, voice );
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
+	if ( voice != NULL) {
+		do {
+			GUSWAVE_VoiceHandle++;
+			if ( GUSWAVE_VoiceHandle < GUSWAVE_MinVoiceHandle ) {
+				GUSWAVE_VoiceHandle = GUSWAVE_MinVoiceHandle;
+			}
+		} while ( GUSWAVE_VoicePlaying( GUSWAVE_VoiceHandle ));
 
-   if ( voice != NULL )
-      {
-      do
-         {
-         GUSWAVE_VoiceHandle++;
-         if ( GUSWAVE_VoiceHandle < GUSWAVE_MinVoiceHandle )
-            {
-            GUSWAVE_VoiceHandle = GUSWAVE_MinVoiceHandle;
-            }
-         }
-      while( GUSWAVE_VoicePlaying( GUSWAVE_VoiceHandle ) );
+		voice->handle = GUSWAVE_VoiceHandle;
+	}
 
-      voice->handle = GUSWAVE_VoiceHandle;
-      }
-
-   return( voice );
-   }
-
+	return (voice);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_VoiceAvailable
@@ -939,44 +820,37 @@ static VoiceNode *GUSWAVE_AllocVoice
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_VoiceAvailable
-   (
-   int priority
-   )
+	(
+		int priority
+	) {
+	VoiceNode * voice;
+	VoiceNode * node;
+	unsigned flags;
 
-   {
-   VoiceNode   *voice;
-   VoiceNode   *node;
-   unsigned    flags;
+	if ( GUSWAVE_VoicesPlaying() < GUSWAVE_MaxVoices ) {
+		return (TRUE);
+	}
 
-   if ( GUSWAVE_VoicesPlaying() < GUSWAVE_MaxVoices )
-      {
-      return( TRUE );
-      }
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	node = VoiceList.start;
+	voice = node;
+	while ( node != NULL) {
+		if ( node->priority < voice->priority ) {
+			voice = node;
+		}
 
-   node = VoiceList.start;
-   voice = node;
-   while( node != NULL )
-      {
-      if ( node->priority < voice->priority )
-         {
-         voice = node;
-         }
+		node = node->next;
+	}
 
-      node = node->next;
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
+	if ( priority >= voice->priority ) {
+		return (TRUE);
+	}
 
-   if ( priority >= voice->priority )
-      {
-      return( TRUE );
-      }
-
-   return( FALSE );
-   }
-
+	return (FALSE);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_GetNextVOCBlock
@@ -985,209 +859,186 @@ int GUSWAVE_VoiceAvailable
 ---------------------------------------------------------------------*/
 
 playbackstatus GUSWAVE_GetNextVOCBlock
-   (
-   VoiceNode *voice
-   )
+	(
+		VoiceNode * voice
+	) {
+	unsigned char * ptr;
+	int blocktype;
+	int lastblocktype;
+	unsigned long blocklength;
+	unsigned long samplespeed;
+	unsigned int tc;
+	int packtype;
+	int voicemode;
+	int done;
+	unsigned BitsPerSample;
+	unsigned Channels;
+	unsigned Format;
 
-   {
-   unsigned char *ptr;
-   int            blocktype;
-   int            lastblocktype;
-   unsigned long  blocklength;
-   unsigned long  samplespeed;
-   unsigned int   tc;
-   int            packtype;
-   int            voicemode;
-   int            done;
-   unsigned       BitsPerSample;
-   unsigned       Channels;
-   unsigned       Format;
+	if ( voice->BlockLength > 0 ) {
+		voice->sound += MAX_BLOCK_LENGTH;
+		voice->length = min( voice->BlockLength, MAX_BLOCK_LENGTH );
+		voice->BlockLength -= voice->length;
+		return (KeepPlaying);
+	}
 
-   if ( voice->BlockLength > 0 )
-      {
-      voice->sound       += MAX_BLOCK_LENGTH;
-      voice->length       = min( voice->BlockLength, MAX_BLOCK_LENGTH );
-      voice->BlockLength -= voice->length;
-      return( KeepPlaying );
-      }
+	ptr = ( unsigned char * ) voice->NextBlock;
 
-   ptr = ( unsigned char * )voice->NextBlock;
+	voice->Playing = TRUE;
 
-   voice->Playing = TRUE;
+	voicemode = 0;
+	lastblocktype = 0;
+	packtype = 0;
 
-   voicemode = 0;
-   lastblocktype = 0;
-   packtype = 0;
+	done = FALSE;
+	while ( !done ) {
+		// Stop playing if we get a NULL pointer
+		if ( ptr == NULL) {
+			voice->Playing = FALSE;
+			done = TRUE;
+			break;
+		}
 
-   done = FALSE;
-   while( !done )
-      {
-      // Stop playing if we get a NULL pointer
-      if ( ptr == NULL )
-         {
-         voice->Playing = FALSE;
-         done = TRUE;
-         break;
-         }
+		blocktype = ( int ) *ptr;
+		blocklength = (*( unsigned long * ) (ptr + 1)) & 0x00ffffff;
+		ptr += 4;
 
-      blocktype = ( int )*ptr;
-      blocklength = ( *( unsigned long * )( ptr + 1 ) ) & 0x00ffffff;
-      ptr += 4;
+		switch ( blocktype ) {
+		case 0 :
+			// End of data
+			voice->Playing = FALSE;
+			done = TRUE;
+			break;
 
-      switch( blocktype )
-         {
-         case 0 :
-            // End of data
-            voice->Playing = FALSE;
-            done = TRUE;
-            break;
+		case 1 :
+			// Sound data block
+			voice->bits = 8;
+			if ( lastblocktype != 8 ) {
+				tc = ( unsigned int ) *ptr << 8;
+				packtype = *(ptr + 1);
+			}
 
-         case 1 :
-            // Sound data block
-            voice->bits = 8;
-            if ( lastblocktype != 8 )
-               {
-               tc = ( unsigned int )*ptr << 8;
-               packtype = *( ptr + 1 );
-               }
+			ptr += 2;
+			blocklength -= 2;
 
-            ptr += 2;
-            blocklength -= 2;
+			samplespeed = 256000000L / (65536 - tc);
 
-            samplespeed = 256000000L / ( 65536 - tc );
+			// Skip packed or stereo data
+			if ((packtype != 0) || (voicemode != 0)) {
+				ptr += blocklength;
+			} else {
+				done = TRUE;
+			}
+			voicemode = 0;
+			break;
 
-            // Skip packed or stereo data
-            if ( ( packtype != 0 ) || ( voicemode != 0 ) )
-               {
-               ptr += blocklength;
-               }
-            else
-               {
-               done = TRUE;
-               }
-            voicemode = 0;
-            break;
+		case 2 :
+			// Sound continuation block
+			samplespeed = voice->SamplingRate;
+			done = TRUE;
+			break;
 
-         case 2 :
-            // Sound continuation block
-            samplespeed = voice->SamplingRate;
-            done = TRUE;
-            break;
+		case 3 :
+			// Silence
+			// Not implimented.
+			ptr += blocklength;
+			break;
 
-         case 3 :
-            // Silence
-            // Not implimented.
-            ptr += blocklength;
-            break;
+		case 4 :
+			// Marker
+			// Not implimented.
+			ptr += blocklength;
+			break;
 
-         case 4 :
-            // Marker
-            // Not implimented.
-            ptr += blocklength;
-            break;
+		case 5 :
+			// ASCII string
+			// Not implimented.
+			ptr += blocklength;
+			break;
 
-         case 5 :
-            // ASCII string
-            // Not implimented.
-            ptr += blocklength;
-            break;
+		case 6 :
+			// Repeat begin
+			voice->LoopCount = *( unsigned short * ) ptr;
+			ptr += blocklength;
+			voice->LoopStart = ptr;
+			break;
 
-         case 6 :
-            // Repeat begin
-            voice->LoopCount = *( unsigned short * )ptr;
-            ptr += blocklength;
-            voice->LoopStart = ptr;
-            break;
+		case 7 :
+			// Repeat end
+			ptr += blocklength;
+			if ( lastblocktype == 6 ) {
+				voice->LoopCount = 0;
+			} else {
+				if ((voice->LoopCount > 0) && (voice->LoopStart != NULL)) {
+					ptr = voice->LoopStart;
+					if ( voice->LoopCount < 0xffff ) {
+						voice->LoopCount--;
+						if ( voice->LoopCount == 0 ) {
+							voice->LoopStart = NULL;
+						}
+					}
+				}
+			}
+			break;
 
-         case 7 :
-            // Repeat end
-            ptr += blocklength;
-            if ( lastblocktype == 6 )
-               {
-               voice->LoopCount = 0;
-               }
-            else
-               {
-               if ( ( voice->LoopCount > 0 ) && ( voice->LoopStart != NULL ) )
-                  {
-                  ptr = voice->LoopStart;
-                  if ( voice->LoopCount < 0xffff )
-                     {
-                     voice->LoopCount--;
-                     if ( voice->LoopCount == 0 )
-                        {
-                        voice->LoopStart = NULL;
-                        }
-                     }
-                  }
-               }
-            break;
+		case 8 :
+			// Extended block
+			voice->bits = 8;
+			tc = *( unsigned short * ) ptr;
+			packtype = *(ptr + 2);
+			voicemode = *(ptr + 3);
+			ptr += blocklength;
+			break;
 
-         case 8 :
-            // Extended block
-            voice->bits = 8;
-            tc = *( unsigned short * )ptr;
-            packtype = *( ptr + 2 );
-            voicemode = *( ptr + 3 );
-            ptr += blocklength;
-            break;
+		case 9 :
+			// New sound data block
+			samplespeed = *( unsigned long * ) ptr;
+			BitsPerSample = ( unsigned ) *(ptr + 4);
+			Channels = ( unsigned ) *(ptr + 5);
+			Format = ( unsigned ) *( unsigned short * ) (ptr + 6);
 
-         case 9 :
-            // New sound data block
-            samplespeed = *( unsigned long * )ptr;
-            BitsPerSample = ( unsigned )*( ptr + 4 );
-            Channels = ( unsigned )*( ptr + 5 );
-            Format = ( unsigned )*( unsigned short * )( ptr + 6 );
+			if ((BitsPerSample == 8) && (Channels == 1) &&
+				(Format == VOC_8BIT)) {
+				ptr += 12;
+				blocklength -= 12;
+				voice->bits = 8;
+				done = TRUE;
+			} else if ((BitsPerSample == 16) && (Channels == 1) &&
+				(Format == VOC_16BIT)) {
+				ptr += 12;
+				blocklength -= 12;
+				voice->bits = 16;
+				done = TRUE;
+			} else {
+				ptr += blocklength;
+			}
+			break;
 
-            if ( ( BitsPerSample == 8 ) && ( Channels == 1 ) &&
-               ( Format == VOC_8BIT ) )
-               {
-               ptr += 12;
-               blocklength -= 12;
-               voice->bits  = 8;
-               done = TRUE;
-               }
-            else if ( ( BitsPerSample == 16 ) && ( Channels == 1 ) &&
-               ( Format == VOC_16BIT ) )
-               {
-               ptr         += 12;
-               blocklength -= 12;
-               voice->bits  = 16;
-               done         = TRUE;
-               }
-            else
-               {
-               ptr += blocklength;
-               }
-            break;
+		default :
+			// Unknown data.  Probably not a VOC file.
+			voice->Playing = FALSE;
+			done = TRUE;
+			break;
+		}
 
-         default :
-            // Unknown data.  Probably not a VOC file.
-            voice->Playing = FALSE;
-            done = TRUE;
-            break;
-         }
+		lastblocktype = blocktype;
+	}
 
-      lastblocktype = blocktype;
-      }
+	if ( voice->Playing ) {
+		voice->NextBlock = ptr + blocklength;
+		voice->sound = ptr;
 
-   if ( voice->Playing )
-      {
-      voice->NextBlock    = ptr + blocklength;
-      voice->sound        = ptr;
+		voice->SamplingRate = samplespeed;
+		voice->RateScale = (voice->SamplingRate * voice->PitchScale) >> 16;
 
-      voice->SamplingRate = samplespeed;
-      voice->RateScale    = ( voice->SamplingRate * voice->PitchScale ) >> 16;
+		voice->length = min( blocklength, MAX_BLOCK_LENGTH );
+		voice->BlockLength = blocklength - voice->length;
 
-      voice->length       = min( blocklength, MAX_BLOCK_LENGTH );
-      voice->BlockLength  = blocklength - voice->length;
+		return (KeepPlaying);
+	}
 
-      return( KeepPlaying );
-      }
-
-   return( SoundDone );
-   }
-
+	return (SoundDone);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_GetNextWAVBlock
@@ -1196,32 +1047,27 @@ playbackstatus GUSWAVE_GetNextVOCBlock
 ---------------------------------------------------------------------*/
 
 playbackstatus GUSWAVE_GetNextWAVBlock
-   (
-   VoiceNode *voice
-   )
+	(
+		VoiceNode * voice
+	) {
+	if ( voice->BlockLength <= 0 ) {
+		if ( voice->LoopStart == NULL) {
+			voice->Playing = FALSE;
+			return (SoundDone);
+		}
 
-   {
-   if ( voice->BlockLength <= 0 )
-      {
-      if ( voice->LoopStart == NULL )
-         {
-         voice->Playing = FALSE;
-         return( SoundDone );
-         }
+		voice->BlockLength = voice->LoopSize;
+		voice->NextBlock = voice->LoopStart;
+		voice->length = 0;
+	}
 
-      voice->BlockLength = voice->LoopSize;
-      voice->NextBlock   = voice->LoopStart;
-      voice->length      = 0;
-      }
+	voice->sound = voice->NextBlock;
+	voice->length = min( voice->BlockLength, 0x8000 );
+	voice->NextBlock += voice->length;
+	voice->BlockLength -= voice->length;
 
-   voice->sound        = voice->NextBlock;
-   voice->length       = min( voice->BlockLength, 0x8000 );
-   voice->NextBlock   += voice->length;
-   voice->BlockLength -= voice->length;
-
-   return( KeepPlaying );
-   }
-
+	return (KeepPlaying);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_GetNextDemandFeedBlock
@@ -1230,39 +1076,33 @@ playbackstatus GUSWAVE_GetNextWAVBlock
 ---------------------------------------------------------------------*/
 
 playbackstatus GUSWAVE_GetNextDemandFeedBlock
-   (
-   VoiceNode *voice
-   )
+	(
+		VoiceNode * voice
+	) {
+	if ( voice->BlockLength > 0 ) {
+		voice->sound += voice->length;
+		voice->length = min( voice->BlockLength, 0x8000 );
+		voice->BlockLength -= voice->length;
 
-   {
-   if ( voice->BlockLength > 0 )
-      {
-      voice->sound       += voice->length;
-      voice->length       = min( voice->BlockLength, 0x8000 );
-      voice->BlockLength -= voice->length;
+		return (KeepPlaying);
+	}
 
-      return( KeepPlaying );
-      }
+	if ( voice->DemandFeed == NULL) {
+		return (SoundDone);
+	}
 
-   if ( voice->DemandFeed == NULL )
-      {
-      return( SoundDone );
-      }
-
-   ( voice->DemandFeed )( &voice->sound, &voice->BlockLength );
+	(voice->DemandFeed)( &voice->sound, &voice->BlockLength );
 //   voice->sound = GUS_Silence16;
 //   voice->BlockLength = 256;
 
-   voice->length       = min( voice->BlockLength, 0x8000 );
-   voice->BlockLength -= voice->length;
+	voice->length = min( voice->BlockLength, 0x8000 );
+	voice->BlockLength -= voice->length;
 
-   if ( ( voice->length > 0 ) && ( voice->sound != NULL ) )
-      {
-      return( KeepPlaying );
-      }
-   return( NoMoreData );
-   }
-
+	if ((voice->length > 0) && (voice->sound != NULL)) {
+		return (KeepPlaying);
+	}
+	return (NoMoreData);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_Play
@@ -1271,92 +1111,80 @@ playbackstatus GUSWAVE_GetNextDemandFeedBlock
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_Play
-   (
-   VoiceNode *voice,
-   int angle,
-   int volume,
-   int channels
-   )
+	(
+		VoiceNode * voice,
+		int angle,
+		int volume,
+		int channels
+	) {
+	int VoiceNumber;
+	int type;
+	int pan;
+	unsigned flags;
+	int ( * servicefunction )( int reason, int voice, unsigned char ** buf, unsigned long * size );
 
-   {
-   int      VoiceNumber;
-   int      type;
-   int      pan;
-   unsigned flags;
-   int ( *servicefunction )( int reason, int voice, unsigned char **buf, unsigned long *size );
+	type = 0;
+	if ( channels != 1 ) {
+		type |= TYPE_STEREO;
+	}
 
-   type = 0;
-   if ( channels != 1 )
-      {
-      type |= TYPE_STEREO;
-      }
+	if ( voice->bits == 8 ) {
+		type |= TYPE_8BIT;
+		type |= TYPE_INVERT_MSB;
+	}
 
-   if ( voice->bits == 8 )
-      {
-      type |= TYPE_8BIT;
-      type |= TYPE_INVERT_MSB;
-      }
+	voice->GF1voice = -1;
 
-   voice->GF1voice  = -1;
+	angle &= 31;
+	pan = GUSWAVE_PanTable[angle];
+	if ( GUSWAVE_SwapLeftRight ) {
+		pan = 15 - pan;
+	}
 
-   angle &= 31;
-   pan = GUSWAVE_PanTable[ angle ];
-   if ( GUSWAVE_SwapLeftRight )
-      {
-      pan = 15 - pan;
-      }
+	voice->Pan = pan;
 
-   voice->Pan = pan;
+	volume = max( 0, volume );
+	volume = min( 255, volume );
+	voice->Volume = volume;
 
-   volume = max( 0, volume );
-   volume = min( 255, volume );
-   voice->Volume = volume;
+	if ( !GUS_Debug ) {
+		servicefunction = GUSWAVE_CallBack;
+	} else {
+		servicefunction = GUSWAVE_DebugCallBack;
+	}
 
-   if ( !GUS_Debug )
-      {
-      servicefunction = GUSWAVE_CallBack;
-      }
-   else
-      {
-      servicefunction = GUSWAVE_DebugCallBack;
-      }
+	VoiceNumber = gf1_play_digital( 0, voice->sound, voice->length,
+									voice->mem, GUSWAVE_Volume - (255 - volume) * 4, pan,
+									voice->RateScale, type, &GUS_HoldBuffer, servicefunction );
 
-   VoiceNumber = gf1_play_digital( 0, voice->sound, voice->length,
-      voice->mem, GUSWAVE_Volume - ( 255 - volume ) * 4, pan,
-      voice->RateScale, type, &GUS_HoldBuffer, servicefunction );
+	if ( VoiceNumber == NO_MORE_VOICES ) {
+		if ( GUS_Debug ) {
+			DB_printf( "Out of voices.\n" );
+		}
 
-   if ( VoiceNumber == NO_MORE_VOICES )
-      {
-      if ( GUS_Debug )
-         {
-         DB_printf( "Out of voices.\n" );
-         }
+		flags = DisableInterrupts();
+		LL_AddToTail( VoiceNode, &VoicePool, voice );
+		RestoreInterrupts( flags );
 
-      flags = DisableInterrupts();
-      LL_AddToTail( VoiceNode, &VoicePool, voice );
-      RestoreInterrupts( flags );
+		GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
+		return (GUSWAVE_Warning);
+	}
 
-      GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
-      return( GUSWAVE_Warning );
-      }
+	flags = DisableInterrupts();
+	voice->GF1voice = VoiceNumber;
+	voice->Active = TRUE;
+	LL_AddToTail( VoiceNode, &VoiceList, voice );
+	VoiceStatus[VoiceNumber].playing = TRUE;
+	VoiceStatus[VoiceNumber].Voice = voice;
 
-   flags = DisableInterrupts();
-   voice->GF1voice = VoiceNumber;
-   voice->Active   = TRUE;
-   LL_AddToTail( VoiceNode, &VoiceList, voice );
-   VoiceStatus[ VoiceNumber ].playing = TRUE;
-   VoiceStatus[ VoiceNumber ].Voice   = voice;
+	if ( GUS_Debug ) {
+		DB_printf( "GUS voice %d playing\n", VoiceNumber );
+	}
 
-   if ( GUS_Debug )
-      {
-      DB_printf( "GUS voice %d playing\n", VoiceNumber );
-      }
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
-
-   return( voice->handle );
-   }
-
+	return (voice->handle);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_PlayVOC
@@ -1365,82 +1193,74 @@ int GUSWAVE_Play
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_PlayVOC
-   (
-   char *sample,
-   int   pitchoffset,
-   int   angle,
-   int   volume,
-   int   priority,
-   unsigned long callbackval
-   )
+	(
+		char * sample,
+		int pitchoffset,
+		int angle,
+		int volume,
+		int priority,
+		unsigned long callbackval
+	) {
+	int handle;
+	int status;
+	playbackstatus soundstatus;
+	VoiceNode * voice;
+	unsigned flags;
 
-   {
-   int handle;
-   int status;
-   playbackstatus soundstatus;
-   VoiceNode *voice;
-   unsigned flags;
+	// Make sure it's a valid VOC file.
+	status = strncmp( sample, "Creative Voice File", 19 );
+	if ( status != 0 ) {
+		// Tell multivoc that we had a bad VOC file
+		MV_ErrorCode = MV_InvalidVOCFile;
 
-   // Make sure it's a valid VOC file.
-   status = strncmp( sample, "Creative Voice File", 19 );
-   if ( status != 0 )
-      {
-      // Tell multivoc that we had a bad VOC file
-      MV_ErrorCode = MV_InvalidVOCFile;
+		GUSWAVE_SetErrorCode( GUSWAVE_InvalidVOCFile );
+		return (GUSWAVE_Error);
+	}
 
-      GUSWAVE_SetErrorCode( GUSWAVE_InvalidVOCFile );
-      return( GUSWAVE_Error );
-      }
+	// Request a voice from the voice pool
+	voice = GUSWAVE_AllocVoice( priority );
+	if ( voice == NULL) {
+		if ( GUS_Debug ) {
+			DB_printf( "No more voices.  Skipping sound.\n" );
+		}
+		GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
+		return (GUSWAVE_Warning);
+	}
 
-   // Request a voice from the voice pool
-   voice = GUSWAVE_AllocVoice( priority );
-   if ( voice == NULL )
-      {
-      if ( GUS_Debug )
-         {
-         DB_printf( "No more voices.  Skipping sound.\n" );
-         }
-      GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
-      return( GUSWAVE_Warning );
-      }
+	voice->NextBlock = sample + *( unsigned short int * ) (sample + 0x14);
+	voice->LoopStart = NULL;
+	voice->LoopCount = 0;
+	voice->BlockLength = 0;
+	voice->PitchScale = PITCH_GetScale( pitchoffset );
+	voice->wavetype = VOC;
+	voice->bits = 8;
+	voice->GetSound = GUSWAVE_GetNextVOCBlock;
+	voice->length = 0;
+	voice->next = NULL;
+	voice->prev = NULL;
+	voice->priority = priority;
+	voice->callbackval = callbackval;
 
-   voice->NextBlock   = sample + *( unsigned short int * )( sample + 0x14 );
-   voice->LoopStart   = NULL;
-   voice->LoopCount   = 0;
-   voice->BlockLength = 0;
-   voice->PitchScale  = PITCH_GetScale( pitchoffset );
-   voice->wavetype    = VOC;
-   voice->bits        = 8;
-   voice->GetSound    = GUSWAVE_GetNextVOCBlock;
-   voice->length      = 0;
-   voice->next        = NULL;
-   voice->prev        = NULL;
-   voice->priority    = priority;
-   voice->callbackval = callbackval;
+	soundstatus = GUSWAVE_GetNextVOCBlock( voice );
+	if ( soundstatus == SoundDone ) {
+		flags = DisableInterrupts();
+		LL_AddToTail( VoiceNode, &VoicePool, voice );
+		RestoreInterrupts( flags );
 
-   soundstatus = GUSWAVE_GetNextVOCBlock( voice );
-   if ( soundstatus == SoundDone )
-      {
-      flags = DisableInterrupts();
-      LL_AddToTail( VoiceNode, &VoicePool, voice );
-      RestoreInterrupts( flags );
+		if ( GUS_Debug ) {
+			DB_printf( "Voice ended before playback.\n" );
+		}
 
-      if ( GUS_Debug )
-         {
-         DB_printf( "Voice ended before playback.\n" );
-         }
+		// Tell multivoc that we had a bad VOC file
+		MV_ErrorCode = MV_InvalidVOCFile;
 
-      // Tell multivoc that we had a bad VOC file
-      MV_ErrorCode = MV_InvalidVOCFile;
+		GUSWAVE_SetErrorCode( GUSWAVE_InvalidVOCFile );
+		return (GUSWAVE_Error);
+	}
 
-      GUSWAVE_SetErrorCode( GUSWAVE_InvalidVOCFile );
-      return( GUSWAVE_Error );
-      }
-
-   handle = GUSWAVE_Play( voice, angle, volume, 1 );
-   return( handle );
-   }
-
+	handle = GUSWAVE_Play( voice, angle, volume, 1 );
+	return (handle);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_PlayWAV
@@ -1449,106 +1269,96 @@ int GUSWAVE_PlayVOC
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_PlayWAV
-   (
-   char *sample,
-   int   pitchoffset,
-   int   angle,
-   int   volume,
-   int   priority,
-   unsigned long callbackval
-   )
+	(
+		char * sample,
+		int pitchoffset,
+		int angle,
+		int volume,
+		int priority,
+		unsigned long callbackval
+	) {
+	VoiceNode * voice;
+	int handle;
+	int channels;
+	int bits;
+	int length;
+	riff_header * riff;
+	format_header * format;
+	data_header * data;
 
-   {
-   VoiceNode *voice;
-   int        handle;
-   int        channels;
-   int        bits;
-   int        length;
-   riff_header   *riff;
-   format_header *format;
-   data_header   *data;
+	riff = ( riff_header * ) sample;
 
-   riff = ( riff_header * )sample;
+	if ((strncmp( riff->RIFF, "RIFF", 4 ) != 0) ||
+		(strncmp( riff->WAVE, "WAVE", 4 ) != 0) ||
+		(strncmp( riff->fmt, "fmt ", 4 ) != 0)) {
+		GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
+		return (GUSWAVE_Error);
+	}
 
-   if ( ( strncmp( riff->RIFF, "RIFF", 4 ) != 0 ) ||
-      ( strncmp( riff->WAVE, "WAVE", 4 ) != 0 ) ||
-      ( strncmp( riff->fmt, "fmt ", 4) != 0 ) )
-      {
-      GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
-      return( GUSWAVE_Error );
-      }
+	format = ( format_header * ) (riff + 1);
+	data = ( data_header * ) ((( char * ) format) + riff->format_size);
 
-   format = ( format_header * )( riff + 1 );
-   data   = ( data_header * )( ( ( char * )format ) + riff->format_size );
+	if ( format->wFormatTag != 1 ) {
+		GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
+		return (GUSWAVE_Error);
+	}
 
-   if ( format->wFormatTag != 1 )
-      {
-      GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
-      return( GUSWAVE_Error );
-      }
+	channels = format->nChannels;
+	if ((channels != 1) && (channels != 2)) {
+		GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
+		return (GUSWAVE_Error);
+	}
 
-   channels = format->nChannels;
-   if ( ( channels != 1 ) && ( channels != 2 ) )
-      {
-      GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
-      return( GUSWAVE_Error );
-      }
+	bits = format->nBitsPerSample;
+	if ((bits != 8) && (bits != 16)) {
+		GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
+		return (GUSWAVE_Error);
+	}
 
-   bits = format->nBitsPerSample;
-   if ( ( bits != 8 ) && ( bits != 16 ) )
-      {
-      GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
-      return( GUSWAVE_Error );
-      }
+	if ( strncmp( data->DATA, "data", 4 ) != 0 ) {
+		GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
+		return (GUSWAVE_Error);
+	}
 
-   if ( strncmp( data->DATA, "data", 4 ) != 0 )
-      {
-      GUSWAVE_SetErrorCode( GUSWAVE_InvalidWAVFile );
-      return( GUSWAVE_Error );
-      }
+	// Request a voice from the voice pool
+	voice = GUSWAVE_AllocVoice( priority );
+	if ( voice == NULL) {
+		if ( GUS_Debug ) {
+			DB_printf( "No more voices.  Skipping sound.\n" );
+		}
+		GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
+		return (GUSWAVE_Warning);
+	}
 
-   // Request a voice from the voice pool
-   voice = GUSWAVE_AllocVoice( priority );
-   if ( voice == NULL )
-      {
-      if ( GUS_Debug )
-         {
-         DB_printf( "No more voices.  Skipping sound.\n" );
-         }
-      GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
-      return( GUSWAVE_Warning );
-      }
+	voice->wavetype = WAV;
+	voice->bits = bits;
+	voice->GetSound = GUSWAVE_GetNextWAVBlock;
 
-   voice->wavetype    = WAV;
-   voice->bits        = bits;
-   voice->GetSound    = GUSWAVE_GetNextWAVBlock;
+	length = data->size;
 
-   length = data->size;
+	voice->Playing = TRUE;
+	voice->DemandFeed = NULL;
+	voice->LoopStart = NULL;
+	voice->LoopCount = 0;
+	voice->length = min( length, 0x8000 );
+	voice->BlockLength = length - voice->length;//  min( loopend + 1, data->size );
+	voice->sound = ( char * ) (data + 1);
+	voice->NextBlock = voice->sound + voice->length;
+	voice->next = NULL;
+	voice->prev = NULL;
+	voice->priority = priority;
+	voice->callbackval = callbackval;
+	voice->LoopStart = NULL;// voice->NextBlock + loopstart;
+	voice->LoopEnd = NULL;//voice->NextBlock + min( loopend, data->size - 1 );
+	voice->LoopSize = 0;//( voice->LoopEnd - voice->LoopStart ) + 1;
+	voice->PitchScale = PITCH_GetScale( pitchoffset );
+	voice->SamplingRate = format->nSamplesPerSec;
+	voice->RateScale = (voice->SamplingRate * voice->PitchScale) >> 16;
 
-   voice->Playing     = TRUE;
-   voice->DemandFeed  = NULL;
-   voice->LoopStart   = NULL;
-   voice->LoopCount   = 0;
-   voice->length      = min( length, 0x8000 );
-   voice->BlockLength = length - voice->length;//  min( loopend + 1, data->size );
-   voice->sound       = ( char * )( data + 1 );
-   voice->NextBlock   = voice->sound + voice->length;
-   voice->next        = NULL;
-   voice->prev        = NULL;
-   voice->priority    = priority;
-   voice->callbackval = callbackval;
-   voice->LoopStart   = NULL;// voice->NextBlock + loopstart;
-   voice->LoopEnd     = NULL;//voice->NextBlock + min( loopend, data->size - 1 );
-   voice->LoopSize    = 0;//( voice->LoopEnd - voice->LoopStart ) + 1;
-   voice->PitchScale  = PITCH_GetScale( pitchoffset );
-   voice->SamplingRate = format->nSamplesPerSec;
-   voice->RateScale   = ( voice->SamplingRate * voice->PitchScale ) >> 16;
+	handle = GUSWAVE_Play( voice, angle, volume, channels );
 
-   handle = GUSWAVE_Play( voice, angle, volume, channels );
-
-   return( handle );
-   }
-
+	return (handle);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_StartDemandFeedPlayback
@@ -1557,58 +1367,53 @@ int GUSWAVE_PlayWAV
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_StartDemandFeedPlayback
-   (
-   void ( *function )( char **ptr, unsigned long *length ),
-   int   channels,
-   int   bits,
-   int   rate,
-   int   pitchoffset,
-   int   angle,
-   int   volume,
-   int   priority,
-   unsigned long callbackval
-   )
+	(
+		void ( * function )( char ** ptr, unsigned long * length ),
+		int channels,
+		int bits,
+		int rate,
+		int pitchoffset,
+		int angle,
+		int volume,
+		int priority,
+		unsigned long callbackval
+	) {
+	VoiceNode * voice;
+	int handle;
 
-   {
-   VoiceNode *voice;
-   int        handle;
+	// Request a voice from the voice pool
+	voice = GUSWAVE_AllocVoice( priority );
+	if ( voice == NULL) {
+		if ( GUS_Debug ) {
+			DB_printf( "No more voices.  Skipping sound.\n" );
+		}
+		GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
+		return (GUSWAVE_Warning);
+	}
 
-   // Request a voice from the voice pool
-   voice = GUSWAVE_AllocVoice( priority );
-   if ( voice == NULL )
-      {
-      if ( GUS_Debug )
-         {
-         DB_printf( "No more voices.  Skipping sound.\n" );
-         }
-      GUSWAVE_SetErrorCode( GUSWAVE_NoVoices );
-      return( GUSWAVE_Warning );
-      }
+	voice->wavetype = DemandFeed;
+	voice->bits = bits;
+	voice->GetSound = GUSWAVE_GetNextDemandFeedBlock;
+	voice->Playing = TRUE;
+	voice->DemandFeed = function;
+	voice->LoopStart = NULL;
+	voice->LoopCount = 0;
+	voice->BlockLength = 0;
+	voice->length = 256;
+	voice->sound = (bits == 8) ? GUS_Silence8 : ( char * ) GUS_Silence16;
+	voice->NextBlock = NULL;
+	voice->next = NULL;
+	voice->prev = NULL;
+	voice->priority = priority;
+	voice->callbackval = callbackval;
+	voice->PitchScale = PITCH_GetScale( pitchoffset );
+	voice->SamplingRate = rate;
+	voice->RateScale = (voice->SamplingRate * voice->PitchScale) >> 16;
 
-   voice->wavetype    = DemandFeed;
-   voice->bits        = bits;
-   voice->GetSound    = GUSWAVE_GetNextDemandFeedBlock;
-   voice->Playing     = TRUE;
-   voice->DemandFeed  = function;
-   voice->LoopStart   = NULL;
-   voice->LoopCount   = 0;
-   voice->BlockLength = 0;
-   voice->length      = 256;
-   voice->sound       = ( bits == 8 ) ? GUS_Silence8 : ( char * )GUS_Silence16;
-   voice->NextBlock   = NULL;
-   voice->next        = NULL;
-   voice->prev        = NULL;
-   voice->priority    = priority;
-   voice->callbackval = callbackval;
-   voice->PitchScale  = PITCH_GetScale( pitchoffset );
-   voice->SamplingRate = rate;
-   voice->RateScale   = ( voice->SamplingRate * voice->PitchScale ) >> 16;
+	handle = GUSWAVE_Play( voice, angle, volume, channels );
 
-   handle = GUSWAVE_Play( voice, angle, volume, channels );
-
-   return( handle );
-   }
-
+	return (handle);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_SetReverseStereo
@@ -1617,14 +1422,11 @@ int GUSWAVE_StartDemandFeedPlayback
 ---------------------------------------------------------------------*/
 
 void GUSWAVE_SetReverseStereo
-   (
-   int setting
-   )
-
-   {
-   GUSWAVE_SwapLeftRight = setting;
-   }
-
+	(
+		int setting
+	) {
+	GUSWAVE_SwapLeftRight = setting;
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_GetReverseStereo
@@ -1633,14 +1435,11 @@ void GUSWAVE_SetReverseStereo
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_GetReverseStereo
-   (
-   void
-   )
-
-   {
-   return( GUSWAVE_SwapLeftRight );
-   }
-
+	(
+		void
+	) {
+	return (GUSWAVE_SwapLeftRight);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_InitVoices
@@ -1649,64 +1448,53 @@ int GUSWAVE_GetReverseStereo
 ---------------------------------------------------------------------*/
 
 static int GUSWAVE_InitVoices
-   (
-   void
-   )
+	(
+		void
+	) {
+	int i;
 
-   {
-   int i;
+	for ( i = 0; i < MAX_VOICES; i++ ) {
+		VoiceStatus[i].playing = FALSE;
+		VoiceStatus[i].Voice = NULL;
+	}
 
-   for( i = 0; i < MAX_VOICES; i++ )
-      {
-      VoiceStatus[ i ].playing = FALSE;
-      VoiceStatus[ i ].Voice   = NULL;
-      }
+	VoicePool.start = NULL;
+	VoicePool.end = NULL;
+	VoiceList.start = NULL;
+	VoiceList.end = NULL;
 
-   VoicePool.start = NULL;
-   VoicePool.end   = NULL;
-   VoiceList.start = NULL;
-   VoiceList.end   = NULL;
+	for ( i = 0; i < VOICES; i++ ) {
+		GUSWAVE_Voices[i].num = -1;
+		GUSWAVE_Voices[i].Active = FALSE;
+		GUSWAVE_Voices[i].GF1voice = -1;
+		GUSWAVE_Voices[i].mem = NULL;
+	}
 
-   for( i = 0; i < VOICES; i++ )
-      {
-      GUSWAVE_Voices[ i ].num      = -1;
-      GUSWAVE_Voices[ i ].Active   = FALSE;
-      GUSWAVE_Voices[ i ].GF1voice = -1;
-      GUSWAVE_Voices[ i ].mem      = NULL;
-      }
+	for ( i = 0; i < VOICES; i++ ) {
+		GUSWAVE_Voices[i].num = i;
+		GUSWAVE_Voices[i].Active = FALSE;
+		GUSWAVE_Voices[i].GF1voice = 0;
 
-   for( i = 0; i < VOICES; i++ )
-      {
-      GUSWAVE_Voices[ i ].num      = i;
-      GUSWAVE_Voices[ i ].Active   = FALSE;
-      GUSWAVE_Voices[ i ].GF1voice = 0;
+		GUSWAVE_Voices[i].mem = gf1_malloc( GF1BSIZE );
+		if ( GUSWAVE_Voices[i].mem == NULL) {
+			GUSWAVE_MaxVoices = i;
+			if ( i < 1 ) {
+				if ( GUSMIDI_Installed ) {
+					GUSWAVE_SetErrorCode( GUSWAVE_UltraNoMemMIDI );
+				} else {
+					GUSWAVE_SetErrorCode( GUSWAVE_UltraNoMem );
+				}
+				return (GUSWAVE_Error);
+			}
 
-      GUSWAVE_Voices[ i ].mem = gf1_malloc( GF1BSIZE );
-      if ( GUSWAVE_Voices[ i ].mem == NULL )
-         {
-         GUSWAVE_MaxVoices = i;
-         if ( i < 1 )
-            {
-            if ( GUSMIDI_Installed )
-               {
-               GUSWAVE_SetErrorCode( GUSWAVE_UltraNoMemMIDI );
-               }
-            else
-               {
-               GUSWAVE_SetErrorCode( GUSWAVE_UltraNoMem );
-               }
-            return( GUSWAVE_Error );
-            }
+			break;
+		}
 
-         break;
-         }
+		LL_AddToTail( VoiceNode, &VoicePool, &GUSWAVE_Voices[i] );
+	}
 
-      LL_AddToTail( VoiceNode, &VoicePool, &GUSWAVE_Voices[ i ] );
-      }
-
-   return( GUSWAVE_Ok );
-   }
-
+	return (GUSWAVE_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_SetCallBack
@@ -1715,14 +1503,11 @@ static int GUSWAVE_InitVoices
 ---------------------------------------------------------------------*/
 
 void GUSWAVE_SetCallBack
-   (
-   void ( *function )( unsigned long )
-   )
-
-   {
-   GUSWAVE_CallBackFunc = function;
-   }
-
+	(
+		void ( * function )( unsigned long )
+	) {
+	GUSWAVE_CallBackFunc = function;
+}
 
 /*---------------------------------------------------------------------
    Function: GUSWAVE_Init
@@ -1731,43 +1516,38 @@ void GUSWAVE_SetCallBack
 ---------------------------------------------------------------------*/
 
 int GUSWAVE_Init
-   (
-   int numvoices
-   )
+	(
+		int numvoices
+	) {
+	int status;
 
-   {
-   int status;
+	if ( GUSWAVE_Installed ) {
+		GUSWAVE_Shutdown();
+	}
 
-   if ( GUSWAVE_Installed )
-      {
-      GUSWAVE_Shutdown();
-      }
+	GUSWAVE_SetErrorCode( GUSWAVE_Ok );
 
-   GUSWAVE_SetErrorCode( GUSWAVE_Ok );
+	status = GUS_Init();
+	if ( status != GUS_Ok ) {
+		GUSWAVE_SetErrorCode( GUSWAVE_GUSError );
+		return (GUSWAVE_Error);
+	}
 
-   status = GUS_Init();
-   if ( status != GUS_Ok )
-      {
-      GUSWAVE_SetErrorCode( GUSWAVE_GUSError );
-      return( GUSWAVE_Error );
-      }
+	GUS_Debug = USER_CheckParameter( "DEBUGGUS" );
 
-   GUS_Debug = USER_CheckParameter( "DEBUGGUS" );
+	GUSWAVE_MaxVoices = min( numvoices, VOICES );
+	GUSWAVE_MaxVoices = max( GUSWAVE_MaxVoices, 0 );
 
-   GUSWAVE_MaxVoices = min( numvoices, VOICES );
-   GUSWAVE_MaxVoices = max( GUSWAVE_MaxVoices, 0 );
+	status = GUSWAVE_InitVoices();
+	if ( status != GUSWAVE_Ok ) {
+		GUS_Shutdown();
+		return (status);
+	}
 
-   status = GUSWAVE_InitVoices();
-   if ( status != GUSWAVE_Ok )
-      {
-      GUS_Shutdown();
-      return( status );
-      }
+	GUSWAVE_SetReverseStereo(FALSE);
 
-   GUSWAVE_SetReverseStereo( FALSE );
+	GUSWAVE_CallBackFunc = NULL;
+	GUSWAVE_Installed = TRUE;
 
-   GUSWAVE_CallBackFunc = NULL;
-   GUSWAVE_Installed = TRUE;
-
-   return( GUSWAVE_Ok );
-   }
+	return (GUSWAVE_Ok);
+}

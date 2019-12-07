@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SNAPBACKSPEED 10*15//*2 = bna added
 #define YZHORIZONSPEED 4*5//*2 = bna added
 #define HORIZONYZOFFSET (FINEANGLES/4)
-#define SetPlayerHorizon(ps,hlevel)    \
+#define SetPlayerHorizon( ps, hlevel )    \
     {                                  \
     if ((hlevel)>YZANGLELIMIT)           \
        (ps)->horizon=HORIZONYZOFFSET+YZANGLELIMIT;\
@@ -44,25 +44,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
        (ps)->horizon=HORIZONYZOFFSET-YZANGLELIMIT;\
     else                                  \
        (ps)->horizon=HORIZONYZOFFSET+(hlevel);\
-	 }
+     }
 
 #define StartWeaponChange \
 {\
  SD_PlaySoundRTP(SD_SELECTWPNSND,ob->x,ob->y);\
  pstate->weapondowntics = WEAPONS[pstate->weapon].screenheight/GMOVE;\
  if ((ob==player) && SHOW_BOTTOM_STATUS_BAR() )\
-	 DrawBarAmmo (false);            \
+     DrawBarAmmo (false);            \
 }
-
 
 #define BULLETHOLEOFFSET 0x700
 
-#define M_DIST(x1,x2,y1,y2)   (((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)))
+#define M_DIST( x1, x2, y1, y2 )   (((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)))
 
-#define W_CHANGE(x)   ((x->weapondowntics) || (x->weaponuptics))
+#define W_CHANGE( x )   ((x->weapondowntics) || (x->weaponuptics))
 #define NOMOM         ((!ob->momentumx) && (!ob->momentumy))
-#define DISTOK(p1,p2,d)    (abs((p1)-(p2)) <= d)
-#define Fix(a)        (a &= (FINEANGLES-1))
+#define DISTOK( p1, p2, d )    (abs((p1)-(p2)) <= d)
+#define Fix( a )        (a &= (FINEANGLES-1))
 #define REMOTEPKTSIZE    (sizeof(MoveType))
 #define BJRUNSPEED   2048
 #define BJJUMPSPEED  680
@@ -77,10 +76,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define BASEMOVE     0x600
 #define ANGLEMOVE    0x100000
 
-#define SGN(x)                 (x>0 ? 1 : -1)
+#define SGN( x )                 (x>0 ? 1 : -1)
 #define NETMOM    (BASEMOVE+0x10000)
 
-#define DISTANCE(x1,x2,y1,y2)   (FixedMulShift((x1-x2),(x1-x2),16)+FixedMulShift((y1-y2),(y1-y2),16))
+#define DISTANCE( x1, x2, y1, y2 )   (FixedMulShift((x1-x2),(x1-x2),16)+FixedMulShift((y1-y2),(y1-y2),16))
 
 #define TILTLIMIT     95
 #define PLAYERSTEPTIME 0xf000
@@ -120,6 +119,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define VR_RECORDBUTTON      (15)
 
 #define STEPADJUST 3
-void BatAttack(objtype*ob);
-void  T_DogLick (objtype *ob);
+void BatAttack( objtype * ob );
+void T_DogLick( objtype * ob );
 #endif

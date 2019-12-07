@@ -66,13 +66,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #if (!defined MAX_PATH)
-  #if (defined MAXPATHLEN)
-    #define MAX_PATH MAXPATHLEN
-  #elif (defined PATH_MAX)
-    #define MAX_PATH PATH_MAX
-  #else
-    #define MAX_PATH 256
-  #endif
+#if (defined MAXPATHLEN)
+#define MAX_PATH MAXPATHLEN
+#elif (defined PATH_MAX)
+#define MAX_PATH PATH_MAX
+#else
+#define MAX_PATH 256
+#endif
 #endif
 
 //
@@ -85,7 +85,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //***************************************************************************
 
 #ifndef DATADIR
-#define DATADIR	""
+#define DATADIR    ""
 #endif
 
 #undef PI
@@ -96,7 +96,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #define PI      3.141592657
-#define LONG(a) ((int)a)
+#define LONG( a ) ((int)a)
 #define M_PI            3.14159
 
 #ifndef O_BINARY
@@ -108,39 +108,39 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #ifndef min
-#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#define min( a, b )  (((a) < (b)) ? (a) : (b))
 #endif
 
 #ifndef max
-#define max(a, b)  (((a) > (b)) ? (a) : (b))
+#define max( a, b )  (((a) > (b)) ? (a) : (b))
 #endif
 
 #if !PLATFORM_DOS
-  #if PLATFORM_WIN32
-    #define strcmpi(x, y) stricmp(x, y)
-    #define _fstricmp(x, y) stricmp(x, y)
-  #elif PLATFORM_UNIX
-    #ifndef strcmpi
-      #define strcmpi(x, y) strcasecmp(x, y)
-    #endif
+#if PLATFORM_WIN32
+#define strcmpi(x, y) stricmp(x, y)
+#define _fstricmp(x, y) stricmp(x, y)
+#elif PLATFORM_UNIX
+#ifndef strcmpi
+#define strcmpi( x, y ) strcasecmp(x, y)
+#endif
 
-    #ifndef stricmp
-      #define stricmp(x, y) strcasecmp(x, y)
-    #endif
+#ifndef stricmp
+#define stricmp( x, y ) strcasecmp(x, y)
+#endif
 
-    #ifndef _fstricmp
-      #define _fstricmp(x, y) strcasecmp(x, y)
-    #endif
+#ifndef _fstricmp
+#define _fstricmp( x, y ) strcasecmp(x, y)
+#endif
 
-    char *strupr(char *);
-    char *itoa(int, char *, int);
-    char *ltoa(long, char *, int);
-    char *ultoa(unsigned long, char *, int);
-    char getch(void);
-    long filelength(int handle);
-  #else
-    #error please define for your platform.
-  #endif
+char * strupr( char * );
+char * itoa( int, char *, int );
+char * ltoa( long, char *, int );
+char * ultoa( unsigned long, char *, int );
+char getch( void );
+long filelength( int handle );
+#else
+#error please define for your platform.
+#endif
 
 #if !defined(ANSIESC)
 #define STUB_FUNCTION fprintf(stderr,"STUB: %s at " __FILE__ ", line %d, thread %d\n",__FUNCTION__,__LINE__,getpid())
@@ -208,7 +208,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define PLAYERSIZE                        0x5700l                       // player radius
 #define MAPSIZE                           128                         // maps are 64*64 max
 #define NUMAREAS                          47
-#define MAPSPOT(x,y,plane)                (mapplanes[plane][MAPSIZE*(y)+(x)])
+#define MAPSPOT( x, y, plane )                (mapplanes[plane][MAPSIZE*(y)+(x)])
 #define AREATILE                          107
 #define ICONARROWS                        72
 #define PUSHABLETILE                      80
@@ -216,7 +216,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ALTELEVATORTILE                   106
 #define LASTLEVELVALUE                    459
 
-#define AREANUMBER(x,y)                   (MAPSPOT((x),(y),0)-AREATILE)
+#define AREANUMBER( x, y )                   (MAPSPOT((x),(y),0)-AREATILE)
 
 //***************************************************************************
 //
@@ -280,21 +280,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // device type codes, returned in deviceType field (SWIFT_StaticData)
 //
-#define SWIFT_DEV_NONE		0
-#define SWIFT_DEV_CYBERMAN	1
+#define SWIFT_DEV_NONE        0
+#define SWIFT_DEV_CYBERMAN    1
 
 //
 // Dynamic device data
 //
-#define SDD_EXTERNAL_POWER_CONNECTED	1
-#define SDD_EXTERNAL_POWER_TOO_HIGH	   2
+#define SDD_EXTERNAL_POWER_CONNECTED    1
+#define SDD_EXTERNAL_POWER_TOO_HIGH       2
 
-#define AX(r) ((r).x.eax)
-#define BX(r) ((r).x.ebx)
-#define CX(r) ((r).x.ecx)
-#define DX(r) ((r).x.edx)
-#define SI(r) ((r).x.esi)
-#define DI(r) ((r).x.edi)
+#define AX( r ) ((r).x.eax)
+#define BX( r ) ((r).x.ebx)
+#define CX( r ) ((r).x.ecx)
+#define DX( r ) ((r).x.edx)
+#define SI( r ) ((r).x.esi)
+#define DI( r ) ((r).x.edi)
 
 //***************************************************************************
 //
@@ -305,9 +305,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ///////////////////      GLOBAL DATA TYPES ///////////////////////////////
 
 
-typedef unsigned char           byte;
-typedef unsigned short int      word;
-typedef unsigned int            longword;
+typedef unsigned char byte;
+typedef unsigned short int word;
+typedef unsigned int longword;
 typedef int fixed;
 
 
@@ -327,129 +327,122 @@ typedef enum
 
 typedef unsigned char boolean;
 enum {
-  false, true
+	false, true
 };
 #endif
-
-
-
 
 typedef enum {
-		  east,
-		  northeast,
-		  north,
-		  northwest,
-		  west,
-		  southwest,
-		  south,
-		  southeast,
-		  nodir
+	east,
+	northeast,
+	north,
+	northwest,
+	west,
+	southwest,
+	south,
+	southeast,
+	nodir
 } dirtype;
 
-typedef enum
- {SPRITE,
-  WALL,
-  ACTOR,
-  DOOR,
-  PWALL,
-  MWALL
- }
- thingtype;
+typedef enum {
+	SPRITE,
+	WALL,
+	ACTOR,
+	DOOR,
+	PWALL,
+	MWALL
+}
+	thingtype;
 
 #define NUMTXBUTTONS    16
-enum    {
-		  bt_nobutton=-1,
-		  bt_attack=0,
-		  bt_strafe=1,
-		  bt_run=2,
-		  bt_use=3,
-		  bt_lookup=4,
-		  bt_lookdown=5,
-		  bt_swapweapon=6,
-		  bt_dropweapon=7,
-		  bt_horizonup=8,
-        bt_horizondown=9,
-        bt_pistol=10,
-        bt_dualpistol=11,
-        bt_mp40=12,
-        bt_missileweapon=13,
-        bt_autorun=14,
-		  bt_recordsound=15,
-		  bt_strafeleft=16,
-		  bt_straferight=17,
-        bt_turnaround=18,
-        bt_aimbutton=19,
-        di_north=20,
-        di_east=21,
-        di_south=22,
-        di_west=23,
-        bt_map=24,
-        bt_message=25,
-        bt_directmsg=26,
-        NUMBUTTONS
+enum {
+	bt_nobutton = -1,
+	bt_attack = 0,
+	bt_strafe = 1,
+	bt_run = 2,
+	bt_use = 3,
+	bt_lookup = 4,
+	bt_lookdown = 5,
+	bt_swapweapon = 6,
+	bt_dropweapon = 7,
+	bt_horizonup = 8,
+	bt_horizondown = 9,
+	bt_pistol = 10,
+	bt_dualpistol = 11,
+	bt_mp40 = 12,
+	bt_missileweapon = 13,
+	bt_autorun = 14,
+	bt_recordsound = 15,
+	bt_strafeleft = 16,
+	bt_straferight = 17,
+	bt_turnaround = 18,
+	bt_aimbutton = 19,
+	di_north = 20,
+	di_east = 21,
+	di_south = 22,
+	di_west = 23,
+	bt_map = 24,
+	bt_message = 25,
+	bt_directmsg = 26,
+	NUMBUTTONS
 };
 
-
 #if (SHAREWARE == 0)
- #define MAXWEAPONS  13
+#define MAXWEAPONS  13
 #else
- #define MAXWEAPONS  9
+#define MAXWEAPONS  9
 #endif
 
-
-typedef enum    { wp_pistol,
-						wp_twopistol,
-						wp_mp40,
-						wp_bazooka,
-						wp_heatseeker,
-                  wp_drunk,
-                  wp_firebomb,
-                  wp_firewall,
-						wp_godhand,
+typedef enum {
+	wp_pistol,
+	wp_twopistol,
+	wp_mp40,
+	wp_bazooka,
+	wp_heatseeker,
+	wp_drunk,
+	wp_firebomb,
+	wp_firewall,
+	wp_godhand,
 
 #if (SHAREWARE == 0)
-                  wp_split,
-						wp_kes,
-						wp_bat,
-                  wp_dog
+	wp_split,
+	wp_kes,
+	wp_bat,
+	wp_dog
 #endif
 
-                } weapontype;
+} weapontype;
 
-
-
-enum    {
-						gd_baby,
-						gd_easy,
-						gd_medium,
-						gd_hard
+enum {
+	gd_baby,
+	gd_easy,
+	gd_medium,
+	gd_hard
 };
 
+typedef enum {
+	ex_stillplaying,
+	ex_completed,
+	ex_died,
+	ex_warped,
+	ex_resetgame,
+	ex_loadedgame,
+	ex_victorious,
+	ex_abort,
+	ex_demodone,
+	ex_skiplevel,
+	ex_secretlevel,
+	ex_secretdone,
+	ex_titles,
+	ex_demorecord,
+	ex_demoplayback,
 
-typedef enum    {
-		  ex_stillplaying,
-		  ex_completed,
-		  ex_died,
-		  ex_warped,
-		  ex_resetgame,
-		  ex_loadedgame,
-		  ex_victorious,
-		  ex_abort,
-		  ex_demodone,
-		  ex_skiplevel,
-		  ex_secretlevel,
-        ex_secretdone,
-        ex_titles,
-		  ex_demorecord,
-		  ex_demoplayback,
-
-		  ex_bossdied,
-		  ex_gameover,
-		  ex_battledone
+	ex_bossdied,
+	ex_gameover,
+	ex_battledone
 } exit_t;
 
 // Types for cache lumps (for endian converters)
-enum    {
+enum {
 	cache_other,
 	cache_pic_t,
 	cache_lpic_t,

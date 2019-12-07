@@ -23,23 +23,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //MED
 #include "memcheck.h"
 
-void CinematicDelay ( void )
-{
-   CalcTics();
+void CinematicDelay( void ) {
+	CalcTics();
 }
 
-int GetCinematicTime ( void )
-{
-   return GetTicCount ();
+int GetCinematicTime( void ) {
+	return GetTicCount();
 }
 
-boolean CinematicAbort( void )
-{
-   return (IN_CheckAck ());
+boolean CinematicAbort( void ) {
+	return (IN_CheckAck());
 }
 
-void ClearCinematicAbort( void )
-{
-   IN_StartAck ();
+void ClearCinematicAbort( void ) {
+	IN_StartAck();
 }
 

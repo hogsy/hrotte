@@ -37,14 +37,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ==============
 */
 
-void CinematicGetPalette (byte *pal)
-{
+void CinematicGetPalette( byte * pal ) {
 #ifdef DOS
 	int	i;
 
    outp (PEL_READ_ADR,0);
 	for (i=0 ; i<768 ; i++)
-      pal[i] = ((inp (PEL_DATA))<<2);
+	  pal[i] = ((inp (PEL_DATA))<<2);
 #else
 #endif
 }
@@ -59,14 +58,13 @@ void CinematicGetPalette (byte *pal)
 ==============
 */
 
-void CinematicSetPalette (byte *pal)
-{
+void CinematicSetPalette( byte * pal ) {
 #ifdef DOS
 	int	i;
 
    outp (PEL_WRITE_ADR,0);
 	for (i=0 ; i<768 ; i++)
-      outp (PEL_DATA, pal[i]>>2);
+	  outp (PEL_DATA, pal[i]>>2);
 #else
 #endif
 }

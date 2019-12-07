@@ -48,7 +48,7 @@ boolean cinematicdone;
 static int cinematictime;
 static int cinematictics;
 static int cinematictictime;
-static int profiletics=-1;
+static int profiletics = -1;
 
 /*
 ================
@@ -57,24 +57,22 @@ static int profiletics=-1;
 =
 ================
 */
-void ProfileMachine ( void )
-{
-   int i;
-   int time;
-   int endtime;
+void ProfileMachine( void ) {
+	int i;
+	int time;
+	int endtime;
 
-   if (profiletics>0)
-      return;
-   time=GetCinematicTime();
-   for (i=0;i<4;i++)
-      {
-      ProfileDisplay();
-      }
-   endtime=GetCinematicTime();
+	if ( profiletics > 0 )
+		return;
+	time = GetCinematicTime();
+	for ( i = 0; i < 4; i++ ) {
+		ProfileDisplay();
+	}
+	endtime = GetCinematicTime();
 
-   profiletics = (endtime-time)>>2;
-   if (profiletics<1)
-      profiletics=1;
+	profiletics = (endtime - time) >> 2;
+	if ( profiletics < 1 )
+		profiletics = 1;
 }
 
 /*
@@ -84,17 +82,15 @@ void ProfileMachine ( void )
 =
 ================
 */
-void StartupCinematic ( void )
-{
-   StartupEvents ();
-   StartupCinematicActors ();
-   cinematicdone=false;
-   cinematictime=0;
-   GetCinematicTics ();
-   ClearCinematicAbort();
-   ProfileMachine();
+void StartupCinematic( void ) {
+	StartupEvents();
+	StartupCinematicActors();
+	cinematicdone = false;
+	cinematictime = 0;
+	GetCinematicTics();
+	ClearCinematicAbort();
+	ProfileMachine();
 }
-
 
 /*
 ================
@@ -103,12 +99,10 @@ void StartupCinematic ( void )
 =
 ================
 */
-void ShutdownCinematic ( void )
-{
-   ShutdownEvents ();
-   ShutdownCinematicActors ();
+void ShutdownCinematic( void ) {
+	ShutdownEvents();
+	ShutdownCinematicActors();
 }
-
 
 /*
 ================
@@ -118,25 +112,21 @@ void ShutdownCinematic ( void )
 ================
 */
 
-void ParseCinematicScript (void)
-{
-   int time;
+void ParseCinematicScript( void ) {
+	int time;
 
-   time=0;
-   do
-      {
-      //
-      // get next command time
-      //
-      GetToken (true);
-      if (endofscript)
-         break;
-      time+=ParseNum(token);
-      ParseEvent ( time );
-      }
-   while (script_p < scriptend_p);
+	time = 0;
+	do {
+		//
+		// get next command time
+		//
+		GetToken( true );
+		if ( endofscript )
+			break;
+		time += ParseNum( token );
+		ParseEvent( time );
+	} while ( script_p < scriptend_p );
 }
-
 
 /*
 ==============
@@ -146,15 +136,14 @@ void ParseCinematicScript (void)
 ==============
 */
 
-void CacheScriptFile (char *filename)
-{
-	long            size;
-   int lump;
+void CacheScriptFile( char * filename ) {
+	long size;
+	int lump;
 
-   lump=W_GetNumForName(filename);
+	lump = W_GetNumForName( filename );
 
-   scriptbuffer=W_CacheLumpNum(lump,PU_CACHE, CvtNull, 1);
-	size = W_LumpLength(lump);
+	scriptbuffer = W_CacheLumpNum( lump, PU_CACHE, CvtNull, 1 );
+	size = W_LumpLength( lump );
 
 	script_p = scriptbuffer;
 	scriptend_p = script_p + size;
@@ -162,7 +151,6 @@ void CacheScriptFile (char *filename)
 	endofscript = false;
 	tokenready = false;
 }
-
 
 /*
 =================
@@ -172,21 +160,20 @@ void CacheScriptFile (char *filename)
 =================
 */
 
-void GrabCinematicScript (char const *basename, boolean uselumpy)
-{
-   char script[256];
+void GrabCinematicScript( char const * basename, boolean uselumpy ) {
+	char script[256];
 
 //
 // read in the script file
 //
-   strcpy (script, basename);
-   strcat (script,".ms");
-   if (uselumpy==false)
-      LoadScriptFile (script);
-   else
-      CacheScriptFile ((char *)basename);
+	strcpy( script, basename );
+	strcat( script, ".ms" );
+	if ( uselumpy == false )
+		LoadScriptFile( script );
+	else
+		CacheScriptFile(( char * ) basename );
 
-   ParseCinematicScript ();
+	ParseCinematicScript();
 }
 
 /*
@@ -197,52 +184,46 @@ void GrabCinematicScript (char const *basename, boolean uselumpy)
 ==============
 */
 
-void GetCinematicTics ( void )
-{
-   int time;
+void GetCinematicTics( void ) {
+	int time;
 
-   time=GetCinematicTime();
-   while (time==cinematictictime)
-      {
-      time=GetCinematicTime();
-      }
-   cinematictics=(time-cinematictictime);
-   cinematictictime=time;
-   cinematictics=profiletics;
+	time = GetCinematicTime();
+	while ( time == cinematictictime ) {
+		time = GetCinematicTime();
+	}
+	cinematictics = (time - cinematictictime);
+	cinematictictime = time;
+	cinematictics = profiletics;
 }
 
+void PlayMovie( char * name, boolean uselumpy ) {
+	int i;
 
-void PlayMovie ( char * name, boolean uselumpy )
-{
-   int i;
+	StartupCinematic();
+	GrabCinematicScript( name, uselumpy );
 
-   StartupCinematic ( );
-   GrabCinematicScript (name, uselumpy);
-
-   PrecacheCinematic ( );
-   GetCinematicTics();
-   while (cinematicdone==false)
-      {
-      cinematicdone=CinematicAbort();
+	PrecacheCinematic();
+	GetCinematicTics();
+	while ( cinematicdone == false ) {
+		cinematicdone = CinematicAbort();
 #if DUMP
-      printf("time=%ld\n",cinematictime);
+		printf("time=%ld\n",cinematictime);
 #endif
-      for (i=0;i<cinematictics;i++)
-         {
-         UpdateCinematicEvents ( cinematictime );
-         UpdateCinematicActors ( );
-         cinematictime++;
-         }
-      DrawCinematicActors ();
-      GetCinematicTics();
-      }
+		for ( i = 0; i < cinematictics; i++ ) {
+			UpdateCinematicEvents( cinematictime );
+			UpdateCinematicActors();
+			cinematictime++;
+		}
+		DrawCinematicActors();
+		GetCinematicTics();
+	}
 
-   ShutdownCinematic ();
+	ShutdownCinematic();
 }
 
 #ifndef DOS
 int cin_iscale;
-byte *cin_source;
+byte * cin_source;
 int cin_texturemid;
 int cin_ycenter;
 int cin_yh;
@@ -250,35 +231,34 @@ int cin_yl;
 
 /* f_scale.asm */
 
-void R_DrawFilmColumn (byte * buf)
-{
+void R_DrawFilmColumn( byte * buf ) {
 	// This is *NOT* 100% correct - DDOI
 	int count;
 	int frac, fracstep;
-	byte *dest;
+	byte * dest;
 
 	count = cin_yh - cin_yl;
-	if (count < 0) return;
+	if ( count < 0 )
+		return;
 
 	dest = buf + ylookup[cin_yl];
 
 	fracstep = cin_iscale;
-	frac = cin_texturemid + (cin_yl-cin_ycenter)*fracstep;
+	frac = cin_texturemid + (cin_yl - cin_ycenter) * fracstep;
 
-	while (count--) {
-		*dest = cin_source[(frac>>SFRACBITS)];
+	while ( count-- ) {
+		*dest = cin_source[(frac >> SFRACBITS)];
 		dest += iGLOBAL_SCREENWIDTH;
 		frac += fracstep;
 	}
 }
 
-void DrawFilmPost (byte * buf, byte * src, int height)
-{
-	while (height--) { 
+void DrawFilmPost( byte * buf, byte * src, int height ) {
+	while ( height-- ) {
 		*buf = *src;
-		
+
 		src++;
-		
+
 		buf += linewidth;
 	}
 }

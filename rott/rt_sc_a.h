@@ -26,10 +26,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _rt_sc_a_public
 #define _rt_sc_a_public
 
-void R_DrawColumn (byte * buf);
-void R_DrawSolidColumn (int color, byte * buf);
-void R_TransColumn (byte * buf);
-void R_DrawClippedColumn (byte * buf);
+void R_DrawColumn( byte * buf );
+void R_DrawSolidColumn( int color, byte * buf );
+void R_TransColumn( byte * buf );
+void R_DrawClippedColumn( byte * buf );
 
 #if defined(__WATCOMC__)
 #pragma aux R_DrawColumn parm [EDI] modify exact [eax ebx ecx edx esi edi]

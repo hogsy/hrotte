@@ -37,19 +37,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
    Error definitions
 ---------------------------------------------------------------------*/
 
-enum USRHOOKS_Errors
-   {
-   USRHOOKS_Warning = -2,
-   USRHOOKS_Error   = -1,
-   USRHOOKS_Ok      = 0
-   };
-
+enum USRHOOKS_Errors {
+	USRHOOKS_Warning = -2,
+	USRHOOKS_Error = -1,
+	USRHOOKS_Ok = 0
+};
 
 /*---------------------------------------------------------------------
    Function Prototypes
 ---------------------------------------------------------------------*/
 
-int USRHOOKS_GetMem( void **ptr, unsigned long size );
-int USRHOOKS_FreeMem( void *ptr );
+int USRHOOKS_GetMem( void ** ptr, unsigned long size );
+int USRHOOKS_FreeMem( void * ptr );
 
 #endif

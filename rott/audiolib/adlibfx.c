@@ -41,19 +41,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define FALSE ( !TRUE )
 
 static void ADLIBFX_SendOutput( int reg, int data );
-static void ADLIBFX_Service( task *Task );
+static void ADLIBFX_Service( task * Task );
 
-static long     ADLIBFX_LengthLeft;
-static int      ADLIBFX_Block;
-static ALSound *ADLIBFX_Sound = NULL;
-static char    *ADLIBFX_SoundPtr = NULL;
-static int      ADLIBFX_Priority;
+static long ADLIBFX_LengthLeft;
+static int ADLIBFX_Block;
+static ALSound * ADLIBFX_Sound = NULL;
+static char * ADLIBFX_SoundPtr = NULL;
+static int ADLIBFX_Priority;
 static unsigned long ADLIBFX_CallBackVal;
-static void     ( *ADLIBFX_CallBackFunc )( unsigned long ) = NULL;
-static int      ADLIBFX_SoundVolume;
-static int      ADLIBFX_TotalVolume = ADLIBFX_MaxVolume;
-static task    *ADLIBFX_ServiceTask = NULL;
-static int      ADLIBFX_VoiceHandle = ADLIBFX_MinVoiceHandle;
+static void ( * ADLIBFX_CallBackFunc )( unsigned long ) = NULL;
+static int ADLIBFX_SoundVolume;
+static int ADLIBFX_TotalVolume = ADLIBFX_MaxVolume;
+static task * ADLIBFX_ServiceTask = NULL;
+static int ADLIBFX_VoiceHandle = ADLIBFX_MinVoiceHandle;
 
 int ADLIBFX_Installed = FALSE;
 
@@ -62,7 +62,6 @@ int ADLIBFX_ErrorCode = ADLIBFX_Ok;
 #define ADLIBFX_SetErrorCode( status ) \
    ADLIBFX_ErrorCode   = ( status );
 
-
 /*---------------------------------------------------------------------
    Function: ADLIBFX_ErrorString
 
@@ -70,44 +69,35 @@ int ADLIBFX_ErrorCode = ADLIBFX_Ok;
    number.  A -1 returns a pointer the current error.
 ---------------------------------------------------------------------*/
 
-char *ADLIBFX_ErrorString
-   (
-   int ErrorNumber
-   )
+char * ADLIBFX_ErrorString
+	(
+		int ErrorNumber
+	) {
+	char * ErrorString;
 
-   {
-   char *ErrorString;
+	switch ( ErrorNumber ) {
+	case ADLIBFX_Warning :
+	case ADLIBFX_Error :ErrorString = ADLIBFX_ErrorString( ADLIBFX_ErrorCode );
+		break;
 
-   switch( ErrorNumber )
-      {
-      case ADLIBFX_Warning :
-      case ADLIBFX_Error :
-         ErrorString = ADLIBFX_ErrorString( ADLIBFX_ErrorCode );
-         break;
+	case ADLIBFX_Ok :ErrorString = "Adlib FX ok.";
+		break;
 
-      case ADLIBFX_Ok :
-         ErrorString = "Adlib FX ok.";
-         break;
+	case ADLIBFX_NoVoices :ErrorString = "No free voices available in Adlib FX.";
+		break;
 
-      case ADLIBFX_NoVoices :
-         ErrorString = "No free voices available in Adlib FX.";
-         break;
+	case ADLIBFX_VoiceNotFound :ErrorString = "No voice with matching handle found.";
+		break;
 
-      case ADLIBFX_VoiceNotFound :
-         ErrorString = "No voice with matching handle found.";
-         break;
+	case ADLIBFX_DPMI_Error :ErrorString = "DPMI Error in AdlibFX.";
+		break;
 
-      case ADLIBFX_DPMI_Error :
-         ErrorString = "DPMI Error in AdlibFX.";
-         break;
+	default :ErrorString = "Unknown Adlib FX error code.";
+		break;
+	}
 
-      default :
-         ErrorString = "Unknown Adlib FX error code.";
-         break;
-      }
-
-   return( ErrorString );
-   }
+	return (ErrorString);
+}
 
 
 /**********************************************************************
@@ -126,35 +116,30 @@ char *ADLIBFX_ErrorString
 ---------------------------------------------------------------------*/
 
 static void ADLIBFX_SendOutput
-   (
-   int reg,
-   int data
-   )
+	(
+		int reg,
+		int data
+	) {
+	int i;
+	int adlib_port = 0x388;
+	unsigned flags;
 
-   {
-   int i;
-   int adlib_port = 0x388;
-   unsigned flags;
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	outp( adlib_port, reg );
 
-   outp( adlib_port, reg );
+	for ( i = 6; i; i-- ) {
+		inp( adlib_port );
+	}
 
-   for( i = 6; i ; i-- )
-      {
-      inp( adlib_port );
-      }
+	outp( adlib_port + 1, data );
 
-   outp( adlib_port + 1, data );
+	for ( i = 35; i; i-- ) {
+		inp( adlib_port );
+	}
 
-   for( i = 35; i ; i-- )
-      {
-      inp( adlib_port );
-      }
-
-   RestoreInterrupts( flags );
-   }
-
+	RestoreInterrupts( flags );
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_Stop
@@ -163,38 +148,33 @@ static void ADLIBFX_SendOutput
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_Stop
-   (
-   int handle
-   )
+	(
+		int handle
+	) {
+	unsigned flags;
 
-   {
-   unsigned flags;
+	if ((handle != ADLIBFX_VoiceHandle) || (ADLIBFX_Sound == NULL)) {
+		ADLIBFX_SetErrorCode( ADLIBFX_VoiceNotFound );
+		return (ADLIBFX_Warning);
+	}
 
-   if ( ( handle != ADLIBFX_VoiceHandle ) || ( ADLIBFX_Sound == NULL ) )
-      {
-      ADLIBFX_SetErrorCode( ADLIBFX_VoiceNotFound );
-      return( ADLIBFX_Warning );
-      }
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	ADLIBFX_SendOutput( 0xb0, 0 );
 
-   ADLIBFX_SendOutput( 0xb0, 0 );
+	ADLIBFX_Sound = NULL;
+	ADLIBFX_SoundPtr = NULL;
+	ADLIBFX_LengthLeft = 0;
+	ADLIBFX_Priority = 0;
 
-   ADLIBFX_Sound      = NULL;
-   ADLIBFX_SoundPtr   = NULL;
-   ADLIBFX_LengthLeft = 0;
-   ADLIBFX_Priority   = 0;
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
+	if ( ADLIBFX_CallBackFunc ) {
+		ADLIBFX_CallBackFunc( ADLIBFX_CallBackVal );
+	}
 
-   if ( ADLIBFX_CallBackFunc )
-      {
-      ADLIBFX_CallBackFunc( ADLIBFX_CallBackVal );
-      }
-
-   return( ADLIBFX_Ok );
-   }
-
+	return (ADLIBFX_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_Service
@@ -203,34 +183,26 @@ int ADLIBFX_Stop
 ---------------------------------------------------------------------*/
 
 static void ADLIBFX_Service
-   (
-   task *Task
-   )
+	(
+		task * Task
+	) {
+	int value;
 
-   {
-   int value;
+	if ( ADLIBFX_SoundPtr ) {
+		value = *ADLIBFX_SoundPtr++;
+		if ( value != 0 ) {
+			ADLIBFX_SendOutput( 0xa0, value );
+			ADLIBFX_SendOutput( 0xb0, ADLIBFX_Block );
+		} else {
+			ADLIBFX_SendOutput( 0xb0, 0 );
+		}
 
-   if ( ADLIBFX_SoundPtr )
-      {
-      value = *ADLIBFX_SoundPtr++;
-      if ( value != 0 )
-         {
-         ADLIBFX_SendOutput( 0xa0, value );
-         ADLIBFX_SendOutput( 0xb0, ADLIBFX_Block );
-         }
-      else
-         {
-         ADLIBFX_SendOutput( 0xb0, 0 );
-         }
-
-      ADLIBFX_LengthLeft--;
-      if ( ADLIBFX_LengthLeft <= 0 )
-         {
-         ADLIBFX_Stop( ADLIBFX_VoiceHandle );
-         }
-      }
-   }
-
+		ADLIBFX_LengthLeft--;
+		if ( ADLIBFX_LengthLeft <= 0 ) {
+			ADLIBFX_Stop( ADLIBFX_VoiceHandle );
+		}
+	}
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_SetVolume
@@ -239,43 +211,39 @@ static void ADLIBFX_Service
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_SetVolume
-   (
-   int handle,
-   int volume
-   )
+	(
+		int handle,
+		int volume
+	) {
+	unsigned flags;
+	int carrierlevel;
 
-   {
-   unsigned flags;
-   int      carrierlevel;
+	flags = DisableInterrupts();
+	if ((handle != ADLIBFX_VoiceHandle) || (ADLIBFX_Sound == NULL)) {
+		RestoreInterrupts( flags );
+		ADLIBFX_SetErrorCode( ADLIBFX_VoiceNotFound );
+		return (ADLIBFX_Warning);
+	}
 
-   flags = DisableInterrupts();
-   if ( ( handle != ADLIBFX_VoiceHandle ) || ( ADLIBFX_Sound == NULL ) )
-      {
-      RestoreInterrupts( flags );
-      ADLIBFX_SetErrorCode( ADLIBFX_VoiceNotFound );
-      return( ADLIBFX_Warning );
-      }
+	volume = min( volume, ADLIBFX_MaxVolume );
+	volume = max( volume, 0 );
+	ADLIBFX_SoundVolume = volume;
 
-   volume  = min( volume, ADLIBFX_MaxVolume );
-   volume  = max( volume, 0 );
-   ADLIBFX_SoundVolume = volume;
+	volume *= ADLIBFX_TotalVolume;
+	volume /= ADLIBFX_MaxVolume;
 
-   volume *= ADLIBFX_TotalVolume;
-   volume /= ADLIBFX_MaxVolume;
+	carrierlevel = ADLIBFX_Sound->cScale & 0x3f;
+	carrierlevel ^= 0x3f;
+	carrierlevel *= (volume / 2) + 0x80;
+	carrierlevel /= ADLIBFX_MaxVolume;
+	carrierlevel ^= 0x3f;
+	carrierlevel |= ADLIBFX_Sound->cScale & 0xc0;
 
-   carrierlevel  = ADLIBFX_Sound->cScale & 0x3f;
-   carrierlevel ^= 0x3f;
-   carrierlevel *= ( volume / 2 ) + 0x80;
-   carrierlevel /= ADLIBFX_MaxVolume;
-   carrierlevel ^= 0x3f;
-   carrierlevel |= ADLIBFX_Sound->cScale & 0xc0;
+	ADLIBFX_SendOutput( 0x43, carrierlevel );
 
-   ADLIBFX_SendOutput( 0x43, carrierlevel );
-
-   RestoreInterrupts( flags );
-   return( ADLIBFX_Ok );
-   }
-
+	RestoreInterrupts( flags );
+	return (ADLIBFX_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_SetTotalVolume
@@ -284,20 +252,17 @@ int ADLIBFX_SetVolume
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_SetTotalVolume
-   (
-   int volume
-   )
+	(
+		int volume
+	) {
+	volume = max( volume, 0 );
+	volume = min( volume, ADLIBFX_MaxVolume );
 
-   {
-   volume = max( volume, 0 );
-   volume = min( volume, ADLIBFX_MaxVolume );
+	ADLIBFX_TotalVolume = volume;
+	ADLIBFX_SetVolume( ADLIBFX_VoiceHandle, ADLIBFX_SoundVolume );
 
-   ADLIBFX_TotalVolume = volume;
-   ADLIBFX_SetVolume( ADLIBFX_VoiceHandle, ADLIBFX_SoundVolume );
-
-   return( ADLIBFX_Ok );
-   }
-
+	return (ADLIBFX_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_GetTotalVolume
@@ -306,14 +271,11 @@ int ADLIBFX_SetTotalVolume
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_GetTotalVolume
-   (
-   void
-   )
-
-   {
-   return( ADLIBFX_TotalVolume );
-   }
-
+	(
+		void
+	) {
+	return (ADLIBFX_TotalVolume);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_VoiceAvailable
@@ -322,19 +284,15 @@ int ADLIBFX_GetTotalVolume
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_VoiceAvailable
-   (
-   int priority
-   )
+	(
+		int priority
+	) {
+	if ( priority < ADLIBFX_Priority ) {
+		return (FALSE);
+	}
 
-   {
-   if ( priority < ADLIBFX_Priority )
-      {
-      return( FALSE );
-      }
-
-   return( TRUE );
-   }
-
+	return (TRUE);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_Play
@@ -343,74 +301,69 @@ int ADLIBFX_VoiceAvailable
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_Play
-   (
-   ALSound *sound,
-   int volume,
-   int priority,
-   unsigned long callbackval
-   )
+	(
+		ALSound * sound,
+		int volume,
+		int priority,
+		unsigned long callbackval
+	) {
+	unsigned flags;
+	int carrierlevel;
 
-   {
-   unsigned flags;
-   int      carrierlevel;
+	if ( priority < ADLIBFX_Priority ) {
+		ADLIBFX_SetErrorCode( ADLIBFX_NoVoices );
+		return (ADLIBFX_Warning);
+	}
 
-   if ( priority < ADLIBFX_Priority )
-      {
-      ADLIBFX_SetErrorCode( ADLIBFX_NoVoices );
-      return( ADLIBFX_Warning );
-      }
+	ADLIBFX_Stop( ADLIBFX_VoiceHandle );
 
-   ADLIBFX_Stop( ADLIBFX_VoiceHandle );
+	ADLIBFX_VoiceHandle++;
+	if ( ADLIBFX_VoiceHandle < ADLIBFX_MinVoiceHandle ) {
+		ADLIBFX_VoiceHandle = ADLIBFX_MinVoiceHandle;
+	}
 
-   ADLIBFX_VoiceHandle++;
-   if ( ADLIBFX_VoiceHandle < ADLIBFX_MinVoiceHandle )
-      {
-      ADLIBFX_VoiceHandle = ADLIBFX_MinVoiceHandle;
-      }
+	flags = DisableInterrupts();
 
-   flags = DisableInterrupts();
+	ADLIBFX_LengthLeft = sound->length;
+	ADLIBFX_Priority = priority;
+	ADLIBFX_Sound = sound;
+	ADLIBFX_SoundPtr = &sound->data;
+	ADLIBFX_CallBackVal = callbackval;
 
-   ADLIBFX_LengthLeft  = sound->length;
-   ADLIBFX_Priority    = priority;
-   ADLIBFX_Sound       = sound;
-   ADLIBFX_SoundPtr    = &sound->data;
-   ADLIBFX_CallBackVal = callbackval;
+	ADLIBFX_Block = ((sound->block & 7) << 2) | 0x20;
 
-   ADLIBFX_Block = ( ( sound->block & 7 ) << 2 ) | 0x20;
+	volume = min( volume, ADLIBFX_MaxVolume );
+	volume = max( volume, 0 );
+	ADLIBFX_SoundVolume = volume;
 
-   volume = min( volume, ADLIBFX_MaxVolume );
-   volume = max( volume, 0 );
-   ADLIBFX_SoundVolume = volume;
+	volume *= ADLIBFX_TotalVolume;
+	volume /= ADLIBFX_MaxVolume;
 
-   volume *= ADLIBFX_TotalVolume;
-   volume /= ADLIBFX_MaxVolume;
+	carrierlevel = sound->cScale & 0x3f;
+	carrierlevel ^= 0x3f;
+	carrierlevel *= (volume / 2) + 0x80;
+	carrierlevel /= ADLIBFX_MaxVolume;
+	carrierlevel ^= 0x3f;
+	carrierlevel |= sound->cScale & 0xc0;
 
-   carrierlevel  = sound->cScale & 0x3f;
-   carrierlevel ^= 0x3f;
-   carrierlevel *= ( volume / 2 ) + 0x80;
-   carrierlevel /= ADLIBFX_MaxVolume;
-   carrierlevel ^= 0x3f;
-   carrierlevel |= sound->cScale & 0xc0;
+	ADLIBFX_SendOutput( 0x20, sound->mChar );
+	ADLIBFX_SendOutput( 0x40, sound->mScale );
+	ADLIBFX_SendOutput( 0x60, sound->mAttack );
+	ADLIBFX_SendOutput( 0x80, sound->mSus );
+	ADLIBFX_SendOutput( 0xe0, sound->mWave );
 
-   ADLIBFX_SendOutput( 0x20, sound->mChar );
-   ADLIBFX_SendOutput( 0x40, sound->mScale );
-   ADLIBFX_SendOutput( 0x60, sound->mAttack );
-   ADLIBFX_SendOutput( 0x80, sound->mSus );
-   ADLIBFX_SendOutput( 0xe0, sound->mWave );
+	ADLIBFX_SendOutput( 0x23, sound->cChar );
+	ADLIBFX_SendOutput( 0x43, carrierlevel );
+	ADLIBFX_SendOutput( 0x63, sound->cAttack );
+	ADLIBFX_SendOutput( 0x83, sound->cSus );
+	ADLIBFX_SendOutput( 0xe3, sound->cWave );
 
-   ADLIBFX_SendOutput( 0x23, sound->cChar );
-   ADLIBFX_SendOutput( 0x43, carrierlevel );
-   ADLIBFX_SendOutput( 0x63, sound->cAttack );
-   ADLIBFX_SendOutput( 0x83, sound->cSus );
-   ADLIBFX_SendOutput( 0xe3, sound->cWave );
+	ADLIBFX_SendOutput( 0xc0, 0 );
 
-   ADLIBFX_SendOutput( 0xc0, 0 );
+	RestoreInterrupts( flags );
 
-   RestoreInterrupts( flags );
-
-   return( ADLIBFX_VoiceHandle );
-   }
-
+	return (ADLIBFX_VoiceHandle);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_SoundPlaying
@@ -419,22 +372,18 @@ int ADLIBFX_Play
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_SoundPlaying
-   (
-   int handle
-   )
+	(
+		int handle
+	) {
+	int status;
 
-   {
-   int status;
+	status = FALSE;
+	if ((handle == ADLIBFX_VoiceHandle) && (ADLIBFX_LengthLeft > 0)) {
+		status = TRUE;
+	}
 
-   status = FALSE;
-   if ( ( handle == ADLIBFX_VoiceHandle ) && ( ADLIBFX_LengthLeft > 0 ) )
-      {
-      status = TRUE;
-      }
-
-   return( status );
-   }
-
+	return (status);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_LockEnd
@@ -443,13 +392,10 @@ int ADLIBFX_SoundPlaying
 ---------------------------------------------------------------------*/
 
 static void ADLIBFX_LockEnd
-   (
-   void
-   )
-
-   {
-   }
-
+	(
+		void
+	) {
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_SetCallBack
@@ -458,14 +404,11 @@ static void ADLIBFX_LockEnd
 ---------------------------------------------------------------------*/
 
 void ADLIBFX_SetCallBack
-   (
-   void ( *function )( unsigned long )
-   )
-
-   {
-   ADLIBFX_CallBackFunc = function;
-   }
-
+	(
+		void ( * function )( unsigned long )
+	) {
+	ADLIBFX_CallBackFunc = function;
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_Init
@@ -474,46 +417,41 @@ void ADLIBFX_SetCallBack
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_Init
-   (
-   void
-   )
+	(
+		void
+	) {
+	int status;
 
-   {
-   int status;
+	if ( ADLIBFX_Installed ) {
+		ADLIBFX_Shutdown();
+	}
 
-   if ( ADLIBFX_Installed )
-      {
-      ADLIBFX_Shutdown();
-      }
+	status = DPMI_LockMemoryRegion( ADLIBFX_LockStart, ADLIBFX_LockEnd );
+	status |= DPMI_Lock( ADLIBFX_VoiceHandle );
+	status |= DPMI_Lock( ADLIBFX_Sound );
+	status |= DPMI_Lock( ADLIBFX_ErrorCode );
+	status |= DPMI_Lock( ADLIBFX_SoundPtr );
+	status |= DPMI_Lock( ADLIBFX_LengthLeft );
+	status |= DPMI_Lock( ADLIBFX_Priority );
+	status |= DPMI_Lock( ADLIBFX_CallBackFunc );
+	status |= DPMI_Lock( ADLIBFX_Block );
 
-   status  = DPMI_LockMemoryRegion( ADLIBFX_LockStart, ADLIBFX_LockEnd );
-   status |= DPMI_Lock( ADLIBFX_VoiceHandle );
-   status |= DPMI_Lock( ADLIBFX_Sound );
-   status |= DPMI_Lock( ADLIBFX_ErrorCode );
-   status |= DPMI_Lock( ADLIBFX_SoundPtr );
-   status |= DPMI_Lock( ADLIBFX_LengthLeft );
-   status |= DPMI_Lock( ADLIBFX_Priority );
-   status |= DPMI_Lock( ADLIBFX_CallBackFunc );
-   status |= DPMI_Lock( ADLIBFX_Block );
-
-   if ( status != DPMI_Ok )
-      {
-      ADLIBFX_SetErrorCode( ADLIBFX_DPMI_Error );
-      return( ADLIBFX_Error );
-      }
+	if ( status != DPMI_Ok ) {
+		ADLIBFX_SetErrorCode( ADLIBFX_DPMI_Error );
+		return (ADLIBFX_Error);
+	}
 
 //JIM
 //   AL_ReserveVoice( 0 );
-   ADLIBFX_Stop( ADLIBFX_VoiceHandle );
-   ADLIBFX_ServiceTask = TS_ScheduleTask( &ADLIBFX_Service, 140, 2, NULL );
-   TS_Dispatch();
-   ADLIBFX_Installed = TRUE;
-   ADLIBFX_CallBackFunc = NULL;
+	ADLIBFX_Stop( ADLIBFX_VoiceHandle );
+	ADLIBFX_ServiceTask = TS_ScheduleTask( &ADLIBFX_Service, 140, 2, NULL);
+	TS_Dispatch();
+	ADLIBFX_Installed = TRUE;
+	ADLIBFX_CallBackFunc = NULL;
 
-   ADLIBFX_SetErrorCode( ADLIBFX_Ok );
-   return( ADLIBFX_Ok );
-   }
-
+	ADLIBFX_SetErrorCode( ADLIBFX_Ok );
+	return (ADLIBFX_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: ADLIBFX_Shutdown
@@ -522,31 +460,28 @@ int ADLIBFX_Init
 ---------------------------------------------------------------------*/
 
 int ADLIBFX_Shutdown
-   (
-   void
-   )
-
-   {
-   if ( ADLIBFX_Installed )
-      {
-      ADLIBFX_Stop( ADLIBFX_VoiceHandle );
-      TS_Terminate( ADLIBFX_ServiceTask );
-      ADLIBFX_ServiceTask = NULL;
+	(
+		void
+	) {
+	if ( ADLIBFX_Installed ) {
+		ADLIBFX_Stop( ADLIBFX_VoiceHandle );
+		TS_Terminate( ADLIBFX_ServiceTask );
+		ADLIBFX_ServiceTask = NULL;
 //JIM
 //      AL_ReleaseVoice( 0 );
-      ADLIBFX_Installed = FALSE;
+		ADLIBFX_Installed = FALSE;
 
-      DPMI_UnlockMemoryRegion( ADLIBFX_LockStart, ADLIBFX_LockEnd );
-      DPMI_Unlock( ADLIBFX_VoiceHandle );
-      DPMI_Unlock( ADLIBFX_Sound );
-      DPMI_Unlock( ADLIBFX_ErrorCode );
-      DPMI_Unlock( ADLIBFX_SoundPtr );
-      DPMI_Unlock( ADLIBFX_LengthLeft );
-      DPMI_Unlock( ADLIBFX_Priority );
-      DPMI_Unlock( ADLIBFX_CallBackFunc );
-      DPMI_Unlock( ADLIBFX_Block );
-      }
+		DPMI_UnlockMemoryRegion( ADLIBFX_LockStart, ADLIBFX_LockEnd );
+		DPMI_Unlock( ADLIBFX_VoiceHandle );
+		DPMI_Unlock( ADLIBFX_Sound );
+		DPMI_Unlock( ADLIBFX_ErrorCode );
+		DPMI_Unlock( ADLIBFX_SoundPtr );
+		DPMI_Unlock( ADLIBFX_LengthLeft );
+		DPMI_Unlock( ADLIBFX_Priority );
+		DPMI_Unlock( ADLIBFX_CallBackFunc );
+		DPMI_Unlock( ADLIBFX_Block );
+	}
 
-   ADLIBFX_SetErrorCode( ADLIBFX_Ok );
-   return( ADLIBFX_Ok );
-   }
+	ADLIBFX_SetErrorCode( ADLIBFX_Ok );
+	return (ADLIBFX_Ok);
+}

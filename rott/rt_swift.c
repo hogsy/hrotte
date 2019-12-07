@@ -41,7 +41,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //MED
 #include "memcheck.h"
 
-
 #ifdef DOS
 
 //****************************************************************************
@@ -62,10 +61,10 @@ int SWIFT_Initialize (void)
    if (fActive)                     // SWIFT extensions already active
    {
 #ifdef DEGUB
-      SoftError( "SWIFT_Initialize: Already active.\n");
-      SoftError( "SWIFT_Initialize: returns TRUE\n");
+	  SoftError( "SWIFT_Initialize: Already active.\n");
+	  SoftError( "SWIFT_Initialize: returns TRUE\n");
 #endif
-      return (1);
+	  return (1);
    }
 
    nAttached = SWIFT_DEV_NONE;
@@ -74,10 +73,10 @@ int SWIFT_Initialize (void)
    if (_dos_getvect(0x33) == NULL)  // No mouse driver loaded
    {
 #ifdef DBUG
-      SoftError( "SWIFT_Initialize: No mouse driver loaded.\n");
-      SoftError( "SWIFT_Initialize: returns FALSE\n");
+	  SoftError( "SWIFT_Initialize: No mouse driver loaded.\n");
+	  SoftError( "SWIFT_Initialize: returns FALSE\n");
 #endif
-      return (0);
+	  return (0);
    }
 
 
@@ -88,10 +87,10 @@ int SWIFT_Initialize (void)
    if (AX (regs) == 0)
    {                                // no mouse
 #ifdef DBUG
-      SoftError( "SWIFT_Initialize: No pointing device attached.\n");
-      SoftError( "SWIFT_Initialize: returns FALSE\n");
+	  SoftError( "SWIFT_Initialize: No pointing device attached.\n");
+	  SoftError( "SWIFT_Initialize: returns FALSE\n");
 #endif
-      return (0);
+	  return (0);
    }
 
 #ifdef DBUG
@@ -102,11 +101,11 @@ int SWIFT_Initialize (void)
    int386 (0x33, &regs, &regs);
    SoftError( "SWIFT_Initialize: driver version %d.%02d\n", regs.h.bh, regs.h.bl);
    SoftError( "SWIFT_Initialize: %s mouse using IRQ %d\n",
-          (regs.h.ch==1) ? "bus" :
-          (regs.h.ch==2) ? "serial" :
-          (regs.h.ch==3) ? "inport" :
-          (regs.h.ch==4) ? "PS/2" :
-                           "unknown", regs.h.cl);
+		  (regs.h.ch==1) ? "bus" :
+		  (regs.h.ch==2) ? "serial" :
+		  (regs.h.ch==3) ? "inport" :
+		  (regs.h.ch==4) ? "PS/2" :
+						   "unknown", regs.h.cl);
 #endif
 
 
@@ -115,61 +114,61 @@ int SWIFT_Initialize (void)
    if (!pdosmem)
    {
 #ifdef DBUG
-      SoftError( "SWIFT_Initialize: DOS Alloc failed!\n");
-      SoftError( "SWIFT_Initialize: returns FALSE\n");
+	  SoftError( "SWIFT_Initialize: DOS Alloc failed!\n");
+	  SoftError( "SWIFT_Initialize: returns FALSE\n");
 #endif
-      return (0);
+	  return (0);
    }
 
 //
 // SWIFT device supported and attached
 //
    if (SWIFT_GetStaticDeviceInfo (&sdBuf))
-      fSwift = 1;
+	  fSwift = 1;
 
 
    if (!fSwift)
    {  // SWIFT functions not present
 #ifdef DBUG
-      SoftError( "SWIFT_Initialize: no SWIFT support in mouse driver.\n");
+	  SoftError( "SWIFT_Initialize: no SWIFT support in mouse driver.\n");
 #endif
    }
    else
-      if (sdBuf.deviceType == SWIFT_DEV_NONE)
-      {
+	  if (sdBuf.deviceType == SWIFT_DEV_NONE)
+	  {
 #ifdef DBUG
-         SoftError( "SWIFT_Initialize: no SWIFT device connected.\n");
+		 SoftError( "SWIFT_Initialize: no SWIFT device connected.\n");
 #endif
-      }
-      else
-      {
-         nAttached = sdBuf.deviceType;
+	  }
+	  else
+	  {
+		 nAttached = sdBuf.deviceType;
 #ifdef DBUG
-         SoftError( "SWIFT_Initialize: ");
+		 SoftError( "SWIFT_Initialize: ");
 
-         switch (nAttached)
-         {
-            case SWIFT_DEV_CYBERMAN:
-               SoftError( "CyberMan %d.%02d connected.\n",
-                                sdBuf.majorVersion, sdBuf.minorVersion);
-            break;
+		 switch (nAttached)
+		 {
+			case SWIFT_DEV_CYBERMAN:
+			   SoftError( "CyberMan %d.%02d connected.\n",
+								sdBuf.majorVersion, sdBuf.minorVersion);
+			break;
 
-            default:
-               SoftError( "Unknown SWIFT device (type %d) connected.\n",
-                                nAttached);
-            break;
-         }
+			default:
+			   SoftError( "Unknown SWIFT device (type %d) connected.\n",
+								nAttached);
+			break;
+		 }
 #endif
-      fActive = 1;
+	  fActive = 1;
    }
 
    if (!fActive)
    {                    // activation of SWIFT module failed for some reason
-      if (pdosmem)
-      {                 // if DOS buffer was allocated, free it
-         freeDOS(selector);
-         pdosmem = 0;
-      }
+	  if (pdosmem)
+	  {                 // if DOS buffer was allocated, free it
+		 freeDOS(selector);
+		 pdosmem = 0;
+	  }
    }
 
 #ifdef DBUG
@@ -199,14 +198,14 @@ void SWIFT_Terminate (void)
 
    if (fActive)
    {
-     // free DOS buffer
-      if (pdosmem)
-      {
-         freeDOS(selector);
-         pdosmem = 0;
-      }
+	 // free DOS buffer
+	  if (pdosmem)
+	  {
+		 freeDOS(selector);
+		 pdosmem = 0;
+	  }
 
-      fActive = 0;
+	  fActive = 0;
    }
 }
 
@@ -262,7 +261,7 @@ void SWIFT_Get3DStatus (SWIFT_3DStatus far *pstat)
 #ifdef DBUG
    if (!fActive)
    {
-      SoftError( "SWIFT_Get3DStatus: SWIFT module not active!\n");
+	  SoftError( "SWIFT_Get3DStatus: SWIFT module not active!\n");
    }
 #endif
 
@@ -299,7 +298,7 @@ void SWIFT_TactileFeedback (int d, int on, int off)
 
 #ifdef DBUG
    SoftError( "SWIFT_TactileFeedback (dur=%d ms, on=%d ms, off=%d ms)\n",
-                   d / 40 * 40, on/5*5, off/5*5);
+				   d / 40 * 40, on/5*5, off/5*5);
 #endif
 }
 
@@ -384,12 +383,12 @@ void far *allocDOS (unsigned nbytes, short *pseg, short *psel)
 
    if (regs.w.cflag == 0)
    {
-      *pseg = AX (regs);      // the real-mode segment
-      *psel = DX (regs);      // equivalent protected-mode selector
-      // pprot is the protected mode address of the same allocated block.
-      // The Rational extender maps the 1 MB physical DOS memory into
-      // the bottom of our virtual address space.
-      pprot = (void far *) ((unsigned)*pseg << 4);
+	  *pseg = AX (regs);      // the real-mode segment
+	  *psel = DX (regs);      // equivalent protected-mode selector
+	  // pprot is the protected mode address of the same allocated block.
+	  // The Rational extender maps the 1 MB physical DOS memory into
+	  // the bottom of our virtual address space.
+	  pprot = (void far *) ((unsigned)*pseg << 4);
    }
    return pprot;
 }
@@ -398,32 +397,27 @@ void far *allocDOS (unsigned nbytes, short *pseg, short *psel)
 
 /* This isn't of much use in Linux. */
 
-int SWIFT_Initialize (void)
-{
+int SWIFT_Initialize( void ) {
 	STUB_FUNCTION;
-	
+
 	return 0;
 }
 
-void SWIFT_Terminate (void)
-{
+void SWIFT_Terminate( void ) {
 	STUB_FUNCTION;
 }
 
-void SWIFT_Get3DStatus (SWIFT_3DStatus far *pstat)
-{
+void SWIFT_Get3DStatus( SWIFT_3DStatus far * pstat ) {
 	STUB_FUNCTION;
 }
 
-void SWIFT_TactileFeedback (int d, int on, int off)
-{
+void SWIFT_TactileFeedback( int d, int on, int off ) {
 	STUB_FUNCTION;
 }
 
-unsigned SWIFT_GetDynamicDeviceData (void)
-{
+unsigned SWIFT_GetDynamicDeviceData( void ) {
 	STUB_FUNCTION;
-	
+
 	return 0;
 }
 

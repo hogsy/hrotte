@@ -20,12 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __AL_MIDI_H
 #define __AL_MIDI_H
 
-enum AL_Errors
-   {
-   AL_Warning  = -2,
-   AL_Error    = -1,
-   AL_Ok       = 0,
-   };
+enum AL_Errors {
+	AL_Warning = -2,
+	AL_Error = -1,
+	AL_Ok = 0,
+};
 
 #define AL_MaxVolume             127
 #define AL_DefaultChannelVolume  90
@@ -35,13 +34,13 @@ enum AL_Errors
 #define ADLIB_PORT 0x388
 
 void AL_SendOutputToPort( int port, int reg, int data );
-void AL_SendOutput( int  voice, int reg, int data );
+void AL_SendOutput( int voice, int reg, int data );
 void AL_StereoOn( void );
 void AL_StereoOff( void );
-int  AL_ReserveVoice( int voice );
-int  AL_ReleaseVoice( int voice );
+int AL_ReserveVoice( int voice );
+int AL_ReleaseVoice( int voice );
 void AL_Shutdown( void );
-int  AL_Init( int soundcard );
+int AL_Init( int soundcard );
 void AL_SetMaxMidiChannel( int channel );
 void AL_Reset( void );
 void AL_NoteOff( int channel, int key, int velocity );
@@ -52,7 +51,7 @@ void AL_AllNotesOff( int channel );
 void AL_ControlChange( int channel, int type, int data );
 void AL_ProgramChange( int channel, int patch );
 void AL_SetPitchBend( int channel, int lsb, int msb );
-int  AL_DetectFM( void );
-void AL_RegisterTimbreBank( unsigned char *timbres );
+int AL_DetectFM( void );
+void AL_RegisterTimbreBank( unsigned char * timbres );
 
 #endif

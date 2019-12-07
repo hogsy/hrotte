@@ -33,25 +33,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MEMORYPRETAG   (0x1a2b3c4d)
 #define MEMORYPOSTTAG  (0x9f8e7d6b)
 
-typedef struct memblock_s
-{
-#if (MEMORYCORRUPTIONTEST==1)
-         int     pretag;
+typedef struct memblock_s {
+#if (MEMORYCORRUPTIONTEST == 1)
+	int     pretag;
 #endif
-         int     size;   // including the header and possibly tiny fragments
-         void    **user; // NULL if a free block
-			int     tag;    // purgelevel
-         struct memblock_s   *next, *prev;
-#if (MEMORYCORRUPTIONTEST==1)
-         int     posttag;
+	int size;   // including the header and possibly tiny fragments
+	void ** user; // NULL if a free block
+	int tag;    // purgelevel
+	struct memblock_s * next, * prev;
+#if (MEMORYCORRUPTIONTEST == 1)
+	int     posttag;
 #endif
 } memblock_t;
 
-typedef struct
-{
-         int     size;          // total bytes malloced, including header
-         memblock_t  blocklist; // start / end cap for linked list
-         memblock_t  *rover;
+typedef struct {
+	int size;          // total bytes malloced, including header
+	memblock_t blocklist; // start / end cap for linked list
+	memblock_t * rover;
 } memzone_t;
 
 #endif

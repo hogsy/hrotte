@@ -7,7 +7,7 @@
 
 extern int iGLOBAL_SCREENWIDTH;//bna val 800
 extern int iGLOBAL_SCREENHEIGHT;//bna val 600
-extern int iGLOBAL_SCREENBWIDE ;
+extern int iGLOBAL_SCREENBWIDE;
 extern int iG_SCREENWIDTH;// default screen width in bytes
 
 extern int iGLOBAL_HEALTH_X;
@@ -18,8 +18,8 @@ extern int iGLOBAL_AMMO_Y;
 extern int iGLOBAL_FOCALWIDTH;
 extern double dGLOBAL_FPFOCALWIDTH;
 
-void EnableScreenStretch(void);
-void DisableScreenStretch(void);
+void EnableScreenStretch( void );
+void DisableScreenStretch( void );
 
 /*
 double dYZANGLELIMIT;

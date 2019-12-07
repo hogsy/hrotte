@@ -20,11 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __MYPRINT_H
 #define __MYPRINT_H
 
-enum COLORS
-   {
-   BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY,
-   LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE
-   };
+enum COLORS {
+	BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY,
+	LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE
+};
 
 #define NONE         -1
 #define SINGLE_FRAME -1
@@ -35,9 +34,9 @@ void TextBox( int x1, int y1, int x2, int y2, int ch, int foreground, int backgr
 void TextFrame( int x1, int y1, int x2, int y2, int type, int foreground, int background );
 void mysetxy( int x, int y );
 void myputch( char ch );
-int  printstring( char *string );
-int  printnum( int number );
-int  printunsigned( unsigned long number, int radix );
-int  myprintf( char *fmt, ... ) __attribute__((format(printf,1,2)));
+int printstring( char * string );
+int printnum( int number );
+int printunsigned( unsigned long number, int radix );
+int myprintf( char * fmt, ... ) __attribute__((format(printf, 1, 2)));
 
 #endif

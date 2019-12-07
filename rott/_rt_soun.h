@@ -22,14 +22,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SOUNDTYPES 2
 
-typedef struct
-{
-   int     snds[SOUNDTYPES];
-   byte    flags;
-   byte    priority;
-   byte    count;
-   int     prevhandle;
-   int     prevdistance;
+typedef struct {
+	int snds[SOUNDTYPES];
+	byte flags;
+	byte priority;
+	byte count;
+	int prevhandle;
+	int prevdistance;
 } sound_t;
 
 #define SD_OVERWRITE  0x01
@@ -39,24 +38,24 @@ typedef struct
 #define SD_PLAYONCE      0x10
 
 enum {
-   sd_prio0=17,
-   sd_prio1=16,
-   sd_prio2=15,
-   sd_prio3=14,
-   sd_prio4=13,
-   sd_prio5=12,
-   sd_prio6=11,
-   sd_prio7=10,
-   sd_prio8=9,
-   sd_prio9=8,
-   sd_prio10=7,
-   sd_prio11=6,
-   sd_prio12=5,
-   sd_prio13=4,
-   sd_prio14=3,
-   sd_prio15=2,
-   sd_prio16=1
-} ;
+	sd_prio0 = 17,
+	sd_prio1 = 16,
+	sd_prio2 = 15,
+	sd_prio3 = 14,
+	sd_prio4 = 13,
+	sd_prio5 = 12,
+	sd_prio6 = 11,
+	sd_prio7 = 10,
+	sd_prio8 = 9,
+	sd_prio9 = 8,
+	sd_prio10 = 7,
+	sd_prio11 = 6,
+	sd_prio12 = 5,
+	sd_prio13 = 4,
+	sd_prio14 = 3,
+	sd_prio15 = 2,
+	sd_prio16 = 1
+};
 
 #define SD_PRIOSECRET sd_prio1
 #define SD_PRIOREMOTE sd_prio1
@@ -88,27 +87,24 @@ enum {
 
 #define PitchOffset()  ((RandomNumber("Pitch Offset",0)-128)>>SD_RANDOMSHIFT)
 
-#define SoundOffset(x) (sounds[x].snds[soundtype])
+#define SoundOffset( x ) (sounds[x].snds[soundtype])
 
 #define GUSMIDIINIFILE ("gusmidi.ini")
 
-
 typedef enum {
-   loop_yes,
-   loop_no
+	loop_yes,
+	loop_no
 } looptypes;
 
-
-typedef struct
-{
-   byte    loopflag;
-   byte    songtype;
-   char    lumpname[9];
-   char    songname[40];
+typedef struct {
+	byte loopflag;
+	byte songtype;
+	char lumpname[9];
+	char songname[40];
 } song_t;
 
-int SD_PlayIt ( int sndnum, int angle, int distance, int pitch );
-boolean SD_SoundOkay ( int sndnum );
+int SD_PlayIt( int sndnum, int angle, int distance, int pitch );
+boolean SD_SoundOkay( int sndnum );
 
 #endif
 

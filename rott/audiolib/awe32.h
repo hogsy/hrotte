@@ -32,20 +32,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __AWE32_H
 #define __AWE32_H
 
-enum AWE32_ERRORS
-   {
-   AWE32_Warning = -2,
-   AWE32_Error = -1,
-   AWE32_Ok = 0,
-   AWE32_SoundBlasterError,
-   AWE32_NotDetected,
-   AWE32_UnableToInitialize,
-   AWE32_MPU401Error,
-   AWE32_DPMI_Error
-   };
+enum AWE32_ERRORS {
+	AWE32_Warning = -2,
+	AWE32_Error = -1,
+	AWE32_Ok = 0,
+	AWE32_SoundBlasterError,
+	AWE32_NotDetected,
+	AWE32_UnableToInitialize,
+	AWE32_MPU401Error,
+	AWE32_DPMI_Error
+};
 
-char *AWE32_ErrorString( int ErrorNumber );
-int  AWE32_Init( void );
+char * AWE32_ErrorString( int ErrorNumber );
+int AWE32_Init( void );
 void AWE32_Shutdown( void );
 void AWE32_NoteOff( int channel, int key, int velocity );
 void AWE32_NoteOn( int channel, int key, int velocity );

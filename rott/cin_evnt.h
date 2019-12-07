@@ -26,16 +26,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern eventtype * firstevent;
 extern eventtype * lastevent;
 
-void AddEvent (eventtype * event);
-void DeleteEvent(eventtype * event);
+void AddEvent( eventtype * event );
+void DeleteEvent( eventtype * event );
 
-eventtype * GetNewEvent ( void );
-void StartupEvents ( void );
-void ShutdownEvents ( void );
-eventtype * CreateEvent ( int time, int type );
-void ParseEvent ( int time );
-void UpdateCinematicEvents ( int time );
-void PrecacheCinematic ( void );
+eventtype * GetNewEvent( void );
+void StartupEvents( void );
+void ShutdownEvents( void );
+eventtype * CreateEvent( int time, int type );
+void ParseEvent( int time );
+void UpdateCinematicEvents( int time );
+void PrecacheCinematic( void );
 
 #endif
 

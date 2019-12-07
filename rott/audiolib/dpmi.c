@@ -35,9 +35,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define TRUE  ( 1 == 1 )
 #define FALSE ( !TRUE )
 
-static union  REGS  Regs;
+static union REGS Regs;
 static struct SREGS SegRegs;
-
 
 /*---------------------------------------------------------------------
    Function: DPMI_GetRealModeVector
@@ -46,24 +45,21 @@ static struct SREGS SegRegs;
 ---------------------------------------------------------------------*/
 
 unsigned long DPMI_GetRealModeVector
-   (
-   int num
-   )
+	(
+		int num
+	) {
+	unsigned long vector;
 
-   {
-   unsigned long vector;
+	Regs.x.eax = 0x0200;
+	Regs.h.bl = num;
+	int386( 0x31, &Regs, &Regs );
 
-   Regs.x.eax = 0x0200;
-   Regs.h.bl  = num;
-   int386( 0x31, &Regs, &Regs );
+	vector = Regs.w.cx & 0xffff;
+	vector <<= 16;
+	vector |= Regs.w.dx & 0xffff;
 
-   vector   = Regs.w.cx & 0xffff;
-   vector <<= 16;
-   vector  |= Regs.w.dx & 0xffff;
-
-   return( vector );
-   }
-
+	return (vector);
+}
 
 /*---------------------------------------------------------------------
    Function: DPMI_SetRealModeVector
@@ -72,20 +68,17 @@ unsigned long DPMI_GetRealModeVector
 ---------------------------------------------------------------------*/
 
 void DPMI_SetRealModeVector
-   (
-   int num,
-   unsigned long vector
-   )
+	(
+		int num,
+		unsigned long vector
+	) {
+	Regs.x.eax = 0x0201;
+	Regs.h.bl = num;
+	Regs.w.dx = vector & 0xffff;
+	Regs.w.cx = (vector >> 16) & 0xffff;
 
-   {
-   Regs.x.eax = 0x0201;
-   Regs.h.bl  = num;
-   Regs.w.dx = vector & 0xffff;
-   Regs.w.cx = ( vector >> 16 ) & 0xffff;
-
-   int386( 0x31, &Regs, &Regs );
-   }
-
+	int386( 0x31, &Regs, &Regs );
+}
 
 /*---------------------------------------------------------------------
    Function: DPMI_CallRealModeFunction
@@ -94,31 +87,27 @@ void DPMI_SetRealModeVector
 ---------------------------------------------------------------------*/
 
 int DPMI_CallRealModeFunction
-   (
-   dpmi_regs *callregs
-   )
+	(
+		dpmi_regs * callregs
+	) {
+	// Setup our registers to call DPMI
+	Regs.w.ax = 0x0301;
+	Regs.h.bl = 0;
+	Regs.h.bh = 0;
+	Regs.w.cx = 0;
 
-   {
-   // Setup our registers to call DPMI
-   Regs.w.ax = 0x0301;
-   Regs.h.bl = 0;
-   Regs.h.bh = 0;
-   Regs.w.cx = 0;
+	SegRegs.es = FP_SEG( callregs );
+	Regs.x.edi = FP_OFF( callregs );
 
-   SegRegs.es = FP_SEG( callregs );
-   Regs.x.edi = FP_OFF( callregs );
+	// Call Real-mode procedure with Far Return Frame
+	int386x( 0x31, &Regs, &Regs, &SegRegs );
 
-   // Call Real-mode procedure with Far Return Frame
-   int386x( 0x31, &Regs, &Regs, &SegRegs );
+	if ( Regs.x.cflag ) {
+		return (DPMI_Error);
+	}
 
-   if ( Regs.x.cflag )
-      {
-      return( DPMI_Error );
-      }
-
-   return( DPMI_Ok );
-   }
-
+	return (DPMI_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: DPMI_LockMemory
@@ -128,41 +117,37 @@ int DPMI_CallRealModeFunction
 ---------------------------------------------------------------------*/
 
 int DPMI_LockMemory
-   (
-   void *address,
-   unsigned length
-   )
+	(
+		void * address,
+		unsigned length
+	) {
+	unsigned linear;
 
-   {
-   unsigned linear;
+	// Thanks to DOS/4GW's zero-based flat memory model, converting
+	// a pointer of any type to a linear address is trivial.
 
-   // Thanks to DOS/4GW's zero-based flat memory model, converting
-   // a pointer of any type to a linear address is trivial.
+	linear = ( unsigned ) address;
 
-   linear = (unsigned) address;
+	// DPMI Lock Linear Region
+	Regs.w.ax = 0x600;
 
-   // DPMI Lock Linear Region
-   Regs.w.ax = 0x600;
+	// Linear address in BX:CX
+	Regs.w.bx = (linear >> 16);
+	Regs.w.cx = (linear & 0xFFFF);
 
-   // Linear address in BX:CX
-   Regs.w.bx = (linear >> 16);
-   Regs.w.cx = (linear & 0xFFFF);
+	// Length in SI:DI
+	Regs.w.si = (length >> 16);
+	Regs.w.di = (length & 0xFFFF);
 
-   // Length in SI:DI
-   Regs.w.si = (length >> 16);
-   Regs.w.di = (length & 0xFFFF);
+	int386( 0x31, &Regs, &Regs );
 
-   int386 (0x31, &Regs, &Regs);
+	// Return 0 if can't lock
+	if ( Regs.w.cflag ) {
+		return (DPMI_Error);
+	}
 
-   // Return 0 if can't lock
-   if ( Regs.w.cflag )
-      {
-      return( DPMI_Error );
-      }
-
-   return ( DPMI_Ok );
-   }
-
+	return (DPMI_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: DPMI_LockMemoryRegion
@@ -172,19 +157,16 @@ int DPMI_LockMemory
 ---------------------------------------------------------------------*/
 
 int DPMI_LockMemoryRegion
-   (
-   void *start,
-   void *end
-   )
+	(
+		void * start,
+		void * end
+	) {
+	int status;
 
-   {
-   int status;
+	status = DPMI_LockMemory( start, ( char * ) end - ( char * ) start );
 
-   status = DPMI_LockMemory( start, ( char * )end - ( char * )start );
-
-   return( status );
-   }
-
+	return (status);
+}
 
 /*---------------------------------------------------------------------
    Function: DPMI_UnlockMemory
@@ -193,41 +175,37 @@ int DPMI_LockMemoryRegion
 ---------------------------------------------------------------------*/
 
 int DPMI_UnlockMemory
-   (
-   void *address,
-   unsigned length
-   )
+	(
+		void * address,
+		unsigned length
+	) {
+	unsigned linear;
 
-   {
-   unsigned linear;
+	// Thanks to DOS/4GW's zero-based flat memory model, converting
+	// a pointer of any type to a linear address is trivial.
 
-   // Thanks to DOS/4GW's zero-based flat memory model, converting
-   // a pointer of any type to a linear address is trivial.
+	linear = ( unsigned ) address;
 
-   linear = (unsigned) address;
+	// DPMI Unlock Linear Region
+	Regs.w.ax = 0x601;
 
-   // DPMI Unlock Linear Region
-   Regs.w.ax = 0x601;
+	// Linear address in BX:CX
+	Regs.w.bx = (linear >> 16);
+	Regs.w.cx = (linear & 0xFFFF);
 
-   // Linear address in BX:CX
-   Regs.w.bx = (linear >> 16);
-   Regs.w.cx = (linear & 0xFFFF);
+	// Length in SI:DI
+	Regs.w.si = (length >> 16);
+	Regs.w.di = (length & 0xFFFF);
 
-   // Length in SI:DI
-   Regs.w.si = (length >> 16);
-   Regs.w.di = (length & 0xFFFF);
+	int386( 0x31, &Regs, &Regs );
 
-   int386 (0x31, &Regs, &Regs);
+	// Return 0 if can't unlock
+	if ( Regs.w.cflag ) {
+		return (DPMI_Error);
+	}
 
-   // Return 0 if can't unlock
-   if ( Regs.w.cflag )
-      {
-      return( DPMI_Error );
-      }
-
-   return ( DPMI_Ok );
-   }
-
+	return (DPMI_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: DPMI_UnlockMemoryRegion
@@ -236,15 +214,13 @@ int DPMI_UnlockMemory
 ---------------------------------------------------------------------*/
 
 int DPMI_UnlockMemoryRegion
-   (
-   void *start,
-   void *end
-   )
+	(
+		void * start,
+		void * end
+	) {
+	int status;
 
-   {
-   int status;
+	status = DPMI_UnlockMemory( start, ( char * ) end - ( char * ) start );
 
-   status = DPMI_UnlockMemory( start, ( char * )end - ( char * )start );
-
-   return( status );
-   }
+	return (status);
+}

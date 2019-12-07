@@ -31,53 +31,51 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __DMA_H
 #define __DMA_H
 
-enum DMA_ERRORS
-   {
-   DMA_Error = -1,
-   DMA_Ok    = 0,
-   DMA_ChannelOutOfRange,
-   DMA_InvalidChannel
-   };
+enum DMA_ERRORS {
+	DMA_Error = -1,
+	DMA_Ok = 0,
+	DMA_ChannelOutOfRange,
+	DMA_InvalidChannel
+};
 
-enum DMA_Modes
-   {
-   DMA_SingleShotRead,
-   DMA_SingleShotWrite,
-   DMA_AutoInitRead,
-   DMA_AutoInitWrite
-   };
+enum DMA_Modes {
+	DMA_SingleShotRead,
+	DMA_SingleShotWrite,
+	DMA_AutoInitRead,
+	DMA_AutoInitWrite
+};
 
-char *DMA_ErrorString
-   (
-   int ErrorNumber
-   );
+char * DMA_ErrorString
+	(
+		int ErrorNumber
+	);
 
 int DMA_VerifyChannel
-   (
-   int channel
-   );
+	(
+		int channel
+	);
 
 int DMA_SetupTransfer
-   (
-   int  channel,
-   char *address,
-   int  length,
-   int  mode
-   );
+	(
+		int channel,
+		char * address,
+		int length,
+		int mode
+	);
 
 int DMA_EndTransfer
-   (
-   int channel
-   );
+	(
+		int channel
+	);
 
-char *DMA_GetCurrentPos
-   (
-   int channel
-   );
+char * DMA_GetCurrentPos
+	(
+		int channel
+	);
 
 int DMA_GetTransferCount
-   (
-   int channel
-   );
+	(
+		int channel
+	);
 
 #endif

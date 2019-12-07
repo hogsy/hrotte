@@ -22,9 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "develop.h"
 
-void  InitializeRNG ( void );
-int   GetRandomSeed ( void );
-
+void InitializeRNG( void );
+int GetRandomSeed( void );
 
 #if RANDOMTEST
 
@@ -36,16 +35,14 @@ int   RNG ( char * string, int val );
 
 #else
 
-int   GameRNG ( void );
-#define GameRandomNumber(string,val)   GameRNG()
+int GameRNG( void );
+#define GameRandomNumber( string, val )   GameRNG()
 
-int   RNG ( void );
-#define RandomNumber(string,val)   RNG()
+int RNG( void );
+#define RandomNumber( string, val )   RNG()
 
 #endif
 
-
-
-void  SetRNGindex ( int i );
-int   GetRNGindex ( void );
+void SetRNGindex( int i );
+int GetRNGindex( void );
 #endif

@@ -112,57 +112,54 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define EMIDI_AffectsCurrentCard( c, type ) \
    ( ( ( c ) == EMIDI_ALL_CARDS ) || ( ( c ) == ( type ) ) )
 
-
 #define EMIDI_NUM_CONTEXTS      7
-typedef struct
-   {
-   unsigned char *pos;
-   unsigned char *loopstart;
-   short          loopcount;
-   short          RunningStatus;
-   unsigned       time;
-   long           FPSecondsPerTick;
-   short          tick;
-   short          beat;
-   short          measure;
-   short          BeatsPerMeasure;
-   short          TicksPerBeat;
-   short          TimeBase;
-   long           delay;
-   short          active;
-   } songcontext;
+typedef struct {
+	unsigned char * pos;
+	unsigned char * loopstart;
+	short loopcount;
+	short RunningStatus;
+	unsigned time;
+	long FPSecondsPerTick;
+	short tick;
+	short beat;
+	short measure;
+	short BeatsPerMeasure;
+	short TicksPerBeat;
+	short TimeBase;
+	long delay;
+	short active;
+} songcontext;
 
-typedef struct
-   {
-   unsigned char *start;
-   unsigned char *pos;
+typedef struct {
+	unsigned char * start;
+	unsigned char * pos;
 
-   long           delay;
-   short          active;
-   short          RunningStatus;
+	long delay;
+	short active;
+	short RunningStatus;
 
-   short          currentcontext;
-   songcontext    context[ EMIDI_NUM_CONTEXTS ];
+	short currentcontext;
+	songcontext context[EMIDI_NUM_CONTEXTS];
 
-   char           EMIDI_IncludeTrack;
-   char           EMIDI_ProgramChange;
-   char           EMIDI_VolumeChange;
-   } track;
+	char EMIDI_IncludeTrack;
+	char EMIDI_ProgramChange;
+	char EMIDI_VolumeChange;
+} track;
 
-static long _MIDI_ReadNumber( void *from, size_t size );
-static long _MIDI_ReadDelta( track *ptr );
+static long _MIDI_ReadNumber( void * from, size_t size );
+static long _MIDI_ReadDelta( track * ptr );
 static void _MIDI_ResetTracks( void );
 static void _MIDI_AdvanceTick( void );
-static void _MIDI_MetaEvent( track *Track );
-static void _MIDI_SysEx( track *Track );
-static int  _MIDI_InterpretControllerInfo( track *Track, int TimeSet,
-   int channel, int c1, int c2 );
+static void _MIDI_MetaEvent( track * Track );
+static void _MIDI_SysEx( track * Track );
+static int _MIDI_InterpretControllerInfo( track * Track, int TimeSet,
+										  int channel, int c1, int c2 );
 //static
-   void _MIDI_ServiceRoutine( task *Task );
-static int  _MIDI_SendControlChange( int channel, int c1, int c2 );
+void _MIDI_ServiceRoutine( task * Task );
+static int _MIDI_SendControlChange( int channel, int c1, int c2 );
 static void _MIDI_SetChannelVolume( int channel, int volume );
 static void _MIDI_SendChannelVolumes( void );
-static int  _MIDI_ProcessNextTick( void );
+static int _MIDI_ProcessNextTick( void );
 static void _MIDI_InitEMIDI( void );
 
 /*

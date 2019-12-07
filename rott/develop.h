@@ -55,10 +55,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define RANDOMTEST  0
 #define WHEREAMI    0
 
-
-
-
-#if (WHEREAMI==1)
+#if (WHEREAMI == 1)
 
 #define wami(val)      \
    {                   \
@@ -74,7 +71,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #else
 
-#define wami(val)
+#define wami( val )
 #define waminot()
 
 #endif

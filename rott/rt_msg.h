@@ -43,28 +43,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAXMSGS 15
 
-typedef struct msgt
-{
-  byte active;
-  byte flags;
-  int  tictime;
-  char * text;
+typedef struct msgt {
+	byte active;
+	byte flags;
+	int tictime;
+	char * text;
 } messagetype;
 
 extern messagetype Messages[MAXMSGS];
 
 extern boolean MessagesEnabled;
 
-
 void RestoreMessageBackground( void );
-void DrawMessages ( void );
-int AddMessage (char * text, int flags);
-void InitializeMessages ( void );
-void ResetMessageTime ( void );
-int StringLength (char *string);
-void UpdateModemMessage (int num, char c);
-void ModemMessageDeleteChar (int num);
-void DeleteMessage ( int num );
+void DrawMessages( void );
+int AddMessage( char * text, int flags );
+void InitializeMessages( void );
+void ResetMessageTime( void );
+int StringLength( char * string );
+void UpdateModemMessage( int num, char c );
+void ModemMessageDeleteChar( int num );
+void DeleteMessage( int num );
 void FinishModemMessage( int num, boolean send );
 void DeletePriorityMessage( int flags );
 

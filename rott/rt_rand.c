@@ -46,9 +46,8 @@ static int sndindex = 0;
 //
 //****************************************************************************
 
-int GetRandomSeed ( void )
-{
-   return ( time (NULL) % (SIZE_OF_RANDOM_TABLE) );
+int GetRandomSeed( void ) {
+	return (time(NULL) % (SIZE_OF_RANDOM_TABLE));
 }
 
 //****************************************************************************
@@ -57,10 +56,9 @@ int GetRandomSeed ( void )
 //
 //****************************************************************************
 
-void  InitializeRNG ( void )
-{
-   SetRNGindex(GetRandomSeed());
-   sndindex=GetRandomSeed();
+void InitializeRNG( void ) {
+	SetRNGindex( GetRandomSeed());
+	sndindex = GetRandomSeed();
 }
 
 //****************************************************************************
@@ -69,11 +67,10 @@ void  InitializeRNG ( void )
 //
 //****************************************************************************
 
-void  SetRNGindex ( int i )
-{
-   rndindex=i;
+void SetRNGindex( int i ) {
+	rndindex = i;
 //#if (DEVELOPMENT == 1)
-   SoftError("RNG index set at %d\n",i);
+	SoftError( "RNG index set at %d\n", i );
 //#endif
 }
 
@@ -83,13 +80,11 @@ void  SetRNGindex ( int i )
 //
 //****************************************************************************
 
-int GetRNGindex ( void )
-{
-   return rndindex;
+int GetRNGindex( void ) {
+	return rndindex;
 }
 
-
-#if (RANDOMTEST==1)
+#if (RANDOMTEST == 1)
 //****************************************************************************
 //
 // int GameRNG ( char * string, int val )
@@ -107,17 +102,14 @@ int   GameRNG ( char * string, int val )
 // int GameRNG (void)
 //
 //****************************************************************************
-int   GameRNG ( void )
-{
-   rndindex = (rndindex+1)&(SIZE_OF_RANDOM_TABLE-1);
+int GameRNG( void ) {
+	rndindex = (rndindex + 1) & (SIZE_OF_RANDOM_TABLE - 1);
 
-   return RandomTable[rndindex];
+	return RandomTable[rndindex];
 }
 #endif
 
-
-
-#if (RANDOMTEST==1)
+#if (RANDOMTEST == 1)
 //****************************************************************************
 //
 // int RNG ( char * string, int val )
@@ -137,11 +129,10 @@ int   RNG ( char * string, int val )
 //
 //****************************************************************************
 
-int   RNG( void )
-{
-   sndindex = (sndindex+1)&(SIZE_OF_RANDOM_TABLE-1);
+int RNG( void ) {
+	sndindex = (sndindex + 1) & (SIZE_OF_RANDOM_TABLE - 1);
 
-   return RandomTable[sndindex];
+	return RandomTable[sndindex];
 }
 #endif
 

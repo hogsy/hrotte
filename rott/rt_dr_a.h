@@ -26,13 +26,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //***************************************************************************
 
-void SetMode240(void);
-void RefreshClear(void);
-void DrawPost (int height, char * column, char * buf);
-void  DrawHeightPost (int height, byte * src, byte * buf); // IN rt_dr_a.asm
-void R_DrawWallColumn (byte * buf);
-void  DrawMenuPost (int height, byte * src, byte * buf); // IN rt_dr_a.asm
-void  DrawMapPost (int height, byte * src, byte * buf); // IN rt_dr_a.asm
+void SetMode240( void );
+void RefreshClear( void );
+void DrawPost( int height, char * column, char * buf );
+void DrawHeightPost( int height, byte * src, byte * buf ); // IN rt_dr_a.asm
+void R_DrawWallColumn( byte * buf );
+void DrawMenuPost( int height, byte * src, byte * buf ); // IN rt_dr_a.asm
+void DrawMapPost( int height, byte * src, byte * buf ); // IN rt_dr_a.asm
 
 #if defined(__WATCOMC__)
 #pragma aux DrawPost parm [ECX] [ESI] [EDI] modify exact [eax ebx ecx edx esi edi]

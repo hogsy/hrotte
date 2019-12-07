@@ -65,9 +65,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //****************************************************************************
 
-                                          // Active flag:
+										  // Active flag:
 static int fActive;                       //  TRUE after successful init
-                                          //  and before termination
+										  //  and before termination
 static int nAttached = SWIFT_DEV_NONE;    // type of SWIFT device
 
 union REGS regs;
@@ -80,16 +80,16 @@ void far *pdosmem;                        // pointer to DOS memory block
 // DPMI real mode interrupt structure
 static struct rminfo
 {
-    long di;
-    long si;
-    long bp;
-    long reserved_by_system;
-    long bx;
-    long dx;
-    long cx;
-    long ax;
-    short flags;
-    short es, ds, fs, gs, ip, cs, sp, ss;
+	long di;
+	long si;
+	long bp;
+	long reserved_by_system;
+	long bx;
+	long dx;
+	long cx;
+	long ax;
+	short flags;
+	short es, ds, fs, gs, ip, cs, sp, ss;
 } RMI;
 
 

@@ -47,21 +47,21 @@ static WORD wSBCBaseAddx;            /* Sound Blaster base address */
 static WORD wEMUBaseAddx;            /* EMU8000 subsystem base address */
 static WORD wMpuBaseAddx;            /* MPU401 base address */
 
-static unsigned short NoteFlags[ 128 ];
+static unsigned short NoteFlags[128];
 
 /*  macros  */
 #define SBCPort( x )  ( ( x ) + wSBCBaseAddx )
 #define MPUPort( x )  ( ( x ) + wMpuBaseAddx )
 
 static SOUND_PACKET spSound =
-   {
-   0
-   };
+	{
+		0
+	};
 
-static LONG lBankSizes[ MAXBANKS ] =
-   {
-   0
-   };
+static LONG lBankSizes[MAXBANKS] =
+	{
+		0
+	};
 
 unsigned SetES( void );
 #pragma aux SetES = \
@@ -69,18 +69,17 @@ unsigned SetES( void );
         "mov ax, es" \
         "mov bx, ds" \
         "mov es, bx" \
-        modify [ eax ebx ];
+        modify[eax ebx];
 
 void RestoreES( unsigned num );
 #pragma aux RestoreES = \
         "mov  es, ax" \
-        parm [ eax ];
+        parm[eax];
 
 int AWE32_ErrorCode = AWE32_Ok;
 
 #define AWE32_SetErrorCode( status ) \
    AWE32_ErrorCode = ( status );
-
 
 /*---------------------------------------------------------------------
    Function: AWE32_ErrorString
@@ -89,51 +88,40 @@ int AWE32_ErrorCode = AWE32_Ok;
    number.  A -1 returns a pointer the current error.
 ---------------------------------------------------------------------*/
 
-char *AWE32_ErrorString
-   (
-   int ErrorNumber
-   )
+char * AWE32_ErrorString
+	(
+		int ErrorNumber
+	) {
+	char * ErrorString;
 
-   {
-   char *ErrorString;
+	switch ( ErrorNumber ) {
+	case AWE32_Warning :
+	case AWE32_Error :ErrorString = AWE32_ErrorString( AWE32_ErrorCode );
+		break;
 
-   switch( ErrorNumber )
-      {
-      case AWE32_Warning :
-      case AWE32_Error :
-         ErrorString = AWE32_ErrorString( AWE32_ErrorCode );
-         break;
+	case AWE32_Ok :ErrorString = "AWE32 ok.";
+		break;
 
-      case AWE32_Ok :
-         ErrorString = "AWE32 ok.";
-         break;
+	case AWE32_SoundBlasterError :ErrorString = BLASTER_ErrorString( BLASTER_Error );
+		break;
 
-      case AWE32_SoundBlasterError :
-         ErrorString = BLASTER_ErrorString( BLASTER_Error );
-         break;
+	case AWE32_NotDetected :ErrorString = "Could not detect AWE32.";
+		break;
 
-      case AWE32_NotDetected :
-         ErrorString = "Could not detect AWE32.";
-         break;
+	case AWE32_UnableToInitialize :ErrorString = "Unable to initialize AWE32.";
 
-      case AWE32_UnableToInitialize :
-         ErrorString = "Unable to initialize AWE32.";
+	case AWE32_MPU401Error :ErrorString = "MPU-401 initialization failed in AWE32.";
+		break;
 
-      case AWE32_MPU401Error :
-         ErrorString = "MPU-401 initialization failed in AWE32.";
-         break;
+	case AWE32_DPMI_Error :ErrorString = "DPMI Error in AWE32.";
+		break;
 
-      case AWE32_DPMI_Error :
-         ErrorString = "DPMI Error in AWE32.";
-         break;
+	default :ErrorString = "Unknown AWE32 error code.";
+		break;
+	}
 
-      default :
-         ErrorString = "Unknown AWE32 error code.";
-         break;
-      }
-
-   return( ErrorString );
-   }
+	return (ErrorString);
+}
 
 
 /**********************************************************************
@@ -145,130 +133,109 @@ char *AWE32_ErrorString
 
 #define AWE32_LockStart AWE32_NoteOff
 
-
 void AWE32_NoteOff
-   (
-   int channel,
-   int key,
-   int velocity
-   )
+	(
+		int channel,
+		int key,
+		int velocity
+	) {
+	unsigned temp;
 
-   {
-   unsigned temp;
-
-   temp = SetES();
-   awe32NoteOff( channel, key, velocity );
-   RestoreES( temp );
-   NoteFlags[ key ] ^= ( 1 << channel );
-   }
+	temp = SetES();
+	awe32NoteOff( channel, key, velocity );
+	RestoreES( temp );
+	NoteFlags[key] ^= (1 << channel);
+}
 
 void AWE32_NoteOn
-   (
-   int channel,
-   int key,
-   int velocity
-   )
+	(
+		int channel,
+		int key,
+		int velocity
+	) {
+	unsigned temp;
 
-   {
-   unsigned temp;
-
-   temp = SetES();
-   awe32NoteOn( channel, key, velocity );
-   RestoreES( temp );
-   NoteFlags[ key ] |= ( 1 << channel );
-   }
+	temp = SetES();
+	awe32NoteOn( channel, key, velocity );
+	RestoreES( temp );
+	NoteFlags[key] |= (1 << channel);
+}
 
 void AWE32_PolyAftertouch
-   (
-   int channel,
-   int key,
-   int pressure
-   )
+	(
+		int channel,
+		int key,
+		int pressure
+	) {
+	unsigned temp;
 
-   {
-   unsigned temp;
-
-   temp = SetES();
-   awe32PolyKeyPressure( channel, key, pressure );
-   RestoreES( temp );
-   }
+	temp = SetES();
+	awe32PolyKeyPressure( channel, key, pressure );
+	RestoreES( temp );
+}
 
 void AWE32_ChannelAftertouch
-   (
-   int channel,
-   int pressure
-   )
+	(
+		int channel,
+		int pressure
+	) {
+	unsigned temp;
 
-   {
-   unsigned temp;
-
-   temp = SetES();
-   awe32ChannelPressure( channel, pressure );
-   RestoreES( temp );
-   }
+	temp = SetES();
+	awe32ChannelPressure( channel, pressure );
+	RestoreES( temp );
+}
 
 void AWE32_ControlChange
-   (
-   int channel,
-   int number,
-   int value
-   )
+	(
+		int channel,
+		int number,
+		int value
+	) {
+	unsigned temp;
+	int i;
+	unsigned channelmask;
 
-   {
-   unsigned temp;
-   int i;
-   unsigned channelmask;
+	temp = SetES();
 
-   temp = SetES();
-
-   if ( number == 0x7b )
-      {
-      channelmask = 1 << channel;
-      for( i = 0; i < 128; i++ )
-         {
-         if ( NoteFlags[ i ] & channelmask )
-            {
-            awe32NoteOff( channel, i, 0 );
-            NoteFlags[ i ] ^= channelmask;
-            }
-         }
-      }
-   else
-      {
-      awe32Controller( channel, number, value );
-      }
-   RestoreES( temp );
-   }
+	if ( number == 0x7b ) {
+		channelmask = 1 << channel;
+		for ( i = 0; i < 128; i++ ) {
+			if ( NoteFlags[i] & channelmask ) {
+				awe32NoteOff( channel, i, 0 );
+				NoteFlags[i] ^= channelmask;
+			}
+		}
+	} else {
+		awe32Controller( channel, number, value );
+	}
+	RestoreES( temp );
+}
 
 void AWE32_ProgramChange
-   (
-   int channel,
-   int program
-   )
+	(
+		int channel,
+		int program
+	) {
+	unsigned temp;
 
-   {
-   unsigned temp;
-
-   temp = SetES();
-   awe32ProgramChange( channel, program );
-   RestoreES( temp );
-   }
+	temp = SetES();
+	awe32ProgramChange( channel, program );
+	RestoreES( temp );
+}
 
 void AWE32_PitchBend
-   (
-   int channel,
-   int lsb,
-   int msb
-   )
+	(
+		int channel,
+		int lsb,
+		int msb
+	) {
+	unsigned temp;
 
-   {
-   unsigned temp;
-
-   temp = SetES();
-   awe32PitchBend( channel, lsb, msb );
-   RestoreES( temp );
-   }
-
+	temp = SetES();
+	awe32PitchBend( channel, lsb, msb );
+	RestoreES( temp );
+}
 
 /*---------------------------------------------------------------------
    Function: AWE32_LockEnd
@@ -277,12 +244,10 @@ void AWE32_PitchBend
 ---------------------------------------------------------------------*/
 
 static void AWE32_LockEnd
-   (
-   void
-   )
-
-   {
-   }
+	(
+		void
+	) {
+}
 
 
 /*
@@ -333,126 +298,112 @@ static int InitMPU
    }
 */
 
-/*ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸*/
-/*³ ShutdownMPU                                                    ³*/
-/*³ Cleans up Sound Blaster to normal state.                               ³*/
-/*ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾*/
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¸*/
+/*ï¿½ ShutdownMPU                                                    ï¿½*/
+/*ï¿½ Cleans up Sound Blaster to normal state.                               ï¿½*/
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¾*/
 
 static void ShutdownMPU
-   (
-   void
-   )
+	(
+		void
+	) {
+	volatile DWORD dwCount;
 
-   {
-   volatile DWORD dwCount;
+	for ( dwCount = 0; dwCount < 0x2000; dwCount++ );
+	dwCount = 0x2000;
+	while ( dwCount && _inp(MPUPort( 1 )) & 0x40 )
+		--dwCount;
+	_outp(MPUPort( 1 ), MPU_RESET_CMD );
+	for ( dwCount = 0; dwCount < 0x2000; dwCount++ );
+	_inp(MPUPort( 0 ));
 
-   for (dwCount=0; dwCount<0x2000; dwCount++) ;
-   dwCount = 0x2000;
-   while (dwCount && _inp(MPUPort(1)) & 0x40) --dwCount;
-   _outp(MPUPort(1), MPU_RESET_CMD);
-   for (dwCount=0; dwCount<0x2000; dwCount++) ;
-   _inp(MPUPort(0));
-
-   for (dwCount=0; dwCount<0x2000; dwCount++) ;
-   dwCount = 0x2000;
-   while (dwCount && _inp(MPUPort(1)) & 0x40) --dwCount;
-   _outp(MPUPort(1), MPU_RESET_CMD);
-   for (dwCount=0; dwCount<0x2000; dwCount++) ;
-   _inp(MPUPort(0));
-   }
+	for ( dwCount = 0; dwCount < 0x2000; dwCount++ );
+	dwCount = 0x2000;
+	while ( dwCount && _inp(MPUPort( 1 )) & 0x40 )
+		--dwCount;
+	_outp(MPUPort( 1 ), MPU_RESET_CMD );
+	for ( dwCount = 0; dwCount < 0x2000; dwCount++ );
+	_inp(MPUPort( 0 ));
+}
 
 
-/*ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸*/
-/*³ LoadSBK                                                                ³*/
-/*ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾*/
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¸*/
+/*ï¿½ LoadSBK                                                                ï¿½*/
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¾*/
 
 static void LoadSBK
-   (
-   void
-   )
+	(
+		void
+	) {
+	/* use embeded preset objects */
+	spSound.bank_no = 0;            /* load as Bank 0 */
+	spSound.total_banks = 1;        /* use 1 bank first */
+	lBankSizes[0] = 0;            /* ram is not needed */
 
-   {
-   /* use embeded preset objects */
-   spSound.bank_no = 0;            /* load as Bank 0 */
-   spSound.total_banks = 1;        /* use 1 bank first */
-   lBankSizes[ 0 ] = 0;            /* ram is not needed */
-
-   spSound.banksizes = lBankSizes;
-   awe32DefineBankSizes( &spSound );
-   awe32SoundPad.SPad1 = awe32SPad1Obj;
-   awe32SoundPad.SPad2 = awe32SPad2Obj;
-   awe32SoundPad.SPad3 = awe32SPad3Obj;
-   awe32SoundPad.SPad4 = awe32SPad4Obj;
-   awe32SoundPad.SPad5 = awe32SPad5Obj;
-   awe32SoundPad.SPad6 = awe32SPad6Obj;
-   awe32SoundPad.SPad7 = awe32SPad7Obj;
-   }
-
+	spSound.banksizes = lBankSizes;
+	awe32DefineBankSizes( &spSound );
+	awe32SoundPad.SPad1 = awe32SPad1Obj;
+	awe32SoundPad.SPad2 = awe32SPad2Obj;
+	awe32SoundPad.SPad3 = awe32SPad3Obj;
+	awe32SoundPad.SPad4 = awe32SPad4Obj;
+	awe32SoundPad.SPad5 = awe32SPad5Obj;
+	awe32SoundPad.SPad6 = awe32SPad6Obj;
+	awe32SoundPad.SPad7 = awe32SPad7Obj;
+}
 
 int AWE32_Init
-   (
-   void
-   )
+	(
+		void
+	) {
+	int status;
+	BLASTER_CONFIG Blaster;
 
-   {
-   int status;
-   BLASTER_CONFIG Blaster;
+	wSBCBaseAddx = 0x220;
+	wEMUBaseAddx = 0x620;
+	wMpuBaseAddx = 0x330;
 
-   wSBCBaseAddx = 0x220;
-   wEMUBaseAddx = 0x620;
-   wMpuBaseAddx = 0x330;
+	status = BLASTER_GetCardSettings( &Blaster );
+	if ( status != BLASTER_Ok ) {
+		status = BLASTER_GetEnv( &Blaster );
+		if ( status != BLASTER_Ok ) {
+			AWE32_SetErrorCode( AWE32_SoundBlasterError );
+			return (AWE32_Error);
+		}
+	}
 
-   status = BLASTER_GetCardSettings( &Blaster );
-   if ( status != BLASTER_Ok )
-      {
-      status = BLASTER_GetEnv( &Blaster );
-      if ( status != BLASTER_Ok )
-         {
-         AWE32_SetErrorCode( AWE32_SoundBlasterError );
-         return( AWE32_Error );
-         }
-      }
+	wSBCBaseAddx = Blaster.Address;
+	if ( wSBCBaseAddx == UNDEFINED ) {
+		wSBCBaseAddx = 0x220;
+	}
 
-   wSBCBaseAddx = Blaster.Address;
-   if ( wSBCBaseAddx == UNDEFINED )
-      {
-      wSBCBaseAddx = 0x220;
-      }
+	wMpuBaseAddx = Blaster.Midi;
+	if ( wMpuBaseAddx == UNDEFINED ) {
+		wMpuBaseAddx = 0x330;
+	}
 
-   wMpuBaseAddx = Blaster.Midi;
-   if ( wMpuBaseAddx == UNDEFINED )
-      {
-      wMpuBaseAddx = 0x330;
-      }
+	wEMUBaseAddx = Blaster.Emu;
+	if ( wEMUBaseAddx <= 0 ) {
+		wEMUBaseAddx = wSBCBaseAddx + 0x400;
+	}
 
-   wEMUBaseAddx = Blaster.Emu;
-   if ( wEMUBaseAddx <= 0 )
-      {
-      wEMUBaseAddx = wSBCBaseAddx + 0x400;
-      }
+	status = awe32Detect( wEMUBaseAddx );
+	if ( status ) {
+		AWE32_SetErrorCode( AWE32_NotDetected );
+		return (AWE32_Error);
+	}
 
-   status = awe32Detect( wEMUBaseAddx );
-   if ( status )
-      {
-      AWE32_SetErrorCode( AWE32_NotDetected );
-      return( AWE32_Error );
-      }
+	status = awe32InitHardware();
+	if ( status ) {
+		AWE32_SetErrorCode( AWE32_UnableToInitialize );
+		return (AWE32_Error);
+	}
 
-   status = awe32InitHardware();
-   if ( status )
-      {
-      AWE32_SetErrorCode( AWE32_UnableToInitialize );
-      return( AWE32_Error );
-      }
-
-
-   status = awe32InitMIDI();
-   if ( status )
-      {
-      AWE32_Shutdown();
-      AWE32_SetErrorCode( AWE32_MPU401Error )
-      return( AWE32_Error );
-      }
+	status = awe32InitMIDI();
+	if ( status ) {
+		AWE32_Shutdown();
+		AWE32_SetErrorCode( AWE32_MPU401Error )
+		return (AWE32_Error);
+	}
 
 /*
     status = InitMPU();
@@ -473,68 +424,65 @@ int AWE32_Init
          }
       }
 */
-   status  = DPMI_LockMemoryRegion( AWE32_LockStart, AWE32_LockEnd );
-   status |= DPMI_Lock( wSBCBaseAddx );
-   status |= DPMI_Lock( wEMUBaseAddx );
-   status |= DPMI_Lock( wMpuBaseAddx );
-   status |= DPMI_Lock( spSound );
-   status |= DPMI_Lock( lBankSizes );
-   status |= DPMI_LockMemory( NoteFlags, sizeof( NoteFlags ) );
+	status = DPMI_LockMemoryRegion( AWE32_LockStart, AWE32_LockEnd );
+	status |= DPMI_Lock( wSBCBaseAddx );
+	status |= DPMI_Lock( wEMUBaseAddx );
+	status |= DPMI_Lock( wMpuBaseAddx );
+	status |= DPMI_Lock( spSound );
+	status |= DPMI_Lock( lBankSizes );
+	status |= DPMI_LockMemory( NoteFlags, sizeof( NoteFlags ));
 
-   // Lock awe32 library
-   status  = DPMI_LockMemoryRegion( __midieng_code, __midieng_ecode );
-   status  = DPMI_LockMemoryRegion( __midieng_code(), __midieng_ecode() );
-   status  = DPMI_LockMemoryRegion( __nrpn_code, __nrpn_ecode );
-   status  = DPMI_LockMemoryRegion( __nrpn_code(), __nrpn_ecode() );
-   status  = DPMI_LockMemoryRegion( &__midivar_data, &__midivar_edata );
-   status  = DPMI_LockMemoryRegion( &__nrpnvar_data, &__nrpnvar_edata );
-   status  = DPMI_LockMemoryRegion( &__embed_data, &__embed_edata );
+	// Lock awe32 library
+	status = DPMI_LockMemoryRegion( __midieng_code, __midieng_ecode );
+	status = DPMI_LockMemoryRegion( __midieng_code(), __midieng_ecode());
+	status = DPMI_LockMemoryRegion( __nrpn_code, __nrpn_ecode );
+	status = DPMI_LockMemoryRegion( __nrpn_code(), __nrpn_ecode());
+	status = DPMI_LockMemoryRegion( &__midivar_data, &__midivar_edata );
+	status = DPMI_LockMemoryRegion( &__nrpnvar_data, &__nrpnvar_edata );
+	status = DPMI_LockMemoryRegion( &__embed_data, &__embed_edata );
 
-   if ( status != DPMI_Ok )
-      {
-      ShutdownMPU();
-      awe32Terminate();
-      AWE32_SetErrorCode( AWE32_DPMI_Error );
-      return( AWE32_Error );
-      }
+	if ( status != DPMI_Ok ) {
+		ShutdownMPU();
+		awe32Terminate();
+		AWE32_SetErrorCode( AWE32_DPMI_Error );
+		return (AWE32_Error);
+	}
 
-   // Set the number of voices to use to 32
-   awe32NumG = 32;
+	// Set the number of voices to use to 32
+	awe32NumG = 32;
 
-   awe32TotalPatchRam(&spSound);
+	awe32TotalPatchRam( &spSound );
 
-   LoadSBK();
-   awe32InitMIDI();
-   awe32InitNRPN();
+	LoadSBK();
+	awe32InitMIDI();
+	awe32InitNRPN();
 
-   memset( NoteFlags, 0, sizeof( NoteFlags ) );
+	memset( NoteFlags, 0, sizeof( NoteFlags ));
 
-   return( AWE32_Ok );
-   }
+	return (AWE32_Ok);
+}
 
 void AWE32_Shutdown
-   (
-   void
-   )
+	(
+		void
+	) {
+	ShutdownMPU();
+	awe32Terminate();
 
-   {
-   ShutdownMPU();
-   awe32Terminate();
+	DPMI_UnlockMemoryRegion( AWE32_LockStart, AWE32_LockEnd );
+	DPMI_Unlock( wSBCBaseAddx );
+	DPMI_Unlock( wEMUBaseAddx );
+	DPMI_Unlock( wMpuBaseAddx );
+	DPMI_Unlock( spSound );
+	DPMI_Unlock( lBankSizes );
+	DPMI_UnlockMemory( NoteFlags, sizeof( NoteFlags ));
 
-   DPMI_UnlockMemoryRegion( AWE32_LockStart, AWE32_LockEnd );
-   DPMI_Unlock( wSBCBaseAddx );
-   DPMI_Unlock( wEMUBaseAddx );
-   DPMI_Unlock( wMpuBaseAddx );
-   DPMI_Unlock( spSound );
-   DPMI_Unlock( lBankSizes );
-   DPMI_UnlockMemory( NoteFlags, sizeof( NoteFlags ) );
-
-   // Unlock awe32 library
-   DPMI_UnlockMemoryRegion( __midieng_code, __midieng_ecode );
-   DPMI_UnlockMemoryRegion( __midieng_code(), __midieng_ecode() );
-   DPMI_UnlockMemoryRegion( __nrpn_code, __nrpn_ecode );
-   DPMI_UnlockMemoryRegion( __nrpn_code(), __nrpn_ecode() );
-   DPMI_UnlockMemoryRegion( &__midivar_data, &__midivar_edata );
-   DPMI_UnlockMemoryRegion( &__nrpnvar_data, &__nrpnvar_edata );
-   DPMI_UnlockMemoryRegion( &__embed_data, &__embed_edata );
-   }
+	// Unlock awe32 library
+	DPMI_UnlockMemoryRegion( __midieng_code, __midieng_ecode );
+	DPMI_UnlockMemoryRegion( __midieng_code(), __midieng_ecode());
+	DPMI_UnlockMemoryRegion( __nrpn_code, __nrpn_ecode );
+	DPMI_UnlockMemoryRegion( __nrpn_code(), __nrpn_ecode());
+	DPMI_UnlockMemoryRegion( &__midivar_data, &__midivar_edata );
+	DPMI_UnlockMemoryRegion( &__nrpnvar_data, &__nrpnvar_edata );
+	DPMI_UnlockMemoryRegion( &__embed_data, &__embed_edata );
+}

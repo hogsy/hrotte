@@ -44,33 +44,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //***************************************************************************
 
-typedef  enum
-{
-	motion_Left  = -1,
-	motion_Up    = -1,
-   motion_None  = 0,
-   motion_Right = 1,
-   motion_Down  = 1
+typedef enum {
+	motion_Left = -1,
+	motion_Up = -1,
+	motion_None = 0,
+	motion_Right = 1,
+	motion_Down = 1
 } Motion;
 
-
-typedef  enum
-{
-   dir_North,
-   dir_NorthEast,
-   dir_East,
-   dir_SouthEast,
-   dir_South,
-   dir_SouthWest,
-   dir_West,
-   dir_NorthWest,
-   dir_None
+typedef enum {
+	dir_North,
+	dir_NorthEast,
+	dir_East,
+	dir_SouthEast,
+	dir_South,
+	dir_SouthWest,
+	dir_West,
+	dir_NorthWest,
+	dir_None
 } Direction;
 
 typedef byte ScanCode;
 
-typedef  enum
-{
+typedef enum {
 	ctrl_Keyboard,
 	ctrl_Keyboard1 = ctrl_Keyboard, ctrl_Keyboard2,
 	ctrl_Joystick,
@@ -78,58 +74,50 @@ typedef  enum
 	ctrl_Mouse
 } ControlType;
 
-typedef  struct
-{
-	boolean     button0,
-					button1,
-					button2,
-					button3;
-	int         x,
-					y;
-	Motion      xaxis,
-					yaxis;
-	Direction   dir;
+typedef struct {
+	boolean button0,
+		button1,
+		button2,
+		button3;
+	int x,
+		y;
+	Motion xaxis,
+		yaxis;
+	Direction dir;
 } CursorInfo;
 
+typedef CursorInfo ControlInfo;
 
-typedef  CursorInfo  ControlInfo;
-
-
-typedef  struct
-{
-   ScanCode button0,
-            button1,
-            upleft,
-            up,
-            upright,
-            left,
-            right,
-            downleft,
-            down,
-            downright;
+typedef struct {
+	ScanCode button0,
+		button1,
+		upleft,
+		up,
+		upright,
+		left,
+		right,
+		downleft,
+		down,
+		downright;
 } KeyboardDef;
 
-
-typedef struct
-{
-   word  joyMinX,joyMinY,
-         threshMinX,threshMinY,
-         threshMaxX,threshMaxY,
-         joyMaxX,joyMaxY,
-         joyMultXL,joyMultYL,
-         joyMultXH,joyMultYH;
+typedef struct {
+	word joyMinX, joyMinY,
+		threshMinX, threshMinY,
+		threshMaxX, threshMaxY,
+		joyMaxX, joyMaxY,
+		joyMultXL, joyMultYL,
+		joyMultXH, joyMultYH;
 } JoystickDef;
 
-
-typedef struct
-{
-   boolean messageon;
-   boolean directed;
-   boolean inmenu;
-   int     remoteridicule;
-   int     towho;
-   int     textnum;
-   int     length;
+typedef struct {
+	boolean messageon;
+	boolean directed;
+	boolean inmenu;
+	int remoteridicule;
+	int towho;
+	int textnum;
+	int length;
 } ModemMessage;
 
 
@@ -142,27 +130,27 @@ typedef struct
 extern boolean MousePresent;
 extern boolean JoysPresent[MaxJoys];
 extern boolean JoyPadPresent;
-extern int     mouseadjustment;
-extern int     threshold;
+extern int mouseadjustment;
+extern int threshold;
 
-extern boolean  Paused;
+extern boolean Paused;
 extern volatile int LastScan;
 /* extern KeyboardDef KbdDefs;
 extern JoystickDef JoyDefs[];
 extern ControlType Controls[MAXPLAYERS]; */
 
-extern boolean  SpaceBallPresent;
-extern boolean  CybermanPresent;
-extern boolean  AssassinPresent;
+extern boolean SpaceBallPresent;
+extern boolean CybermanPresent;
+extern boolean AssassinPresent;
 extern char LastASCII;
 extern volatile int LastScan;
 
 extern byte Joy_xb,
-            Joy_yb,
-            Joy_xs,
-            Joy_ys;
+	Joy_yb,
+	Joy_xs,
+	Joy_ys;
 extern word Joy_x,
-            Joy_y;
+	Joy_y;
 
 extern int LastLetter;
 extern char LetterQueue[MAXLETTERS];
@@ -176,37 +164,37 @@ extern const char ScanChars[128];
 //
 //***************************************************************************
 
-void INL_GetMouseDelta(int *x,int *y);
-word IN_GetMouseButtons (void);
+void INL_GetMouseDelta( int * x, int * y );
+word IN_GetMouseButtons( void );
 void IN_IgnoreMouseButtons( void );
-boolean INL_StartMouse (void);
-void INL_ShutMouse (void);
-void IN_Startup(void);
-void IN_Default (boolean gotit, ControlType in);
-void IN_Shutdown (void);
-void IN_SetKeyHook(void (*hook)());
-void IN_ClearKeysDown (void);
-void IN_ReadControl (int player, ControlInfo *info);
-void IN_SetControlType (int player, ControlType type);
-ScanCode IN_WaitForKey (void);
-char IN_WaitForASCII (void);
-void IN_StartAck (void);
-boolean IN_CheckAck (void);
-void IN_Ack (void);
-boolean IN_UserInput (long delay);
-void IN_GetJoyAbs (word joy, word *xp, word *yp);
-void INL_GetJoyDelta (word joy, int *dx, int *dy);
-word INL_GetJoyButtons (word joy);
+boolean INL_StartMouse( void );
+void INL_ShutMouse( void );
+void IN_Startup( void );
+void IN_Default( boolean gotit, ControlType in );
+void IN_Shutdown( void );
+void IN_SetKeyHook( void (* hook)());
+void IN_ClearKeysDown( void );
+void IN_ReadControl( int player, ControlInfo * info );
+void IN_SetControlType( int player, ControlType type );
+ScanCode IN_WaitForKey( void );
+char IN_WaitForASCII( void );
+void IN_StartAck( void );
+boolean IN_CheckAck( void );
+void IN_Ack( void );
+boolean IN_UserInput( long delay );
+void IN_GetJoyAbs( word joy, word * xp, word * yp );
+void INL_GetJoyDelta( word joy, int * dx, int * dy );
+word INL_GetJoyButtons( word joy );
 //word IN_GetJoyButtonsDB (word joy);
-void INL_SetJoyScale (word joy);
-void IN_SetupJoy (word joy, word minx, word maxx, word miny, word maxy);
-boolean INL_StartJoy (word joy);
-void INL_ShutJoy (word joy);
-byte IN_JoyButtons (void);
-void IN_UpdateKeyboard (void);
-void IN_ClearKeyboardQueue (void);
-int IN_InputUpdateKeyboard (void);
-void IN_PumpEvents (void);
-void QueueLetterInput (void);
+void INL_SetJoyScale( word joy );
+void IN_SetupJoy( word joy, word minx, word maxx, word miny, word maxy );
+boolean INL_StartJoy( word joy );
+void INL_ShutJoy( word joy );
+byte IN_JoyButtons( void );
+void IN_UpdateKeyboard( void );
+void IN_ClearKeyboardQueue( void );
+int IN_InputUpdateKeyboard( void );
+void IN_PumpEvents( void );
+void QueueLetterInput( void );
 
 #endif

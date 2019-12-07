@@ -66,7 +66,6 @@ unsigned MPU_Delay = 0x5000;
 
 #define MPU_LockStart MPU_SendMidi
 
-
 /*---------------------------------------------------------------------
    Function: MPU_SendMidi
 
@@ -74,32 +73,27 @@ unsigned MPU_Delay = 0x5000;
 ---------------------------------------------------------------------*/
 
 void MPU_SendMidi
-   (
-   int data
-   )
+	(
+		int data
+	) {
+	int port = MPU_BaseAddr + 1;
+	unsigned count;
 
-   {
-   int      port = MPU_BaseAddr + 1;
-   unsigned count;
+	count = MPU_Delay;
+	while ( count > 0 ) {
+		// check if status port says we're ready for write
+		if ( !(inp( port ) & MPU_ReadyToWrite)) {
+			break;
+		}
 
-   count = MPU_Delay;
-   while( count > 0 )
-      {
-      // check if status port says we're ready for write
-      if ( !( inp( port ) & MPU_ReadyToWrite ) )
-         {
-         break;
-         }
+		count--;
+	}
 
-      count--;
-      }
+	port--;
 
-   port--;
-
-   // Send the midi data
-   outp( port, data );
-   }
-
+	// Send the midi data
+	outp( port, data );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_NoteOff
@@ -108,18 +102,15 @@ void MPU_SendMidi
 ---------------------------------------------------------------------*/
 
 void MPU_NoteOff
-   (
-   int channel,
-   int key,
-   int velocity
-   )
-
-   {
-   MPU_SendMidi( MIDI_NOTE_OFF | channel );
-   MPU_SendMidi( key );
-   MPU_SendMidi( velocity );
-   }
-
+	(
+		int channel,
+		int key,
+		int velocity
+	) {
+	MPU_SendMidi( MIDI_NOTE_OFF | channel );
+	MPU_SendMidi( key );
+	MPU_SendMidi( velocity );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_NoteOn
@@ -128,18 +119,15 @@ void MPU_NoteOff
 ---------------------------------------------------------------------*/
 
 void MPU_NoteOn
-   (
-   int channel,
-   int key,
-   int velocity
-   )
-
-   {
-   MPU_SendMidi( MIDI_NOTE_ON | channel );
-   MPU_SendMidi( key );
-   MPU_SendMidi( velocity );
-   }
-
+	(
+		int channel,
+		int key,
+		int velocity
+	) {
+	MPU_SendMidi( MIDI_NOTE_ON | channel );
+	MPU_SendMidi( key );
+	MPU_SendMidi( velocity );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_PolyAftertouch
@@ -148,18 +136,15 @@ void MPU_NoteOn
 ---------------------------------------------------------------------*/
 
 void MPU_PolyAftertouch
-   (
-   int channel,
-   int key,
-   int pressure
-   )
-
-   {
-   MPU_SendMidi( MIDI_POLY_AFTER_TCH | channel );
-   MPU_SendMidi( key );
-   MPU_SendMidi( pressure );
-   }
-
+	(
+		int channel,
+		int key,
+		int pressure
+	) {
+	MPU_SendMidi( MIDI_POLY_AFTER_TCH | channel );
+	MPU_SendMidi( key );
+	MPU_SendMidi( pressure );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_ControlChange
@@ -168,18 +153,15 @@ void MPU_PolyAftertouch
 ---------------------------------------------------------------------*/
 
 void MPU_ControlChange
-   (
-   int channel,
-   int number,
-   int value
-   )
-
-   {
-   MPU_SendMidi( MIDI_CONTROL_CHANGE | channel );
-   MPU_SendMidi( number );
-   MPU_SendMidi( value );
-   }
-
+	(
+		int channel,
+		int number,
+		int value
+	) {
+	MPU_SendMidi( MIDI_CONTROL_CHANGE | channel );
+	MPU_SendMidi( number );
+	MPU_SendMidi( value );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_ProgramChange
@@ -188,16 +170,13 @@ void MPU_ControlChange
 ---------------------------------------------------------------------*/
 
 void MPU_ProgramChange
-   (
-   int channel,
-   int program
-   )
-
-   {
-   MPU_SendMidi( MIDI_PROGRAM_CHANGE | channel );
-   MPU_SendMidi( program );
-   }
-
+	(
+		int channel,
+		int program
+	) {
+	MPU_SendMidi( MIDI_PROGRAM_CHANGE | channel );
+	MPU_SendMidi( program );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_ChannelAftertouch
@@ -206,16 +185,13 @@ void MPU_ProgramChange
 ---------------------------------------------------------------------*/
 
 void MPU_ChannelAftertouch
-   (
-   int channel,
-   int pressure
-   )
-
-   {
-   MPU_SendMidi( MIDI_AFTER_TOUCH | channel );
-   MPU_SendMidi( pressure );
-   }
-
+	(
+		int channel,
+		int pressure
+	) {
+	MPU_SendMidi( MIDI_AFTER_TOUCH | channel );
+	MPU_SendMidi( pressure );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_PitchBend
@@ -224,18 +200,15 @@ void MPU_ChannelAftertouch
 ---------------------------------------------------------------------*/
 
 void MPU_PitchBend
-   (
-   int channel,
-   int lsb,
-   int msb
-   )
-
-   {
-   MPU_SendMidi( MIDI_PITCH_BEND | channel );
-   MPU_SendMidi( lsb );
-   MPU_SendMidi( msb );
-   }
-
+	(
+		int channel,
+		int lsb,
+		int msb
+	) {
+	MPU_SendMidi( MIDI_PITCH_BEND | channel );
+	MPU_SendMidi( lsb );
+	MPU_SendMidi( msb );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_SendCommand
@@ -244,28 +217,23 @@ void MPU_PitchBend
 ---------------------------------------------------------------------*/
 
 void MPU_SendCommand
-   (
-   int data
-   )
+	(
+		int data
+	) {
+	int port = MPU_BaseAddr + 1;
+	unsigned count;
 
-   {
-   int      port = MPU_BaseAddr + 1;
-   unsigned count;
+	count = 0xffff;
+	while ( count > 0 ) {
+		// check if status port says we're ready for write
+		if ( !(inp( port ) & MPU_ReadyToWrite)) {
+			break;
+		}
+		count--;
+	}
 
-   count = 0xffff;
-   while( count > 0 )
-      {
-      // check if status port says we're ready for write
-      if ( !( inp( port ) & MPU_ReadyToWrite ) )
-         {
-         break;
-         }
-      count--;
-      }
-
-   outp( port, data );
-   }
-
+	outp( port, data );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_Reset
@@ -274,40 +242,34 @@ void MPU_SendCommand
 ---------------------------------------------------------------------*/
 
 int MPU_Reset
-   (
-   void
-   )
+	(
+		void
+	) {
+	int port = MPU_BaseAddr + 1;
+	unsigned count;
 
-   {
-   int      port = MPU_BaseAddr + 1;
-   unsigned count;
+	// Output "Reset" command via Command port
+	MPU_SendCommand( MPU_CmdReset );
 
-   // Output "Reset" command via Command port
-   MPU_SendCommand( MPU_CmdReset );
+	// Wait for status port to be ready for read
+	count = 0xffff;
+	while ( count > 0 ) {
+		if ( !(inp( port ) & MPU_ReadyToRead)) {
+			port--;
 
-   // Wait for status port to be ready for read
-   count = 0xffff;
-   while( count > 0 )
-      {
-      if ( !( inp( port ) & MPU_ReadyToRead ) )
-         {
-         port--;
+			// Check for a successful reset
+			if ( inp( port ) == MPU_CmdAcknowledge ) {
+				return (MPU_Ok);
+			}
 
-         // Check for a successful reset
-         if ( inp( port ) == MPU_CmdAcknowledge )
-            {
-            return( MPU_Ok );
-            }
+			port++;
+		}
+		count--;
+	}
 
-         port++;
-         }
-      count--;
-      }
-
-   // Failed to reset : MPU-401 not detected
-   return( MPU_NotFound );
-   }
-
+	// Failed to reset : MPU-401 not detected
+	return (MPU_NotFound);
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_EnterUART
@@ -316,40 +278,34 @@ int MPU_Reset
 ---------------------------------------------------------------------*/
 
 int MPU_EnterUART
-   (
-   void
-   )
+	(
+		void
+	) {
+	int port = MPU_BaseAddr + 1;
+	unsigned count;
 
-   {
-   int      port = MPU_BaseAddr + 1;
-   unsigned count;
+	// Output "Enter UART" command via Command port
+	MPU_SendCommand( MPU_CmdEnterUART );
 
-   // Output "Enter UART" command via Command port
-   MPU_SendCommand( MPU_CmdEnterUART );
+	// Wait for status port to be ready for read
+	count = 0xffff;
+	while ( count > 0 ) {
+		if ( !(inp( port ) & MPU_ReadyToRead)) {
+			port--;
 
-   // Wait for status port to be ready for read
-   count = 0xffff;
-   while( count > 0 )
-      {
-      if ( !( inp( port ) & MPU_ReadyToRead ) )
-         {
-         port--;
+			// Check for a successful reset
+			if ( inp( port ) == MPU_CmdAcknowledge ) {
+				return (MPU_Ok);
+			}
 
-         // Check for a successful reset
-         if ( inp( port ) == MPU_CmdAcknowledge )
-            {
-            return( MPU_Ok );
-            }
+			port++;
+		}
+		count--;
+	}
 
-         port++;
-         }
-      count--;
-      }
-
-   // Failed to reset : MPU-401 not detected
-   return( MPU_UARTFailed );
-   }
-
+	// Failed to reset : MPU-401 not detected
+	return (MPU_UARTFailed);
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_Init
@@ -358,37 +314,31 @@ int MPU_EnterUART
 ---------------------------------------------------------------------*/
 
 int MPU_Init
-   (
-   int addr
-   )
+	(
+		int addr
+	) {
+	int status;
+	int count;
+	char * ptr;
 
-   {
-   int status;
-   int count;
-   char *ptr;
+	ptr = USER_GetText( "MPUDELAY" );
+	if ( ptr != NULL) {
+		MPU_Delay = ( unsigned ) atol( ptr );
+	}
 
-   ptr = USER_GetText( "MPUDELAY" );
-   if ( ptr != NULL )
-      {
-      MPU_Delay = ( unsigned )atol( ptr );
-      }
+	MPU_BaseAddr = addr;
 
-   MPU_BaseAddr = addr;
+	count = 4;
+	while ( count > 0 ) {
+		status = MPU_Reset();
+		if ( status == MPU_Ok ) {
+			return (MPU_EnterUART());
+		}
+		count--;
+	}
 
-   count = 4;
-   while( count > 0 )
-      {
-      status = MPU_Reset();
-      if ( status == MPU_Ok )
-         {
-         return( MPU_EnterUART() );
-         }
-      count--;
-      }
-
-   return( status );
-   }
-
+	return (status);
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_LockEnd
@@ -397,13 +347,10 @@ int MPU_Init
 ---------------------------------------------------------------------*/
 
 static void MPU_LockEnd
-   (
-   void
-   )
-
-   {
-   }
-
+	(
+		void
+	) {
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_UnlockMemory
@@ -412,16 +359,13 @@ static void MPU_LockEnd
 ---------------------------------------------------------------------*/
 
 void MPU_UnlockMemory
-   (
-   void
-   )
-
-   {
-   DPMI_UnlockMemoryRegion( MPU_LockStart, MPU_LockEnd );
-   DPMI_Unlock( MPU_BaseAddr );
-   DPMI_Unlock( MPU_Delay );
-   }
-
+	(
+		void
+	) {
+	DPMI_UnlockMemoryRegion( MPU_LockStart, MPU_LockEnd );
+	DPMI_Unlock( MPU_BaseAddr );
+	DPMI_Unlock( MPU_Delay );
+}
 
 /*---------------------------------------------------------------------
    Function: MPU_LockMemory
@@ -430,22 +374,19 @@ void MPU_UnlockMemory
 ---------------------------------------------------------------------*/
 
 int MPU_LockMemory
-   (
-   void
-   )
+	(
+		void
+	) {
+	int status;
 
-   {
-   int status;
+	status = DPMI_LockMemoryRegion( MPU_LockStart, MPU_LockEnd );
+	status |= DPMI_Lock( MPU_BaseAddr );
+	status |= DPMI_Lock( MPU_Delay );
 
-   status  = DPMI_LockMemoryRegion( MPU_LockStart, MPU_LockEnd );
-   status |= DPMI_Lock( MPU_BaseAddr );
-   status |= DPMI_Lock( MPU_Delay );
+	if ( status != DPMI_Ok ) {
+		MPU_UnlockMemory();
+		return (MPU_Error);
+	}
 
-   if ( status != DPMI_Ok )
-      {
-      MPU_UnlockMemory();
-      return( MPU_Error );
-      }
-
-   return( MPU_Ok );
-   }
+	return (MPU_Ok);
+}

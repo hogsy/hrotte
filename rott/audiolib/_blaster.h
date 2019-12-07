@@ -121,13 +121,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CalcSamplingRate( tc ) \
    ( 256000000L / ( 65536L - ( tc << 8 ) ) )
 
-typedef struct
-   {
-   int IsSupported;
-   int HasMixer;
-   int MaxMixMode;
-   int MinSamplingRate;
-   int MaxSamplingRate;
-   } CARD_CAPABILITY;
+typedef struct {
+	int IsSupported;
+	int HasMixer;
+	int MaxMixMode;
+	int MinSamplingRate;
+	int MaxSamplingRate;
+} CARD_CAPABILITY;
 
 #endif

@@ -34,8 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //******************************************************************************
 
 typedef struct {
-   char str[10];
-   int length;
+	char str[10];
+	int length;
 } STR;
 
 //******************************************************************************
@@ -147,7 +147,7 @@ typedef struct {
 #define MAXSAVEDGAMESIZE 120000
 
 #if (SHAREWARE == 0)
-#define WEAPON_IS_MAGICAL(x) (((x) == wp_dog) || ((x) == wp_godhand))
+#define WEAPON_IS_MAGICAL( x ) (((x) == wp_dog) || ((x) == wp_godhand))
 #else
 #define WEAPON_IS_MAGICAL(x) ((x) == wp_godhand)
 #endif
@@ -158,8 +158,8 @@ typedef struct {
 //
 //******************************************************************************
 
-void DrawMPPic (int xpos, int ypos, int width, int height, int heightmod, byte *src, boolean bufferofsonly);
-void DrawHighScores (void);
-void GM_MemToScreen (byte *source, int width, int height, int x, int y);
+void DrawMPPic( int xpos, int ypos, int width, int height, int heightmod, byte * src, boolean bufferofsonly );
+void DrawHighScores( void );
+void GM_MemToScreen( byte * source, int width, int height, int x, int y );
 
 #endif

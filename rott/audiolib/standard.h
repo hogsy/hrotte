@@ -35,16 +35,15 @@ typedef int boolean;
 typedef int errorcode;
 
 #ifndef TRUE
-   #define TRUE ( 1 == 1 )
-   #define FALSE ( !TRUE )
+#define TRUE ( 1 == 1 )
+#define FALSE ( !TRUE )
 #endif
 
-enum STANDARD_ERRORS
-   {
-   Warning = -2,
-   FatalError = -1,
-   Success = 0
-   };
+enum STANDARD_ERRORS {
+	Warning = -2,
+	FatalError = -1,
+	Success = 0
+};
 
 #define BITSET( data, bit ) \
    ( ( ( data ) & ( bit ) ) == ( bit ) )
@@ -58,9 +57,9 @@ enum STANDARD_ERRORS
 #define FOREVER    for( ; ; )
 
 #ifdef NDEBUG
-   #define DEBUGGING 0
+#define DEBUGGING 0
 #else
-   #define DEBUGGING 1
+#define DEBUGGING 1
 #endif
 
 #define DEBUG_CODE \

@@ -56,109 +56,100 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MAX_VOLUME 4095
 #define BUFFER     2048U  /* size of DMA buffer for patch loading */
 
-typedef enum
-   {
-   Raw,
-   VOC,
-   DemandFeed,
-   WAV
-   } wavedata;
+typedef enum {
+	Raw,
+	VOC,
+	DemandFeed,
+	WAV
+} wavedata;
 
-typedef enum
-   {
-   NoMoreData,
-   KeepPlaying,
-   SoundDone
-   } playbackstatus;
+typedef enum {
+	NoMoreData,
+	KeepPlaying,
+	SoundDone
+} playbackstatus;
 
+typedef volatile struct VoiceNode {
+	struct VoiceNode * next;
+	struct VoiceNode * prev;
 
-typedef volatile struct VoiceNode
-   {
-   struct VoiceNode *next;
-   struct VoiceNode *prev;
+	wavedata wavetype;
+	int bits;
+	playbackstatus ( * GetSound )( struct VoiceNode * voice );
 
-   wavedata      wavetype;
-   int           bits;
-   playbackstatus ( *GetSound )( struct VoiceNode *voice );
+	int num;
 
-   int num;
+	unsigned long mem;           /* location in ultrasound memory */
+	int Active;        /* this instance in use */
+	int GF1voice;      /* handle to active voice */
 
-   unsigned long  mem;           /* location in ultrasound memory */
-   int            Active;        /* this instance in use */
-   int            GF1voice;      /* handle to active voice */
+	char * NextBlock;
+	char * LoopStart;
+	char * LoopEnd;
+	unsigned LoopCount;
+	unsigned long LoopSize;
+	unsigned long BlockLength;
 
-   char          *NextBlock;
-   char          *LoopStart;
-   char          *LoopEnd;
-   unsigned       LoopCount;
-   unsigned long  LoopSize;
-   unsigned long  BlockLength;
+	unsigned long PitchScale;
 
-   unsigned long  PitchScale;
+	unsigned char * sound;
+	unsigned long length;
+	unsigned long SamplingRate;
+	unsigned long RateScale;
+	int Playing;
 
-   unsigned char *sound;
-   unsigned long  length;
-   unsigned long  SamplingRate;
-   unsigned long  RateScale;
-   int            Playing;
+	int handle;
+	int priority;
 
-   int    handle;
-   int    priority;
+	void ( * DemandFeed )( char ** ptr, unsigned long * length );
 
-   void          ( *DemandFeed )( char **ptr, unsigned long *length );
+	unsigned long callbackval;
 
-   unsigned long callbackval;
+	int Volume;
+	int Pan;
+}
+	VoiceNode;
 
-   int    Volume;
-   int    Pan;
-   }
-VoiceNode;
+typedef struct {
+	VoiceNode * start;
+	VoiceNode * end;
+}
+	voicelist;
 
-typedef struct
-   {
-   VoiceNode *start;
-   VoiceNode *end;
-   }
-voicelist;
+typedef volatile struct voicestatus {
+	VoiceNode * Voice;
+	int playing;
+}
+	voicestatus;
 
-typedef volatile struct voicestatus
-   {
-   VoiceNode *Voice;
-   int playing;
-   }
-voicestatus;
+typedef struct {
+	char RIFF[4];
+	unsigned long file_size;
+	char WAVE[4];
+	char fmt[4];
+	unsigned long format_size;
+} riff_header;
 
-typedef struct
-   {
-   char          RIFF[ 4 ];
-   unsigned long file_size;
-   char          WAVE[ 4 ];
-   char          fmt[ 4 ];
-   unsigned long format_size;
-   } riff_header;
+typedef struct {
+	unsigned short wFormatTag;
+	unsigned short nChannels;
+	unsigned long nSamplesPerSec;
+	unsigned long nAvgBytesPerSec;
+	unsigned short nBlockAlign;
+	unsigned short nBitsPerSample;
+} format_header;
 
-typedef struct
-   {
-   unsigned short wFormatTag;
-   unsigned short nChannels;
-   unsigned long  nSamplesPerSec;
-   unsigned long  nAvgBytesPerSec;
-   unsigned short nBlockAlign;
-   unsigned short nBitsPerSample;
-   } format_header;
+typedef struct {
+	unsigned char DATA[4];
+	unsigned long size;
+} data_header;
 
-typedef struct
-   {
-   unsigned char DATA[ 4 ];
-   unsigned long size;
-   } data_header;
+playbackstatus GUSWAVE_GetNextVOCBlock( VoiceNode * voice );
+VoiceNode * GUSWAVE_GetVoice( int handle );
 
-playbackstatus GUSWAVE_GetNextVOCBlock( VoiceNode *voice );
-VoiceNode *GUSWAVE_GetVoice( int handle );
+int GUSWAVE_Play( VoiceNode * voice, int angle, int volume, int channels );
 
-int GUSWAVE_Play( VoiceNode *voice, int angle, int volume, int channels );
-
-VoiceNode *GUSWAVE_AllocVoice( int priority );
+VoiceNode * GUSWAVE_AllocVoice( int priority );
 static int GUSWAVE_InitVoices( void );
 
 #endif

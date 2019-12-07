@@ -19,27 +19,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #ifndef    __ASSERT_H
 
-    #define    __ASSERT_H
+#define    __ASSERT_H
 
-    #ifdef NDEBUG
+#ifdef NDEBUG
 
-        #define ASSERT(f)
+#define ASSERT(f)
 
-    #else
+#else
 
-        #pragma aux _Assert aborts;          /* _Assert will not return */
-        extern void _Assert( char *strFile, unsigned  uLine ); /*prototype */
+#pragma aux _Assert aborts;          /* _Assert will not return */
+extern void _Assert( char * strFile, unsigned uLine ); /*prototype */
 
-        #define ASSERT(f)          \
+#define ASSERT( f )          \
             if (f)                 \
                 ;                  \
             else                   \
                 _Assert( __FILE__, __LINE__ )
 
-    #endif
+#endif
 
 #else
 
-    #error Multiple definition of ASSERT()
+#error Multiple definition of ASSERT()
 
 #endif

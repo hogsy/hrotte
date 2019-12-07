@@ -28,14 +28,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "states.h"
 
-
 #define FL_SYNCED          0x400
 #define FL_MASTER          0x800
 #define FL_SKELETON        0x02
 #define GASTICS            1050
 
-
-#define M_ISACTOR(x)     ((x!=NULL) && (x->which == ACTOR))
+#define M_ISACTOR( x )     ((x!=NULL) && (x->which == ACTOR))
 
 #define SF_GUTS          0x20
 
@@ -45,36 +43,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MAXPOP           32
 #define MAXDELETE        512
 
-#define InMapBounds(x,y) (((x) >= 0) && ((x) < MAPSIZE) && ((y) >= 0) && ((y) < MAPSIZE))
+#define InMapBounds( x, y ) (((x) >= 0) && ((x) < MAPSIZE) && ((y) >= 0) && ((y) < MAPSIZE))
 
+#define ACTIVE( ob )       ((ob == firstactive) || (ob->prevactive) || (ob->nextactive))
 
-#define ACTIVE(ob)       ((ob == firstactive) || (ob->prevactive) || (ob->nextactive))
+enum { SHOOT, SIGHT, DIRCHECK, EXPLOSION, MISSILE };
 
-enum {SHOOT,SIGHT,DIRCHECK,EXPLOSION,MISSILE};
-
-
-typedef enum
-   {
-   gt_sparks,
-   gt_organ,
-   gt_rib,
-   gt_pinkorgan,
-   gt_head,
-   gt_arm,
-   gt_leg,
-   gt_humerus,
-   gt_pelvis,
-   gt_limb,
-   gt_bsoul,
-   gt_lsoul,
-   gt_spit,
-   NumGibTypes
-   }gib_t;
+typedef enum {
+	gt_sparks,
+	gt_organ,
+	gt_rib,
+	gt_pinkorgan,
+	gt_head,
+	gt_arm,
+	gt_leg,
+	gt_humerus,
+	gt_pelvis,
+	gt_limb,
+	gt_bsoul,
+	gt_lsoul,
+	gt_spit,
+	NumGibTypes
+} gib_t;
 
 #define GUTS         (NumGibTypes)
 #define RANDOM       (NumGibTypes + 1)
 #define DISEMBOWEL   (NumGibTypes + 2)
-
 
 #define GASVALUE               192
 
@@ -99,14 +93,12 @@ int M_ABS(int value);
 #define M_ABS abs
 #endif
 
-#define M_CheckPlayerKilled(ob) \
+#define M_CheckPlayerKilled( ob ) \
 { if ((ob->obclass == playerobj) && (ob->flags & FL_DYING)) \
-	 BATTLE_CheckGameStatus(battle_player_killed,ob->dirchoosetime);\
+     BATTLE_CheckGameStatus(battle_player_killed,ob->dirchoosetime);\
 }
 
-
-
-#define SetTilePosition(ob, newtilex, newtiley)    \
+#define SetTilePosition( ob, newtilex, newtiley )    \
   {                                                \
   ob->tilex = newtilex;                            \
   ob->tiley = newtiley;                            \
@@ -114,8 +106,7 @@ int M_ABS(int value);
   ob->y = (ob->tiley << TILESHIFT) + TILEGLOBAL/2; \
   }
 
-
-#define SetFinePosition(ob, newx, newy)            \
+#define SetFinePosition( ob, newx, newy )            \
   {                                                \
   ob->x = newx;                                    \
   ob->y = newy;                                    \
@@ -123,7 +114,7 @@ int M_ABS(int value);
   ob->tiley = (ob->y >> TILESHIFT);                \
   }
 
-#define SetVisiblePosition(ob, x, y)               \
+#define SetVisiblePosition( ob, x, y )               \
   {                                                \
   ob->drawx = x;                                   \
   ob->drawy = y;                                   \
@@ -140,297 +131,284 @@ int M_ABS(int value);
 #define DMG_AHGUN     10
 #define DMG_ENEMYBULLETWEAPON     10
 
+typedef struct bas {
+	short operate,
+		see,
+		fire,
+		hit,
+		die;
+} basic_actor_sounds;
 
+extern basic_actor_sounds BAS[NUMCLASSES + 3];
 
-
-typedef struct bas
- {
-  short operate,
-        see,
-        fire,
-        hit,
-        die;
- } basic_actor_sounds;
-
-extern basic_actor_sounds  BAS[NUMCLASSES+3];
-
-
-typedef struct
- {int x,y;
- }_2Dpoint;
+typedef struct {
+	int x, y;
+} _2Dpoint;
 
 typedef enum {
-		  inertobj,
-		  playerobj,
-		  lowguardobj,
-		  highguardobj,
-		  overpatrolobj,
-		  strikeguardobj,
-		  blitzguardobj,
-		  triadenforcerobj,
-		  deathmonkobj,
-		  dfiremonkobj,
-		  roboguardobj,
+	inertobj,
+	playerobj,
+	lowguardobj,
+	highguardobj,
+	overpatrolobj,
+	strikeguardobj,
+	blitzguardobj,
+	triadenforcerobj,
+	deathmonkobj,
+	dfiremonkobj,
+	roboguardobj,
 
-		  b_darianobj,
-		  b_heinrichobj,
-		  b_robobossobj,
-		  b_darkmonkobj,
-		  b_darksnakeobj,
-		  patrolgunobj,
-		  wallopobj,
-
-
-		  //specials
-
-		  pillarobj,
-		  firejetobj,
-		  bladeobj,
-		  crushcolobj,
-		  boulderobj,
-		  spearobj,
-		  gasgrateobj,
-		  springobj,
-
-		  // Missile weapon types
-
-		  shurikenobj,
-		  wallfireobj,
-		  netobj,
-		  h_mineobj,
-		  grenadeobj,
-		  fireballobj,
-		  dmfballobj,
-		  bigshurikenobj,
-		  missileobj,
-		  NMEsaucerobj,
-		  dm_weaponobj,
-		  dm_heatseekobj,
-		  dm_spitobj,
-		  p_bazookaobj,
-		  p_firebombobj,
-		  p_heatseekobj,
-		  p_drunkmissileobj,
-		  p_firewallobj,
-		  p_splitmissileobj,
-		  p_kesobj,
-		  p_godballobj,
-		  collectorobj,
-        diskobj,
-        rainobj
+	b_darianobj,
+	b_heinrichobj,
+	b_robobossobj,
+	b_darkmonkobj,
+	b_darksnakeobj,
+	patrolgunobj,
+	wallopobj,
 
 
-		  }classtype;
+	//specials
 
+	pillarobj,
+	firejetobj,
+	bladeobj,
+	crushcolobj,
+	boulderobj,
+	spearobj,
+	gasgrateobj,
+	springobj,
 
-typedef struct objstruct
-{
-		  thingtype                     which;
-		  byte                     tilex,tiley;
-		  fixed                    x,y,z;
-        int                      shapenum;
-		  unsigned                 flags;
-		  short                    ticcount;
-		  signed short             hitpoints;
-		  word                     whichactor;
+	// Missile weapon types
 
-		  signed short             dirchoosetime;
-		  fixed                    drawx,drawy;
-		  classtype                obclass;
-		  statetype *              state;
-		  signed char              door_to_open;
-		  byte                     areanumber;
-		  signed short             shapeoffset;
-		  int                      targettilex,targettiley;
+	shurikenobj,
+	wallfireobj,
+	netobj,
+	h_mineobj,
+	grenadeobj,
+	fireballobj,
+	dmfballobj,
+	bigshurikenobj,
+	missileobj,
+	NMEsaucerobj,
+	dm_weaponobj,
+	dm_heatseekobj,
+	dm_spitobj,
+	p_bazookaobj,
+	p_firebombobj,
+	p_heatseekobj,
+	p_drunkmissileobj,
+	p_firewallobj,
+	p_splitmissileobj,
+	p_kesobj,
+	p_godballobj,
+	collectorobj,
+	diskobj,
+	rainobj
 
+} classtype;
 
-		  dirtype                  dir;
-		  short int                angle;
-		  short int                yzangle;
+typedef struct objstruct {
+	thingtype which;
+	byte tilex, tiley;
+	fixed x, y, z;
+	int shapenum;
+	unsigned flags;
+	short ticcount;
+	signed short hitpoints;
+	word whichactor;
 
-		  int                      soundhandle;
-		  int                      speed;
-		  int                      momentumx, momentumy, momentumz;
-		  int                      temp1,temp2,temp3;
-		  void                     *whatever,*target;
-		  struct objstruct         *next, *prev;
-		  struct objstruct         *nextactive, *prevactive;
-		  struct objstruct         *nextinarea, *previnarea;
+	signed short dirchoosetime;
+	fixed drawx, drawy;
+	classtype obclass;
+	statetype * state;
+	signed char door_to_open;
+	byte areanumber;
+	signed short shapeoffset;
+	int targettilex, targettiley;
+
+	dirtype dir;
+	short int angle;
+	short int yzangle;
+
+	int soundhandle;
+	int speed;
+	int momentumx, momentumy, momentumz;
+	int temp1, temp2, temp3;
+	void * whatever, * target;
+	struct objstruct * next, * prev;
+	struct objstruct * nextactive, * prevactive;
+	struct objstruct * nextinarea, * previnarea;
 
 } objtype;
 
+typedef struct b_struct {
+	int NMErotate;
+	int NMEdirstried;
+	int NMEqueuesize;
+	int ESAU_HIDING, ESAU_SHOOTING;
+	int HRAMMING, HMINING;
+	int SOUNDTIME;
+	int redindex, REDTIME;
+	int monkz;
+	int monkup;
+	int firespawned;
+	int notouch, noholes;
+	int nexttouch, nextpop;
+	int popsleft;
+	int DSTATE;
+	int doorcount;
+	int KEYACTORSLEFT;
+	int GASON;
+	int gasindex;
+	boolean NET_IN_FLIGHT;
+	boolean madenoise;
+	_2Dpoint ETOUCH[MAXTOUCH], EPOP[MAXPOP], TOMLOC;
+	int NUMWEAPONS;
+	int BulletHoleNum;
+	int NUMBEGGINGKEVINS;
+	boolean fulllightgibs;
+	boolean directgibs;
+	int gibgravity;
+	int gibspeed;
+	boolean supergibflag;
+	boolean randgibspeed;
+	int numgibs;
+	boolean elevatormusicon;
+} misc_stuff;
 
-
-
-typedef struct b_struct
- {int   NMErotate;
-  int   NMEdirstried;
-  int   NMEqueuesize;
-  int   ESAU_HIDING,ESAU_SHOOTING;
-  int   HRAMMING, HMINING;
-  int   SOUNDTIME;
-  int   redindex,REDTIME;
-  int   monkz;
-  int   monkup;
-  int   firespawned;
-  int   notouch,noholes;
-  int   nexttouch,nextpop;
-  int   popsleft;
-  int   DSTATE;
-  int   doorcount;
-  int   KEYACTORSLEFT;
-  int      GASON;
-  int      gasindex;
-  boolean  NET_IN_FLIGHT;
-  boolean  madenoise;
-  _2Dpoint ETOUCH[MAXTOUCH],EPOP[MAXPOP],TOMLOC;
-  int   NUMWEAPONS;
-  int   BulletHoleNum;
-  int   NUMBEGGINGKEVINS;
-  boolean fulllightgibs;
-  boolean directgibs;
-  int     gibgravity;
-  int     gibspeed;
-  boolean supergibflag;
-  boolean randgibspeed;
-  int     numgibs;
-  boolean elevatormusicon;
- }misc_stuff;
-
-
-extern  boolean          ludicrousgibs;
-extern  objtype*         PLAYER0MISSILE;
-extern  byte             deathshapeoffset[8];
-extern  byte             RANDOMACTORTYPE[10];
-extern  objtype*         FIRSTACTOR,*LASTACTOR;
-extern  objtype          *FIRSTRAIN,*LASTRAIN;
-extern  objtype*         SCREENEYE;
-extern  objtype          *firstareaactor[NUMAREAS+1],*lastareaactor[NUMAREAS+1];
-extern  misc_stuff       mstruct,*MISCVARS;
-extern  int              actorstart,actorstop;
-extern  exit_t           playstate;
-extern  objtype          *lastactive,*firstactive;
-extern  objtype          *new,**objlist,
-								 *killerobj;
-extern  void             *actorat[MAPSIZE][MAPSIZE];
-extern  int              angletodir[ANGLES];
-extern _2Dpoint          SNAKEPATH[512];
+extern boolean ludicrousgibs;
+extern objtype * PLAYER0MISSILE;
+extern byte deathshapeoffset[8];
+extern byte RANDOMACTORTYPE[10];
+extern objtype * FIRSTACTOR, * LASTACTOR;
+extern objtype * FIRSTRAIN, * LASTRAIN;
+extern objtype * SCREENEYE;
+extern objtype * firstareaactor[NUMAREAS + 1], * lastareaactor[NUMAREAS + 1];
+extern misc_stuff mstruct, * MISCVARS;
+extern int actorstart, actorstop;
+extern exit_t playstate;
+extern objtype * lastactive, * firstactive;
+extern objtype * new, ** objlist,
+	* killerobj;
+extern void * actorat[MAPSIZE][MAPSIZE];
+extern int angletodir[ANGLES];
+extern _2Dpoint SNAKEPATH[512];
 /* extern  int              STOPSPEED; */
-extern  int              FRICTION;
+extern int FRICTION;
 
-extern  int              objcount;
+extern int objcount;
 
-void     SpawnInertActor(int,int,int);
-objtype* DiskAt(int tilex,int tiley);
-void     GetRainActors(void);
-void     DoRain(void);
-void     SpawnDisk(int,int,int,boolean);
-void     T_ElevDisk(objtype*);
-void     Add_To_Delete_Array(void*);
-void     Remove_Delete_Array_Entries(void);
-void     MakeInactive(objtype*ob);
-void     RespawnEluder(void);
-void     SpawnCollector(int,int);
-void     MakeLastInArea(objtype*);
-void     RemoveFromArea(objtype*);
-void     GetMomenta(objtype*,objtype*,int*,int*,int*,int);
-int      AngleBetween(objtype*,objtype*);
-void     TurnActorIntoSprite(objtype*);
-void     ResolveDoorSpace(int,int);
-void     RemoveObj(objtype*);
-void     SpawnParticles(objtype*,int,int);
-void     MakeActive(objtype*);
-void     SpawnSpear(int,int,int);
-void     SpawnBoulder(int,int,int);
-void     SpawnCrushingColumn(int,int,int);
-void     SpawnFirejet(int,int,int,int);
-void     T_Firethink(objtype*);
-void     SpawnBlade(int,int,int,int,int);
-void     T_OrobotChase(objtype*);
-void     SpawnMultiSpriteActor(classtype,int,int,int);
-boolean  ActorTryMove(objtype*,int,int,int);
-void     A_Repeat(objtype*);
-void     T_Heinrich_Defend(objtype*);
-void     T_Heinrich_Out_of_Control(objtype*);
-void     A_HeinrichShoot(objtype*);
-void     T_EsauWait(objtype*);
-void     T_EsauRise(objtype*);
-void     A_Drain(objtype*ob);
-void     T_Explosion(objtype*ob);
-void     T_MoveColumn(objtype*);
-void     EnableObject(long object);
-void     DisableObject(long object);
+void SpawnInertActor( int, int, int );
+objtype * DiskAt( int tilex, int tiley );
+void GetRainActors( void );
+void DoRain( void );
+void SpawnDisk( int, int, int, boolean );
+void T_ElevDisk( objtype * );
+void Add_To_Delete_Array( void * );
+void Remove_Delete_Array_Entries( void );
+void MakeInactive( objtype * ob );
+void RespawnEluder( void );
+void SpawnCollector( int, int );
+void MakeLastInArea( objtype * );
+void RemoveFromArea( objtype * );
+void GetMomenta( objtype *, objtype *, int *, int *, int *, int );
+int AngleBetween( objtype *, objtype * );
+void TurnActorIntoSprite( objtype * );
+void ResolveDoorSpace( int, int );
+void RemoveObj( objtype * );
+void SpawnParticles( objtype *, int, int );
+void MakeActive( objtype * );
+void SpawnSpear( int, int, int );
+void SpawnBoulder( int, int, int );
+void SpawnCrushingColumn( int, int, int );
+void SpawnFirejet( int, int, int, int );
+void T_Firethink( objtype * );
+void SpawnBlade( int, int, int, int, int );
+void T_OrobotChase( objtype * );
+void SpawnMultiSpriteActor( classtype, int, int, int );
+boolean ActorTryMove( objtype *, int, int, int );
+void A_Repeat( objtype * );
+void T_Heinrich_Defend( objtype * );
+void T_Heinrich_Out_of_Control( objtype * );
+void A_HeinrichShoot( objtype * );
+void T_EsauWait( objtype * );
+void T_EsauRise( objtype * );
+void A_Drain( objtype * ob );
+void T_Explosion( objtype * ob );
+void T_MoveColumn( objtype * );
+void EnableObject( long object );
+void DisableObject( long object );
 
-void     T_Collide(objtype*);
-void  Collision(objtype*ob,objtype *attacker,int hitmomentumx,int hitmomentumy);
-void     ActorMovement (objtype *);
-void     MoveActor(objtype*);
+void T_Collide( objtype * );
+void Collision( objtype * ob, objtype * attacker, int hitmomentumx, int hitmomentumy );
+void ActorMovement( objtype * );
+void MoveActor( objtype * );
 
-void     InitActorList(void);
-void     NewState(objtype*,statetype*);
-void     DoActor(objtype*);
+void InitActorList( void );
+void NewState( objtype *, statetype * );
+void DoActor( objtype * );
 
-void     SpawnPushColumn(int tilex,int tiley,int which,int dir, int linked);
-void     SpawnGunThingy(classtype which, int tilex, int tiley, int dir);
-void     SpawnStand (classtype which, int tilex, int tiley, int dir, int ambush);
-void     SpawnPatrol (classtype which, int tilex, int tiley, int dir);
-void     SpawnDeadGuard (int tilex, int tiley);
-void     SpawnWallfire(int tilex, int tiley, int dir);
-void     SpawnMissile(objtype*,classtype,int,int,statetype*,int);
+void SpawnPushColumn( int tilex, int tiley, int which, int dir, int linked );
+void SpawnGunThingy( classtype which, int tilex, int tiley, int dir );
+void SpawnStand( classtype which, int tilex, int tiley, int dir, int ambush );
+void SpawnPatrol( classtype which, int tilex, int tiley, int dir );
+void SpawnDeadGuard( int tilex, int tiley );
+void SpawnWallfire( int tilex, int tiley, int dir );
+void SpawnMissile( objtype *, classtype, int, int, statetype *, int );
 
-void     InitHitRect (objtype *ob, unsigned radius);
-void     NewState (objtype *ob, statetype *state);
-void     SelectPathDir(objtype*);
-void     SelectChaseDir (objtype *ob);
-boolean  SightPlayer (objtype *ob);
-boolean  CheckLine (void*,void *,int);
-boolean  CheckSight (objtype *ob,void*);
-void     KillActor (objtype *ob);
-void     DamageThing (void *, int);
-void     MissileHit (objtype *,void*);
-void     GetNewActor(void);
+void InitHitRect( objtype * ob, unsigned radius );
+void NewState( objtype * ob, statetype * state );
+void SelectPathDir( objtype * );
+void SelectChaseDir( objtype * ob );
+boolean SightPlayer( objtype * ob );
+boolean CheckLine( void *, void *, int );
+boolean CheckSight( objtype * ob, void * );
+void KillActor( objtype * ob );
+void DamageThing( void *, int );
+void MissileHit( objtype *, void * );
+void GetNewActor( void );
 
-void     T_WallPath(objtype*);
-void     T_Path (objtype *ob);   //done
-void     T_RoboChase(objtype*ob);
-void     T_RoboPath(objtype*ob);
-void     T_Chase (objtype *ob);      //done
-void     T_EsauChase(objtype*ob); //done
-void     T_Spears(objtype*);
-void     T_Projectile (objtype *ob); //done
-void     T_Stand (objtype *ob);      //done
-void     T_GunStand(objtype *ob); //done
-void     T_Use(objtype *ob);         // done
-void     A_Shoot (objtype *ob);        // done
-void     A_MissileWeapon(objtype*);    // done
-void     A_Wallfire(objtype*);
+void T_WallPath( objtype * );
+void T_Path( objtype * ob );   //done
+void T_RoboChase( objtype * ob );
+void T_RoboPath( objtype * ob );
+void T_Chase( objtype * ob );      //done
+void T_EsauChase( objtype * ob ); //done
+void T_Spears( objtype * );
+void T_Projectile( objtype * ob ); //done
+void T_Stand( objtype * ob );      //done
+void T_GunStand( objtype * ob ); //done
+void T_Use( objtype * ob );         // done
+void A_Shoot( objtype * ob );        // done
+void A_MissileWeapon( objtype * );    // done
+void A_Wallfire( objtype * );
 
-void     A_Steal(objtype*);
+void A_Steal( objtype * );
 
-void     T_Roll(objtype*);
-void     T_BossDied (objtype *ob);
-boolean  QuickSpaceCheck(objtype*,int,int);
-void     PushWallMove(int num);
-void     SpawnNewObj(unsigned,unsigned,statetype*,classtype);
-void     SpawnSpring(int,int);
-void     SpawnFourWayGun(int,int);
-void     SpawnSnake(int tilex,int tiley);
-void     SpawnSneaky(int,int);
-boolean  MissileTryMove(objtype*ob,int,int,int);
+void T_Roll( objtype * );
+void T_BossDied( objtype * ob );
+boolean QuickSpaceCheck( objtype *, int, int );
+void PushWallMove( int num );
+void SpawnNewObj( unsigned, unsigned, statetype *, classtype );
+void SpawnSpring( int, int );
+void SpawnFourWayGun( int, int );
+void SpawnSnake( int tilex, int tiley );
+void SpawnSneaky( int, int );
+boolean MissileTryMove( objtype * ob, int, int, int );
 
-void     SaveActors(byte ** buf, int * size);
-void     LoadActors(byte * buf, int size);
+void SaveActors( byte ** buf, int * size );
+void LoadActors( byte * buf, int size );
 
-boolean  TurnOffLight0 (int tilex, int tiley);
-boolean  TurnOffLight1 (int tilex, int tiley, int i, int j);
-boolean  TurnOffLight2 (int tilex, int tiley, int j);
-boolean  TurnOffLight3 (int tilex, int tiley, int i);
+boolean TurnOffLight0( int tilex, int tiley );
+boolean TurnOffLight1( int tilex, int tiley, int i, int j );
+boolean TurnOffLight2( int tilex, int tiley, int j );
+boolean TurnOffLight3( int tilex, int tiley, int i );
 
-void     ParseMomentum(objtype *ob,int angle);
-void     SpawnGroundExplosion(int x, int y, int z);
-void     RayShoot (objtype * shooter, int damage, int accuracy);
-void FindEmptyTile(int *stilex, int *stiley);
-void T_Wind( objtype *ob );
+void ParseMomentum( objtype * ob, int angle );
+void SpawnGroundExplosion( int x, int y, int z );
+void RayShoot( objtype * shooter, int damage, int accuracy );
+void FindEmptyTile( int * stilex, int * stiley );
+void T_Wind( objtype * ob );
 void StopWind( void );
 
 #endif

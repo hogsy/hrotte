@@ -22,13 +22,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MPU_DefaultAddress 0x330
 
-enum MPU_ERRORS
-   {
-   MPU_Warning = -2,
-   MPU_Error = -1,
-   MPU_Ok = 0,
-   MPU_DPMI_Error
-   };
+enum MPU_ERRORS {
+	MPU_Warning = -2,
+	MPU_Error = -1,
+	MPU_Ok = 0,
+	MPU_DPMI_Error
+};
 
 #define MPU_NotFound       -1
 #define MPU_UARTFailed     -2
@@ -44,9 +43,9 @@ extern unsigned MPU_Delay;
 
 void MPU_SendCommand( int data );
 void MPU_SendMidi( int data );
-int  MPU_Reset( void );
-int  MPU_EnterUART( void );
-int  MPU_Init( int addr );
+int MPU_Reset( void );
+int MPU_EnterUART( void );
+int MPU_Init( int addr );
 void MPU_ResetMidi( void );
 void MPU_NoteOff( int channel, int key, int velocity );
 void MPU_NoteOn( int channel, int key, int velocity );
@@ -56,6 +55,6 @@ void MPU_ProgramChange( int channel, int program );
 void MPU_ChannelAftertouch( int channel, int pressure );
 void MPU_PitchBend( int channel, int lsb, int msb );
 void MPU_UnlockMemory( void );
-int  MPU_LockMemory( void );
+int MPU_LockMemory( void );
 
 #endif

@@ -36,7 +36,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define VBLCOUNTER   35
 
-
 #define KEYQMAX      256
 #define MAXKEYBOARDSCAN         128
 
@@ -60,10 +59,10 @@ extern volatile int fasttics;
 
 #define SetFastTics(a) {fasttics=a;}
 #else
-int GetTicCount (void);
-int GetFastTics (void);
+int GetTicCount( void );
+int GetFastTics( void );
 
-void SetFastTics(int);
+void SetFastTics( int );
 #endif
 
 extern int KeyboardStarted;
@@ -73,17 +72,17 @@ extern const int ShiftNames[];   // Shifted Ascii->scancode conversion
 extern volatile boolean PausePressed;  //Game paused variable
 extern volatile boolean PanicPressed;  //Panic key variable
 
-void I_StartupTimer (void);        // Start up timer isr
-void I_SetTimer0(int speed);       // Set the timer to a given speed
-void I_ShutdownTimer (void);       // Shutdown timer isr
+void I_StartupTimer( void );        // Start up timer isr
+void I_SetTimer0( int speed );       // Set the timer to a given speed
+void I_ShutdownTimer( void );       // Shutdown timer isr
 void I_SetKeyboardLEDs( int which, boolean val ); // Turns LED's on or off
-void I_StartupKeyboard (void);     // Startup Keyboard isr
-void I_ShutdownKeyboard (void);    // Shutdown keyboard isr
-void I_Delay ( int delay );
-void ISR_SetTime(int settime);
+void I_StartupKeyboard( void );     // Startup Keyboard isr
+void I_ShutdownKeyboard( void );    // Shutdown keyboard isr
+void I_Delay( int delay );
+void ISR_SetTime( int settime );
 void I_SendKeyboardData
-   (
-   int val
-   );
+	(
+		int val
+	);
 
 #endif

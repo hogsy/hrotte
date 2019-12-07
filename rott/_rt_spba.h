@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _rt_spba_private
 #define _rt_spba_private
 
-#define SGN(x)                 (x>0 ? 1 : -1)
+#define SGN( x )                 (x>0 ? 1 : -1)
 
 #define NUMSPACEBALLBUTTONS 6
 

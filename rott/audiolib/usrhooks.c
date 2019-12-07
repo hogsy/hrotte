@@ -31,7 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include "usrhooks.h"
 
-
 /*---------------------------------------------------------------------
    Function: USRHOOKS_GetMem
 
@@ -41,25 +40,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ---------------------------------------------------------------------*/
 
 int USRHOOKS_GetMem
-   (
-   void **ptr,
-   unsigned long size
-   )
+	(
+		void ** ptr,
+		unsigned long size
+	) {
+	void * memory;
 
-   {
-   void *memory;
+	memory = malloc( size );
+	if ( memory == NULL) {
+		return (USRHOOKS_Error);
+	}
 
-   memory = malloc( size );
-   if ( memory == NULL )
-      {
-      return( USRHOOKS_Error );
-      }
+	*ptr = memory;
 
-   *ptr = memory;
-
-   return( USRHOOKS_Ok );
-   }
-
+	return (USRHOOKS_Ok);
+}
 
 /*---------------------------------------------------------------------
    Function: USRHOOKS_FreeMem
@@ -68,17 +63,14 @@ int USRHOOKS_GetMem
 ---------------------------------------------------------------------*/
 
 int USRHOOKS_FreeMem
-   (
-   void *ptr
-   )
+	(
+		void * ptr
+	) {
+	if ( ptr == NULL) {
+		return (USRHOOKS_Error);
+	}
 
-   {
-   if ( ptr == NULL )
-      {
-      return( USRHOOKS_Error );
-      }
+	free( ptr );
 
-   free( ptr );
-
-   return( USRHOOKS_Ok );
-   }
+	return (USRHOOKS_Ok);
+}

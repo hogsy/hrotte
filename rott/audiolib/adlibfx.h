@@ -31,50 +31,48 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __ADLIBFX_H
 #define __ADLIBFX_H
 
-enum ADLIBFX_Errors
-   {
-   ADLIBFX_Warning = -2,
-   ADLIBFX_Error   = -1,
-   ADLIBFX_Ok      = 0,
-   ADLIBFX_NoVoices,
-   ADLIBFX_VoiceNotFound,
-   ADLIBFX_DPMI_Error
-   };
+enum ADLIBFX_Errors {
+	ADLIBFX_Warning = -2,
+	ADLIBFX_Error = -1,
+	ADLIBFX_Ok = 0,
+	ADLIBFX_NoVoices,
+	ADLIBFX_VoiceNotFound,
+	ADLIBFX_DPMI_Error
+};
 
-typedef	struct
-   {
-   unsigned long  length;
-   short int      priority;
-   char           mChar, cChar;
-   char           mScale, cScale;
-   char           mAttack, cAttack;
-   char           mSus, cSus;
-   char           mWave, cWave;
-   char           nConn;
-   char           voice;
-   char           mode;
-   char           unused[ 3 ];
-   char           block;
-   char           data[];
-   } ALSound;
+typedef struct {
+	unsigned long length;
+	short int priority;
+	char mChar, cChar;
+	char mScale, cScale;
+	char mAttack, cAttack;
+	char mSus, cSus;
+	char mWave, cWave;
+	char nConn;
+	char voice;
+	char mode;
+	char unused[3];
+	char block;
+	char data[];
+} ALSound;
 
 #define ADLIBFX_MaxVolume      255
 #define ADLIBFX_MinVoiceHandle 1
 
-char *ADLIBFX_ErrorString( int ErrorNumber );
-int   ADLIBFX_Stop( int handle );
-int   ADLIBFX_SetVolume( int handle, int volume );
-int   ADLIBFX_SetTotalVolume( int volume );
-int   ADLIBFX_GetTotalVolume( void );
-int   ADLIBFX_VoiceAvailable( int priority );
-int   ADLIBFX_Play( ALSound *sound, int volume, int priority, unsigned long callbackval );
-int   ADLIBFX_SoundPlaying( int handle );
-void  ADLIBFX_SetCallBack( void ( *function )( unsigned long ) );
-int   ADLIBFX_Init( void );
-int   ADLIBFX_Shutdown( void );
-   #pragma aux ADLIBFX_Shutdown frame;
-void  PCFX_UnlockMemory( void );
-   #pragma aux ADLIBFX_UnlockMemory frame;
-int   PCFX_LockMemory( void );
+char * ADLIBFX_ErrorString( int ErrorNumber );
+int ADLIBFX_Stop( int handle );
+int ADLIBFX_SetVolume( int handle, int volume );
+int ADLIBFX_SetTotalVolume( int volume );
+int ADLIBFX_GetTotalVolume( void );
+int ADLIBFX_VoiceAvailable( int priority );
+int ADLIBFX_Play( ALSound * sound, int volume, int priority, unsigned long callbackval );
+int ADLIBFX_SoundPlaying( int handle );
+void ADLIBFX_SetCallBack( void ( * function )( unsigned long ));
+int ADLIBFX_Init( void );
+int ADLIBFX_Shutdown( void );
+#pragma aux ADLIBFX_Shutdown frame;
+void PCFX_UnlockMemory( void );
+#pragma aux ADLIBFX_UnlockMemory frame;
+int PCFX_LockMemory( void );
 
 #endif

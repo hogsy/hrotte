@@ -115,22 +115,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static void SOUNDSCAPE_EnableInterrupt( void );
 static void SOUNDSCAPE_DisableInterrupt( void );
-static void __interrupt __far SOUNDSCAPE_ServiceInterrupt( void );
-static int  ga_read( int rnum );
+static void __interrupt
+__far SOUNDSCAPE_ServiceInterrupt( void );
+static int ga_read( int rnum );
 static void ga_write( int rnum, int value );
-static int  ad_read( int rnum );
+static int ad_read( int rnum );
 static void ad_write( int rnum, int value );
 static void tdelay( void );
 static void pcm_format( void );
-static int  SOUNDSCAPE_SetupDMABuffer( char *BufferPtr, int BufferSize, int mode );
-static int  SOUNDSCAPE_BeginPlayback( int length );
+static int SOUNDSCAPE_SetupDMABuffer( char * BufferPtr, int BufferSize, int mode );
+static int SOUNDSCAPE_BeginPlayback( int length );
 static void SOUNDSCAPE_LockEnd( void );
 static void SOUNDSCAPE_UnlockMemory( void );
-static int  SOUNDSCAPE_LockMemory( void );
+static int SOUNDSCAPE_LockMemory( void );
 static unsigned short allocateTimerStack( unsigned short size );
 static void deallocateTimerStack( unsigned short selector );
-static int  parse( char *val, char *str, FILE *p1 );
-static int  SOUNDSCAPE_FindCard( void );
-static int  SOUNDSCAPE_Setup( void );
+static int parse( char * val, char * str, FILE * p1 );
+static int SOUNDSCAPE_FindCard( void );
+static int SOUNDSCAPE_Setup( void );
 
 #endif

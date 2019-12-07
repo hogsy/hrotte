@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SMOKEWALLOFFSET    (0x800)
 #define MZADJUST           0x30000;
 #define MAXSTEPHEIGHT      24
-#define SIGN(x)            ((x)>=0)?(1):(-1)
+#define SIGN( x )            ((x)>=0)?(1):(-1)
 #define MAXRAIN            128
 #define SG_PSTAT      0x4000
 #define SG_PSTATE     0x2000
@@ -55,18 +55,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define NUMSTATES 11
 
 enum {
-  STAND,
-  PATH,
-  COLLIDE1,
-  COLLIDE2,
-  CHASE,
-  USE,
-  AIM,
-  DIE,
-  FIRE,
-  WAIT,
-  CRUSH
-  };
+	STAND,
+	PATH,
+	COLLIDE1,
+	COLLIDE2,
+	CHASE,
+	USE,
+	AIM,
+	DIE,
+	FIRE,
+	WAIT,
+	CRUSH
+};
 
 #define SHOTMOM                0x200l
 #define NEXT                   1
@@ -102,23 +102,21 @@ enum {
 
 //=========================== macros =============================
 
-#define M_ISWALL(x)           ((x->which == WALL) || (x->which == PWALL) || (x->which == MWALL))
-#define M_DISTOK(p1,p2,d)     (abs((p1)-(p2)) <= d)
-#define M_NONS(x)             ((x->obclass == wallfireobj) || (x->obclass == pillarobj))
-#define M_CHOOSETIME(x)       ((int)(TILEGLOBAL/((x->speed))))
-#define M_DIST(x1,x2,y1,y2)   (((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)))
-#define M_S(x)                (UPDATE_STATES[x][ob->obclass-lowguardobj])
-#define Fix(a)                (a &= (FINEANGLES - 1))
+#define M_ISWALL( x )           ((x->which == WALL) || (x->which == PWALL) || (x->which == MWALL))
+#define M_DISTOK( p1, p2, d )     (abs((p1)-(p2)) <= d)
+#define M_NONS( x )             ((x->obclass == wallfireobj) || (x->obclass == pillarobj))
+#define M_CHOOSETIME( x )       ((int)(TILEGLOBAL/((x->speed))))
+#define M_DIST( x1, x2, y1, y2 )   (((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)))
+#define M_S( x )                (UPDATE_STATES[x][ob->obclass-lowguardobj])
+#define Fix( a )                (a &= (FINEANGLES - 1))
 
-
-#define STOPACTOR(ob)                   \
+#define STOPACTOR( ob )                   \
    {                                    \
    ob->momentumx = ob->momentumy = 0;   \
    ob->dirchoosetime = 0;               \
    }
 
-
-#define M_CHECKDIR(ob,tdir)             \
+#define M_CHECKDIR( ob, tdir )             \
    {                                    \
    ob->dir = tdir;                      \
    ParseMomentum(ob,dirangle8[tdir]);   \
@@ -128,7 +126,7 @@ enum {
    }                                    \
 
 
-#define M_CHECKTURN(x,ndir)                             \
+#define M_CHECKTURN( x, ndir )                             \
    {                                                    \
    if (ndir == olddir)                                  \
       ZEROMOM;                                          \
@@ -150,7 +148,7 @@ enum {
       }                                                 \
    }                                                    \
 
-#define M_CheckDoor(ob)                          \
+#define M_CheckDoor( ob )                          \
    {                                             \
    door = ob->door_to_open;                      \
    if (door != -1)                               \
@@ -166,7 +164,7 @@ enum {
       }                                          \
    }                                             \
 
-#define M_CheckBossSounds(ob)                                 \
+#define M_CheckBossSounds( ob )                                 \
    {                                                          \
    if ((ob->obclass >= b_darianobj) &&                        \
        (ob->obclass <= b_darksnakeobj) &&                     \
@@ -202,30 +200,26 @@ enum {
       }                                                       \
    }
 
-
-
-
-#define SET_DEATH_SHAPEOFFSET(ob)                     \
+#define SET_DEATH_SHAPEOFFSET( ob )                     \
    {                                                  \
    ob->flags |= FL_ALTERNATE;                         \
    ob->shapeoffset += deathshapeoffset[ob->obclass];  \
    }
 
-
-#define RESET_DEATH_SHAPEOFFSET(ob)                   \
+#define RESET_DEATH_SHAPEOFFSET( ob )                   \
    {                                                  \
    ob->flags &= ~FL_ALTERNATE;                        \
    ob->shapeoffset -= deathshapeoffset[ob->obclass];  \
    }
 
-#define LOW_VIOLENCE_DEATH_SHOULD_BE_SET(ob)          \
+#define LOW_VIOLENCE_DEATH_SHOULD_BE_SET( ob )          \
      ((gamestate.violence < vl_high) &&               \
       (ob->obclass >= lowguardobj) &&                 \
       (ob->obclass <= triadenforcerobj) &&            \
       (!(ob->flags & FL_ALTERNATE))                   \
      )                                                \
 
-#define LOW_VIOLENCE_DEATH_IS_SET(ob)   (ob->flags & FL_ALTERNATE)
+#define LOW_VIOLENCE_DEATH_IS_SET( ob )   (ob->flags & FL_ALTERNATE)
 
 #define LOW_VIOLENCE_PAIN_SHOULD_BE_SET  LOW_VIOLENCE_DEATH_SHOULD_BE_SET
 
@@ -238,59 +232,58 @@ enum {
 
 // default = actor
 
-typedef struct  sat
- { int          x,y,z;
-	unsigned     flags;
-	int          hitpoints;
-	int          targetx,targety;
-	int          angle;
-	int          yzangle;
-	int          speed;
-	int          momentumx,momentumy,momentumz;
-	int          temp1,temp2,temp3;
-	int          whateverindex,targetindex;
+typedef struct sat {
+	int x, y, z;
+	unsigned flags;
+	int hitpoints;
+	int targetx, targety;
+	int angle;
+	int yzangle;
+	int speed;
+	int momentumx, momentumy, momentumz;
+	int temp1, temp2, temp3;
+	int whateverindex, targetindex;
 
-	short        ticcount;
-	short        shapeoffset;
-	short        stateindex;
-	short        dirchoosetime;
+	short ticcount;
+	short shapeoffset;
+	short stateindex;
+	short dirchoosetime;
 
-	byte         areanumber;
-	byte         obclass;
-	signed char  door_to_open;
-	signed char  dir;
+	byte areanumber;
+	byte obclass;
+	signed char door_to_open;
+	signed char dir;
 
- }saved_actor_type;
+} saved_actor_type;
 
-
-typedef struct
- {thingtype which;
-  byte tilex,tiley;
-  fixed x,y,z;
- }tpoint;
+typedef struct {
+	thingtype which;
+	byte tilex, tiley;
+	fixed x, y, z;
+} tpoint;
 
 
 //========================== Function Prototypes ==============================
 
-void     MissileMovement(objtype*);
-boolean  MissileTryMove(objtype*,int,int,int);
-void     T_DarkSnakeChase(objtype*);
-void     HeatSeek(objtype*);
-boolean  CheckDoor(objtype *ob,doorobj_t*,int,int);
-boolean  NextToDoor(objtype*ob);
-void     MissileHit (objtype *ob,void*);
-int      Near(objtype*,void*,int);
-void     FirstSighting(objtype*);
-void     SelectOrobotChaseDir(objtype*);
-void     SelectPathDir(objtype*);
-void     SelectChaseDir(objtype*);
-void     SelectRoboChaseDir(objtype*);
-void     SelectDodgeDir(objtype*);
-void     SelectRollDir (objtype*);
-void     SelectTouchDir(objtype*);
-void     SelectMineDir(objtype*);
-boolean  WallCheck(int,int);
-boolean  NMEspincheck(objtype*);
-void     TurnActorIntoSprite(objtype*ob);
-void     ActivateEnemy(objtype*);
+void MissileMovement( objtype * );
+boolean MissileTryMove( objtype *, int, int, int );
+void T_DarkSnakeChase( objtype * );
+void HeatSeek( objtype * );
+boolean CheckDoor( objtype * ob, doorobj_t *, int, int );
+boolean NextToDoor( objtype * ob );
+void MissileHit( objtype * ob, void * );
+int Near( objtype *, void *, int );
+void FirstSighting( objtype * );
+void SelectOrobotChaseDir( objtype * );
+void SelectPathDir( objtype * );
+void SelectChaseDir( objtype * );
+void SelectRoboChaseDir( objtype * );
+void SelectDodgeDir( objtype * );
+void SelectRollDir( objtype * );
+void SelectTouchDir( objtype * );
+void SelectMineDir( objtype * );
+boolean WallCheck( int, int );
+boolean NMEspincheck( objtype * );
+void TurnActorIntoSprite( objtype * ob );
+void ActivateEnemy( objtype * );
 #endif
