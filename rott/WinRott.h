@@ -46,10 +46,3 @@ double dYZANGLELIMIT;
 //#define VIEWWIDTH               MAXSCREENWIDTH//320*2             // size of view window
 //#define VIEWHEIGHT              MAXSCREENHEIGHT//200*2
 //#define MAXSCANLINES            MAXSCREENHEIGHT//200*2             // size of ylookup table
-
-
-
-
-
-
-

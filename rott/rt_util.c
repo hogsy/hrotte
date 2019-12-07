@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "rt_def.h"
 
-#include <malloc.h>
 #include <SDL2/SDL.h>
 
 #include <stdarg.h>
@@ -37,15 +36,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_util.h"
 #include "isr.h"
 #include "z_zone.h"
-#include "rt_dr_a.h"
 #include "rt_in.h"
 #include "rt_main.h"
 #include "scriplib.h"
 #include "rt_menu.h"
 #include "rt_playr.h"
-#include "version.h"
 #include "develop.h"
-#include "rt_vid.h"
 #include "rt_view.h"
 #include "modexlib.h"
 #include "rt_cfg.h"
@@ -385,28 +381,6 @@ void Error( char * error, ... ) {
 
 	ShutDown();    // DDOI - moved this so that it doesn't try to access player
 	// which is freed by this function.
-
-#ifdef DOS
-	GetPathFromEnvironment( filename, ApogeePath, ERRORFILE );
-	handle=SafeOpenAppend ( filename );
-	for (y=0;y<16;y++)
-	   {
-	   for (x=0;x<160;x+=2)
-		  SafeWrite(handle,(byte *)0xB8000+(y*160)+x,1);
-	   i=10;
-	   SafeWrite(handle,&i,1);
-	   i=13;
-	   SafeWrite(handle,&i,1);
-	   }
-
-	close(handle);
-
-	if ( SOUNDSETUP )
-	   {
-	   getch();
-	   }
-
-#endif
 
 	SDL_Quit();
 
@@ -1103,6 +1077,8 @@ void SwapIntelShortArray( short * s, int num ) {
 ============================================================================
 */
 
+SDL_Surface * GetSdlSurface( void );
+
 /*
 ==============
 =
@@ -1114,57 +1090,25 @@ void SwapIntelShortArray( short * s, int num ) {
 */
 
 void GetaPalette( byte * palette ) {
-#if 0    // todo
-	int i;
-	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
-
-	for ( i = 0; i < 256; i++ ) {
+	SDL_Palette * pal = GetSdlSurface()->format->palette;
+	for ( int i = 0; i < 256; i++ ) {
 		palette[0] = pal->colors[i].r;
 		palette[1] = pal->colors[i].g;
 		palette[2] = pal->colors[i].b;
+
 		palette += 3;
 	}
-#endif
-}
-
-/*
-==============
-=
-= SetaPalette
-=
-= Sets an 8 bit / color palette
-=
-==============
-*/
-
-void SetaPalette( byte * pal ) {
-#if 0 // todo
-	SDL_Color cmap[256];
-	int i;
-
-	for ( i = 0; i < 256; i++ ) {
-		cmap[i].r = pal[i * 3 + 0];
-		cmap[i].g = pal[i * 3 + 1];
-		cmap[i].b = pal[i * 3 + 2];
-	}
-
-	SDL_SetColors( SDL_GetVideoSurface(), cmap, 0, 256 );
-#endif
 }
 
 void GetPalette( char * palette ) {
-#if 0 // todo
-	int i;
-	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
-
-	for ( i = 0; i < 256; i++ ) {
+	SDL_Palette * pal = GetSdlSurface()->format->palette;
+	for ( int i = 0; i < 256; i++ ) {
 		palette[0] = pal->colors[i].r;
 		palette[1] = pal->colors[i].g;
 		palette[2] = pal->colors[i].b;
 
 		palette += 3;
 	}
-#endif
 }
 
 void SetPalette( char * pal ) {
@@ -1220,7 +1164,6 @@ int US_CheckParm( char * parm, char ** strings ) {
 =============================================================================
 */
 
-
 /*
 =================
 =
@@ -1230,18 +1173,14 @@ int US_CheckParm( char * parm, char ** strings ) {
 */
 
 void VL_FillPalette( int red, int green, int blue ) {
-#if 0 // todo
 	SDL_Color cmap[256];
-	int i;
-
-	for ( i = 0; i < 256; i++ ) {
+	for ( int i = 0; i < 256; i++ ) {
 		cmap[i].r = red << 2;
 		cmap[i].g = green << 2;
 		cmap[i].b = blue << 2;
 	}
 
-	SDL_SetColors( SDL_GetVideoSurface(), cmap, 0, 256 );
-#endif
+	SDL_SetPaletteColors( GetSdlSurface()->format->palette, cmap, 0, 256 );
 }
 
 //===========================================================================
@@ -1315,18 +1254,14 @@ void VL_NormalizePalette( byte * palette ) {
 */
 
 void VL_SetPalette( byte * palette ) {
-#if 0 // todo
 	SDL_Color cmap[256];
-	int i;
-
-	for ( i = 0; i < 256; i++ ) {
-		cmap[i].r = gammatable[(gammaindex << 6) + (*palette++)] << 2;
-		cmap[i].g = gammatable[(gammaindex << 6) + (*palette++)] << 2;
-		cmap[i].b = gammatable[(gammaindex << 6) + (*palette++)] << 2;
+	for ( int i = 0; i < 256; i++ ) {
+		cmap[i].r = gammatable[( gammaindex << 6 ) + ( *palette++ )] << 2;
+		cmap[i].g = gammatable[( gammaindex << 6 ) + ( *palette++ )] << 2;
+		cmap[i].b = gammatable[( gammaindex << 6 ) + ( *palette++ )] << 2;
 	}
 
-	SDL_SetColors( SDL_GetVideoSurface(), cmap, 0, 256 );
-#endif
+	SDL_SetPaletteColors( GetSdlSurface()->format->palette, cmap, 0, 256 );
 }
 
 
@@ -1344,18 +1279,14 @@ void VL_SetPalette( byte * palette ) {
 */
 
 void VL_GetPalette( byte * palette ) {
-#if 0 // todo
-	int i;
-	SDL_Palette * pal = SDL_GetVideoSurface()->format->palette;
-
-	for ( i = 0; i < 256; i++ ) {
+	SDL_Palette * pal = GetSdlSurface()->format->palette;
+	for ( int i = 0; i < 256; i++ ) {
 		palette[0] = pal->colors[i].r >> 2;
 		palette[1] = pal->colors[i].g >> 2;
 		palette[2] = pal->colors[i].b >> 2;
 
 		palette += 3;
 	}
-#endif
 }
 
 /*

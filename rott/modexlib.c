@@ -72,7 +72,12 @@ void DrawCenterAim();
 static SDL_Window * sdlWindow = NULL;
 static SDL_Renderer * sdlRenderer = NULL;
 static SDL_Texture * sdlTexture = NULL;
+static SDL_Surface * sdlPalSurface = NULL;
 static SDL_Surface * sdlSurface = NULL;
+
+SDL_Surface * GetSdlSurface( void ) {
+	return sdlPalSurface;
+}
 
 void GraphicsMode( void ) {
 	if ( SDL_InitSubSystem( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 ) {
@@ -109,20 +114,29 @@ void GraphicsMode( void ) {
 
 	// Setup the texture and surface
 
-	sdlSurface = SDL_CreateRGBSurface( 0, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT, 8,
-									   0xFF000000,
-									   0x00FF0000,
-									   0x0000FF00,
-									   0x000000FF
+	sdlPalSurface = SDL_CreateRGBSurfaceWithFormat(
+		0,
+		iGLOBAL_SCREENWIDTH,
+		iGLOBAL_SCREENHEIGHT,
+		8,
+		SDL_PIXELFORMAT_INDEX8
+	);
+	if ( sdlPalSurface == NULL) {
+		Error( "Failed to create SDL surface!\nSDL: %s\n", SDL_GetError());
+	}
+
+	sdlSurface = SDL_CreateRGBSurfaceWithFormat(
+		0,
+		iGLOBAL_SCREENWIDTH,
+		iGLOBAL_SCREENHEIGHT,
+		32,
+		SDL_PIXELFORMAT_BGRA32
 	);
 	if ( sdlSurface == NULL) {
 		Error( "Failed to create SDL surface!\nSDL: %s\n", SDL_GetError());
 	}
 
-	sdlTexture = SDL_CreateTexture( sdlRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-									iGLOBAL_SCREENWIDTH,
-									iGLOBAL_SCREENHEIGHT
-	);
+	sdlTexture = SDL_CreateTextureFromSurface( sdlRenderer, sdlSurface );
 	if ( sdlTexture == NULL) {
 		Error( "Failed to create SDL texture!\nSDL: %s\n", SDL_GetError());
 	}
@@ -196,9 +210,9 @@ void VL_SetVGAPlaneMode( void ) {
 //    screensize=MAXSCREENHEIGHT*MAXSCREENWIDTH;
 	screensize = iGLOBAL_SCREENHEIGHT * iGLOBAL_SCREENWIDTH;
 
-	page1start = sdlSurface->pixels;
-	page2start = sdlSurface->pixels;
-	page3start = sdlSurface->pixels;
+	page1start = sdlPalSurface->pixels;
+	page2start = sdlPalSurface->pixels;
+	page3start = sdlPalSurface->pixels;
 	displayofs = page1start;
 	bufferofs = page2start;
 
@@ -282,7 +296,6 @@ void VL_ClearBuffer( byte * buf, byte color ) {
 */
 
 void VL_ClearVideo( byte color ) {
-	// todo: check this is correct...
 	SDL_SetRenderDrawColor( sdlRenderer, color, color, color, 255 );
 	SDL_RenderClear( sdlRenderer );
 }
@@ -302,7 +315,20 @@ void VL_DePlaneVGA( void ) {}
 void VH_UpdateScreen( void ) {
 	DrawCenterAim();
 
+	// Convert pallette surface
+	typedef struct { unsigned char b, g, r, a; } rgb_t;
+	rgb_t * rgb = sdlSurface->pixels;
+	for ( unsigned int i = 0; i < sdlPalSurface->pitch * iGLOBAL_SCREENHEIGHT; ++i ) {
+		int index = (( uint8_t * ) ( sdlPalSurface->pixels ))[i];
+		rgb->r = sdlPalSurface->format->palette->colors[index].r;
+		rgb->g = sdlPalSurface->format->palette->colors[index].g;
+		rgb->b = sdlPalSurface->format->palette->colors[index].b;
+		rgb->a = 255;
+		rgb++;
+	}
+
 	SDL_UpdateTexture( sdlTexture, NULL, sdlSurface->pixels, sdlSurface->pitch );
+
 	SDL_RenderClear( sdlRenderer );
 	SDL_RenderCopy( sdlRenderer, sdlTexture, NULL, NULL);
 	SDL_RenderPresent( sdlRenderer );
