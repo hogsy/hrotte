@@ -105,6 +105,18 @@ boolean VL_GetFilterMode( void ) {
 	return filter;
 }
 
+void VL_SetFullscreenMode( boolean fullscreen ) {
+	sdl_fullscreen = fullscreen;
+
+	// Window probably hasn't been created yet
+	if ( sdlWindow == NULL) {
+		return;
+	}
+
+	SDL_SetWindowFullscreen( sdlWindow, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 );
+	SDL_SetWindowPosition( sdlWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+}
+
 void GraphicsMode( void ) {
 	if ( SDL_InitSubSystem( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 ) {
 		Error( "Could not initialize SDL!\nSDL: %s\n", SDL_GetError());
@@ -112,17 +124,12 @@ void GraphicsMode( void ) {
 
 	SDL_ShowCursor( 0 );
 
-	Uint32 flags = 0;
-	if ( sdl_fullscreen ) {
-		flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
-	}
-
 	sdlWindow = SDL_CreateWindow(
 		"Rise of the Triad",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		0, 0,
-		flags
+		iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT,
+		sdl_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0
 	);
 	if ( sdlWindow == NULL) {
 		Error( "Failed to create SDL window!\nSDL: %s\n", SDL_GetError());
@@ -165,6 +172,8 @@ void GraphicsMode( void ) {
 	if ( sdlTexture == NULL) {
 		Error( "Failed to create SDL texture!\nSDL: %s\n", SDL_GetError());
 	}
+
+	SDL_SetWindowGrab( sdlWindow, true );
 }
 
 /*
@@ -382,7 +391,6 @@ extern boolean ingame;
 int iG_playerTilt;
 
 void DrawCenterAim() {
-#if 0 // todo: uhh keep this??
 	int x;
 
 	int percenthealth = ( locplayerstate->health * 10 ) / MaxHitpointsForCharacter( locplayerstate );
@@ -423,7 +431,6 @@ void DrawCenterAim() {
 			}
 		}
 	}
-#endif
 }
 // bna function added end
 

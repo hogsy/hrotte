@@ -4786,13 +4786,9 @@ void CP_ExtOptionsMenu( void ) {
 		case 3: usejump ^= 1;
 			DrawExtOptionsButtons();
 			break;
-		case 4:
-#if 0 // todo
-			if ( SDL_WM_ToggleFullScreen( SDL_GetVideoSurface())) {
-				sdl_fullscreen ^= 1;
-				DrawExtOptionsButtons();
-			}
-#endif
+		case 4: sdl_fullscreen ^= 1;
+			VL_SetFullscreenMode( sdl_fullscreen );
+			DrawExtOptionsButtons();
 			break;
 		case 5: VL_SetFilterMode( !VL_GetFilterMode());
 			DrawExtOptionsButtons();
