@@ -41,7 +41,6 @@ extern char ** _argv;
 
 void markgetch( void );
 boolean StringsNotEqual( char * s1, char * s2, int length );
-void GetPalette( char * pal );
 void ClearGraphicsScreen( void );
 void ClearBuffer( char * buf, int size );
 void Error( char * error, ... ) __attribute__((noreturn, format(printf, 1, 2)));

@@ -1077,40 +1077,6 @@ void SwapIntelShortArray( short * s, int num ) {
 ============================================================================
 */
 
-SDL_Surface * GetSdlSurface( void );
-
-/*
-==============
-=
-= GetaPalette
-=
-= Return an 8 bit / color palette
-=
-==============
-*/
-
-void GetaPalette( byte * palette ) {
-	SDL_Palette * pal = GetSdlSurface()->format->palette;
-	for ( int i = 0; i < 256; i++ ) {
-		palette[0] = pal->colors[i].r;
-		palette[1] = pal->colors[i].g;
-		palette[2] = pal->colors[i].b;
-
-		palette += 3;
-	}
-}
-
-void GetPalette( char * palette ) {
-	SDL_Palette * pal = GetSdlSurface()->format->palette;
-	for ( int i = 0; i < 256; i++ ) {
-		palette[0] = pal->colors[i].r;
-		palette[1] = pal->colors[i].g;
-		palette[2] = pal->colors[i].b;
-
-		palette += 3;
-	}
-}
-
 
 //******************************************************************************
 //
@@ -1158,6 +1124,8 @@ int US_CheckParm( char * parm, char ** strings ) {
 
 =============================================================================
 */
+
+SDL_Surface * GetSdlSurface( void );
 
 /*
 =================

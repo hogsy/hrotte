@@ -154,6 +154,7 @@ static char * ParmStrings[] = { "nojoys", "nomouse", "spaceball", "cyberman", "a
 
 static int TranslateSdlKey( int key ) {
 	switch ( key ) {
+	case SDLK_BACKSLASH: return 0x2B;
 	case SDLK_COMMA: return sc_Comma;
 	case SDLK_PERIOD: return sc_Period;
 	case SDLK_RETURN:
@@ -787,56 +788,15 @@ void IN_Startup( void ) {
 	  except where no such name is available.
 	 */
 #if 0 // todo
-	scancodes[SDLK_ESCAPE] = sc_Escape;
-	scancodes[SDLK_1] = sc_1;
-	scancodes[SDLK_2] = sc_2;
-	scancodes[SDLK_3] = sc_3;
-	scancodes[SDLK_4] = sc_4;
-	scancodes[SDLK_5] = sc_5;
-	scancodes[SDLK_6] = sc_6;
-	scancodes[SDLK_7] = sc_7;
-	scancodes[SDLK_8] = sc_8;
-	scancodes[SDLK_9] = sc_9;
-	scancodes[SDLK_0] = sc_0;
 
-	//scancodes[SDLK_EQUALS]          = 0x4E;
-	scancodes[SDLK_EQUALS] = sc_Equals;
-
-	scancodes[SDLK_BACKSPACE] = sc_BackSpace;
-	scancodes[SDLK_TAB] = sc_Tab;
-	scancodes[SDLK_q] = sc_Q;
-	scancodes[SDLK_w] = sc_W;
-	scancodes[SDLK_e] = sc_E;
-	scancodes[SDLK_r] = sc_R;
-	scancodes[SDLK_t] = sc_T;
-	scancodes[SDLK_y] = sc_Y;
-	scancodes[SDLK_u] = sc_U;
-	scancodes[SDLK_i] = sc_I;
-	scancodes[SDLK_o] = sc_O;
-	scancodes[SDLK_p] = sc_P;
 	scancodes[SDLK_LEFTBRACKET] = sc_OpenBracket;
 	scancodes[SDLK_RIGHTBRACKET] = sc_CloseBracket;
 	scancodes[SDLK_RETURN] = sc_Return;
 	scancodes[SDLK_LCTRL] = sc_Control;
-	scancodes[SDLK_a] = sc_A;
-	scancodes[SDLK_s] = sc_S;
-	scancodes[SDLK_d] = sc_D;
-	scancodes[SDLK_f] = sc_F;
-	scancodes[SDLK_g] = sc_G;
-	scancodes[SDLK_h] = sc_H;
-	scancodes[SDLK_j] = sc_J;
-	scancodes[SDLK_k] = sc_K;
-	scancodes[SDLK_l] = sc_L;
 	scancodes[SDLK_SEMICOLON] = 0x27;
 	scancodes[SDLK_QUOTE] = 0x28;
 	scancodes[SDLK_BACKQUOTE] = 0x29;
 
-	/* left shift, but ROTT maps it to right shift in isr.c */
-	scancodes[SDLK_LSHIFT] = sc_RShift; /* sc_LShift */
-
-	scancodes[SDLK_BACKSLASH] = 0x2B;
-	/* Accept the German eszett as a backslash key */
-	scancodes[SDLK_WORLD_63] = 0x2B;
 	scancodes[SDLK_z] = sc_Z;
 	scancodes[SDLK_x] = sc_X;
 	scancodes[SDLK_c] = sc_C;
@@ -856,21 +816,7 @@ void IN_Startup( void ) {
 	scancodes[SDLK_LALT] = sc_Alt;
 	scancodes[SDLK_RALT] = sc_Alt;
 	scancodes[SDLK_MODE] = sc_Alt;
-	scancodes[SDLK_RCTRL] = sc_Control;
-	scancodes[SDLK_SPACE] = sc_Space;
-	scancodes[SDLK_CAPSLOCK] = sc_CapsLock;
-	scancodes[SDLK_F1] = sc_F1;
-	scancodes[SDLK_F2] = sc_F2;
-	scancodes[SDLK_F3] = sc_F3;
-	scancodes[SDLK_F4] = sc_F4;
-	scancodes[SDLK_F5] = sc_F5;
-	scancodes[SDLK_F6] = sc_F6;
-	scancodes[SDLK_F7] = sc_F7;
-	scancodes[SDLK_F8] = sc_F8;
-	scancodes[SDLK_F9] = sc_F9;
-	scancodes[SDLK_F10] = sc_F10;
-	scancodes[SDLK_F11] = sc_F11;
-	scancodes[SDLK_F12] = sc_F12;
+
 	scancodes[SDLK_NUMLOCK] = 0x45;
 	scancodes[SDLK_SCROLLOCK] = 0x46;
 

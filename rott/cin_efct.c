@@ -450,35 +450,22 @@ void DrawCinematicBackdrop( backevent * back ) {
 
 	plane = 0;
 
-#ifdef DOS
-	for (plane=0;plane<4;plane++)
-#endif
-	{
-		buf = ( byte * ) bufferofs;
-		offset = (back->currentoffset >> FRACTIONBITS) + plane;
+	buf = ( byte * ) bufferofs;
+	offset = ( back->currentoffset >> FRACTIONBITS) + plane;
+	for ( i = 0; i < iGLOBAL_SCREENWIDTH; i++, offset++, buf++ ) {
+		if ( offset >= back->backdropwidth )
+			src = shape + p->collumnofs[offset - back->backdropwidth];
+		else if ( offset < 0 )
+			src = shape + p->collumnofs[offset + back->backdropwidth];
+		else
+			src = shape + p->collumnofs[offset];
 
-		VGAWRITEMAP( plane );
-
-#ifdef DOS
-		for (i=plane;i<iGLOBAL_SCREENWIDTH;i+=4,offset+=4,buf++)
-#else
-		for ( i = 0; i < iGLOBAL_SCREENWIDTH; i++, offset++, buf++ )
-#endif
-		{
-			if ( offset >= back->backdropwidth )
-				src = shape + p->collumnofs[offset - back->backdropwidth];
-			else if ( offset < 0 )
-				src = shape + p->collumnofs[offset + back->backdropwidth];
-			else
-				src = shape + p->collumnofs[offset];
-
-			postoffset = *(src++);
-			for ( ; postoffset != 255; ) {
-				postlength = *(src++);
-				DrawFilmPost( buf + ylookup[toppost + postoffset], src, postlength );
-				src += postlength;
-				postoffset = *(src++);
-			}
+		postoffset = *( src++ );
+		for ( ; postoffset != 255; ) {
+			postlength = *( src++ );
+			DrawFilmPost( buf + ylookup[toppost + postoffset], src, postlength );
+			src += postlength;
+			postoffset = *( src++ );
 		}
 	}
 }
@@ -718,21 +705,16 @@ boolean UpdateCinematicEffect( enum_eventtype type, void * effect ) {
 	case background_scrolling:
 	case backdrop_scrolling:
 	case backdrop_noscrolling:
-	case background_multi:return UpdateCinematicBack(( backevent * ) effect );
-		break;
+	case background_multi: return UpdateCinematicBack(( backevent * ) effect );
 	case sprite_background:
-	case sprite_foreground:return UpdateCinematicSprite(( spriteevent * ) effect );
-		break;
-	case flic:return true;
-		break;
+	case sprite_foreground: return UpdateCinematicSprite(( spriteevent * ) effect );
+	case flic: return true;
 	case palette:
 	case fadeout:
 	case blankscreen:
-	case clearbuffer:return true;
-		break;
-	case cinematicend:cinematicdone = true;
+	case clearbuffer: return true;
+	case cinematicend: cinematicdone = true;
 		return true;
-		break;
 	}
 	return true;
 }
@@ -746,37 +728,27 @@ boolean UpdateCinematicEffect( enum_eventtype type, void * effect ) {
 boolean DrawCinematicEffect( enum_eventtype type, void * effect ) {
 	switch ( type ) {
 	case background_noscrolling:
-	case background_scrolling:DrawCinematicBackground(( backevent * ) effect );
+	case background_scrolling: DrawCinematicBackground(( backevent * ) effect );
 		return true;
-		break;
-	case background_multi:DrawCinematicMultiBackground(( backevent * ) effect );
+	case background_multi: DrawCinematicMultiBackground(( backevent * ) effect );
 		return true;
-		break;
 	case backdrop_scrolling:
-	case backdrop_noscrolling:DrawCinematicBackdrop(( backevent * ) effect );
+	case backdrop_noscrolling: DrawCinematicBackdrop(( backevent * ) effect );
 		return true;
-		break;
 	case sprite_background:
-	case sprite_foreground:DrawCinematicSprite(( spriteevent * ) effect );
+	case sprite_foreground: DrawCinematicSprite(( spriteevent * ) effect );
 		return true;
-		break;
-	case flic:DrawFlic(( flicevent * ) effect );
+	case flic: DrawFlic(( flicevent * ) effect );
 		return false;
-		break;
-	case palette:DrawPalette(( paletteevent * ) effect );
+	case palette: DrawPalette(( paletteevent * ) effect );
 		return false;
-		break;
-	case fadeout:DrawFadeout();
+	case fadeout: DrawFadeout();
 		return false;
-		break;
-	case blankscreen:DrawBlankScreen();
+	case blankscreen: DrawBlankScreen();
 		return false;
-		break;
-	case clearbuffer:DrawClearBuffer();
+	case clearbuffer: DrawClearBuffer();
 		return false;
-		break;
 	case cinematicend:return true;
-		break;
 	}
 	return true;
 }
