@@ -315,7 +315,7 @@ void VL_DePlaneVGA( void ) {}
 void VH_UpdateScreen( void ) {
 	DrawCenterAim();
 
-	// Convert pallette surface
+	// Convert palette surface
 	typedef struct { unsigned char b, g, r, a; } rgb_t;
 	rgb_t * rgb = sdlSurface->pixels;
 	for ( unsigned int i = 0; i < sdlPalSurface->pitch * iGLOBAL_SCREENHEIGHT; ++i ) {

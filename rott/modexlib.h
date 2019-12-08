@@ -135,38 +135,8 @@ void XFlipPage( void );
 void WaitVBL( void );
 void TurnOffTextCursor( void );
 
-#ifdef __WATCOMC__
-#pragma aux VGAWRITEMAP =      \
-		"mov    eax,01H"       \
-		"mov    edx,03c5h"     \
-		"shl    eax,cl"        \
-		"out    dx,al"         \
-		parm    [ecx]          \
-		modify exact [eax edx]
-
-#pragma aux VGAMAPMASK =       \
-		"mov    edx,03c5h"     \
-		"out    dx,al"         \
-		parm    [eax]          \
-		modify exact [edx]
-
-#pragma aux VGAREADMAP =      \
-		"shl    eax,08H"      \
-		"mov    edx,03ceh"    \
-		"add    eax,04H"      \
-		"out    dx,ax"        \
-		parm    [eax]         \
-		modify exact [eax edx]
-#endif
-
-#ifdef DOS
-void  VGAMAPMASK (int x);
-void  VGAREADMAP (int x);
-void  VGAWRITEMAP(int x);
-#else
 #define VGAMAPMASK( a )
 #define VGAREADMAP( a )
 #define VGAWRITEMAP( a )
-#endif
 
 #endif
