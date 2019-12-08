@@ -34,21 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //***************************************************************************
 
-int SWIFT_Initialize( void );
-//
-// Test for presence of SWIFT extensions and SWIFT device
-// Returns 1 (TRUE) if SWIFT features are available, 0 otherwise.
-// Remember to call SWIFT_Terminate() if SWIFT_Initialize succeeds!
-//
-
-void SWIFT_Terminate( void );
-//
-// Free resources required for SWIFT support.  If SWIFT_Initialize has
-// not been called, or returned FALSE, this function does nothing.
-// SWIFT_Terminate should always be called at some time after a call to
-// SWIFT_Initialize has returned TRUE.
-//
-
 int SWIFT_GetAttachedDevice( void );
 //
 // Returns the device-type code for the attached SWIFT device, if any.

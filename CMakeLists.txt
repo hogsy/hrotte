@@ -58,7 +58,6 @@ add_executable(hrotte
         rott/cin_evnt.c
         rott/cin_glob.c
         rott/cin_main.c
-        rott/cin_util.c
         rott/dosutil.c
         rott/dukemusc.c
         rott/engine.c

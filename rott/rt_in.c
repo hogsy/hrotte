@@ -905,29 +905,6 @@ void IN_Startup( void ) {
 		spaceballenabled = true;
 	}
 
-	if (( checkcyberman || checkassassin ) && ( swiftstatus = SWIFT_Initialize())) {
-		int dynamic;
-
-		if ( checkcyberman ) {
-			CybermanPresent = swiftstatus;
-			cybermanenabled = true;
-		} else if ( checkassassin ) {
-			AssassinPresent = checkassassin & swiftstatus;
-			assassinenabled = true;
-		}
-
-		dynamic = SWIFT_GetDynamicDeviceData();
-
-		SWIFT_TactileFeedback( 40, 20, 20 );
-
-		if ( SWIFT_GetDynamicDeviceData() == 2 )
-			Error( "SWIFT ERROR : External Power too high!\n" );
-
-		SWIFT_TactileFeedback( 100, 10, 10 );
-		if ( !quiet )
-			printf( "IN_Startup: Swift Device Present\n" );
-	}
-
 	IN_Started = true;
 }
 
@@ -968,9 +945,6 @@ void IN_Shutdown( void ) {
 
 	for ( i = 0; i < MaxJoys; i++ )
 		INL_ShutJoy( i );
-
-	if ( CybermanPresent || AssassinPresent )
-		SWIFT_Terminate();
 
 	CloseSpaceBall();
 
