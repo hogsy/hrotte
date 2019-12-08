@@ -114,6 +114,9 @@ void VL_SetFullscreenMode( boolean fullscreen ) {
 	}
 
 	SDL_SetWindowFullscreen( sdlWindow, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 );
+
+	// Always reset to the middle of the screen, otherwise on platforms such as Ubuntu
+	// the window will get stuck under the side-menu :(
 	SDL_SetWindowPosition( sdlWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
@@ -124,8 +127,11 @@ void GraphicsMode( void ) {
 
 	SDL_ShowCursor( 0 );
 
+	char windowTitle[32];
+	snprintf( windowTitle, sizeof( windowTitle ), "hrotte %s (%s-%s)", GIT_COMMIT_COUNT, GIT_BRANCH, GIT_COMMIT_HASH );
+
 	sdlWindow = SDL_CreateWindow(
-		"Rise of the Triad",
+		windowTitle,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
 		iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT,
