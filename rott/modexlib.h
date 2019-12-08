@@ -123,6 +123,10 @@ extern boolean graphicsmode;
 
 void GraphicsMode( void );
 void SetTextMode( void );
+
+void VL_SetFilterMode( boolean linear );
+boolean VL_GetFilterMode( void );
+
 void VL_SetVGAPlaneMode( void );
 void VL_ClearBuffer( byte * buf, byte color );
 void VL_ClearVideo( byte color );

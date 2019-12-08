@@ -34,8 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #	include <unistd.h>
 #endif
 
-#include <SDL2/SDL.h>
-
 #include "rt_def.h"
 #include "_rt_menu.h"
 #include "rt_menu.h"
@@ -64,11 +62,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "rt_msg.h"
 #include "rt_net.h"
 #include "rt_scale.h"
-
 #include "rt_battl.h"
 #include "develop.h"
-//MED
-#include "memcheck.h"
+#include "_rt_util.h"
 
 
 //******************************************************************************
@@ -371,7 +367,8 @@ CP_MenuNames MainMenuNames[] =
 		"QUIT"
 	};
 
-CP_iteminfo MainItems = { MENU_X, MENU_Y + 1, 9, STARTITEM, 32, MainMenuNames, mn_largefont };
+CP_iteminfo MainItems =
+	{ MENU_X, MENU_Y + 1, Util_GetNumOfArrayItems( MainMenuNames ), STARTITEM, 32, MainMenuNames, mn_largefont };
 CP_itemtype MainMenu[] =
 	{
 		{ CP_CursorLocation, "mm_opt1\0", 'N', ( menuptr ) CP_NewGame },
@@ -418,7 +415,7 @@ CP_MenuNames CtlMenuNames[] =
 		"CUSTOMIZE CONTROLS"
 	};
 
-CP_iteminfo CtlItems = { CTL_X, MENU_Y, 9, -1, 36, CtlMenuNames, mn_largefont };
+CP_iteminfo CtlItems = { CTL_X, MENU_Y, Util_GetNumOfArrayItems( CtlMenuNames ), -1, 36, CtlMenuNames, mn_largefont };
 CP_itemtype CtlMenu[] =
 	{
 		{ CP_Inactive, "ctl_mic\0", 'M', NULL },
@@ -636,7 +633,7 @@ CP_MenuNames MouseBtnNames[] =
 		"DOUBLE-CLICK B2  \x9             "
 	};
 
-CP_iteminfo MouseBtnItems = { 19, 52, 6, 0, 11, MouseBtnNames, mn_8x8font };
+CP_iteminfo MouseBtnItems = { 19, 52, Util_GetNumOfArrayItems( MouseBtnNames ), 0, 11, MouseBtnNames, mn_8x8font };
 
 CP_itemtype MouseBtnMenu[] =
 	{
@@ -685,7 +682,8 @@ CP_MenuNames PlayerMenuNames[] =
 		"IAN PAUL FREELEY"
 	};
 
-CP_iteminfo PlayerItems = { TUF_X, 48, 5, 0, 80, PlayerMenuNames, mn_largefont };
+CP_iteminfo
+	PlayerItems = { TUF_X, 48, Util_GetNumOfArrayItems( PlayerMenuNames ), 0, 80, PlayerMenuNames, mn_largefont };
 
 CP_itemtype PlayerMenu[] =
 	{
@@ -730,16 +728,20 @@ CP_MenuNames OptionsNames[] =
 		"VIOLENCE LEVEL",
 		"SCREEN SIZE"
 	};
+
 //bna added
+
 CP_MenuNames ExtOptionsNames[] =
 	{
 		"MOUSELOOK",
 		"INVERSE MOUSE",
 		"CROSS HAIR",
 		"JUMPING",
-		"FULLSCREEN"
+		"FULLSCREEN",
+		"SCREEN FILTER"
 	};
-CP_iteminfo ExtOptionsItems = { 20, MENU_Y, 5, 0, 43, ExtOptionsNames, mn_largefont };
+CP_iteminfo
+	ExtOptionsItems = { 20, MENU_Y, Util_GetNumOfArrayItems( ExtOptionsNames ), 0, 43, ExtOptionsNames, mn_largefont };
 
 CP_itemtype ExtOptionsMenu[] =
 	{
@@ -747,7 +749,8 @@ CP_itemtype ExtOptionsMenu[] =
 		{ 1, "", 'I', NULL },
 		{ 1, "", 'C', NULL },
 		{ 1, "", 'J', NULL },
-		{ 1, "", 'F', NULL }
+		{ 1, "", 'F', NULL },
+		{ 1, "", 'S', NULL },
 	};
 
 //bna added end
@@ -774,7 +777,7 @@ CP_MenuNames DetailMenuNames[] =
 		"HIGH DETAIL"
 	};
 
-CP_iteminfo DetailItems = { 32, 64, 3, 0, 43, DetailMenuNames, mn_largefont };
+CP_iteminfo DetailItems = { 32, 64, Util_GetNumOfArrayItems( DetailMenuNames ), 0, 43, DetailMenuNames, mn_largefont };
 
 CP_itemtype DetailMenu[] =
 	{
@@ -4791,6 +4794,9 @@ void CP_ExtOptionsMenu( void ) {
 			}
 #endif
 			break;
+		case 5: VL_SetFilterMode( !VL_GetFilterMode());
+			DrawExtOptionsButtons();
+			break;
 		}
 
 	} while ( which >= 0 );
@@ -4834,6 +4840,11 @@ void DrawExtOptionsButtons( void ) {
 			case 4:
 				if ( sdl_fullscreen == 1 )
 					on = 1;
+				break;
+			case 5:
+				if ( VL_GetFilterMode()) {
+					on = 1;
+				}
 				break;
 			}
 

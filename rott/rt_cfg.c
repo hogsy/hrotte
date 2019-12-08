@@ -514,6 +514,11 @@ boolean ParseConfigFile( void ) {
 		ReadInt( "ScreenWidth", &iGLOBAL_SCREENWIDTH );
 		ReadInt( "ScreenHeight", &iGLOBAL_SCREENHEIGHT );
 
+		// Read in filter option
+		boolean filterMode = false;
+		ReadBoolean( "ScreenFilter", &filterMode );
+		VL_SetFilterMode( filterMode );
+
 		// Read in ViewSize
 
 		ReadInt( "ViewSize", &viewsize );
@@ -521,7 +526,7 @@ boolean ParseConfigFile( void ) {
 		// Read in Weaponscale
 
 		ReadInt( "Weaponscale", &G_weaponscale );//bna added
-		if ((G_weaponscale < 150) || (G_weaponscale > 600)) {
+		if (( G_weaponscale < 150 ) || ( G_weaponscale > 600 )) {
 			if ( iGLOBAL_SCREENWIDTH == 320 ) {
 				G_weaponscale = 168;
 			} else if ( iGLOBAL_SCREENWIDTH == 640 ) {
@@ -954,13 +959,6 @@ void ReadConfig( void ) {
 
 		Z_Free( scriptbuffer );
 	}
-#ifdef DOS
-																															else if ( !SOUNDSETUP )
-      {
-      Error( "Could not find SOUND.ROT.  Please run SNDSETUP to configure "
-         "your sound hardware." );
-      }
-#endif
 
 #ifdef _ROTT_
 	ReadScores();
@@ -1705,6 +1703,13 @@ void WriteConfig( void ) {
 	SafeWriteString( file, "; 320x200, 640x480 and 800x600\n" );
 	WriteParameter( file, "ScreenWidth      ", iGLOBAL_SCREENWIDTH );
 	WriteParameter( file, "ScreenHeight     ", iGLOBAL_SCREENHEIGHT );
+
+	// Write out filter mode
+	SafeWriteString( file, "\n;\n" );
+	SafeWriteString( file, "; Screen filter.\n" );
+	SafeWriteString( file, "; 0 - nearest\n" );
+	SafeWriteString( file, "; 1 - linear\n" );
+	WriteParameter( file, "ScreenFilter     ", VL_GetFilterMode());
 
 	// Write out ViewSize
 

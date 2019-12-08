@@ -79,6 +79,32 @@ SDL_Surface * GetSdlSurface( void ) {
 	return sdlPalSurface;
 }
 
+static boolean filter = false;
+void VL_SetFilterMode( boolean linear ) {
+	filter = linear;
+
+	SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, linear ? "linear" : "nearest" );
+
+	// Window probably hasn't been created yet
+	if ( sdlRenderer == NULL) {
+		return;
+	}
+
+	if ( sdlTexture != NULL) {
+		SDL_DestroyTexture( sdlTexture );
+		sdlTexture = NULL;
+	}
+
+	sdlTexture = SDL_CreateTextureFromSurface( sdlRenderer, sdlSurface );
+	if ( sdlTexture == NULL) {
+		Error( "Failed to create SDL texture!\nSDL: %s\n", SDL_GetError());
+	}
+}
+
+boolean VL_GetFilterMode( void ) {
+	return filter;
+}
+
 void GraphicsMode( void ) {
 	if ( SDL_InitSubSystem( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 ) {
 		Error( "Could not initialize SDL!\nSDL: %s\n", SDL_GetError());
@@ -109,7 +135,6 @@ void GraphicsMode( void ) {
 		Error( "Failed to create SDL renderer!\nSDL: %s\n", SDL_GetError());
 	}
 
-	SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "linear" );
 	SDL_RenderSetLogicalSize( sdlRenderer, iGLOBAL_SCREENWIDTH, iGLOBAL_SCREENHEIGHT );
 
 	// Setup the texture and surface
