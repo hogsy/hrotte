@@ -1,0 +1,124 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <JSCodeStyleSettings version="0">
+      <option name="FORCE_SEMICOLON_STYLE" value="true" />
+      <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
+      <option name="USE_DOUBLE_QUOTES" value="false" />
+      <option name="FORCE_QUOTE_STYlE" value="true" />
+      <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline" />
+      <option name="CHAINED_CALL_DOT_ON_NEW_LINE" value="false" />
+    </JSCodeStyleSettings>
+    <Objective-C>
+      <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
+      <option name="KEEP_STRUCTURES_IN_ONE_LINE" value="true" />
+      <option name="KEEP_CASE_EXPRESSIONS_IN_ONE_LINE" value="true" />
+      <option name="FUNCTION_NON_TOP_AFTER_RETURN_TYPE_WRAP" value="0" />
+      <option name="FUNCTION_TOP_AFTER_RETURN_TYPE_WRAP" value="0" />
+      <option name="FUNCTION_PARAMETERS_WRAP" value="5" />
+      <option name="FUNCTION_CALL_ARGUMENTS_WRAP" value="5" />
+      <option name="TEMPLATE_DECLARATION_STRUCT_WRAP" value="1" />
+      <option name="TEMPLATE_DECLARATION_FUNCTION_WRAP" value="1" />
+      <option name="TEMPLATE_CALL_ARGUMENTS_WRAP" value="5" />
+      <option name="TEMPLATE_CALL_ARGUMENTS_ALIGN_MULTILINE" value="true" />
+      <option name="ALIGN_INIT_LIST_IN_COLUMNS" value="false" />
+      <option name="SPACE_WITHIN_FUNCTION_DECLARATION_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_FUNCTION_CALL_PARENTHESES" value="true" />
+      <option name="SPACE_BEFORE_PROTOCOLS_BRACKETS" value="false" />
+      <option name="SPACE_AFTER_POINTER_IN_DECLARATION" value="true" />
+      <option name="SPACE_AFTER_REFERENCE_IN_DECLARATION" value="true" />
+      <option name="DISCHARGED_SHORT_TERNARY_OPERATOR" value="true" />
+      <option name="KEEP_BLANK_LINES_BEFORE_END" value="1" />
+      <option name="HEADER_GUARD_STYLE_PATTERN" value="${PROJECT_NAME}_${PROJECT_REL_PATH}_${FILE_NAME}_${EXT}" />
+      <option name="NAMESPACES_NAMING_CONVENTION">
+        <value prefix="" style="SNAKE_CASE" suffix="" />
+      </option>
+      <option name="CLASSES_AND_STRUCTS_NAMING_CONVENTION">
+        <value prefix="" style="PASCAL_CASE" suffix="" />
+      </option>
+      <option name="ENUMS_NAMING_CONVENTION">
+        <value prefix="" style="PASCAL_CASE" suffix="" />
+      </option>
+      <option name="ENUMERATORS_NAMING_CONVENTION">
+        <value prefix="" style="SCREAMING_SNAKE_CASE" suffix="" />
+      </option>
+      <option name="TYPEDEFS_NAMING_CONVENTION">
+        <value prefix="" style="PASCAL_CASE" suffix="" />
+      </option>
+      <option name="UNIONS_NAMING_CONVENTION">
+        <value prefix="" style="PASCAL_CASE" suffix="" />
+      </option>
+      <option name="METHODS_NAMING_CONVENTION">
+        <value prefix="" style="PASCAL_CASE" suffix="" />
+      </option>
+      <option name="FIELDS_NAMING_CONVENTION">
+        <value prefix="" style="SNAKE_CASE" suffix="_" />
+      </option>
+      <option name="GLOBAL_FUNCTIONS_NAMING_CONVENTION">
+        <value prefix="" style="PASCAL_CASE" suffix="" />
+      </option>
+      <option name="GLOBAL_VARIABLES_NAMING_CONVENTION">
+        <value prefix="" style="SNAKE_CASE" suffix="" />
+      </option>
+      <option name="PARAMETERS_NAMING_CONVENTION">
+        <value prefix="" style="SNAKE_CASE" suffix="" />
+      </option>
+      <option name="LOCAL_VARIABLES_NAMING_CONVENTION">
+        <value prefix="" style="SNAKE_CASE" suffix="" />
+      </option>
+    </Objective-C>
+    <Objective-C-extensions>
+      <rules>
+        <rule entity="MACRO" visibility="ANY" specifier="ANY" prefix="" style="SCREAMING_SNAKE_CASE" suffix="" />
+        <rule entity="NAMESPACE" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
+        <rule entity="CLASS,ENUM,UNION,TYPEDEF" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
+        <rule entity="GLOBAL_FUNCTION,MEMBER_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
+        <rule entity="ENUMERATOR" visibility="ANY" specifier="ANY" prefix="" style="SCREAMING_SNAKE_CASE" suffix="" />
+        <rule entity="GLOBAL_VARIABLE,PARAMETER,LOCAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
+      </rules>
+    </Objective-C-extensions>
+    <codeStyleSettings language="JavaScript">
+      <option name="RIGHT_MARGIN" value="80" />
+      <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+      <option name="CALL_PARAMETERS_WRAP" value="1" />
+      <option name="METHOD_PARAMETERS_WRAP" value="1" />
+      <option name="METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+      <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
+      <option name="BINARY_OPERATION_WRAP" value="1" />
+      <option name="TERNARY_OPERATION_WRAP" value="5" />
+      <option name="ARRAY_INITIALIZER_WRAP" value="5" />
+      <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+      <indentOptions>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="TAB_SIZE" value="2" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="ObjectiveC">
+      <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+      <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
+      <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+      <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
+      <option name="BLANK_LINES_BEFORE_IMPORTS" value="0" />
+      <option name="BLANK_LINES_AFTER_IMPORTS" value="0" />
+      <option name="BLANK_LINES_AROUND_CLASS" value="0" />
+      <option name="BLANK_LINES_AROUND_METHOD" value="0" />
+      <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />
+      <option name="INDENT_CASE_FROM_SWITCH" value="false" />
+      <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="false" />
+      <option name="SPACE_WITHIN_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_IF_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_WHILE_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_FOR_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_CATCH_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_SWITCH_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_CAST_PARENTHESES" value="true" />
+      <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACES" value="true" />
+      <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+      <option name="FOR_STATEMENT_WRAP" value="1" />
+      <option name="ASSIGNMENT_WRAP" value="1" />
+      <indentOptions>
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+  </code_scheme>
+</component>
