@@ -161,10 +161,10 @@ static int playeruniformcolor;
 
 extern void VL_MemToScreenClipped( byte * source, int width, int height, int x, int y );
 void DrawPPic( int xpos, int ypos, int width, int height, byte * src, int num, boolean up, boolean bufferofsonly );
-extern void MoveScreenUpLeft();
-extern void MoveScreenUpRight();
-extern void MoveScreenDownLeft();
-extern void MoveScreenDownRight();
+extern void MoveScreenUpLeft( void );
+extern void MoveScreenUpRight( void );
+extern void MoveScreenDownLeft( void );
+extern void MoveScreenDownRight( void );
 //******************************************************************************
 //
 // V_ReDrawBkgnd ()
