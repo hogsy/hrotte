@@ -20,13 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cin_glob.h"
 #include "modexlib.h"
 
-#ifdef DOS
-#include <conio.h>
-#endif
-
-//MED
-#include "memcheck.h"
-
 /*
 ==============
 =
@@ -45,6 +38,7 @@ void CinematicGetPalette( byte * pal ) {
 	for (i=0 ; i<768 ; i++)
 	  pal[i] = ((inp (PEL_DATA))<<2);
 #else
+	VL_GetPalette( pal );
 #endif
 }
 
@@ -66,5 +60,6 @@ void CinematicSetPalette( byte * pal ) {
 	for (i=0 ; i<768 ; i++)
 	  outp (PEL_DATA, pal[i]>>2);
 #else
+	VL_SetPalette( pal );
 #endif
 }
