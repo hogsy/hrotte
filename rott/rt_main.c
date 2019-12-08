@@ -1099,15 +1099,15 @@ void GameLoop( void ) {
 					byte * tempbuf;
 					MenuFadeOut();
 					ClearGraphicsScreen();
-					SetPalette( &dimpal[0] );
+					VL_SetPalette( &dimpal[0] );
 					PlayMovie( "shartitl", true );
-					if ((LastScan) || (IN_GetMouseButtons())) {
+					if (( LastScan ) || ( IN_GetMouseButtons())) {
 						break;
 					}
 
 					PlayMovie( "shartit2", true );
 
-					if ((LastScan) || (IN_GetMouseButtons())) {
+					if (( LastScan ) || ( IN_GetMouseButtons())) {
 						break;
 					}
 					SD_Play( SD_LIGHTNINGSND );

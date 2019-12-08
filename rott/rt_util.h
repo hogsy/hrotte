@@ -78,7 +78,6 @@ byte BestColor( int r, int g, int b, byte * palette );
 int atan2_appx( int, int );
 int FindDistance( int ix, int iy );
 int Find_3D_Distance( int ix, int iy, int iz );
-void SetPalette( char * pal );
 void FindEGAColors( void );
 void VL_FillPalette( int red, int green, int blue );
 void VL_SetColor( int color, int red, int green, int blue );

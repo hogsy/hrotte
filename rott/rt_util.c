@@ -1111,11 +1111,6 @@ void GetPalette( char * palette ) {
 	}
 }
 
-void SetPalette( char * pal ) {
-	VL_SetPalette( pal );
-}
-
-
 
 //******************************************************************************
 //
