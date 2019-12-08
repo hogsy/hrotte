@@ -68,18 +68,6 @@ int zonememorystarted = 0;
 static memzone_t * mainzone;
 static memzone_t * levelzone;
 static int levelzonesize = LEVELZONESIZE;
-static struct meminfo {
-	unsigned LargestBlockAvail;
-	unsigned MaxUnlockedPage;
-	unsigned LargestLockablePage;
-	unsigned LinAddrSpace;
-	unsigned NumFreePagesAvail;
-	unsigned NumPhysicalPagesFree;
-	unsigned TotalPhysicalPages;
-	unsigned FreeLinAddrSpace;
-	unsigned SizeOfPageFile;
-	unsigned Reserved[3];
-} MemInfo;
 
 /*
 ========================
@@ -690,22 +678,7 @@ void Z_ChangeTag( void * ptr, int tag ) {
 */
 
 int Z_AvailHeap( void ) {
-#ifdef DOS
-	union REGS zregs;
-	struct SREGS zsregs;
-
-
-	zregs.x.eax = 0x00000500;
-	memset( &zsregs, 0, sizeof(zsregs) );
-	zsregs.es = FP_SEG( &MemInfo );
-	zregs.x.edi = FP_OFF( &MemInfo );
-
-	int386x( DPMI_INT, &zregs, &zregs, &zsregs );
-
-	return ((int)MemInfo.LargestBlockAvail);
-#else
 	return MAXMEMORYSIZE;
-#endif
 }
 
 /*
