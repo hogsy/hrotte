@@ -31,15 +31,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "isr.h"
 #include "rt_util.h"
 #include "rt_swift.h"
-#include "rt_vh_a.h"
 #include "rt_cfg.h"
 #include "rt_msg.h"
-#include "rt_playr.h"
 #include "rt_net.h"
 #include "rt_com.h"
-#include "rt_cfg.h"
-//MED
-#include "memcheck.h"
 #include "keyb.h"
 
 #define MAXMESSAGELENGTH      (COM_MAXTEXTSTRINGLENGTH-1)
@@ -92,7 +87,6 @@ static int sdl_total_sticks = 0;
 static word * sdl_stick_button_state = NULL;
 static word sdl_sticks_joybits = 0;
 static int sdl_mouse_grabbed = 0;
-static unsigned int scancodes[4096];
 extern boolean sdl_fullscreen;
 
 //   'q','w','e','r','t','y','u','i','o','p','[',']','\\', 0 ,'a','s',
@@ -156,11 +150,92 @@ static Direction DirTable[] =      // Quick lookup for total direction
 		dir_SouthWest, dir_South, dir_SouthEast
 	};
 
-int (far * function_ptr)();
-
 static char * ParmStrings[] = { "nojoys", "nomouse", "spaceball", "cyberman", "assassin", NULL };
 
-#define sdldebug printf
+static int TranslateSdlKey( int key ) {
+	switch ( key ) {
+	case SDLK_COMMA: return sc_Comma;
+	case SDLK_PERIOD: return sc_Period;
+	case SDLK_RETURN:
+	case SDLK_KP_ENTER: return sc_Return;
+	case SDLK_ESCAPE: return sc_Escape;
+	case SDLK_SPACE: return sc_Space;
+	case SDLK_BACKSPACE: return sc_BackSpace;
+	case SDLK_TAB: return sc_Tab;
+	case SDLK_ALTERASE: return sc_Alt;
+	case SDLK_LCTRL:
+	case SDLK_RCTRL: return sc_Control;
+	case SDLK_CAPSLOCK: return sc_CapsLock;
+	case SDLK_LSHIFT:
+	case SDLK_RSHIFT: return sc_LShift;
+	case SDLK_UP: return sc_UpArrow;
+	case SDLK_DOWN: return sc_DownArrow;
+	case SDLK_LEFT: return sc_LeftArrow;
+	case SDLK_RIGHT: return sc_RightArrow;
+	case SDLK_INSERT: return sc_Insert;
+	case SDLK_DELETE: return sc_Delete;
+	case SDLK_HOME: return sc_Home;
+	case SDLK_END: return sc_End;
+	case SDLK_PAGEUP: return sc_PgUp;
+	case SDLK_PAGEDOWN: return sc_PgDn;
+	case SDLK_F1: return sc_F1;
+	case SDLK_F2: return sc_F2;
+	case SDLK_F3: return sc_F3;
+	case SDLK_F4: return sc_F4;
+	case SDLK_F5: return sc_F5;
+	case SDLK_F6: return sc_F6;
+	case SDLK_F7: return sc_F7;
+	case SDLK_F8: return sc_F8;
+	case SDLK_F9: return sc_F9;
+	case SDLK_F10: return sc_F10;
+	case SDLK_F11: return sc_F11;
+	case SDLK_F12: return sc_F12;
+	case SDLK_PRINTSCREEN: return sc_PrintScreen;
+	case SDLK_1: return sc_1;
+	case SDLK_2: return sc_2;
+	case SDLK_3: return sc_3;
+	case SDLK_4: return sc_4;
+	case SDLK_5: return sc_5;
+	case SDLK_6: return sc_6;
+	case SDLK_7: return sc_7;
+	case SDLK_8: return sc_8;
+	case SDLK_9: return sc_9;
+	case SDLK_0: return sc_0;
+	case SDLK_MINUS:
+	case SDLK_KP_MINUS: return sc_Minus;
+	case SDLK_EQUALS:
+	case SDLK_KP_EQUALS: return sc_Equals;
+	case SDLK_PLUS:
+	case SDLK_KP_PLUS: return sc_Plus;
+	case SDLK_a: return sc_A;
+	case SDLK_b: return sc_B;
+	case SDLK_c: return sc_C;
+	case SDLK_d: return sc_D;
+	case SDLK_e: return sc_E;
+	case SDLK_f: return sc_F;
+	case SDLK_g: return sc_G;
+	case SDLK_h: return sc_H;
+	case SDLK_i: return sc_I;
+	case SDLK_j: return sc_J;
+	case SDLK_k: return sc_K;
+	case SDLK_l: return sc_L;
+	case SDLK_m: return sc_M;
+	case SDLK_n: return sc_N;
+	case SDLK_o: return sc_O;
+	case SDLK_p: return sc_P;
+	case SDLK_q: return sc_Q;
+	case SDLK_r: return sc_R;
+	case SDLK_s: return sc_S;
+	case SDLK_t: return sc_T;
+	case SDLK_u: return sc_U;
+	case SDLK_v: return sc_V;
+	case SDLK_w: return sc_W;
+	case SDLK_x: return sc_X;
+	case SDLK_y: return sc_Y;
+	case SDLK_z: return sc_Z;
+	default: return '\0';
+	}
+}
 
 static int sdl_mouse_button_filter( SDL_Event const * event ) {
 	/*
@@ -240,7 +315,7 @@ static int handle_keypad_enter_hack( const SDL_Event * event ) {
 		if ( event->key.state == SDL_PRESSED ) {
 			if ( event->key.keysym.mod & KMOD_SHIFT) {
 				kp_enter_hack = 1;
-				retval = scancodes[SDLK_KP_ENTER];
+				retval = TranslateSdlKey( SDLK_KP_ENTER );
 			} /* if */
 		} /* if */
 
@@ -248,7 +323,7 @@ static int handle_keypad_enter_hack( const SDL_Event * event ) {
 		{
 			if ( kp_enter_hack ) {
 				kp_enter_hack = 0;
-				retval = scancodes[SDLK_KP_ENTER];
+				retval = TranslateSdlKey( SDLK_KP_ENTER );
 			} /* if */
 		} /* if */
 	} /* if */
@@ -258,13 +333,13 @@ static int handle_keypad_enter_hack( const SDL_Event * event ) {
 
 
 static int sdl_key_filter( const SDL_Event * event ) {
-#if 0 // todo
 	int k;
 	int keyon;
 	int strippedkey;
-	SDL_GrabMode grab_mode = SDL_GRAB_OFF;
 	int extended;
 
+#if 0 // todo ?
+	SDL_GrabMode grab_mode = SDL_GRAB_OFF;
 	if (( event->key.keysym.sym == SDLK_g ) &&
 		( event->key.state == SDL_PRESSED ) &&
 		( event->key.keysym.mod & KMOD_CTRL)) {
@@ -285,6 +360,7 @@ static int sdl_key_filter( const SDL_Event * event ) {
 			sdl_fullscreen ^= 1;
 		return ( 0 );
 	} /* if */
+#endif
 
 	/* HDG: put this above the scancode lookup otherwise it is never reached */
 	if (( event->key.keysym.sym == SDLK_PAUSE ) &&
@@ -295,18 +371,18 @@ static int sdl_key_filter( const SDL_Event * event ) {
 
 	k = handle_keypad_enter_hack( event );
 	if ( !k ) {
-		k = scancodes[event->key.keysym.sym];
+		k = TranslateSdlKey( event->key.keysym.sym );
 		if ( !k )   /* No DOS equivalent defined. */
 			return ( 0 );
 	} /* if */
 
 	/* Fix elweirdo SDL capslock/numlock handling, always treat as press */
 	if (( event->key.keysym.sym != SDLK_CAPSLOCK ) &&
-		( event->key.keysym.sym != SDLK_NUMLOCK ) &&
+		( event->key.keysym.sym != SDLK_NUMLOCKCLEAR ) &&
 		( event->key.state == SDL_RELEASED ))
 		k += 128;  /* +128 signifies that the key is released in DOS. */
 
-	if ( event->key.keysym.sym == SDLK_SCROLLOCK )
+	if ( event->key.keysym.sym == SDLK_SCROLLLOCK )
 		PanicPressed = true;
 
 	else {
@@ -318,7 +394,7 @@ static int sdl_key_filter( const SDL_Event * event ) {
 		if ( extended != 0 ) {
 			KeyboardQueue[Keytail] = extended;
 			Keytail = ( Keytail + 1 ) & ( KEYQMAX - 1 );
-			k = scancodes[event->key.keysym.sym] & 0xFF;
+			k = TranslateSdlKey( event->key.keysym.sym ) & 0xFF;
 			if ( event->key.state == SDL_RELEASED )
 				k += 128;  /* +128 signifies that the key is released in DOS. */
 		}
@@ -334,10 +410,9 @@ static int sdl_key_filter( const SDL_Event * event ) {
 		KeyboardQueue[Keytail] = k;
 		Keytail = ( Keytail + 1 ) & ( KEYQMAX - 1 );
 	}
-#endif
+
 	return ( 0 );
 } /* sdl_key_filter */
-
 
 static int root_sdl_event_filter( const SDL_Event * event ) {
 	switch ( event->type ) {
@@ -711,7 +786,6 @@ void IN_Startup( void ) {
 	  all keys are now mapped to the wolf3d-style names,
 	  except where no such name is available.
 	 */
-	memset( scancodes, '\0', sizeof( scancodes ));
 #if 0 // todo
 	scancodes[SDLK_ESCAPE] = sc_Escape;
 	scancodes[SDLK_1] = sc_1;
@@ -1369,7 +1443,6 @@ void QueueLetterInput( void ) {
 	int scancode;
 	boolean send = false;
 
-#ifndef PLATFORM_DOS
 	/* HACK HACK HACK */
 	/*
 	  OK, we want the new keys NOW, and not when the update gets them.
@@ -1382,7 +1455,6 @@ void QueueLetterInput( void ) {
 	tail = Keytail;
 	queuegotit = 1;
 	/* HACK HACK HACK */
-#endif
 
 	while ( head != tail ) {
 		if ( !( KeyboardQueue[head] & 0x80 ))        // Down event
