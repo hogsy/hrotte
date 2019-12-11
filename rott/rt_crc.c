@@ -19,12 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // CRC lib
 
-#include    <stdio.h>
-#include    <stdlib.h>
-#include    <string.h>
 #include "rt_crc.h"
-//MED
-#include "memcheck.h"
 
 /* variables */
 static const unsigned short int crc16tab[256] =

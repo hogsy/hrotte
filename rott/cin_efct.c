@@ -34,8 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modexlib.h"
 #include "fli_glob.h"
-//MED
-#include "memcheck.h"
 
 static int cin_sprtopoffset;
 static int cin_invscale;
@@ -635,12 +633,7 @@ void DrawBlankScreen( void ) {
 =================
 */
 void DrawClearBuffer( void ) {
-#ifdef DOS
-	VGAMAPMASK(15);
-	memset((byte *)bufferofs,0,iGLOBAL_SCREENBWIDE*iGLOBAL_SCREENHEIGHT);
-#else
 	memset(( byte * ) bufferofs, 0, iGLOBAL_SCREENWIDTH * iGLOBAL_SCREENHEIGHT );
-#endif
 }
 
 /*

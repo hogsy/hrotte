@@ -773,10 +773,7 @@ void INL_ShutJoy( word joy ) {
 void IN_Startup( void ) {
 	boolean checkjoys,
 		checkmouse,
-		checkcyberman,
-		checkspaceball,
-		swiftstatus,
-		checkassassin;
+		checkspaceball;
 
 	word i;
 
@@ -788,7 +785,6 @@ void IN_Startup( void ) {
 	  except where no such name is available.
 	 */
 #if 0 // todo
-
 	scancodes[SDLK_LEFTBRACKET] = sc_OpenBracket;
 	scancodes[SDLK_RIGHTBRACKET] = sc_CloseBracket;
 	scancodes[SDLK_RETURN] = sc_Return;
@@ -855,9 +851,6 @@ void IN_Startup( void ) {
 
 	checkjoys = true;
 	checkmouse = true;
-	checkcyberman = false;
-	checkassassin = false;
-	checkspaceball = false;
 	SpaceBallPresent = false;
 	CybermanPresent = false;
 	AssassinPresent = false;
@@ -870,15 +863,12 @@ void IN_Startup( void ) {
 		case 1:checkmouse = false;
 			break;
 
-		case 2:checkspaceball = true;
+		case 2:break;
+
+		case 3: checkmouse = false;
 			break;
 
-		case 3:checkcyberman = true;
-			checkmouse = false;
-			break;
-
-		case 4:checkassassin = true;
-			checkmouse = false;
+		case 4: checkmouse = false;
 			break;
 		}
 	}
@@ -898,11 +888,6 @@ void IN_Startup( void ) {
 			if ( !quiet )
 				printf( "IN_Startup: Joystick Present\n" );
 		}
-	}
-
-	if ( checkspaceball ) {
-		OpenSpaceBall();
-		spaceballenabled = true;
 	}
 
 	IN_Started = true;
@@ -936,14 +921,12 @@ void IN_Default (boolean gotit, ControlType in)
 //******************************************************************************
 
 void IN_Shutdown( void ) {
-	word i;
-
 	if ( IN_Started == false )
 		return;
 
 //   INL_ShutMouse();
 
-	for ( i = 0; i < MaxJoys; i++ )
+	for ( unsigned int i = 0; i < MaxJoys; i++ )
 		INL_ShutJoy( i );
 
 	CloseSpaceBall();

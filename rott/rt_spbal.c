@@ -55,8 +55,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <dos.h>
 #include <mem.h>
 #endif
-//MED
-#include "memcheck.h"
 
 #ifdef DOS
 /* This file and associated .h files and Spaceball libraries:
