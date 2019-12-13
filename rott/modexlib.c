@@ -123,7 +123,7 @@ void GraphicsMode( void ) {
 		Error( "Could not initialize SDL!\nSDL: %s\n", SDL_GetError());
 	}
 
-	SDL_ShowCursor( 0 );
+	SDL_SetRelativeMouseMode( true );
 
 	char windowTitle[32];
 	snprintf( windowTitle, sizeof( windowTitle ), "hrotte %s (%s-%s)", GIT_COMMIT_COUNT, GIT_BRANCH, GIT_COMMIT_HASH );
