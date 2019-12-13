@@ -417,6 +417,24 @@ static int sdl_key_filter( const SDL_Event * event ) {
 
 static int root_sdl_event_filter( const SDL_Event * event ) {
 	switch ( event->type ) {
+	default: break;
+
+	case SDL_WINDOWEVENT:
+		switch ( event->window.type ) {
+		default: break;
+
+		case SDL_WINDOWEVENT_FOCUS_LOST: SDL_SetRelativeMouseMode( false );
+			break;
+		case SDL_WINDOWEVENT_FOCUS_GAINED: SDL_SetRelativeMouseMode( true );
+			break;
+		case SDL_WINDOWEVENT_MINIMIZED: SDL_SetRelativeMouseMode( false );
+			break;
+		case SDL_WINDOWEVENT_RESTORED: SDL_SetRelativeMouseMode( true );
+			break;
+		case SDL_WINDOWEVENT_CLOSE: break;
+		}
+		break;
+
 	case SDL_KEYUP:
 	case SDL_KEYDOWN: return ( sdl_key_filter( event ));
 	case SDL_JOYBALLMOTION:
