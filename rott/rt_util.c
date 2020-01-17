@@ -284,54 +284,24 @@ void ClearBuffer( char * buf, int size ) {
 void Error( char * error, ... ) {
 	char msgbuf[300];
 	va_list argptr;
-	char i;
 	int size;
 	char * sptr;
-	char buf[30];
-	int handle;
-	int x, y;
 	int level;
 	static int inerror = 0;
-	char filename[128];
 
 	inerror++;
 	if ( inerror > 1 )
 		abort();
 
 	SetTextMode();
-#ifdef DOS
-	memcpy ((byte *)0xB8000, &ROTT_ERR, 160*7);
-#elif defined (ANSIESC)
-	DisplayTextSplash (&ROTT_ERR, 7);
-#endif
-	memset( msgbuf, 0, 300 );
 
-#ifdef DOS
-	px = ERRORVERSIONCOL-1;
-	py = ERRORVERSIONROW;
-#if (SHAREWARE == 1)
-	UL_printf ("S");
-#else
-	UL_printf ("R");
-#endif
-
-	px = ERRORVERSIONCOL;
-	py = ERRORVERSIONROW;
-#if (BETA == 1)
-	UL_printf ("�");
-#else
-	UL_printf (itoa(ROTTMAJORVERSION,&buf[0],10));
-#endif
-
-	// Skip the dot
-	px++;
-
-	UL_printf (itoa(ROTTMINORVERSION,&buf[0],10));
-#endif
+	memset( msgbuf, 0, sizeof( msgbuf ));
 
 	va_start ( argptr, error );
 	vsprintf( &msgbuf[0], error, argptr );
 	va_end ( argptr );
+
+	SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", msgbuf, NULL);
 
 	scriptbuffer = &msgbuf[0];
 	size = strlen( msgbuf );
@@ -357,11 +327,6 @@ void Error( char * error, ... ) {
 		px++;                //SPACE
 		GetToken( true );
 	}
-
-#ifdef ANSIESC
-	for (i = 0; i < 8; i++)
-	   printf ("\n");
-#endif
 
 	if ( player != NULL) {
 		printf( "Player X     = %lx\n", ( long int ) player->x );
