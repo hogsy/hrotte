@@ -83,7 +83,7 @@ void VL_SetColor( int color, int red, int green, int blue );
 void VL_GetColor( int color, int * red, int * green, int * blue );
 void VL_SetPalette( byte * palette );
 void VL_GetPalette( byte * palette );
-void UL_printf( byte * str );
+void UL_printf( const char * str );
 void VL_NormalizePalette( byte * palette );
 void MapDebug( char * error, ... ) __attribute__((format(printf, 1, 2)));
 void OpenMapDebug( void );
